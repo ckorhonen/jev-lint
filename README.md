@@ -38,7 +38,7 @@ Numbers are from the notebook, measured 26 Sep 2026.
 Requires [bun](https://bun.sh) and a TypeSafe API key.
 
 ```sh
-git clone <this repo> ~/Repos/jev-lint && cd ~/Repos/jev-lint
+git clone https://github.com/ckorhonen/jev-lint ~/Repos/jev-lint && cd ~/Repos/jev-lint
 bun install
 security add-generic-password -a "$USER" -s typesafe-api-key -w   # or export TYPESAFE_API_KEY
 ```
@@ -55,6 +55,12 @@ security add-generic-password -a "$USER" -s typesafe-api-key -w   # or export TY
 ```json
 { "matcher": "Edit|Write|apply_patch",
   "hooks": [{ "type": "command", "command": "JEV_LINT_MODEL=jev-1.13.0 bun ~/Repos/jev-lint/src/hook.ts", "timeout": 15 }] }
+```
+
+To make the skills available in every repo, link them into your skill directories:
+
+```sh
+for s in jev-lint-rules jev-lint-eval; do ln -s ~/Repos/jev-lint/.agents/skills/$s ~/.claude/skills/$s; done
 ```
 
 The hook fails open: on a timeout, an API error or an unknown file type it exits 0 silently.
