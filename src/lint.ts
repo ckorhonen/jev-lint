@@ -86,7 +86,7 @@ export type LintResult = {
 
 export async function lintChange(
   change: ChangedFile,
-  opts: { timeoutMs?: number; retries?: number; thresholds?: typeof THRESHOLDS; packs?: Pack[]; cwd?: string } = {},
+  opts: { timeoutMs?: number; retries?: number; thresholds?: typeof THRESHOLDS; packs?: Pack[]; cwd?: string; baseUrl?: string } = {},
 ): Promise<LintResult | undefined> {
   const ruleSet = ruleSetFor(change.filePath, opts.packs, opts.cwd);
   if (!ruleSet || !change.addedCode.trim() || change.addedCode.length > MAX_ADDED_CHARS) return undefined;

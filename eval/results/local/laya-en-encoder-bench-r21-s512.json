@@ -1,0 +1,65 @@
+{
+  "rows": 21,
+  "seq": 512,
+  "runs": 5,
+  "results": {
+    "cpu": {
+      "build_s": 0.56,
+      "median_ms": 16050.3,
+      "min_ms": 15820.5,
+      "max_abs_diff_vs_cpu": 0.0,
+      "coverage": null
+    },
+    "coreml-ane": {
+      "build_s": 1.74,
+      "median_ms": 15280.6,
+      "min_ms": 14985.2,
+      "max_abs_diff_vs_cpu": 0.0,
+      "coverage": {
+        "nodes": 1677,
+        "coreml_nodes": 144,
+        "partitions": 29
+      }
+    },
+    "coreml-gpu": {
+      "build_s": 1.74,
+      "median_ms": 17602.4,
+      "min_ms": 16852.4,
+      "max_abs_diff_vs_cpu": 0.0,
+      "coverage": {
+        "nodes": 1677,
+        "coreml_nodes": 144,
+        "partitions": 29
+      }
+    },
+    "coreml-all": {
+      "build_s": 1.64,
+      "median_ms": 21883.7,
+      "min_ms": 19645.0,
+      "max_abs_diff_vs_cpu": 0.0,
+      "coverage": {
+        "nodes": 1677,
+        "coreml_nodes": 144,
+        "partitions": 29
+      }
+    },
+    "coreml-cpu": {
+      "build_s": 1.51,
+      "median_ms": 18412.2,
+      "min_ms": 18145.6,
+      "max_abs_diff_vs_cpu": 0.0,
+      "coverage": {
+        "nodes": 1677,
+        "coreml_nodes": 144,
+        "partitions": 29
+      }
+    },
+    "torch-mps": {
+      "build_s": null,
+      "median_ms": 2178.6,
+      "min_ms": 2126.2,
+      "max_abs_diff_vs_cpu": 0.04153633117675781,
+      "coverage": null
+    }
+  }
+}

@@ -238,7 +238,7 @@ chart_v1v2 = grouped_bars(v1v2_groups, v1v2_series,
 
 # Threshold sweeps (held-out) and tier bands.
 def sweep(pack, lang, split="holdout"):
-    pts = [p for p in summary["sweeps"] if p["pack"] == pack and p["lang"] == lang and p["split"] == split]
+    pts = [p for p in summary["sweeps"] if p.get("system", "jev") == "jev" and p["pack"] == pack and p["lang"] == lang and p["split"] == split]
     pts.sort(key=lambda p: p["threshold"])
     return [p["threshold"] for p in pts], [p["precision"] for p in pts], [p["recall"] for p in pts]
 
@@ -251,7 +251,7 @@ for pack, pname in [("hygiene", "Hygiene"), ("practices", "Practices")]:
 sweep_legend = '<div class="legend"><span class="key"><i class="sw s1"></i>Precision</span><span class="key"><i class="sw s2 dash"></i>Recall</span><span class="key"><i class="sw marker"></i>0.5 and 0.8 cut-offs</span></div>'
 
 def band(pack, lo):
-    rows = [b for b in summary["bands"] if b["pack"] == pack and b["lo"] == lo]
+    rows = [b for b in summary["bands"] if b.get("system", "jev") == "jev" and b["pack"] == pack and b["lo"] == lo]
     real, total = sum(b["real"] for b in rows), sum(b["findings"] for b in rows)
     return (real / total if total else None), real, total
 
@@ -410,6 +410,78 @@ for lname, lang in LANGS:
     for rule in RULES[(lang, "practices")]:
         practice_rule_table.append([f"<code>{rule['id']}</code>", esc(rule["fix"]), DETERMINISTIC.get(rule["id"], "—")])
 
+# ---------------------------------------------------------------- Entry 4: local models
+
+LOCAL = {
+    "Kev-4B (MLX)": load(RES / "summary-local-kev-4b.json"),
+    "Kev-0.8B (MLX)": load(RES / "summary-local-kev-0.8b.json"),
+    "Laya (PyTorch GPU)": load(RES / "summary-local-laya-en-mps.json"),
+}
+ENCODER_BENCH = load(RES / "local/laya-en-encoder-bench-r21-s512.json")
+
+
+def local_res(name, pack, lang, policy="high+medium"):
+    return res(LOCAL[name], "local", pack, lang, "holdout", policy)
+
+
+def local_best(name, pack, lang):
+    pts = [p for p in LOCAL[name]["sweeps"] if p["pack"] == pack and p["lang"] == lang and p["split"] == "holdout"]
+    return max(pts, key=lambda p: p["f1"])
+
+
+local_series = [("Jev, both tiers", "jev", "s1"), ("Kev-4B, both tiers", "Kev-4B (MLX)", "s2"),
+                ("Kev-4B, best threshold", "kev4-best", "s3"), ("Kev-0.8B, both tiers", "Kev-0.8B (MLX)", "s4"),
+                ("Laya, both tiers", "Laya (PyTorch GPU)", "s4")]
+
+
+def local_value(g, s):
+    pack, lang = g
+    if s == "jev":
+        return f1("jev", pack, lang, "high+medium")
+    if s == "kev4-best":
+        return local_best("Kev-4B (MLX)", pack, lang)["f1"]
+    return local_res(s, pack, lang)["f1"]
+
+
+chart_local_f1 = grouped_bars(headline_groups, local_series[:4], local_value, "Held-out F1: Jev vs local models")
+
+
+def mean_p50(summary_obj, system):
+    vals = [r["latency"]["p50"] for r in summary_obj["results"] if r["system"] == system and r["split"] == "holdout" and r["policy"] == "high"]
+    return st.mean(vals) / 1000
+
+
+latency_local = [("Jev (API)", mean_p50(summary, "jev")), ("Kev-0.8B", mean_p50(LOCAL["Kev-0.8B (MLX)"], "local")),
+                 ("Laya (GPU)", mean_p50(LOCAL["Laya (PyTorch GPU)"], "local")), ("Kev-4B", mean_p50(LOCAL["Kev-4B (MLX)"], "local"))]
+chart_local_lat = grouped_bars(
+    [(n, n) for n, _ in latency_local], [("Median seconds per edit", "lat", "s1")],
+    lambda g, s: next(v for n, v in latency_local if n == g), "Median seconds per edit on held-out edits",
+    fmt=lambda v: f"{v:.2f}s", max_v=4, ticks=(0, 1, 2, 3, 4), height=210,
+)
+
+local_rows = []
+for name in LOCAL:
+    for (pname, pack) in [("Hygiene", "hygiene"), ("Practices", "practices")]:
+        for lname, lang in LANGS:
+            both = local_res(name, pack, lang)
+            high = local_res(name, pack, lang, "high")
+            best = local_best(name, pack, lang)
+            local_rows.append([name, f"{pname} · {lname}", pct(both["f1"]), pct(both["cleanFalseAlarmRate"]),
+                               f"{pct(high['precision'])} / {pct(high['recall'])}", f"{pct(best['f1'])} at {best['threshold']:g}",
+                               f"{both['latency']['p50'] / 1000:.1f} s"])
+
+kev4_high = [b for b in LOCAL["Kev-4B (MLX)"]["bands"] if b["lo"] == 0.8]
+kev4_high_real, kev4_high_total = sum(b["real"] for b in kev4_high), sum(b["findings"] for b in kev4_high)
+
+bench_rows = []
+LABELS = {"cpu": "ONNX Runtime, CPU (fp32)", "coreml-ane": "Core ML, CPU + Neural Engine", "coreml-gpu": "Core ML, CPU + GPU",
+          "coreml-all": "Core ML, all units", "coreml-cpu": "Core ML, CPU only", "torch-mps": "PyTorch, Metal GPU"}
+for key, label in LABELS.items():
+    r = ENCODER_BENCH["results"].get(key, {})
+    cov = r.get("coverage")
+    bench_rows.append([label, f"{r.get('median_ms', 0) / 1000:.1f} s",
+                       f"{cov['coreml_nodes']} of {cov['nodes']} nodes, {cov['partitions']} pieces" if cov else "—"])
+
 # ---------------------------------------------------------------- page
 
 N = lambda x: f"{x:.2f}"
@@ -419,6 +491,10 @@ ctx = dict(
     SWEEPS="".join(sweep_charts), SWEEP_LEGEND=sweep_legend, CHART_BANDS=chart_bands,
     CHART_FUNNEL=chart_funnel, CHART_EXTRA=chart_extra, CHART_HOOK_REVIEW=chart_hook_review, CHART_HOOK_OUT=chart_hook_out,
     CHART_R1=chart_r1,
+    CHART_LOCAL_F1=chart_local_f1, CHART_LOCAL_LAT=chart_local_lat,
+    LOCAL_TABLE=table(["Model", "Pack · lang", "F1 (p ≥ 0.5)", "Clean edits flagged", "High tier P / R", "Best F1 (threshold)", "Median time"], local_rows),
+    BENCH_TABLE=table(["Encoder backend", "Time for 21 rules × 512 tokens", "Core ML coverage"], bench_rows),
+    KEV4_HIGH=f"{kev4_high_real} of {kev4_high_total}",
     PRACTICE_TABLE=table(["Judge", "Lang", "Precision", "Recall", "F1", "Clean edits flagged", "Median time"], practice_table_rows),
     PRACTICE_RULES_TS=table(["Rule", "Jev (p ≥ 0.5)", "GPT-6-Luna"], per_rule_rows("typescript")),
     PRACTICE_RULES_SW=table(["Rule", "Jev (p ≥ 0.5)", "GPT-6-Luna"], per_rule_rows("swift")),

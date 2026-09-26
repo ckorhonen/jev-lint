@@ -15,7 +15,10 @@ export type JevResponse = {
   usage: { input_tokens: number; output_tokens: number };
 };
 
-const BASE_URL = process.env.TYPESAFE_BASE_URL ?? "https://api.typesafe.ai";
+// Any server speaking the same `POST /v1/systemone` protocol works, e.g. a local Kev or
+// Laya server: TYPESAFE_BASE_URL=http://127.0.0.1:8009. Local servers need no key.
+const DEFAULT_BASE_URL = process.env.TYPESAFE_BASE_URL ?? "https://api.typesafe.ai";
+const isTypeSafe = (url: string) => new URL(url).hostname.endsWith("typesafe.ai");
 const KEYCHAIN_SERVICE = "typesafe-api-key";
 
 let cachedKey: string | undefined;
@@ -32,16 +35,17 @@ export function apiKey(): string | undefined {
 export async function askNouls(
   state: unknown,
   questions: Record<string, NoulQuestion>,
-  opts: { model?: string; timeoutMs?: number; retries?: number } = {},
+  opts: { model?: string; timeoutMs?: number; retries?: number; baseUrl?: string } = {},
 ): Promise<JevResponse> {
-  const key = apiKey();
+  const baseUrl = opts.baseUrl ?? DEFAULT_BASE_URL;
+  const key = isTypeSafe(baseUrl) ? apiKey() : "local";
   if (!key) throw new Error("TYPESAFE_API_KEY not set and no Keychain item 'typesafe-api-key'");
 
   const body = JSON.stringify({ state, model: opts.model ?? process.env.JEV_LINT_MODEL ?? "jev-latest", questions });
   const retries = opts.retries ?? 0;
 
   for (let attempt = 0; ; attempt++) {
-    const res = await fetch(`${BASE_URL}/v1/systemone`, {
+    const res = await fetch(`${baseUrl}/v1/systemone`, {
       method: "POST",
       headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
       body,

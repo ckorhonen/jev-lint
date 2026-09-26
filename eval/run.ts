@@ -11,7 +11,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { parseArgs } from "node:util";
 import { type Pack, RULE_FILES, ruleSetForLanguage } from "../src/lint";
-import { type Case, type Judgment, judgeJev, judgeLlm, judgeRegex, LLM_MODEL, REGEX_RULES } from "./systems";
+import { type Case, type Judgment, judgeJev, judgeLlm, judgeLocal, judgeRegex, LLM_MODEL, LOCAL_NAME, REGEX_RULES } from "./systems";
 
 const ROOT = join(import.meta.dir, "..");
 const RESULTS = join(ROOT, "eval/results");
@@ -30,10 +30,12 @@ const { values: args } = parseArgs({
     systems: { type: "string", default: "jev,llm,regex" },
     concurrency: { type: "string", default: "8" },
     runs: { type: "string", default: "1" },
+    out: { type: "string", default: "summary.json" },
+    splits: { type: "string", default: "dev,holdout" },
   },
 });
 
-const JUDGES = { jev: judgeJev, llm: judgeLlm, regex: judgeRegex } as const;
+const JUDGES = { jev: (c: Case) => judgeJev(c), llm: judgeLlm, regex: judgeRegex, local: judgeLocal } as const;
 type SystemName = keyof typeof JUDGES;
 
 function loadCases(): Case[] {
@@ -55,7 +57,8 @@ function loadCases(): Case[] {
 // Cache key changes whenever that pack's rule text or the judge model changes.
 const packHash = (pack: BuiltInPack) => createHash("sha256").update(JSON.stringify(RULE_FILES[pack])).digest("hex").slice(0, 10);
 function cacheDir(system: SystemName, run: number, pack: BuiltInPack) {
-  const variant = system === "llm" ? LLM_MODEL : system === "jev" ? (process.env.JEV_LINT_MODEL ?? "jev-latest") : "v1";
+  const variant =
+    system === "llm" ? LLM_MODEL : system === "jev" ? (process.env.JEV_LINT_MODEL ?? "jev-latest") : system === "local" ? LOCAL_NAME : "v1";
   return join(RESULTS, "cache", `${system}-${variant}-${packHash(pack)}-r${run}`);
 }
 
@@ -164,7 +167,8 @@ function latencyStats(cases: Case[], judgments: Map<string, Judgment>) {
 }
 
 async function main() {
-  const cases = loadCases();
+  const splits = (args.splits as string).split(",");
+  const cases = loadCases().filter((c) => splits.includes(c.split));
   const systems = (args.systems as string).split(",") as SystemName[];
   const runs = Number(args.runs);
   console.error(`${cases.length} cases; systems=${systems.join(",")} runs=${runs}`);
@@ -195,7 +199,11 @@ async function main() {
           const subset = cases.filter((c) => c.pack === pack && c.lang === lang && c.split === split);
           if (!subset.length) continue;
           const policies: Record<string, number> =
-            system === "jev" ? { high: HIGH, "high+medium": MEDIUM } : system === "llm" ? { high: 0.9, "high+medium": 0.6 } : { high: 1 };
+            system === "jev" || system === "local"
+              ? { high: HIGH, "high+medium": MEDIUM }
+              : system === "llm"
+                ? { high: 0.9, "high+medium": 0.6 }
+                : { high: 1 };
           const regexCovered = ruleIds(lang, "hygiene").filter((id) => REGEX_RULES[id]);
           for (const [policy, threshold] of Object.entries(policies)) {
             const scored = runsForSystem.map((m) => score(subset, m, threshold));
@@ -213,10 +221,11 @@ async function main() {
               latency: latencyStats(subset, runsForSystem[0]),
             });
           }
-          if (system === "jev") {
+          if (system === "jev" || system === "local") {
             for (const t of SWEEP) {
               const s = score(subset, runsForSystem[0], t);
               sweeps.push({
+                system,
                 pack,
                 lang,
                 split,
@@ -233,7 +242,7 @@ async function main() {
               [0.3, 0.5],
               [0.1, 0.3],
             ]) {
-              bands.push({ pack, lang, split, lo, hi, ...bandPrecision(subset, runsForSystem[0], lo, hi) });
+              bands.push({ system, pack, lang, split, lo, hi, ...bandPrecision(subset, runsForSystem[0], lo, hi) });
             }
           }
         }
@@ -259,7 +268,7 @@ async function main() {
 
   mkdirSync(RESULTS, { recursive: true });
   writeFileSync(
-    join(RESULTS, "summary.json"),
+    join(RESULTS, args.out as string),
     JSON.stringify(
       {
         generatedAt: new Date().toISOString(),

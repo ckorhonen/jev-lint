@@ -34,11 +34,18 @@ function mergeMax(target: Record<string, number>, source: Record<string, number>
   for (const [k, v] of Object.entries(source)) target[k] = Math.max(target[k] ?? 0, v);
 }
 
-export async function judgeJev(c: Case): Promise<Judgment> {
+// A local model server speaking the same /v1/systemone protocol (Kev, Laya, ...).
+// LOCAL_BASE_URL picks the server; LOCAL_NAME names the cache variant.
+export const LOCAL_NAME = process.env.LOCAL_NAME ?? "local";
+export const judgeLocal = (c: Case) => judgeJev(c, process.env.LOCAL_BASE_URL ?? "http://127.0.0.1:8009");
+
+export async function judgeJev(c: Case, baseUrl?: string): Promise<Judgment> {
   const scores: Record<string, number> = {};
   let latencyMs = 0;
   let inputTokens = 0;
-  const results = await Promise.all(changesFor(c).map((ch) => lintChange(ch, { timeoutMs: 30_000, retries: 4, packs: [c.pack] })));
+  const results = await Promise.all(
+    changesFor(c).map((ch) => lintChange(ch, { timeoutMs: 120_000, retries: 4, packs: [c.pack], baseUrl })),
+  );
   for (const r of results) {
     if (!r) continue;
     mergeMax(scores, r.probabilities);

@@ -4,10 +4,12 @@
 //
 // Env: JEV_LINT_MODE=context (default, additionalContext) | block (decision: "block")
 //      JEV_LINT_TIERS=high,medium (default) | high
-//      JEV_LINT_LOG=/path/to/log.jsonl to record every judgment
+//      JEV_LINT_LOG=/path/to/log.jsonl to record every judgment (debug)
+//      JEV_LINT_FINDINGS_LOG=path|off  findings log for feedback (default ~/.local/state/jev-lint/findings.jsonl)
 
 import { appendFileSync } from "node:fs";
 import { extractChanges } from "./extract";
+import { appendRecords, toRecords } from "./findingsLog";
 import { formatFeedback, type LintResult, lintChange } from "./lint";
 
 const MAX_FILES = 8;
@@ -42,13 +44,21 @@ async function main() {
   }
 
   const feedback = formatFeedback(results);
-  if (!feedback) return;
+  if (feedback) {
+    const output =
+      process.env.JEV_LINT_MODE === "block"
+        ? { decision: "block", reason: feedback }
+        : { hookSpecificOutput: { hookEventName: "PostToolUse", additionalContext: feedback } };
+    process.stdout.write(JSON.stringify(output));
+  }
 
-  const output =
-    process.env.JEV_LINT_MODE === "block"
-      ? { decision: "block", reason: feedback }
-      : { hookSpecificOutput: { hookEventName: "PostToolUse", additionalContext: feedback } };
-  process.stdout.write(JSON.stringify(output));
+  // Clean checks are logged too: a later clean check of the same file is how a finding
+  // counts as fixed. Logging must never affect the agent, so errors are swallowed.
+  try {
+    appendRecords(toRecords(results, changes, event));
+  } catch (err) {
+    if (process.env.JEV_LINT_DEBUG) process.stderr.write(`[jev-lint] findings log: ${err}\n`);
+  }
 }
 
 main()

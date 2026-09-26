@@ -7,9 +7,9 @@
   "rules": [
     {
       "id": "repo-hook-stdout-noise",
-      "question": "Is `file_path` inside `src/` and does `added_code` print output with `console.log`, `console.info`, `console.debug`, or `process.stdout.write`, other than one final `process.stdout.write(JSON.stringify(output))` of the hook's result?",
+      "question": "Is `file_path` one of the hook's runtime files (`src/hook.ts`, `src/lint.ts`, `src/extract.ts`, `src/jev.ts`, `src/repoRules.ts`, `src/findingsLog.ts`) and does `added_code` print output with `console.log`, `console.info`, `console.debug`, or `process.stdout.write`, other than one final `process.stdout.write(JSON.stringify(output))` of the hook's result?",
       "true": "Code under src/ prints something to stdout that is not the hook's single final JSON result.",
-      "false": "No stdout printing, or the only stdout write is the final JSON result, or the file is outside src/ (eval scripts and tests may print). Writing to stderr behind a debug flag is fine.",
+      "false": "No stdout printing, or the only stdout write is the final JSON result, or the file is not one of those runtime files. Command-line tools such as `src/validate.ts` and `src/findings.ts`, eval scripts, and tests are meant to print. Writing to stderr behind a debug flag is fine.",
       "fix": "Keep stdout clean in src/ \u2014 the hook's stdout is parsed as JSON (AGENTS.md: hook safety)."
     },
     {

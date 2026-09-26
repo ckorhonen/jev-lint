@@ -25,3 +25,5 @@
 {"id": "c25", "file_path": "eval/systems.ts", "code": "reasoning_effort: process.env.BASELINE_EFFORT ?? \"low\",", "labels": []}
 {"id": "c26", "file_path": "eval/e2e/agreement.ts", "code": "const JUDGE = process.env.JUDGE_MODEL ?? \"gpt-6-sol\";", "labels": ["repo-judge-model-luna"]}
 {"id": "c27", "file_path": "eval/e2e/review.ts", "code": "const MODEL = process.env.REVIEW_MODEL ?? \"gpt-5.5\";", "labels": ["repo-judge-model-luna"]}
+{"id": "c28", "file_path": "src/findings.ts", "code": "console.log(`${records.length} checks in ${path}`);\nfor (const s of summary) console.log(format(s));", "labels": []}
+{"id": "c29", "file_path": "src/validate.ts", "code": "console.log(\"rule  pos neg  P@.8  P@.5  R@.5  verdict\");\nfor (const r of report) console.log(row(r));", "labels": []}

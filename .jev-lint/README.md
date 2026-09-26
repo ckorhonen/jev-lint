@@ -18,3 +18,7 @@ Guidelines not turned into rules (a linter, test, or reviewer is the better chec
 | Tune wording on dev only; report holdout | It's a process rule, not a code pattern. |
 | Use bun, not npm | This is in shell commands and docs, not TS code; the review catches it. |
 | Never commit `.env` | `.gitignore` and gitleaks already enforce it. |
+
+## Changelog
+
+- 2026-09-26: `repo-hook-stdout-noise` narrowed to the hook's runtime files. It flagged `console.log` in the `src/findings.ts` CLI at p=0.93, which the agent (correctly) kept, so it was a false positive. Added two CLI hard negatives and re-validated.

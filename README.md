@@ -83,6 +83,30 @@ The hook picks up the nearest `.jev-lint/` above each edited file. A `.jev-lint/
 such as `{ "packs": ["repo", "practices"] }` chooses which packs apply in that repo. This
 repo dogfoods it: see [`.jev-lint/`](.jev-lint/).
 
+## Learn from what it catches
+
+The hook keeps a local findings log: one line per checked file, with the rules that fired
+and a short excerpt. `src/findings.ts` classifies each finding:
+- **fixed:** the agent corrected it on a later edit of the same file;
+- **kept:** it was still flagged at the file's last check, so the agent disagreed or ignored it;
+- **unknown:** the file wasn't checked again.
+
+```sh
+bun ~/Repos/jev-lint/src/findings.ts --repo . --days 30   # per-rule counts and a suggestion
+```
+
+The **`jev-lint-learn`** skill turns this into reviewed changes for one repo:
+- AGENTS.md guidance for mistakes that keep getting made and fixed;
+- rewording or dropping rules that agents keep ignoring (usually false positives), re-validated with `src/validate.ts`;
+- new rule candidates, handed to `jev-lint-rules`.
+
+## Local models
+
+Kev and Laya serve the same `/v1/systemone` protocol, so `TYPESAFE_BASE_URL=http://127.0.0.1:8009`
+points the hook at a local server. As of 26 Sep 2026 they are not accurate or fast enough on
+these rules (best: Kev-4B at 61–74% held-out F1 and 2–4 s per edit on an M3 Max); see notebook
+Entry 4. `local/laya_server.py` and `local/bench_encoder.py` reproduce the Laya runs.
+
 ## Rule packs
 
 | Pack | Files | What it checks |
@@ -101,7 +125,9 @@ repo dogfoods it: see [`.jev-lint/`](.jev-lint/).
 | `JEV_LINT_MODE` | `context` | `block` sends findings as `decision: "block"` instead of `additionalContext` |
 | `JEV_LINT_MODEL` | `jev-latest` | Pin `jev-1.13.0` so model updates can't shift thresholds |
 | `JEV_LINT_TIMEOUT_MS` | `8000` | Per-call timeout |
-| `JEV_LINT_LOG` | unset | Append every judgment to a JSONL file |
+| `JEV_LINT_LOG` | unset | Debug: append every raw judgment to a JSONL file |
+| `JEV_LINT_FINDINGS_LOG` | `~/.local/state/jev-lint/findings.jsonl` | Findings log used by `jev-lint-learn`; `off` disables it |
+| `TYPESAFE_BASE_URL` | `https://api.typesafe.ai` | Any `/v1/systemone` server, e.g. a local Kev or Laya (no key needed) |
 | `JEV_LINT_DEBUG` | unset | Print errors to stderr |
 
 ## Evaluation harness
@@ -135,6 +161,7 @@ python3 report/build.py <DepartureMono-Regular.woff2>   # rebuild the notebook
 - Skills live in `.agents/skills/`, symlinked for Claude Code at `.claude/skills/`:
   - **`jev-lint-eval`** — the evaluation workflow: rules, labeled cases, offline eval, E2E rounds and notebook entries.
   - **`jev-lint-rules`** — generate and validate `.jev-lint/` rules from a repo's guidelines.
+  - **`jev-lint-learn`** — feed the findings log back into a repo's AGENTS.md and `.jev-lint/` rules.
 
 ## Development
 

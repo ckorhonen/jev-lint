@@ -108,7 +108,16 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12.5px}
   <div class="eyebrow">Contents</div>
   <ol id="toc-list">
     <li><a href="#answer">Current answer</a></li>
-    <li><a href="#e3">Entry 3 · Best practices <span class="tag new">latest</span></a>
+    <li><a href="#e4">Entry 4 · Local models <span class="tag new">latest</span></a>
+      <ol>
+        <li><a href="#e4-accuracy">Accuracy</a></li>
+        <li><a href="#e4-speed">Speed</a></li>
+        <li><a href="#e4-ane">Neural Engine</a></li>
+        <li><a href="#e4-faster">Can it be faster?</a></li>
+        <li><a href="#e4-learned">What we learned</a></li>
+      </ol>
+    </li>
+    <li><a href="#e3">Entry 3 · Best practices</a>
       <ol>
         <li><a href="#e3-rules">The rules</a></li>
         <li><a href="#e3-labeled">Labeled edits</a></li>
@@ -144,7 +153,7 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12.5px}
   <section id="answer">
     <h2>Current answer</h2>
     <div class="verdict">
-      <p class="eyebrow">Recommendation as of Entry 3</p>
+      <p class="eyebrow">Recommendation as of Entry 4</p>
       <p><b>Adopt it with both rule packs, as a non-blocking hint.</b> On best-practice rules like "don't mirror a prop into state with an effect", Jev is accurate once each rule is worded narrowly. In real agent runs it cut graded rule violations by about a third. On React tasks, it cut the review comments our rules cover from 1.42 to 0.25 per task. SwiftUI tasks had too few of those comments to show an effect. It does not replace an AI code reviewer. About three quarters of what the reviewer raised was logic and design problems that no snippet-level rule can see.</p>
     </div>
     <div class="facts">
@@ -169,8 +178,84 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12.5px}
     {{CHART_LATENCY}}
   </section>
 
+  <section class="entry" id="e4">
+    <h2>Entry 4 · Local models on the Mac <span class="date">26 Sep 2026</span> <span class="tag new">latest</span></h2>
+    <p><b>Question.</b> Can a Jev-like model running on this machine (M3 Max, 64 GB) replace the API call? The goal is zero cost per edit and lower latency, ideally using the Apple Neural Engine.</p>
+    <p><b>Setup.</b> Three open models all speak the same <code>/v1/systemone</code> protocol, so the hook and harness only needed a base-URL switch (<code>TYPESAFE_BASE_URL</code>):</p>
+    <ul>
+      <li><a href="https://github.com/jaredpalmer/kev">Kev</a>-0.8B and Kev-4B, fine-tuned Qwen models running on MLX (the GPU, bf16);</li>
+      <li><a href="https://github.com/NandhaKishorM/laya">Laya</a>, a 421M-parameter ModernBERT encoder, on PyTorch's Metal backend.</li>
+    </ul>
+    <p>The rules and held-out edits are the same as in Entries 1 and 3, with the same 0.8 / 0.5 thresholds. Requests ran one at a time so the timings aren't shared. No model was fine-tuned: this is zero-shot.</p>
+
+    <h3 id="e4-accuracy">Accuracy</h3>
+    {{CHART_LOCAL_F1}}
+    <p class="caption">"Best threshold" is Kev-4B's F1 at whichever cut-off suits it best, which was 0.6 in every group. It's picked on the held-out data, so it flatters Kev-4B.</p>
+    <details class="more"><summary>Full table for all three local models</summary>{{LOCAL_TABLE}}</details>
+    <ul>
+      <li><b>Kev-4B is the only usable one, and it's well behind.</b> Its F1 is 54–67% with both tiers, and 61–74% at its best threshold, against Jev's 96–99%. Its high tier is precise ({{KEV4_HIGH}} findings real) but catches only 14–31% of violations. Its double-check tier flags 25–74% of clean edits.</li>
+      <li><b>Kev-0.8B and Laya are close to chance on code.</b> Their F1 is 13–34%, and they flag most or all clean edits. On a two-rule probe, Kev-0.8B even scored the clean file higher on "empty catch" than the file that had one.</li>
+      <li><b>Laya's context limit is a structural problem.</b> The English checkpoint reads 512 tokens, and larger edits are cut off.</li>
+    </ul>
+
+    <h3 id="e4-speed">Speed</h3>
+    {{CHART_LOCAL_LAT}}
+    <p>Every local model was slower than calling Jev's API. Kev-4B's 90th percentile reached 8–10 s on long Swift and practice-rule edits, and one request timed out. Running locally removes the per-call cost (about $1.51 per 10,000 edits with Jev), but it adds seconds to every agent edit.</p>
+
+    <h3 id="e4-ane">The Neural Engine</h3>
+    <p>Kev runs on MLX, which uses the GPU, not the Neural Engine. Laya is the natural candidate for it: an encoder with no text generation. We exported its encoder to ONNX and ran it through ONNX Runtime's Core ML provider. The export matched PyTorch to within 1e-4.</p>
+    {{BENCH_TABLE}}
+    <p class="caption">One lint request is 21 rules × 512 tokens. "Core ML coverage" is how much of the graph Core ML accepted; the rest ran on the CPU.</p>
+    <ul>
+      <li><b>Core ML accepted only 144 of 1,677 graph nodes.</b> ModernBERT's attention and masking ops fell back to the CPU in 29 separate pieces, so every compute-unit setting ran at CPU speed (15–22 s).</li>
+      <li><b>Converting the PyTorch model straight to Core ML</b> with <code>coremltools</code> failed on unsupported ops (<code>new_ones</code>, then boolean mask arithmetic). Patching those is a project of its own.</li>
+      <li><b>Even a perfect port wouldn't beat Jev.</b> Laya encodes the code once per rule, about 10,000 tokens for 21 rules. That's roughly 8.6 trillion operations, which takes at least half a second at the M3 Max Neural Engine's quoted 18 TOPS, and more in practice. Jev and Kev encode the code once for all rules.</li>
+    </ul>
+
+    <h3 id="e4-faster">Can it be faster?</h3>
+    <p>We profiled Kev-4B on real held-out edits: a 6-line edit and a 138-line edit, a new edit versus the same edit sent again. Kev already runs on the GPU (Metal, through MLX). Cold start from launching the server to the first answer was 22.8 s, so it has to stay resident. All numbers below are warm.</p>
+    <div class="table"><table>
+      <thead><tr><th>Rules asked</th><th>6-line edit, new</th><th>6-line edit, repeated</th><th>138-line edit, new</th><th>138-line edit, repeated</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>0.56 s</td><td>0.23 s</td><td>2.52 s</td><td>0.29 s</td></tr>
+        <tr><td>5</td><td>1.46 s</td><td>1.19 s</td><td>3.61 s</td><td>1.23 s</td></tr>
+        <tr><td>13 (hygiene)</td><td>3.98 s</td><td>3.44 s</td><td>3.59 s</td><td>2.02 s</td></tr>
+        <tr><td>23 (both packs)</td><td>8.49 s</td><td>7.90 s</td><td>5.95 s</td><td>5.10 s</td></tr>
+      </tbody>
+    </table></div>
+    <ul>
+      <li><b>The number of rules dominates.</b> Each rule is a separate "row" that re-reads the cached code. On Metal, Kev runs those rows one at a time: its source says so, to keep memory bounded. That costs roughly 250–350 ms per rule even on a 6-line edit.</li>
+      <li><b>The code itself is cheap once cached.</b> Re-sending the same 138-line edit with one rule dropped from 2.5 s to 0.29 s, thanks to Kev's prefix cache. Shortening the rule text by half (dropping the criteria) cut the 6-line case only to 6.1 s. It's the row count, not the words.</li>
+      <li><b>Levers, in order of payoff:</b>
+        <ol>
+          <li><b>Ask only rules that apply to the file.</b> A cheap keyword gate (React rules only when hooks or JSX appear, SwiftUI rules only with <code>import SwiftUI</code>) would often cut 23 rows to 5–8. That helps Jev's cost too, but needs its own recall check.</li>
+          <li><b>A smaller fine-tuned model.</b> The 0.8B model's rows are several times cheaper, if fine-tuning brings its accuracy up.</li>
+          <li><b>Batch rows on Metal.</b> That's a change inside Kev's MLX path.</li>
+          <li><b>An async hook</b>, so the agent isn't waiting at all.</li>
+        </ol>
+      </li>
+      <li><b>A faster GPU mostly means a different machine.</b> Kev batches rows with CUDA graphs on NVIDIA, but a server on the DGX Spark adds a network hop and isn't "local" in the zero-cost-on-this-Mac sense.</li>
+    </ul>
+    <p class="note">Estimate: with gating plus a fine-tuned small model, 0.5–1.5 s per edit on this Mac looks plausible. Beating Jev's ~0.3 s locally is unlikely without batched rows.</p>
+
+    <h3 id="e4-learned">What we learned</h3>
+    <ol>
+      <li><b>Zero-shot local models can't judge these rules yet.</b> Kev-4B is the closest, at about 70% F1, and it's 7–14× slower than Jev's API on this Mac.</li>
+      <li><b>The Neural Engine isn't reachable with today's exports</b>, and Laya's one-pass-per-rule design would cap its speed anyway.</li>
+      <li><b>The promising path is fine-tuning, not a bigger download.</b>
+        <ul>
+          <li>Kev ships a fine-tuning recipe, reported at about $1 per Kev-4B run.</li>
+          <li>Our labeled edits (roughly 9,000 rule judgments) are a ready training set.</li>
+          <li>Rules and cases can be generated further by the <code>jev-lint-rules</code> skill.</li>
+          <li>Training on Jev's own outputs would need a check of TypeSafe's terms first.</li>
+        </ul>
+      </li>
+      <li><b>Latency can be hidden instead of beaten.</b> Claude Code hooks can run in the background and wake the agent only when a finding comes back (<code>asyncRewake</code>). A slower local model might then be fine, but this is untested.</li>
+    </ol>
+  </section>
+
   <section class="entry" id="e3">
-    <h2>Entry 3 · Best-practice rules <span class="date">26 Sep 2026</span> <span class="tag new">latest</span></h2>
+    <h2>Entry 3 · Best-practice rules <span class="date">26 Sep 2026</span></h2>
     <p><b>Question.</b> Entry 1's rules were mostly hygiene. Half of them a regex can check. Can Jev check the practices a deterministic linter can't? Examples: using <code>useEffect</code> only to sync with outside systems, SwiftUI state ownership, and continuation safety. And how much of what an AI code reviewer would later say does it catch first?</p>
 
     <h3 id="e3-rules">The rules</h3>
@@ -271,6 +356,7 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12.5px}
     <h2>Recommendation</h2>
     <ol>
       <li><b>Install the hook with both packs</b> in Claude Code (and Codex once its CLI is fixed on this machine). Run it as a non-blocking hint with thresholds 0.8 / 0.5, and pin <code>JEV_LINT_MODEL=jev-1.13.0</code>.</li>
+      <li><b>Let each repo learn from the hook.</b> The findings log records what fired and whether the agent fixed or kept it. Run the <code>jev-lint-learn</code> skill weekly on active repos: it turns recurring fixes into AGENTS.md guidance, and repeatedly ignored flags into rule rewrites. In its first real use, it narrowed this repo's own stdout rule after a false positive.</li>
       <li><b>Keep the AI code reviewer.</b> The hook handles the pattern-level issues cheaply before review, so review time goes to logic and design, which is where about 75% of review findings were.</li>
       <li><b>Treat rule wording like code.</b> Before adding a rule, add labeled examples and hard negatives, tune on the dev split, and accept it only if the held-out split holds up. The harness does this in one command.</li>
       <li><b>Consider the high tier only for practice rules if noise shows up in practice.</b> Their double-check band was 64% real, compared with 86% for hygiene rules.</li>
@@ -281,7 +367,9 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12.5px}
   <section id="next">
     <h2>Next experiments</h2>
     <ul>
-      <li><b>Local models on the Apple Neural Engine.</b> Run the same harness with fine-tuned Jev-like models, such as <a href="https://github.com/jaredpalmer/kev">Kev</a> and <a href="https://github.com/NandhaKishorM/laya">Laya</a>. The goal is zero cost per call and lower latency than the ~0.3 s API call.</li>
+      <li><b>Fine-tune Kev-4B (then Kev-0.8B) on our labeled edits,</b> and re-run Entry 4. The bar to beat is Jev's 96% held-out F1 at about 0.3 s. Check TypeSafe's terms before training on Jev outputs.</li>
+      <li><b>Try an async hook</b> (<code>asyncRewake</code>) so a slower local judge doesn't block the agent, and measure whether late feedback still gets acted on.</li>
+      <li><b>Neural Engine, only with a model built for it.</b> A shared-state encoder in Apple's Neural Engine layout, if a fine-tuned small model turns out accurate enough.</li>
       <li><b>More coverage of the reviewer's categories.</b> Try rules for the misses (debounce and poll races, continuation cancellation), and check whether they stay precise.</li>
       <li><b>Bigger end-to-end runs.</b> More repeats, a weaker and a stronger agent model, and real repositories instead of scaffolds.</li>
       <li><b>Codex end to end.</b> Blocked for now: the Codex CLI's platform binary is missing on this machine.</li>
@@ -293,6 +381,7 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12.5px}
     <ul>
       <li><b>Jev:</b> <code>jev-latest</code> (jev-1.13.0), one call per edit, one yes/no question (a Noul) per rule. $0.042 per million input tokens; output tokens are free.</li>
       <li><b>LLM judge, grader, reviewer and mapper:</b> GPT-6-Luna at <code>reasoning_effort: low</code>. $0.10 per million input tokens and $0.50 per million output, standard tier, checked 26 Sep 2026. Entry 1 originally used GPT-5.4-mini and GPT-5.5.</li>
+      <li><b>Local models (Entry 4):</b> Kev-0.8B and Kev-4B (<code>jaredpalmer/kev-*</code>, MLX, bf16); Laya 0.3.20 English checkpoint (PyTorch Metal backend; ONNX Runtime 1.30 with the Core ML provider). Held-out split only, one request at a time, on an M3 Max with 64 GB.</li>
       <li><b>Agent:</b> Claude Code headless (Sonnet). User hooks, plugins and MCP servers were off. Hook conditions were interleaved.</li>
       <li><b>Labels:</b> written by Claude subagents, one labeler per edit. Tuning and held-out sets come from different authors. Thresholds were fixed at 0.8 / 0.5 before any data came in.</li>
       <li><b>Caveats:</b>
@@ -314,6 +403,8 @@ python3 report/build.py path/to/DepartureMono-Regular.woff2 # rebuild this page<
   <section id="log">
     <h2>Changelog</h2>
     <ul>
+      <li><b>26 Sep 2026, feedback loop.</b> The hook now keeps a local findings log. <code>src/findings.ts</code> classifies each finding as fixed, kept or unknown, and the <code>jev-lint-learn</code> skill feeds recurring ones back into a repo's AGENTS.md and <code>.jev-lint/</code> rules. The <code>jev-lint-rules</code> skill and <code>src/validate.ts</code> generate and validate repo rules from its guidelines.</li>
+      <li><b>26 Sep 2026, Entry 4.</b> Local models: Kev-0.8B, Kev-4B and Laya on this Mac, plus Laya's encoder through Core ML. The hook and harness gained <code>TYPESAFE_BASE_URL</code> / <code>LOCAL_BASE_URL</code> for any <code>/v1/systemone</code> server. Repo pushed to GitHub, and the hook installed in Claude Code and Codex.</li>
       <li><b>26 Sep 2026, Entry 3.</b> Added 20 best-practice rules, a v1→v2 wording pass for TypeScript, the pre-review catch analysis, and hook on/off runs on 12 React/SwiftUI tasks. The page became a notebook.</li>
       <li><b>26 Sep 2026, Entry 2.</b> Switched every LLM judging role to GPT-6-Luna (low). Re-ran the baseline and re-graded round 1.</li>
       <li><b>26 Sep 2026, Entry 1.</b> First hook, hygiene pack, labeled edits, and 72 agent runs.</li>
