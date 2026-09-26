@@ -1,0 +1,29 @@
+# Managed by the code-reviewer GitHub App setup PR.
+# The trusted reusable workflow is pinned to an immutable commit SHA; bump it deliberately.
+name: Code Reviewer
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+concurrency:
+  group: code-reviewer-${{ github.repository }}-${{ github.event.pull_request.number || github.event.issue.number }}
+  cancel-in-progress: true
+permissions:
+  contents: read
+  pull-requests: write
+  id-token: write
+jobs:
+  code_review:
+    uses: ckorhonen/code-reviewer/.github/workflows/code-reviewer-reusable.yml@71220e0da7ce6276c8a473409d48753444beec0d
+    with:
+      ingest_url: https://api.polaris.sourcebottle.net/ingest
+      oidc_audience: code-reviewer
+      mode: sparse
+      review_strategy: multi-model-union
+      max_cost_usd: "0.25"
+      post_summary_comment: false
+      post_inline_comments: false
+    secrets:
+      openrouter_api_key: ${{ secrets.OPENROUTER_API_KEY }}
