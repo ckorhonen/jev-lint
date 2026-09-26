@@ -1,0 +1,97 @@
+{
+  "language": "swift",
+  "extensions": [".swift"],
+  "rules": [
+    {
+      "id": "swift-no-force-unwrap",
+      "question": "Does `added_code` force-unwrap an optional with a postfix `!`, such as `user!.name`, `URL(string: s)!`, or `dict[key]!`?",
+      "true": "A postfix `!` force-unwraps an optional value.",
+      "false": "No force unwraps. Logical not (`!flag`), `!=`, `try!`, `as!`, and implicitly unwrapped declarations like `var label: UILabel!` do not count.",
+      "fix": "Use `guard let`, `if let`, `??`, or throw a descriptive error."
+    },
+    {
+      "id": "swift-no-force-try",
+      "question": "Does `added_code` use `try!`?",
+      "true": "The added code contains `try!`.",
+      "false": "The added code uses `try`, `try?`, or no try at all.",
+      "fix": "Use `do/catch` or propagate with `throws`."
+    },
+    {
+      "id": "swift-no-force-cast",
+      "question": "Does `added_code` use a forced cast `as!`?",
+      "true": "The added code contains `as!`.",
+      "false": "Casts use `as?` or `as`, or there are no casts.",
+      "fix": "Use `as?` with `guard let` and handle the failure."
+    },
+    {
+      "id": "swift-no-debug-print",
+      "question": "Does `added_code` add a `print(...)`, `debugPrint(...)`, or `dump(...)` call that looks like leftover debugging output?",
+      "true": "There is a print/debugPrint/dump call printing values for debugging, e.g. `print(\"got here\", response)`.",
+      "false": "No debug prints. Output in a command-line tool's intended user-facing path, or logging via `Logger`/`os_log`, does not count.",
+      "fix": "Remove it or use `Logger` from `os`."
+    },
+    {
+      "id": "swift-no-empty-catch",
+      "question": "Does `added_code` contain a `catch` block that silently swallows the error, doing nothing or only containing a comment?",
+      "true": "A catch block is empty or has only comments.",
+      "false": "Every catch block logs, rethrows, returns, or otherwise handles the error, or there is no catch.",
+      "fix": "Log, rethrow, or surface the error."
+    },
+    {
+      "id": "swift-no-restating-comment",
+      "question": "Does `added_code` contain a comment that merely restates what the next line of code obviously does, adding no information (e.g. `// set the title` above `title = \"Home\"`)?",
+      "true": "At least one comment just narrates the code in plain words without explaining why or adding context.",
+      "false": "Comments explain intent, reasons, constraints, or non-obvious behavior, or there are no comments.",
+      "fix": "Delete comments that narrate the code; keep only ones that explain why."
+    },
+    {
+      "id": "swift-no-vague-names",
+      "question": "Does `added_code` declare a variable, constant, parameter, or function with a vague or meaningless name such as `data`, `temp`, `tmp`, `foo`, `thing`, `stuff`, `x`, `val2`, or `obj`, outside of short loop indices or conventional names like `i`, `error`, `id`, `vc`?",
+      "true": "A newly declared name gives no clue what it holds.",
+      "false": "All newly declared names are descriptive or conventional.",
+      "fix": "Rename to say what the value is."
+    },
+    {
+      "id": "swift-no-magic-numbers",
+      "question": "Does `added_code` use an unexplained numeric literal in logic (like `if retries > 7`, `asyncAfter(deadline: .now() + 86400)`, or `price * 0.0825`) instead of a named constant, excluding 0, 1, -1, 2 and numbers that are obvious from context?",
+      "true": "A bare number with non-obvious meaning appears in logic.",
+      "false": "Numbers are named constants, trivial values, layout padding in SwiftUI modifiers, or self-explanatory in context.",
+      "fix": "Extract the number into a well-named constant."
+    },
+    {
+      "id": "swift-no-commented-out-code",
+      "question": "Does `added_code` contain commented-out code, meaning lines of Swift source disabled by putting them in comments?",
+      "true": "A comment contains code that was disabled, e.g. `// let old = compute(x)`.",
+      "false": "Comments are prose only; code examples in documentation comments do not count.",
+      "fix": "Delete dead code; version control keeps history."
+    },
+    {
+      "id": "swift-no-bare-todo",
+      "question": "Does `added_code` add a TODO, FIXME, or XXX comment without an issue link, ticket number, or owner?",
+      "true": "A TODO/FIXME/XXX comment has no ticket reference (like #123, ABC-45, a URL) or owner name.",
+      "false": "No TODO-style comments, or each one references a ticket, URL, or owner.",
+      "fix": "Either do it now or reference a tracked issue."
+    },
+    {
+      "id": "swift-no-hardcoded-secret",
+      "question": "Does `added_code` hardcode a real-looking secret such as an API key, password, access token, or private key as a literal string?",
+      "true": "A credential-like literal value is embedded, e.g. `let apiKey = \"sk_live_51H...\"`.",
+      "false": "Secrets come from the Keychain, configuration, or environment; placeholders like `\"<YOUR_KEY>\"` or empty strings do not count.",
+      "fix": "Load the secret from the Keychain or build configuration."
+    },
+    {
+      "id": "swift-ui-off-main",
+      "question": "Does `added_code` update UI state (a UIKit view or label, or a SwiftUI `@State`/`@Published` property) inside a background context such as `DispatchQueue.global().async` or a URLSession completion handler, without hopping back to the main thread?",
+      "true": "UI or view state is mutated from a background queue or callback with no `DispatchQueue.main`, `MainActor.run`, or `@MainActor` hop.",
+      "false": "UI updates happen on the main thread or main actor, or the code does not touch UI state from background work.",
+      "fix": "Wrap the UI update in `await MainActor.run { }` or `DispatchQueue.main.async { }`, or mark the type `@MainActor`."
+    },
+    {
+      "id": "swift-prefer-guard",
+      "question": "Does `added_code` contain a pyramid of three or more nested `if let` / `if` statements where `guard` with early exit would flatten it?",
+      "true": "Nested optional-binding or conditional checks create deep indentation that `guard` could flatten.",
+      "false": "Uses `guard` for early exits, or nesting is shallow.",
+      "fix": "Use `guard let ... else { return }` for preconditions."
+    }
+  ]
+}

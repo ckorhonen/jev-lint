@@ -1,0 +1,68 @@
+[
+  {
+    "id": "react-user-search",
+    "lang": "typescript",
+    "scaffold": "react",
+    "prompt": "Build src/UserSearch.tsx: a React component with a search box that queries `/api/users?q=<term>` as the user types (debounced ~300ms) and shows matching users (id, name, email) with a result count, a loading indicator, and an error message. Also let the user sort results by name or email. Make sure `npx tsc --noEmit` passes."
+  },
+  {
+    "id": "react-metrics-poller",
+    "lang": "typescript",
+    "scaffold": "react",
+    "prompt": "Build src/MetricsPanel.tsx: a React dashboard panel that loads `/api/metrics` (JSON: array of {name, value, unit}) when it mounts and then refreshes every 10 seconds, pauses refreshing while the browser tab is hidden, and highlights metrics whose value changed since the last refresh. Also show 'last updated N seconds ago'. Make sure `npx tsc --noEmit` passes."
+  },
+  {
+    "id": "react-signup-form",
+    "lang": "typescript",
+    "scaffold": "react",
+    "prompt": "Build src/SignupForm.tsx: a React sign-up form (name, email, password, confirm password, accept terms) with inline validation, a submit button that POSTs JSON to `/api/signup`, shows a success message with the new account's id from the response, and resets the form after a successful submit. Server validation errors come back as {errors: {field: message}} and should show next to the fields. Make sure `npx tsc --noEmit` passes."
+  },
+  {
+    "id": "react-chat-room",
+    "lang": "typescript",
+    "scaffold": "react",
+    "prompt": "Build src/ChatRoom.tsx: a React chat room component that takes a `roomId` prop, connects to `wss://chat.example.com/rooms/<roomId>` with the browser WebSocket API, shows incoming messages (JSON {id, author, text, sentAt}), lets the user send messages, auto-scrolls to the newest message, and shows a 'reconnecting' banner if the socket drops. Switching `roomId` should switch rooms. Make sure `npx tsc --noEmit` passes."
+  },
+  {
+    "id": "react-todo-board",
+    "lang": "typescript",
+    "scaffold": "react",
+    "prompt": "Build src/TodoBoard.tsx: a React todo list where users can add, edit inline, complete, delete, and reorder items (move up / move down buttons), filter by all/active/done, and see a count of remaining items. Persist the list to localStorage and restore it on load. Make sure `npx tsc --noEmit` passes."
+  },
+  {
+    "id": "react-profile-editor",
+    "lang": "typescript",
+    "scaffold": "react",
+    "prompt": "Build src/ProfileEditor.tsx: a React component that receives a `user` prop ({id, displayName, bio, avatarUrl}) and an `onSave(user)` async callback. It lets the user edit display name and bio, shows whether there are unsaved changes, has Save and Reset buttons, and disables Save while saving. Also add src/useUserProfiles.ts, a hook that loads several profiles by id from `/api/users/<id>` for a team page. Make sure `npx tsc --noEmit` passes."
+  },
+  {
+    "id": "swiftui-search",
+    "lang": "swift",
+    "prompt": "Add Sources/App/SearchScreen.swift: a SwiftUI screen with a search field that queries `https://api.example.com/search?q=` as the user types (debounced), showing results (id, title, subtitle) in a List, a loading state, an empty state, and an error message. Put the logic in a view model. Target macOS 13+. Make sure `swift build` succeeds."
+  },
+  {
+    "id": "swiftui-stopwatch",
+    "lang": "swift",
+    "prompt": "Add Sources/App/Stopwatch.swift: a SwiftUI stopwatch with start, stop, reset, and lap buttons, showing elapsed time as mm:ss.SS and a list of laps with their split times formatted nicely. Drive it with a timer in a view model class. Make sure `swift build` succeeds."
+  },
+  {
+    "id": "swiftui-settings",
+    "lang": "swift",
+    "prompt": "Add Sources/App/SettingsScreen.swift: a SwiftUI settings screen backed by a SettingsStore class that persists preferences (display name, theme choice, notifications on/off, refresh interval) to UserDefaults, and updates itself when UserDefaults changes from elsewhere (observe `UserDefaults.didChangeNotification`). The screen receives the store from its parent. Make sure `swift build` succeeds."
+  },
+  {
+    "id": "swiftui-thumbnail-grid",
+    "lang": "swift",
+    "prompt": "Add Sources/App/ThumbnailGrid.swift: a SwiftUI grid of photo thumbnails. Given an array of image URLs, it downloads each thumbnail asynchronously, shows a placeholder while loading, and caches downloaded images in a shared in-memory cache so scrolling back doesn't re-download. Also show each photo's download date formatted as a relative date. Make sure `swift build` succeeds."
+  },
+  {
+    "id": "swift-legacy-bridge",
+    "lang": "swift",
+    "prompt": "Add Sources/App/LegacyBridge.swift. There is a legacy callback-based SDK that I'll describe: `final class LegacyGeocoder { func geocode(_ address: String, completion: @escaping (Result<(Double, Double), Error>) -> Void) }` and `final class LegacyUploader { var onProgress: ((Double) -> Void)?; var onFinish: ((Error?) -> Void)?; func start(file: URL) }` (onProgress fires many times). Define those stub classes, then write modern async/await wrappers: `func geocode(_:) async throws -> (Double, Double)` and `func upload(file:) async throws` that also reports progress through an AsyncStream. Make sure `swift build` succeeds."
+  },
+  {
+    "id": "swiftui-chat",
+    "lang": "swift",
+    "prompt": "Add Sources/App/ChatScreen.swift: a SwiftUI chat screen that connects to `wss://chat.example.com/room` with URLSessionWebSocketTask, decodes incoming JSON messages {id, author, text}, shows them in a scrolling list that stays pinned to the bottom, and lets the user send messages. Reconnect automatically if the connection fails. Make sure `swift build` succeeds."
+  }
+]

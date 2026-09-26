@@ -1,0 +1,27 @@
+{"id": "c01", "file_path": "src/hook.ts", "code": "const results = await lintAll(event);\nconsole.log(\"linted\", results.length);\nprocess.stdout.write(JSON.stringify(output));", "labels": ["repo-hook-stdout-noise"]}
+{"id": "c02", "file_path": "src/lint.ts", "code": "export function tierFor(p: number) {\n  console.debug(\"tier for\", p);\n  return p >= 0.8 ? \"high\" : undefined;\n}", "labels": ["repo-hook-stdout-noise"]}
+{"id": "c03", "file_path": "src/extract.ts", "code": "for (const line of patch.split(\"\\n\")) {\n  process.stdout.write(`line: ${line}\\n`);\n}", "labels": ["repo-hook-stdout-noise"]}
+{"id": "c04", "file_path": "src/jev.ts", "code": "console.info(`calling ${BASE_URL} with ${Object.keys(questions).length} questions`);\nconst res = await fetch(url, init);", "labels": ["repo-hook-stdout-noise"]}
+{"id": "c05", "file_path": "eval/run.ts", "code": "console.log(\"system  lang  split  P  R  F1\");\nfor (const r of results) console.log(format(r));", "labels": []}
+{"id": "c06", "file_path": "src/hook.ts", "code": "if (process.env.JEV_LINT_DEBUG) process.stderr.write(`[jev-lint] ${err}\\n`);", "labels": []}
+{"id": "c07", "file_path": "src/hook.ts", "code": "const output = { hookSpecificOutput: { hookEventName: \"PostToolUse\", additionalContext: feedback } };\nprocess.stdout.write(JSON.stringify(output));", "labels": []}
+{"id": "c08", "file_path": "test/extract.test.ts", "code": "test(\"logs\", () => {\n  console.log(parseApplyPatch(sample));\n  expect(parseApplyPatch(sample)).toHaveLength(1);\n});", "labels": []}
+{"id": "c09", "file_path": "src/hook.ts", "code": "const event = JSON.parse(raw);\nif (!event.tool_name) throw new Error(\"missing tool_name\");", "labels": ["repo-hook-must-fail-open"]}
+{"id": "c10", "file_path": "src/hook.ts", "code": "main().catch((err) => {\n  process.stderr.write(String(err));\n  process.exit(1);\n});", "labels": ["repo-hook-must-fail-open"]}
+{"id": "c11", "file_path": "src/lint.ts", "code": "const ruleSet = ruleSetFor(change.filePath, opts.packs);\nif (!ruleSet) throw new Error(`no rules for ${change.filePath}`);", "labels": ["repo-hook-must-fail-open"]}
+{"id": "c12", "file_path": "src/hook.ts", "code": "main()\n  .catch((err) => {\n    if (process.env.JEV_LINT_DEBUG) process.stderr.write(`[jev-lint] ${err}\\n`);\n  })\n  .finally(() => process.exit(0));", "labels": []}
+{"id": "c13", "file_path": "src/lint.ts", "code": "if (!ruleSet || !change.addedCode.trim()) return undefined;", "labels": []}
+{"id": "c14", "file_path": "src/validate.ts", "code": "if (!existsSync(dir)) throw new Error(`no ${dir}`);\nprocess.exit(failed ? 1 : 0);", "labels": []}
+{"id": "c15", "file_path": "eval/e2e/grade.ts", "code": "const GRADER_MODEL = process.env.GRADER_MODEL ?? \"gpt-5.5\";\nconst body = { model: GRADER_MODEL, reasoning_effort: \"medium\", messages };", "labels": ["repo-judge-model-luna", "repo-judge-effort-low"]}
+{"id": "c16", "file_path": "eval/systems.ts", "code": "export const LLM_MODEL = process.env.BASELINE_MODEL ?? \"gpt-5.4-mini\";\nconst res = await fetch(\"https://api.openai.com/v1/chat/completions\", { method: \"POST\", body: JSON.stringify({ model: LLM_MODEL, messages }) });", "labels": ["repo-judge-model-luna"]}
+{"id": "c17", "file_path": "eval/e2e/review.ts", "code": "const MODEL = process.env.REVIEW_MODEL ?? \"gpt-6-luna\";\nconst EFFORT = process.env.REVIEW_EFFORT ?? \"high\";", "labels": ["repo-judge-effort-low"]}
+{"id": "c18", "file_path": "eval/e2e/review.ts", "code": "const MODEL = process.env.REVIEW_MODEL ?? \"gpt-6-luna\";\nconst EFFORT = process.env.REVIEW_EFFORT ?? \"low\";", "labels": []}
+{"id": "c19", "file_path": "eval/systems.ts", "code": "const scores = await Promise.all(changes.map((ch) => lintChange(ch, { timeoutMs: 30_000 })));", "labels": []}
+{"id": "c20", "file_path": "eval/e2e/grade.ts", "code": "export const GRADER_MODEL = process.env.GRADER_MODEL ?? \"gpt-6-luna\";\nconst GRADER_EFFORT = process.env.GRADER_EFFORT ?? \"low\";", "labels": []}
+{"id": "c21", "file_path": "src/extract.ts", "code": "export function parseApplyPatch(patch: string): ChangedFile[] {\n  const files: ChangedFile[] = [];\n  return files;\n}", "labels": []}
+{"id": "c22", "file_path": "src/repoRules.ts", "code": "for (const v of visited) cache.set(v, found);\nreturn found ?? undefined;", "labels": []}
+{"id": "c23", "file_path": "eval/systems.ts", "code": "reasoning_effort: process.env.BASELINE_EFFORT ?? \"none\",", "labels": ["repo-judge-effort-low"]}
+{"id": "c24", "file_path": "eval/e2e/review.ts", "code": "const body = { model: \"gpt-6-luna\", reasoning_effort: \"medium\", messages: [{ role: \"user\", content: prompt }] };", "labels": ["repo-judge-effort-low"]}
+{"id": "c25", "file_path": "eval/systems.ts", "code": "reasoning_effort: process.env.BASELINE_EFFORT ?? \"low\",", "labels": []}
+{"id": "c26", "file_path": "eval/e2e/agreement.ts", "code": "const JUDGE = process.env.JUDGE_MODEL ?? \"gpt-6-sol\";", "labels": ["repo-judge-model-luna"]}
+{"id": "c27", "file_path": "eval/e2e/review.ts", "code": "const MODEL = process.env.REVIEW_MODEL ?? \"gpt-5.5\";", "labels": ["repo-judge-model-luna"]}

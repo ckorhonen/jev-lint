@@ -1,0 +1,3281 @@
+[
+  {
+    "task": "ts-rate-limiter",
+    "lang": "typescript",
+    "condition": "none",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "src/middleware.ts",
+        "line": 30,
+        "severity": "high",
+        "title": "Client-controlled forwarding header can bypass per-IP limits",
+        "explanation": "When `req.ip` is unavailable, the middleware trusts `X-Forwarded-For`, which clients can usually forge unless a trusted proxy is configured to sanitize it, allowing attackers to rotate the key and evade rate limiting.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/middleware.ts",
+        "line": 37,
+        "severity": "medium",
+        "title": "Cleanup timer has no middleware-level shutdown path",
+        "explanation": "Creating the middleware starts an interval that keeps the process alive, but the limiter is private and the returned middleware exposes no way to stop the timer during server shutdown or tests.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/rateLimiter.ts",
+        "line": 35,
+        "severity": "medium",
+        "title": "Numeric options are not validated for finiteness or valid ranges",
+        "explanation": "`NaN`, infinities, and invalid stale/cleanup intervals pass validation and can produce broken refill behavior, buckets that never expire, or a zero-delay cleanup loop.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/rateLimiter.ts",
+        "line": 88,
+        "severity": "medium",
+        "title": "Invalid token costs can corrupt bucket state",
+        "explanation": "`consume` accepts zero, negative, or non-finite costs; a negative cost increases the bucket above capacity, while `NaN` produces a denied result with a `NaN` retry time.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/middleware.ts",
+        "line": 31,
+        "severity": "medium",
+        "title": "Empty forwarded addresses collapse clients onto one bucket",
+        "explanation": "A header beginning with a comma or whitespace yields an empty key after trimming, so unrelated requests with that malformed header share a single rate-limit bucket.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "ts-github-top-repos",
+    "lang": "typescript",
+    "condition": "jev",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "src/github.ts",
+        "line": 8,
+        "severity": "medium",
+        "title": "Link-header parsing breaks on commas inside URLs",
+        "explanation": "Splitting the Link header on every comma can split a URL whose query contains a comma, causing pagination to stop early and return incomplete results.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/github.ts",
+        "line": 32,
+        "severity": "medium",
+        "title": "Response JSON is trusted without validation",
+        "explanation": "Casting arbitrary JSON to `GitHubRepo[]` allows unexpected API payloads or error-shaped responses to produce invalid results and potentially misleading output.",
+        "rule": "ts-unvalidated-external-data",
+        "jevProbability": 0.97
+      },
+      {
+        "file": "src/github.ts",
+        "line": 42,
+        "severity": "low",
+        "title": "Negative counts return all but trailing repositories",
+        "explanation": "A negative `count` is accepted, and `slice(0, count)` then returns nearly the entire sorted list rather than rejecting or normalizing the invalid input.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/cli.ts",
+        "line": 10,
+        "severity": "medium",
+        "title": "Unhandled request errors produce an unhandled rejection",
+        "explanation": "API failures reject the top-level await without a user-facing error handler, so the CLI emits a runtime stack trace and exits inconsistently instead of reporting a concise failure.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "ts-github-top-repos",
+    "lang": "typescript",
+    "condition": "none",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "src/github.ts",
+        "line": 10,
+        "severity": "medium",
+        "title": "Link parsing breaks on commas inside URLs",
+        "explanation": "Splitting the Link header on every comma can split a valid URL containing a comma, causing pagination to stop early or follow a malformed URL.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/github.ts",
+        "line": 35,
+        "severity": "medium",
+        "title": "API response is trusted without runtime validation",
+        "explanation": "Casting arbitrary JSON to `GitHubRepo[]` lets malformed or unexpected responses reach the sort and output logic, where missing or nonnumeric star counts can produce incorrect results.",
+        "rule": "ts-unvalidated-external-data",
+        "jevProbability": 0.97
+      },
+      {
+        "file": "src/github.ts",
+        "line": 49,
+        "severity": "low",
+        "title": "Count is not validated",
+        "explanation": "A negative or non-finite `count` passed by callers is accepted by `slice`, yielding surprising results instead of rejecting invalid input or applying a documented bound.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "ts-github-top-repos",
+    "lang": "typescript",
+    "condition": "jev-high",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "src/github.ts",
+        "line": 14,
+        "severity": "high",
+        "title": "Validate pagination URL before sending the token",
+        "explanation": "The `Link` header is trusted as a fetch URL, so a malformed or compromised response can point to an attacker-controlled host and receive the `Authorization` header on the next request.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/github.ts",
+        "line": 37,
+        "severity": "medium",
+        "title": "Validate the API response shape",
+        "explanation": "Casting parsed JSON to `GitHubRepo[]` does not validate it; an unexpected object or invalid repository fields can make the spread fail or produce incorrect sorting results.",
+        "rule": "ts-unvalidated-external-data",
+        "jevProbability": 0.97
+      },
+      {
+        "file": "src/github.ts",
+        "line": 50,
+        "severity": "low",
+        "title": "Handle invalid repository counts",
+        "explanation": "A negative `count` makes `slice(0, count)` return all but the last entries rather than no entries, so validate or clamp the argument before slicing.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "ts-rate-limiter",
+    "lang": "typescript",
+    "condition": "jev",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "src/middleware.ts",
+        "line": 29,
+        "severity": "high",
+        "title": "Trusts client-supplied X-Forwarded-For",
+        "explanation": "The middleware uses the first X-Forwarded-For value without checking that the request came through a trusted proxy, so clients can change the rate-limit key on every request and bypass the limit.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/rateLimiter.ts",
+        "line": 39,
+        "severity": "medium",
+        "title": "Does not validate numeric options",
+        "explanation": "NaN, Infinity, or invalid stale/sweep intervals can produce nonsensical refill and cleanup behavior, so validate that the options are finite and that intervals are positive.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/rateLimiter.ts",
+        "line": 55,
+        "severity": "medium",
+        "title": "Does not validate token cost",
+        "explanation": "A negative cost increases a bucket's tokens beyond capacity, while a cost greater than capacity can never be satisfied, so reject non-finite or non-positive costs and costs above capacity.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/middleware.ts",
+        "line": 31,
+        "severity": "low",
+        "title": "Can use an empty forwarded address as the bucket key",
+        "explanation": "A header containing only whitespace produces an empty key after trimming, causing malformed requests to share one bucket instead of falling back to the socket or request IP.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "ts-rate-limiter",
+    "lang": "typescript",
+    "condition": "jev-high",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "src/middleware.ts",
+        "line": 31,
+        "severity": "high",
+        "title": "Trusts client-supplied forwarded IPs",
+        "explanation": "Any caller can spoof `X-Forwarded-For` and obtain a fresh rate-limit bucket, so only honor this header when the request is known to come through a trusted proxy.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/rateLimiter.ts",
+        "line": 67,
+        "severity": "medium",
+        "title": "Does not validate token cost",
+        "explanation": "A negative `cost` passes the availability check and increases the bucket above capacity, while a cost greater than capacity can never succeed; reject non-finite, non-positive, or otherwise unsupported costs.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/rateLimiter.ts",
+        "line": 33,
+        "severity": "medium",
+        "title": "Configuration validation accepts non-finite values",
+        "explanation": "`NaN` and `Infinity` pass the positivity checks and can produce invalid bucket state or retry values, so validate that capacity, refill rate, and stale timeout are finite and valid.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/rateLimiter.ts",
+        "line": 90,
+        "severity": "medium",
+        "title": "Scans every bucket on every request",
+        "explanation": "The opportunistic stale-bucket sweep is O(number of tracked clients) per consume call, making request processing increasingly expensive under high client churn; use a bounded or periodic eviction strategy.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "src/rateLimiter.ts",
+        "rule": "ts-no-magic-numbers",
+        "jevProbability": 0.67,
+        "graderConfirms": false
+      }
+    ]
+  },
+  {
+    "task": "ts-retry-sync",
+    "lang": "typescript",
+    "condition": "none",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "src/index.ts",
+        "line": 1,
+        "severity": "high",
+        "title": "Package entry point exports no API",
+        "explanation": "The module implementations are exported individually, but the empty index means consumers importing the package entry point cannot access `retry`, `syncRecords`, or `main`.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/retry.ts",
+        "line": 41,
+        "severity": "medium",
+        "title": "Invalid attempt counts can skip execution",
+        "explanation": "When `attempts` is zero, negative, or `NaN`, the loop never calls `fn` and the function rejects with `undefined` instead of validating the option or returning the operation's result.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/sync.ts",
+        "line": 40,
+        "severity": "medium",
+        "title": "Retried POSTs can duplicate records",
+        "explanation": "If the server processes a batch but the response is lost or reports a retryable failure, retrying this non-idempotent POST can upload the same records multiple times unless the endpoint deduplicates requests.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/sync.ts",
+        "line": 49,
+        "severity": "low",
+        "title": "Response bodies are never consumed",
+        "explanation": "Neither successful nor failed responses have their bodies consumed or cancelled, which can retain connection resources and interfere with connection reuse during repeated uploads.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "src/sync.ts",
+        "rule": "ts-no-magic-numbers",
+        "jevProbability": 0.6,
+        "graderConfirms": true
+      },
+      {
+        "file": "src/sync.ts",
+        "rule": "ts-sequential-await-loop",
+        "jevProbability": 0.66,
+        "graderConfirms": true
+      }
+    ]
+  },
+  {
+    "task": "ts-retry-sync",
+    "lang": "typescript",
+    "condition": "jev",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "src/retry.ts",
+        "line": 49,
+        "severity": "medium",
+        "title": "Retry callback exceptions abort retries",
+        "explanation": "If `onRetry` throws, its exception escapes immediately and prevents the promised retry/backoff behavior, so callback failures can replace the original operation error.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/retry.ts",
+        "line": 41,
+        "severity": "high",
+        "title": "Invalid attempt counts can return undefined",
+        "explanation": "With `attempts` set to zero, negative, or `NaN`, the loop never runs and the function throws `undefined` instead of validating the option or invoking `fn`.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/retry.ts",
+        "line": 25,
+        "severity": "medium",
+        "title": "Delay options are not validated",
+        "explanation": "Negative or non-finite delays and jitter values can produce invalid or unexpectedly long timers, and jitter above 1 can exceed the configured maximum delay.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/sync.ts",
+        "line": 41,
+        "severity": "medium",
+        "title": "Retries every HTTP failure, including permanent errors",
+        "explanation": "The retry loop treats all non-2xx responses identically, so permanent failures such as authentication or validation errors waste time on retries and may delay reporting.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/sync.ts",
+        "line": 47,
+        "severity": "medium",
+        "title": "Serialization failures occur outside retry handling",
+        "explanation": "`JSON.stringify` can throw for cyclic records or `BigInt`, and because it runs before a fetch promise is returned, that error is recorded as a failed batch rather than handled as an upload retry or rejected before processing.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/sync.ts",
+        "line": 67,
+        "severity": "medium",
+        "title": "Batch lookup assumes unchecked array indexing",
+        "explanation": "With `noUncheckedIndexedAccess` enabled, `batches[i]` may be `undefined`, making the upload call and failed-batch record unsafe; using iteration or guarding the value avoids this.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/index.ts",
+        "line": 1,
+        "severity": "medium",
+        "title": "Package entry point exports no API",
+        "explanation": "The empty barrel means consumers importing from the package root cannot access `retry`, `syncRecords`, or the result types despite those being the apparent public functionality.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "src/sync.ts",
+        "rule": "ts-sequential-await-loop",
+        "jevProbability": 0.65,
+        "graderConfirms": true
+      }
+    ]
+  },
+  {
+    "task": "ts-lru-user-cache",
+    "lang": "typescript",
+    "condition": "jev",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "src/userService.ts",
+        "line": 49,
+        "severity": "medium",
+        "title": "Invalidation does not prevent an in-flight fetch from repopulating the cache",
+        "explanation": "If `invalidate(id)` runs while `getUser(id)` is pending, that fetch later caches its result, so the invalidated value can become available again; invalidate or version pending work so stale requests cannot repopulate the cache.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/cache.ts",
+        "line": 17,
+        "severity": "medium",
+        "title": "Cache capacity accepts invalid numeric values",
+        "explanation": "The check allows values such as `NaN` or `Infinity`, for which the eviction condition may never enforce a bound, and fractional sizes do not have clear capacity semantics; validate that `maxSize` is a finite positive integer.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/cache.ts",
+        "line": 44,
+        "severity": "medium",
+        "title": "`has` reports cached `undefined` values as absent",
+        "explanation": "Because `has` is implemented through `get`, a key storing `undefined` is indistinguishable from a missing or expired key even though it remains in the map.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "ts-transactions-report",
+    "lang": "typescript",
+    "condition": "jev-high",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "src/report.ts",
+        "line": 89,
+        "severity": "medium",
+        "title": "Amount parsing accepts trailing garbage",
+        "explanation": "`parseFloat` accepts inputs such as `\"12abc\"` or `\"1.2.3\"` as valid amounts, so malformed CSV values can silently enter totals instead of being rejected.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/report.ts",
+        "line": 90,
+        "severity": "medium",
+        "title": "Non-finite amounts are not rejected",
+        "explanation": "`parseFloat(\"Infinity\")` returns infinity and passes the `NaN` check, which can produce infinite totals and incorrect review flags.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/report.ts",
+        "line": 73,
+        "severity": "medium",
+        "title": "ISO-like dates bypass date validation",
+        "explanation": "Any string beginning with `YYYY-MM` is accepted without checking the month or the rest of the date, so values such as `2024-99-foo` generate invalid month keys.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/report.ts",
+        "line": 64,
+        "severity": "medium",
+        "title": "Unterminated quoted fields are silently accepted",
+        "explanation": "If the CSV ends while `inQuotes` is true, the parser still returns the partial row rather than reporting malformed input, potentially treating truncated data as valid.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/report.ts",
+        "line": 47,
+        "severity": "medium",
+        "title": "Quotes in unquoted fields corrupt CSV parsing",
+        "explanation": "A quote encountered anywhere outside a quoted field starts quoted mode, even mid-field, so malformed or literal quotes can swallow delimiters and merge fields or rows.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/report.ts",
+        "line": 110,
+        "severity": "medium",
+        "title": "Extra CSV columns are silently ignored",
+        "explanation": "Destructuring only the first four cells means rows with unexpected extra fields are accepted and their data is discarded without warning.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/report.ts",
+        "line": 135,
+        "severity": "low",
+        "title": "Category grouping is case-sensitive",
+        "explanation": "The same logical category (for example, `Retail` and `retail`) is split into separate totals even though retail tax detection treats those names as equivalent.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "ts-lru-user-cache",
+    "lang": "typescript",
+    "condition": "jev-high",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "src/cache.ts",
+        "line": 44,
+        "severity": "medium",
+        "title": "`has` cannot detect cached `undefined` values",
+        "explanation": "Because `V` may include `undefined`, a stored `undefined` is treated as a cache miss by both `has` and callers such as `UserService.getUser`, causing repeated fetches and incorrect presence checks.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/cache.ts",
+        "line": 16,
+        "severity": "medium",
+        "title": "Cache options are not validated",
+        "explanation": "Fractional, `NaN`, or infinite `maxSize` values and non-positive or non-finite `ttlMs` values are accepted, which can produce surprising capacity behavior or entries that never expire.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/cache.ts",
+        "line": 50,
+        "severity": "medium",
+        "title": "Expired entries can evict live entries",
+        "explanation": "`set` evicts the oldest entry without first removing expired entries, so an expired entry later in recency order can remain while a live entry is evicted and the cache stays over capacity in useful entries.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/userService.ts",
+        "line": 36,
+        "severity": "medium",
+        "title": "An old request can clear a newer pending request",
+        "explanation": "After `invalidate` allows a replacement fetch, completion of the earlier request unconditionally deletes the ID's pending entry, so later callers miss the replacement promise and can start duplicate requests (the rejection handler has the same issue).",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/userService.ts",
+        "line": 55,
+        "severity": "low",
+        "title": "Invalidation generations grow without bound",
+        "explanation": "Every invalidated ID is retained in `generations` indefinitely, so services that see many transient IDs accumulate entries even after their cache and requests are gone.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/userService.ts",
+        "line": 60,
+        "severity": "medium",
+        "title": "A throwing prefetch error handler creates an unhandled rejection",
+        "explanation": "If `onPrefetchError` throws, the promise returned by `catch` rejects and is discarded with `void`, producing an unhandled rejection.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "swift-weather-client",
+    "lang": "swift",
+    "condition": "none",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "Sources/App/WeatherClient.swift",
+        "line": 90,
+        "severity": "medium",
+        "title": "Preserve task cancellation",
+        "explanation": "`URLSession.data(from:)` can throw `CancellationError`, but wrapping every error as `.network` hides cancellation from callers and can make cancelled work appear to have failed normally.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/WeatherClient.swift",
+        "line": 77,
+        "severity": "medium",
+        "title": "Preserve existing base URL query items",
+        "explanation": "Assigning `queryItems` replaces any items already present in `baseURL`, so a configured endpoint that relies on fixed query parameters will silently lose them.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/WeatherClient.swift",
+        "line": 79,
+        "severity": "low",
+        "title": "Send the normalized city value",
+        "explanation": "The code trims the city only to check whether it is empty, then sends the original string, so input with surrounding whitespace may produce an avoidable lookup failure.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "Sources/App/WeatherClient.swift",
+        "rule": "swift-no-force-unwrap",
+        "jevProbability": 0.97,
+        "graderConfirms": true
+      }
+    ]
+  },
+  {
+    "task": "ts-retry-sync",
+    "lang": "typescript",
+    "condition": "jev-high",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "src/retry.ts",
+        "line": 38,
+        "severity": "medium",
+        "title": "Retry options are not validated",
+        "explanation": "Invalid values such as `attempts: 0`, a negative attempt count, or `NaN` make the loop run zero times and reject with `undefined`, while negative delays or jitter outside `[0, 1]` produce unintended timing behavior.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/retry.ts",
+        "line": 50,
+        "severity": "medium",
+        "title": "Exceptions from `onRetry` replace the operation error",
+        "explanation": "If the callback throws, the retry loop exits immediately with that callback error rather than continuing retries or ultimately reporting the failed operation.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/sync.ts",
+        "line": 41,
+        "severity": "medium",
+        "title": "Retries can duplicate non-idempotent uploads",
+        "explanation": "A network failure after the server accepts a POST causes this code to resend the batch, so endpoints without idempotency protection may store duplicate records.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/sync.ts",
+        "line": 41,
+        "severity": "medium",
+        "title": "Requests have no timeout or cancellation",
+        "explanation": "A fetch that never settles blocks the current batch and the entire sequential sync indefinitely, with no way for callers to cancel it.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/sync.ts",
+        "line": 25,
+        "severity": "medium",
+        "title": "Endpoint configuration is not validated",
+        "explanation": "Any non-empty environment value is accepted, so malformed URLs or non-HTTP schemes fail only during fetch rather than producing a clear configuration error.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "src/sync.ts",
+        "rule": "ts-no-magic-numbers",
+        "jevProbability": 0.58,
+        "graderConfirms": true
+      },
+      {
+        "file": "src/sync.ts",
+        "rule": "ts-sequential-await-loop",
+        "jevProbability": 0.62,
+        "graderConfirms": true
+      }
+    ]
+  },
+  {
+    "task": "swift-weather-client",
+    "lang": "swift",
+    "condition": "jev-high",
+    "rep": 1,
+    "findings": [],
+    "jevOnly": []
+  },
+  {
+    "task": "swift-weather-client",
+    "lang": "swift",
+    "condition": "jev",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "Sources/App/WeatherClient.swift",
+        "line": 80,
+        "severity": "medium",
+        "title": "Preserve task cancellation",
+        "explanation": "The catch wraps `CancellationError` as a transport failure, so callers cannot reliably distinguish cancellation from a network error and may show an erroneous failure state when a request is cancelled.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/WeatherClient.swift",
+        "line": 55,
+        "severity": "medium",
+        "title": "Validate the base URL scheme",
+        "explanation": "Because callers can provide an arbitrary `baseURL`, this client can send the API key over plain HTTP; reject non-HTTPS URLs except where an explicit test-only transport is used.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "ts-transactions-report",
+    "lang": "typescript",
+    "condition": "jev",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "src/report.ts",
+        "line": 58,
+        "severity": "medium",
+        "title": "Quoted multiline CSV fields are split incorrectly",
+        "explanation": "Splitting the input into physical lines before parsing means a quoted field containing a newline is broken into separate records, so valid CSV descriptions can be dropped or corrupted.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/report.ts",
+        "line": 66,
+        "severity": "medium",
+        "title": "Non-finite amounts are accepted",
+        "explanation": "`Number` accepts values such as `Infinity`, which then produce infinite totals and flagged amounts instead of being rejected as invalid transaction data.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/report.ts",
+        "line": 79,
+        "severity": "medium",
+        "title": "Invalid dates produce a bogus month key",
+        "explanation": "When a date cannot be parsed, the UTC date getters return `NaN`, so the transaction is silently included under the month key `NaN-NaN`.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "ts-lru-user-cache",
+    "lang": "typescript",
+    "condition": "none",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "src/cache.ts",
+        "line": 40,
+        "severity": "medium",
+        "title": "`has` misreports cached `undefined` values",
+        "explanation": "Because `get` uses `undefined` to represent a miss, a key whose stored value is `undefined` is treated as absent and cannot be reliably cached or detected.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/cache.ts",
+        "line": 17,
+        "severity": "medium",
+        "title": "Validate cache size and TTL options",
+        "explanation": "The checks accept `NaN`, fractional sizes, and invalid TTLs, which can disable eviction or produce entries that expire immediately or never expire.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/cache.ts",
+        "line": 46,
+        "severity": "low",
+        "title": "Expired entries can cause avoidable live-entry eviction",
+        "explanation": "`set` evicts the oldest entry without first removing expired entries, so an expired entry elsewhere in the map can remain while a still-valid entry is evicted.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/userService.ts",
+        "line": 35,
+        "severity": "medium",
+        "title": "An invalidated in-flight request can repopulate the cache",
+        "explanation": "`invalidate` only deletes the cached value, so a fetch already in progress can later write stale data back into the cache, and subsequent callers continue joining that request.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "src/userService.ts",
+        "rule": "ts-no-empty-catch",
+        "jevProbability": 0.98,
+        "graderConfirms": true
+      }
+    ]
+  },
+  {
+    "task": "ts-transactions-report",
+    "lang": "typescript",
+    "condition": "none",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "src/report.ts",
+        "line": 103,
+        "severity": "medium",
+        "title": "Non-finite amounts are accepted",
+        "explanation": "`Number(\"Infinity\")` and `Number(\"-Infinity\")` pass the `NaN` check, allowing invalid values to poison category totals and produce nonsensical currency output.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/report.ts",
+        "line": 87,
+        "severity": "medium",
+        "title": "Trimming the whole CSV changes field data",
+        "explanation": "Calling `trim()` before parsing removes whitespace from the first and last fields, including legitimate unquoted field content at the file boundaries.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/report.ts",
+        "line": 45,
+        "severity": "medium",
+        "title": "Malformed quote placement is silently accepted",
+        "explanation": "A quote in an unquoted field is treated as the start of a quoted field, so malformed CSV can be silently merged and reported as corrupted transaction data instead of rejected.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/report.ts",
+        "line": 185,
+        "severity": "low",
+        "title": "An empty report returns a newline",
+        "explanation": "When there are no totals or flagged transactions, `trimEnd()` produces an empty string and the unconditional concatenation returns `\"\\n\"` rather than an empty report.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "src/report.ts",
+        "rule": "ts-no-non-null-assertion",
+        "jevProbability": 0.98,
+        "graderConfirms": true
+      }
+    ]
+  },
+  {
+    "task": "swift-user-store",
+    "lang": "swift",
+    "condition": "none",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "Sources/App/UserListViewModel.swift",
+        "line": 1,
+        "severity": "high",
+        "title": "Missing Combine import",
+        "explanation": "`ObservableObject` and `@Published` are defined by Combine, so importing only Foundation does not provide these symbols and this file will not compile.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/UserListViewModel.swift",
+        "line": 53,
+        "severity": "medium",
+        "title": "A canceled request can clear the newer request’s loading state",
+        "explanation": "The canceled request’s callback sets `isLoading` to `false` before checking for cancellation, so it can hide the loading indicator while a replacement request is still running.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/UserListViewModel.swift",
+        "line": 65,
+        "severity": "medium",
+        "title": "Stale responses can overwrite newer results",
+        "explanation": "Cancellation does not guarantee the previous request’s callback cannot deliver, and this code decodes any successful callback without checking that it belongs to the current request, allowing an older response to replace newer users.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/UserListViewModel.swift",
+        "line": 49,
+        "severity": "medium",
+        "title": "HTTP error responses are treated as successful payloads",
+        "explanation": "The completion handler ignores the `URLResponse`, so server errors are not reported as HTTP failures and may instead appear as misleading decoding errors.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "Sources/App/UserListViewModel.swift",
+        "rule": "swift-no-force-unwrap",
+        "jevProbability": 0.98,
+        "graderConfirms": true
+      }
+    ]
+  },
+  {
+    "task": "swift-disk-cache",
+    "lang": "swift",
+    "condition": "none",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "Sources/App/DiskCache.swift",
+        "line": 84,
+        "severity": "high",
+        "title": "Cache keys can escape the cache directory",
+        "explanation": "Percent-encoding with `.alphanumerics` leaves path separators unescaped, so keys containing `/` or `..` can address files outside the cache directory and overwrite or remove unrelated files.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/DiskCache.swift",
+        "line": 11,
+        "severity": "medium",
+        "title": "Shared JSON coders are used without synchronization",
+        "explanation": "`JSONEncoder` and `JSONDecoder` are mutable reference types and are not guaranteed thread-safe, so concurrent `set` calls can encode simultaneously before entering the queue, potentially causing races or corrupted behavior.",
+        "rule": "swift-unprotected-shared-state",
+        "jevProbability": 0.05
+      },
+      {
+        "file": "Sources/App/DiskCache.swift",
+        "line": 28,
+        "severity": "medium",
+        "title": "Caches-directory lookup can crash",
+        "explanation": "The subscript assumes `urls(for:in:)` always returns an element, and will trap if the cache directory cannot be located.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/DiskCache.swift",
+        "line": 31,
+        "severity": "medium",
+        "title": "Directory creation failures are silently ignored",
+        "explanation": "If creating the cache directory fails, initialization still succeeds and later writes fail with less useful errors while reads silently miss.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/DiskCache.swift",
+        "line": 35,
+        "severity": "medium",
+        "title": "Synchronous queue blocks callers during disk I/O",
+        "explanation": "All operations use `queue.sync` while performing potentially slow filesystem work, which can block the main thread when called from UI code and does not provide an async-friendly API.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/DiskCache.swift",
+        "line": 116,
+        "severity": "medium",
+        "title": "Size accounting can overflow or become inaccurate",
+        "explanation": "Summing file sizes in `Int` can overflow, and failed size lookups default to zero, allowing the cache to exceed its configured cap.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/DiskCache.swift",
+        "line": 117,
+        "severity": "medium",
+        "title": "Negative size limits evict every entry",
+        "explanation": "A negative `maxTotalSize` is accepted, making the eviction loop remove all entries without ever bringing the nonnegative total under the limit.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/DiskCache.swift",
+        "line": 119,
+        "severity": "low",
+        "title": "Eviction ordering is nondeterministic for tied dates",
+        "explanation": "Entries with identical modification dates have no stable tie-breaker, so eviction may vary between runs and remove arbitrary entries.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "ts-ws-client",
+    "lang": "typescript",
+    "condition": "jev",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "src/wsClient.ts",
+        "line": 97,
+        "severity": "medium",
+        "title": "Sending after destroy still queues messages",
+        "explanation": "`send()` does not check `destroyed`, so calls made after permanent teardown silently append payloads to a queue that can never be flushed.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/wsClient.ts",
+        "line": 173,
+        "severity": "medium",
+        "title": "Queue flush can lose unsent messages",
+        "explanation": "The queue is cleared before sending, so if the socket closes or `send()` throws partway through the loop, the remaining payloads are discarded instead of being retained for reconnect.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/wsClient.ts",
+        "line": 124,
+        "severity": "medium",
+        "title": "Reentrant close callback can schedule a duplicate connection",
+        "explanation": "If `onClose` calls `connect()`, it can open a replacement socket and clear `manualClose`; the remainder of this old socket's close handler may then schedule another reconnect, and `openSocket()` does not guard against an existing socket.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/wsClient.ts",
+        "line": 79,
+        "severity": "medium",
+        "title": "JSON serialization can produce a non-string payload",
+        "explanation": "`JSON.stringify` returns `undefined` for values such as `undefined`, functions, and symbols, so the result can be sent or queued as if it were valid JSON despite the declared string queue.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "swift-config-loader",
+    "lang": "swift",
+    "condition": "none",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "Sources/App/AppConfig.swift",
+        "line": 111,
+        "severity": "medium",
+        "title": "HTTPS URL validation accepts malformed URLs",
+        "explanation": "`URL(string:)` can accept strings containing whitespace or other characters that Foundation normalizes, so checking only the scheme and non-nil host can admit a value that is not a valid absolute HTTPS URL; validate the original URL more strictly before using it.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/AppConfig.swift",
+        "line": 69,
+        "severity": "low",
+        "title": "File existence check can mask the underlying read error",
+        "explanation": "The separate `fileExists` check introduces a race and treats directories or unreadable paths as present, after which `Data(contentsOf:)` throws an unrelated error instead of the declared `fileNotFound` error.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "swift-disk-cache",
+    "lang": "swift",
+    "condition": "jev-high",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "Sources/App/DiskCache.swift",
+        "line": 23,
+        "severity": "high",
+        "title": "Concurrent queue allows overlapping JSON encoder/decoder access",
+        "explanation": "`value(forKey:)` runs on the concurrent queue, so multiple calls can use the same `JSONDecoder` simultaneously while `set` also uses the shared encoder outside the queue; these reference-type codec instances are not safe for concurrent use and can race or corrupt operations.",
+        "rule": "swift-unprotected-shared-state",
+        "jevProbability": 0.11
+      },
+      {
+        "file": "Sources/App/DiskCache.swift",
+        "line": 57,
+        "severity": "medium",
+        "title": "Failed writes still trigger eviction",
+        "explanation": "The write error is discarded, and size enforcement runs regardless, so a failed replacement can evict valid cache entries even though the new value was never stored.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/DiskCache.swift",
+        "line": 64,
+        "severity": "medium",
+        "title": "Reads can return an entry after it has been removed or replaced",
+        "explanation": "The read is performed on a concurrent queue while writes and removals use barriers, so those mutations can occur after the read begins but before it finishes, allowing stale results to escape despite a completed removal or replacement.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/DiskCache.swift",
+        "line": 72,
+        "severity": "medium",
+        "title": "Expired-file cleanup can delete a newer replacement",
+        "explanation": "Expiration removal is enqueued asynchronously using only the URL, so a `set` can replace the expired file before the barrier executes and then have the newly written value deleted.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/DiskCache.swift",
+        "line": 105,
+        "severity": "high",
+        "title": "Cache keys can escape the cache directory",
+        "explanation": "Percent-encoding leaves `.` unescaped, so a key such as `..` produces `../.json` and path traversal can read, overwrite, or remove files outside the cache namespace.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/DiskCache.swift",
+        "line": 129,
+        "severity": "medium",
+        "title": "Negative size limits evict every entry",
+        "explanation": "A negative `maxTotalSize` can be passed without validation, making the eviction condition remain true after all files are removed and allowing unrelated directory entries to be deleted.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/DiskCache.swift",
+        "line": 34,
+        "severity": "medium",
+        "title": "Caches-directory lookup can crash",
+        "explanation": "The code force-indexes the result of `FileManager.urls`, which may be empty in constrained or unusual environments and cause an out-of-bounds crash during initialization.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "swift-user-store",
+    "lang": "swift",
+    "condition": "jev",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "Sources/App/UserListViewModel.swift",
+        "line": 45,
+        "severity": "medium",
+        "title": "Ignore completions from superseded requests",
+        "explanation": "Canceling a request does not prevent its completion handler from running, so an older load or refresh can clear `isLoading`, set an obsolete error, or overwrite users after a newer request has started.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/UserListViewModel.swift",
+        "line": 61,
+        "severity": "medium",
+        "title": "Validate the HTTP response before decoding",
+        "explanation": "The response is ignored, so HTTP failures such as 404 or 500 are treated as successful responses and reported as JSON decoding errors instead of meaningful network failures.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/UserListViewModel.swift",
+        "line": 73,
+        "severity": "medium",
+        "title": "Propagate refresh task cancellation",
+        "explanation": "The checked continuation waits for the URL request regardless of caller cancellation, and cancellation does not cancel the underlying data task, so a canceled SwiftUI refresh can remain suspended until the request completes.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "Sources/App/UserListViewModel.swift",
+        "rule": "swiftui-expensive-body",
+        "jevProbability": 0.52,
+        "graderConfirms": false
+      }
+    ]
+  },
+  {
+    "task": "swift-disk-cache",
+    "lang": "swift",
+    "condition": "jev",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "Sources/App/DiskCache.swift",
+        "line": 38,
+        "severity": "medium",
+        "title": "Validate the cache directory name",
+        "explanation": "Because `name` is interpolated into a filesystem path without rejecting path separators or `..`, an unintended or untrusted name can place cache operations outside the app’s caches directory.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/DiskCache.swift",
+        "line": 96,
+        "severity": "medium",
+        "title": "Long keys can exceed filesystem filename limits",
+        "explanation": "Base64 expands keys into a single filename component, so sufficiently long keys exceed common filesystem component limits and make `set` fail instead of supporting arbitrary `String` keys.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/DiskCache.swift",
+        "line": 37,
+        "severity": "low",
+        "title": "Reject negative size limits",
+        "explanation": "A negative `maxTotalSizeInBytes` is accepted and causes size enforcement to evict every entry, which is surprising for a configuration error.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "swift-user-store",
+    "lang": "swift",
+    "condition": "jev-high",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "Sources/App/UserListViewModel.swift",
+        "line": 47,
+        "severity": "medium",
+        "title": "Refresh does not await the network request",
+        "explanation": "`loadUsers()` starts a callback-based request and returns immediately, so `.refreshable` ends its refresh indicator before the request finishes and cannot correctly represent or coordinate the refresh.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/UserListViewModel.swift",
+        "line": 47,
+        "severity": "medium",
+        "title": "Concurrent loads can overwrite newer results",
+        "explanation": "Repeated refreshes or an initial load overlapping a refresh can complete out of order, allowing an older response to overwrite newer users and one completion to clear `isLoading` while another request is still active.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/UserListViewModel.swift",
+        "line": 52,
+        "severity": "medium",
+        "title": "HTTP error responses are treated as successful data",
+        "explanation": "The callback ignores `response`, so non-2xx responses are decoded as user data and may produce misleading parse errors or overwrite the displayed results.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/UserListViewModel.swift",
+        "line": 63,
+        "severity": "medium",
+        "title": "JSON decoding runs on the main thread",
+        "explanation": "The response is dispatched to the main queue before decoding, so larger payloads can block UI rendering and interaction.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/UserListViewModel.swift",
+        "line": 104,
+        "severity": "low",
+        "title": "An empty successful result triggers repeated loads",
+        "explanation": "Because the view uses `users.isEmpty` as its load-state check, a valid response containing no users causes later task executions to fetch again unnecessarily.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "swift-config-loader",
+    "lang": "swift",
+    "condition": "jev",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "Sources/App/AppConfig.swift",
+        "line": 4,
+        "severity": "medium",
+        "title": "Public mutable fields bypass configuration validation",
+        "explanation": "Callers can mutate a loaded `AppConfig` to use out-of-range values or an invalid URL, so the loader’s validation does not remain an invariant of the returned configuration.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "swift-image-loader",
+    "lang": "swift",
+    "condition": "none",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "Sources/App/ImageLoader.swift",
+        "line": 16,
+        "severity": "medium",
+        "title": "Unconditional AppKit image type",
+        "explanation": "`NSImage` is referenced throughout the file even though AppKit is imported conditionally, so this source will not compile for targets where `canImport(AppKit)` is false.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/ImageLoader.swift",
+        "line": 68,
+        "severity": "medium",
+        "title": "Synchronous disk I/O blocks the actor",
+        "explanation": "`Data(contentsOf:)` and the cache write run synchronously on the actor executor, so slow or large disk operations can block other image requests and cache lookups handled by this actor.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/ImageLoader.swift",
+        "line": 94,
+        "severity": "low",
+        "title": "Only HTTP 200 responses are accepted",
+        "explanation": "The loader rejects every other successful 2xx response, including a potentially valid image returned with status 206, instead of accepting successful HTTP status codes generally.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/ImageLoader.swift",
+        "line": 148,
+        "severity": "medium",
+        "title": "Disk cache entries never expire",
+        "explanation": "The URL-only cache key and absence of expiration or revalidation mean an image that changes at the same URL can remain stale on disk indefinitely.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "swift-config-loader",
+    "lang": "swift",
+    "condition": "jev-high",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "Sources/App/AppConfig.swift",
+        "line": 80,
+        "severity": "medium",
+        "title": "Invalid numeric environment overrides are silently ignored",
+        "explanation": "When `APP_TIMEOUT` or `APP_MAX_CONNECTIONS` is present but cannot be parsed as an `Int`, loading silently uses the file value or default, so a malformed deployment override can go unnoticed instead of failing clearly.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/AppConfig.swift",
+        "line": 96,
+        "severity": "medium",
+        "title": "HTTPS scheme comparison may reject valid uppercase schemes",
+        "explanation": "URL schemes are case-insensitive, but comparing `baseURL.scheme` directly to lowercase `\"https\"` can reject otherwise-valid values such as `HTTPS://example.com`.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "swift-todo-view",
+    "lang": "swift",
+    "condition": "none",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "Sources/App/TodoScreen.swift",
+        "line": 16,
+        "severity": "medium",
+        "title": "HTTP error responses are treated as successful payloads",
+        "explanation": "The response is discarded, so a non-2xx response with a decodable body can be reported as a successful todo list instead of a request failure.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/TodoScreen.swift",
+        "line": 76,
+        "severity": "medium",
+        "title": "Repeated appearances start overlapping requests",
+        "explanation": "`onAppear` can run more than once, and each invocation starts a new request whose completion may overwrite newer results or clear the loading state while another request is still in flight.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "Sources/App/TodoScreen.swift",
+        "rule": "swift-no-force-unwrap",
+        "jevProbability": 0.98,
+        "graderConfirms": true
+      }
+    ]
+  },
+  {
+    "task": "swift-todo-view",
+    "lang": "swift",
+    "condition": "jev",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "Sources/App/TodoScreen.swift",
+        "line": 39,
+        "severity": "medium",
+        "title": "Repeated appearances can start overlapping loads",
+        "explanation": "`onAppear` runs each time the screen reappears, so multiple requests can overlap and an older response may overwrite newer results; avoid redundant loads or cancel/identify prior requests.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/TodoScreen.swift",
+        "line": 54,
+        "severity": "medium",
+        "title": "The fetch is not tied to the view lifecycle",
+        "explanation": "The request continues after the screen disappears and its completion still schedules state updates, so use a cancellable task or otherwise prevent updates from an obsolete screen.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "swift-image-loader",
+    "lang": "swift",
+    "condition": "jev-high",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "Sources/App/ImageLoader.swift",
+        "line": 58,
+        "severity": "medium",
+        "title": "Non-Sendable image crosses actor boundary",
+        "explanation": "`NSImage` is not generally `Sendable`, so storing it in `Task<NSImage, Error>` and returning it from an actor can fail Swift 6 strict-concurrency checks or permit unsafe cross-actor access.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/ImageLoader.swift",
+        "line": 138,
+        "severity": "medium",
+        "title": "Cache filenames can exceed filesystem limits",
+        "explanation": "Base64-encoding the entire URL creates a filename proportional to the URL length, so long URLs can exceed filesystem component limits and make disk caching silently fail.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/ImageLoader.swift",
+        "line": 85,
+        "severity": "medium",
+        "title": "Downloaded response size is unbounded",
+        "explanation": "The loader buffers the complete response and decodes it without a size limit, allowing an unexpectedly large or malicious image response to consume excessive memory.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/ImageLoader.swift",
+        "line": 105,
+        "severity": "low",
+        "title": "Image decoding errors are misreported as transport failures",
+        "explanation": "The catch wraps `LoaderError.invalidImageData` in `LoaderError.transportFailure`, obscuring the actual failure category from callers.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/ImageLoader.swift",
+        "line": 83,
+        "severity": "low",
+        "title": "Nonpositive retry counts skip all attempts",
+        "explanation": "When `maxRetries` is zero or negative, the loop performs no request and reports an unrelated unknown transport failure instead of validating or normalizing the configuration.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "swift-image-loader",
+    "lang": "swift",
+    "condition": "jev",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "Sources/App/ImageLoader.swift",
+        "line": 100,
+        "severity": "medium",
+        "title": "Transient HTTP responses are not retried",
+        "explanation": "The 429/5xx path wraps the status failure in `LoaderError.transportFailure`, but `isTransient(_:)` only recognizes `URLError`, so these responses bypass the configured retry policy.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/ImageLoader.swift",
+        "line": 98,
+        "severity": "medium",
+        "title": "Other unsuccessful HTTP responses are treated as image data",
+        "explanation": "Only 429 and 5xx statuses are special-cased, so responses such as 404 are returned as successful data and later reported as invalid image data instead of an HTTP failure.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "swift-todo-view",
+    "lang": "swift",
+    "condition": "jev-high",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "Sources/App/TodoScreen.swift",
+        "line": 47,
+        "severity": "medium",
+        "title": "Repeated appearances can start overlapping requests",
+        "explanation": "`onAppear` may run more than once, and these requests are neither deduplicated nor cancelled, so an older response can overwrite newer todos or clear `isLoading` while another request is still in flight.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "ts-github-top-repos",
+    "lang": "typescript",
+    "condition": "jev-high",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "src/github.ts",
+        "line": 43,
+        "severity": "high",
+        "title": "Followed pagination links can leak the GitHub token",
+        "explanation": "The `Link` header URL is fetched with the same `Authorization` header without checking that it points to `api.github.com`, so a malicious or compromised response could send the configured token to another host.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/github.ts",
+        "line": 41,
+        "severity": "medium",
+        "title": "API response is trusted without runtime validation",
+        "explanation": "The cast does not validate the JSON, so an unexpected response shape can make `repos.push(...page)` throw or produce invalid values that break sorting and output.",
+        "rule": "ts-unvalidated-external-data",
+        "jevProbability": 0.97
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "ts-github-top-repos",
+    "lang": "typescript",
+    "condition": "jev",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "src/github.ts",
+        "line": 10,
+        "severity": "medium",
+        "title": "Link parsing breaks on commas inside URLs",
+        "explanation": "Splitting the Link header on every comma is not safe because a URL can contain a comma, so pagination may stop early or follow an incorrect link.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/github.ts",
+        "line": 31,
+        "severity": "medium",
+        "title": "Pagination follows untrusted Link URLs",
+        "explanation": "The response-provided next URL is fetched without checking its origin, allowing a malformed or compromised Link header to redirect requests (and the Authorization header) to another host.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/github.ts",
+        "line": 37,
+        "severity": "medium",
+        "title": "Response JSON is trusted without validation",
+        "explanation": "Casting arbitrary JSON to `GitHubRepo[]` can let malformed or unexpected API responses produce runtime errors or invalid sorting and output.",
+        "rule": "ts-unvalidated-external-data",
+        "jevProbability": 0.97
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "ts-github-top-repos",
+    "lang": "typescript",
+    "condition": "none",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "src/github.ts",
+        "line": 10,
+        "severity": "medium",
+        "title": "Link parsing can truncate valid pagination URLs",
+        "explanation": "Splitting the Link header on commas before parsing each entry breaks when a URL contains a comma, potentially causing pagination to stop early and return incomplete results.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/github.ts",
+        "line": 30,
+        "severity": "medium",
+        "title": "Pagination follows unvalidated server-provided URLs",
+        "explanation": "The next URL is used directly for a fetch that includes the GitHub authorization header, so a malformed or compromised Link header could direct the token to another host; restrict pagination URLs to the expected GitHub API origin.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/github.ts",
+        "line": 36,
+        "severity": "medium",
+        "title": "API response is asserted without validation",
+        "explanation": "Casting arbitrary JSON to `GitHubRepo[]` allows malformed or unexpected responses to produce invalid data or runtime errors during sorting and output.",
+        "rule": "ts-unvalidated-external-data",
+        "jevProbability": 0.97
+      },
+      {
+        "file": "src/github.ts",
+        "line": 51,
+        "severity": "medium",
+        "title": "Repository count is not validated",
+        "explanation": "A non-finite or otherwise invalid `stargazers_count` makes the sort comparator return `NaN`, yielding incorrect ordering rather than rejecting or handling the malformed API data.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/cli.ts",
+        "line": 10,
+        "severity": "medium",
+        "title": "Unhandled fetch errors cause an uncaught rejection",
+        "explanation": "Network failures, API errors, or invalid responses reject the top-level await without a user-facing error path, producing an unhandled rejection and an unreliable CLI exit status.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "ts-retry-sync",
+    "lang": "typescript",
+    "condition": "jev",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "src/retry.ts",
+        "line": 44,
+        "severity": "high",
+        "title": "Invalid attempt counts silently return undefined",
+        "explanation": "When `attempts` is `0` or negative, the loop never runs and the function throws `undefined`, so validate that attempts is a positive integer before entering the loop.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/retry.ts",
+        "line": 55,
+        "severity": "medium",
+        "title": "A throwing retry callback aborts the retry process",
+        "explanation": "If `onRetry` throws, that callback error escapes and replaces the original operation failure instead of allowing the configured retry sequence to continue.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/retry.ts",
+        "line": 26,
+        "severity": "medium",
+        "title": "Exponential backoff can overflow before it is capped",
+        "explanation": "For a sufficiently large attempt number, `baseDelayMs * 2 ** (attempt - 1)` can become `Infinity`, producing an invalid delay calculation rather than reliably respecting `maxDelayMs`.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/retry.ts",
+        "line": 37,
+        "severity": "medium",
+        "title": "Retry options are not validated",
+        "explanation": "Negative, infinite, or `NaN` delay and jitter values can produce invalid or unintended timing, so the public helper should reject values outside documented ranges.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/sync.ts",
+        "line": 43,
+        "severity": "medium",
+        "title": "Retries can duplicate records after an ambiguous upload failure",
+        "explanation": "If the server commits a POST but the response is lost or the client times out, retrying the same batch can process its records more than once unless the endpoint supports idempotency and the request supplies a stable key.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/sync.ts",
+        "line": 18,
+        "severity": "medium",
+        "title": "Configured endpoint URL is not validated",
+        "explanation": "A malformed or non-HTTP `SYNC_ENDPOINT_URL` is accepted until `fetch` fails, and an unexpected URL scheme or destination can also expose the bearer token; validate the URL and allowed scheme before use.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/sync.ts",
+        "line": 43,
+        "severity": "low",
+        "title": "Retries are not limited to transient failures",
+        "explanation": "The retry wrapper treats permanent responses such as 400, 401, and 403 the same as transient server or network failures, wasting time and potentially delaying useful failure reporting.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/sync.ts",
+        "line": 69,
+        "severity": "low",
+        "title": "All batches are uploaded sequentially",
+        "explanation": "Awaiting each batch in the loop makes large syncs unnecessarily slow; consider bounded concurrency if the endpoint and ordering requirements permit it.",
+        "rule": "ts-sequential-await-loop",
+        "jevProbability": 0.78
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "ts-ws-client",
+    "lang": "typescript",
+    "condition": "none",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "src/wsClient.ts",
+        "line": 61,
+        "severity": "medium",
+        "title": "Repeated connect calls create competing sockets",
+        "explanation": "Calling `connect()` while a socket is already connecting or open starts another socket, so both can deliver messages and the older socket's close event can schedule reconnects that replace the newer connection.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/wsClient.ts",
+        "line": 70,
+        "severity": "medium",
+        "title": "Closing during connection can reconnect unexpectedly",
+        "explanation": "`close()` clears the reconnect timer but leaves the socket's close event to run asynchronously, and a later `connect()` can reset `closedByUser` before that event fires, causing the old socket to schedule an unwanted reconnect.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/wsClient.ts",
+        "line": 103,
+        "severity": "medium",
+        "title": "Stale socket can reset reconnect backoff",
+        "explanation": "The open listener resets `reconnectAttempts` without checking that this socket is still current, so an obsolete socket opening can defeat backoff for the active connection.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/wsClient.ts",
+        "line": 144,
+        "severity": "medium",
+        "title": "A throwing handler prevents later handlers from running",
+        "explanation": "Handlers are invoked without isolation, so one subscriber exception aborts dispatch and suppresses delivery to every remaining subscriber for that message.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/wsClient.ts",
+        "line": 153,
+        "severity": "medium",
+        "title": "Queue is lost if sending a queued message throws",
+        "explanation": "The queue is cleared before serialization and sends complete, so a serialization or WebSocket send failure drops the unsent messages instead of retaining or reporting them.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/wsClient.ts",
+        "line": 162,
+        "severity": "medium",
+        "title": "Heartbeat can queue indefinitely while disconnected",
+        "explanation": "The heartbeat interval calls `send()` even when the socket is unavailable, causing ping messages to accumulate in the outgoing queue and be flushed later as stale heartbeats after reconnect.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/wsClient.ts",
+        "line": 174,
+        "severity": "medium",
+        "title": "Reconnect options are not validated",
+        "explanation": "Negative, non-finite, or otherwise invalid delay and backoff values can produce immediate retry loops or invalid timer delays rather than a usable reconnect policy.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "src/wsClient.ts",
+        "rule": "ts-no-empty-catch",
+        "jevProbability": 0.8,
+        "graderConfirms": false
+      },
+      {
+        "file": "src/wsClient.ts",
+        "rule": "ts-no-vague-names",
+        "jevProbability": 0.5,
+        "graderConfirms": true
+      }
+    ]
+  },
+  {
+    "task": "ts-rate-limiter",
+    "lang": "typescript",
+    "condition": "none",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "src/rateLimiter.ts",
+        "line": 60,
+        "severity": "high",
+        "title": "Cleanup never expires fully refilled buckets",
+        "explanation": "`cleanup()` calls `refill()`, which always advances `lastRefill` to `now`; because cleanup runs periodically, a full bucket's idle time is reset on every sweep and it is never removed.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/rateLimiter.ts",
+        "line": 46,
+        "severity": "medium",
+        "title": "Invalid costs can bypass the limit or corrupt bucket state",
+        "explanation": "`consume()` accepts arbitrary costs, so a negative cost increases tokens beyond capacity and a cost of zero is always allowed; validate that cost is finite and positive.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/rateLimiter.ts",
+        "line": 30,
+        "severity": "medium",
+        "title": "Numeric options accept NaN and infinity",
+        "explanation": "The positivity checks do not reject non-finite values, which can make refill calculations and token comparisons behave unpredictably; validate capacity, refill rate, and stale duration as finite values.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/middleware.ts",
+        "line": 43,
+        "severity": "medium",
+        "title": "Cleanup timer has no lifecycle control",
+        "explanation": "Each middleware instance creates a permanent interval with no way to clear it, keeping the process alive and leaking timers when instances are replaced; expose disposal or otherwise manage the timer lifecycle.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/middleware.ts",
+        "line": 30,
+        "severity": "medium",
+        "title": "Forwarded IP is trusted as an authentication key",
+        "explanation": "When `req.ip` is absent, any caller can supply `X-Forwarded-For` and choose a different rate-limit bucket, so only trust this header when it has been validated by a trusted proxy.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/middleware.ts",
+        "line": 41,
+        "severity": "medium",
+        "title": "Cleanup interval is not validated",
+        "explanation": "A zero or negative `cleanupIntervalMs` is accepted and can cause a near-continuous timer, while non-finite values can produce unreliable scheduling.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "ts-rate-limiter",
+    "lang": "typescript",
+    "condition": "jev-high",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "src/middleware.ts",
+        "line": 37,
+        "severity": "high",
+        "title": "Trusts spoofable forwarded IP header",
+        "explanation": "When neither `req.ip` nor the socket address is available, this uses client-controlled `X-Forwarded-For` as the rate-limit identity, allowing callers to rotate header values and bypass limits; only trust forwarded addresses when a trusted proxy has validated them.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/middleware.ts",
+        "line": 41,
+        "severity": "medium",
+        "title": "Array-valued forwarded header is not parsed",
+        "explanation": "For an array-valued header, the first element may itself contain a comma-separated proxy chain, but this branch uses it verbatim rather than selecting and trimming the first address as the string branch does.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/rateLimiter.ts",
+        "line": 32,
+        "severity": "medium",
+        "title": "Rate-limit options are not validated for finiteness",
+        "explanation": "`NaN` or infinite capacity/refill values pass the `<= 0` checks and can produce buckets that never deny requests or invalid retry intervals, so reject non-finite values.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/rateLimiter.ts",
+        "line": 41,
+        "severity": "medium",
+        "title": "Stale interval can be zero or invalid",
+        "explanation": "An explicit `staleAfterMs` is accepted without validation, and zero or negative values can evict a bucket on every call, effectively granting a fresh full bucket to each request.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/rateLimiter.ts",
+        "line": 76,
+        "severity": "medium",
+        "title": "Backward timestamps postpone refills",
+        "explanation": "When `now` moves backward, `refill` leaves `lastRefillMs` unchanged, so subsequent requests may keep seeing negative elapsed time and receive no refill until the clock catches up; clamp or normalize backward time.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "ts-transactions-report",
+    "lang": "typescript",
+    "condition": "none",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "src/report.ts",
+        "line": 63,
+        "severity": "high",
+        "title": "Splits CSV records inside quoted fields",
+        "explanation": "Splitting on newline before parsing means a valid quoted description containing a line break is treated as multiple records and produces corrupted transactions.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/report.ts",
+        "line": 40,
+        "severity": "medium",
+        "title": "Accepts malformed quote placement",
+        "explanation": "The parser treats any quote outside a quoted field as an opening quote, even in the middle of unquoted text, so malformed CSV is silently reinterpreted instead of rejected.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/report.ts",
+        "line": 79,
+        "severity": "high",
+        "title": "Does not validate CSV field counts",
+        "explanation": "Rows with missing fields yield undefined values that crash at `.trim()`, while extra fields are silently ignored, making input failures inconsistent and potentially losing data.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/report.ts",
+        "line": 84,
+        "severity": "high",
+        "title": "Accepts invalid amounts as NaN or partial numbers",
+        "explanation": "`parseFloat` accepts prefixes such as `12abc` and returns `NaN` for invalid input, which can silently poison totals and formatting rather than reporting invalid transactions.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/report.ts",
+        "line": 55,
+        "severity": "medium",
+        "title": "Validates only the date prefix",
+        "explanation": "The regex accepts impossible dates and arbitrary trailing text such as `2024-13-99junk`, causing invalid transaction dates to be grouped as if valid.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/report.ts",
+        "line": 107,
+        "severity": "medium",
+        "title": "Category grouping is case- and whitespace-sensitive",
+        "explanation": "Tax eligibility normalizes category names, but totals use the original category string, so values such as `Retail` and ` retail ` appear as separate categories despite representing the same category.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/report.ts",
+        "line": 125,
+        "severity": "medium",
+        "title": "Currency formatting can emit non-finite values",
+        "explanation": "Invalid or overflowed amounts produce `NaN` or `Infinity` totals, and `toFixed` displays those strings rather than surfacing a data validation error.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/report.ts",
+        "line": 140,
+        "severity": "medium",
+        "title": "Formatting can exceed the amount column width",
+        "explanation": "The fixed width of 12 is too small for large or negative currency values, so the supposedly aligned report becomes ragged for valid amounts.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "ts-ws-client",
+    "lang": "typescript",
+    "condition": "jev-high",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "src/wsClient.ts",
+        "line": 51,
+        "severity": "high",
+        "title": "Repeated connects create competing sockets",
+        "explanation": "`connect()` always opens a new socket without closing or guarding the existing one, and callbacks from replaced sockets can still deliver messages, start heartbeats, or schedule reconnects against the client’s current state.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/wsClient.ts",
+        "line": 101,
+        "severity": "high",
+        "title": "Stale close events can reconnect after an intentional close",
+        "explanation": "The close callback checks only the shared `closedByUser` flag, so if `connect()` resets it before an older socket’s close event fires, that obsolete socket can schedule an unwanted reconnect.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "src/wsClient.ts",
+        "rule": "ts-no-empty-catch",
+        "jevProbability": 0.79,
+        "graderConfirms": false
+      }
+    ]
+  },
+  {
+    "task": "ts-rate-limiter",
+    "lang": "typescript",
+    "condition": "jev",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "src/middleware.ts",
+        "line": 40,
+        "severity": "high",
+        "title": "Untrusted forwarded IP can bypass per-client limits",
+        "explanation": "When `req.ip` is absent, the middleware trusts the client-controlled `X-Forwarded-For` header, allowing callers to rotate the header and obtain fresh buckets unless the application independently guarantees a trusted proxy.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/rateLimiter.ts",
+        "line": 40,
+        "severity": "medium",
+        "title": "Reject non-finite and invalid limiter options",
+        "explanation": "The checks allow values such as `NaN` and `Infinity` (and do not validate stale/sweep intervals), which can produce unusable refill calculations or prevent stale buckets from ever being removed.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/middleware.ts",
+        "line": 56,
+        "severity": "medium",
+        "title": "Validate request cost before consuming tokens",
+        "explanation": "A zero or negative `cost` bypasses limiting or increases a bucket's tokens beyond capacity, while a cost greater than capacity can never be satisfied and yields misleading retry times.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "ts-retry-sync",
+    "lang": "typescript",
+    "condition": "jev-high",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "src/retry.ts",
+        "line": 57,
+        "severity": "medium",
+        "title": "Retry callback runs after the final failed attempt",
+        "explanation": "`onRetry` is invoked even when no retry will follow, so observers may report a retry that never happens and a callback exception can replace the final operation error.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/retry.ts",
+        "line": 52,
+        "severity": "medium",
+        "title": "Invalid attempt counts can silently skip the operation",
+        "explanation": "Zero, negative, or `NaN` `attempts` values make the loop run zero times and reject with `undefined` instead of invoking `fn` or reporting invalid options.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/retry.ts",
+        "line": 31,
+        "severity": "medium",
+        "title": "Retry options are not validated",
+        "explanation": "Negative or non-finite delays and jitter outside `[0, 1]` can produce nonsensical timing behavior, including immediate retries or invalid timer delays.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/sync.ts",
+        "line": 37,
+        "severity": "medium",
+        "title": "Successful HTTP status codes are treated as upload failures",
+        "explanation": "`response.ok` is false for valid non-error statuses such as `304`, so endpoints that legitimately return those statuses cause a batch to be retried and then marked failed.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/sync.ts",
+        "line": 42,
+        "severity": "medium",
+        "title": "Sync failures are swallowed from the caller",
+        "explanation": "`syncRecords` returns a result even when every batch fails, so callers cannot distinguish complete failure from success unless they inspect the result themselves; consider making the contract explicit or rejecting when appropriate.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/sync.ts",
+        "line": 19,
+        "severity": "low",
+        "title": "Node-specific environment access limits portability",
+        "explanation": "Referencing `process.env` directly makes this module fail in browser or non-Node runtimes unless a compatible `process` global is provided.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/index.ts",
+        "line": 1,
+        "severity": "medium",
+        "title": "Package entry point exports no public API",
+        "explanation": "The barrel module is empty, so consumers importing from the package root cannot access `retryWithBackoff`, `syncRecords`, or `main`.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "src/sync.ts",
+        "rule": "ts-sequential-await-loop",
+        "jevProbability": 0.66,
+        "graderConfirms": true
+      }
+    ]
+  },
+  {
+    "task": "ts-retry-sync",
+    "lang": "typescript",
+    "condition": "none",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "src/retry.ts",
+        "line": 52,
+        "severity": "high",
+        "title": "Invalid attempt counts can silently skip the operation",
+        "explanation": "With `attempts` set to 0, a negative number, or `NaN`, the loop never runs and the function throws `undefined` without calling `fn`; validate that the value is a finite positive integer before entering the loop.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/sync.ts",
+        "line": 97,
+        "severity": "medium",
+        "title": "CLI always syncs an empty record set",
+        "explanation": "The executable entry point hardcodes `records` to an empty array, so running the sync command reports success without uploading any data.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/sync.ts",
+        "line": 106,
+        "severity": "medium",
+        "title": "CLI entry-point detection is brittle",
+        "explanation": "Comparing `import.meta.url` to a manually constructed `file://` string fails for paths requiring URL encoding and other noncanonical path forms, preventing `main()` from running in those cases.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/index.ts",
+        "line": 1,
+        "severity": "medium",
+        "title": "Package entry point exports no API",
+        "explanation": "The barrel file exports nothing, so consumers importing the package entry point cannot access `retryWithBackoff`, `syncRecords`, or the result types.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "src/sync.ts",
+        "rule": "ts-sequential-await-loop",
+        "jevProbability": 0.63,
+        "graderConfirms": true
+      }
+    ]
+  },
+  {
+    "task": "ts-transactions-report",
+    "lang": "typescript",
+    "condition": "jev-high",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "src/report.ts",
+        "line": 57,
+        "severity": "medium",
+        "title": "Quoted fields cannot contain newlines",
+        "explanation": "Splitting the input into physical lines before parsing breaks valid CSV records with quoted multiline fields, producing incorrect transactions and totals.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/report.ts",
+        "line": 58,
+        "severity": "medium",
+        "title": "Trimming lines alters CSV field data",
+        "explanation": "Trimming each record before parsing removes meaningful leading or trailing whitespace from fields, including whitespace inside quoted values at the edges of a line.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/report.ts",
+        "line": 68,
+        "severity": "medium",
+        "title": "Malformed rows silently produce invalid totals",
+        "explanation": "Rows with missing columns or nonnumeric amounts are accepted, and `Number(undefined)` or invalid text yields `NaN`, which then contaminates totals and appears in the report.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/report.ts",
+        "line": 68,
+        "severity": "medium",
+        "title": "Extra CSV columns are silently discarded",
+        "explanation": "Destructuring only the first four parsed fields drops any additional columns without reporting a malformed row, potentially hiding input-data errors.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/report.ts",
+        "line": 41,
+        "severity": "low",
+        "title": "Quotes in unquoted fields are accepted and removed",
+        "explanation": "The parser treats any quote outside a quoted field as an opening delimiter, so malformed input such as `ab\"cd` is silently rewritten rather than rejected or preserved.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "ts-lru-user-cache",
+    "lang": "typescript",
+    "condition": "jev-high",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "src/cache.ts",
+        "line": 19,
+        "severity": "medium",
+        "title": "Validate cache option values",
+        "explanation": "This check accepts `NaN`, `Infinity`, and fractional sizes, while invalid TTLs such as `NaN` make entries never expire and negative TTLs make them immediately stale, so validate that `maxSize` is a finite positive integer and `ttlMs` is a finite non-negative value.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/cache.ts",
+        "line": 42,
+        "severity": "medium",
+        "title": "`has` misreports cached `undefined` values",
+        "explanation": "Because `V` can be `undefined`, a present entry containing that value is treated as absent, so implement `has` using map membership and expiration checks rather than comparing `get`'s result.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/cache.ts",
+        "line": 48,
+        "severity": "low",
+        "title": "Expired entries can evict live entries",
+        "explanation": "Expired entries are only removed when their own keys are read, so an expired entry at the LRU end can cause a still-valid entry to be evicted on insertion.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/userService.ts",
+        "line": 41,
+        "severity": "medium",
+        "title": "Invalidation does not prevent an in-flight load from repopulating the cache",
+        "explanation": "If `invalidate(id)` runs while `fetchUser(id)` is pending, that request's completion unconditionally caches its result, making the invalidated user available again.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "swift-weather-client",
+    "lang": "swift",
+    "condition": "none",
+    "rep": 2,
+    "findings": [],
+    "jevOnly": [
+      {
+        "file": "Sources/App/WeatherClient.swift",
+        "rule": "swift-no-force-unwrap",
+        "jevProbability": 0.97,
+        "graderConfirms": true
+      }
+    ]
+  },
+  {
+    "task": "ts-lru-user-cache",
+    "lang": "typescript",
+    "condition": "jev",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "src/cache.ts",
+        "line": 17,
+        "severity": "medium",
+        "title": "Validate cache option values",
+        "explanation": "`maxSize` and `ttlMs` are not checked for finite positive values, so `NaN`/infinite sizes can disable eviction and invalid TTLs can make entries expire immediately or never expire.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/cache.ts",
+        "line": 40,
+        "severity": "medium",
+        "title": "`has` misreports cached `undefined` values",
+        "explanation": "Because `get` also returns `undefined` for a miss, a key whose cached value is `undefined` is always reported absent even while its entry exists.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/cache.ts",
+        "line": 46,
+        "severity": "medium",
+        "title": "Expired entries can evict live entries",
+        "explanation": "Expired entries are only removed when their own keys are read, so a later insertion can evict the oldest live entry to make room while an expired entry elsewhere still occupies capacity.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/userService.ts",
+        "line": 39,
+        "severity": "medium",
+        "title": "Invalidation does not prevent an in-flight fetch from repopulating the cache",
+        "explanation": "If `invalidate(id)` runs while a request is pending, that request can later cache its stale result, and subsequent callers can also receive the still-pending result.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "swift-weather-client",
+    "lang": "swift",
+    "condition": "jev-high",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "Sources/App/WeatherClient.swift",
+        "line": 84,
+        "severity": "medium",
+        "title": "Cancellation is converted into an ordinary request failure",
+        "explanation": "The broad catch wraps `CancellationError` as `requestFailed`, so callers cannot reliably distinguish task cancellation from a network error; rethrow cancellation before wrapping other errors.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/WeatherClient.swift",
+        "line": 72,
+        "severity": "medium",
+        "title": "Replacing query items can discard required base URL parameters",
+        "explanation": "Assigning `components.queryItems` replaces any query parameters already present on a caller-supplied `baseURL`, which can break endpoints that require fixed query items; preserve existing items or explicitly document that they are discarded.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/WeatherClient.swift",
+        "line": 56,
+        "severity": "low",
+        "title": "Whitespace-only API keys are accepted",
+        "explanation": "The initializer only checks that the key is nonempty, so an environment value containing whitespace passes validation and produces confusing authentication failures.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "ts-ws-client",
+    "lang": "typescript",
+    "condition": "jev",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "src/wsClient.ts",
+        "line": 42,
+        "severity": "medium",
+        "title": "Repeated connect calls create competing sockets",
+        "explanation": "Calling `connect()` while a socket is connecting or open replaces `this.ws` without closing the previous socket, whose events can still trigger reconnects or heartbeat cleanup and interfere with the active connection.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/wsClient.ts",
+        "line": 51,
+        "severity": "medium",
+        "title": "Late close events can reconnect after a new connect",
+        "explanation": "`close()` sets `closedByUser` and closes the current socket, but a subsequent `connect()` resets that flag before the old socket's close event fires, allowing the obsolete socket to schedule an unwanted reconnect.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/wsClient.ts",
+        "line": 51,
+        "severity": "medium",
+        "title": "Socket reference is cleared before close completes",
+        "explanation": "Setting `this.ws` to null immediately after `close()` means sends made while the socket is closing are queued even though the closing socket may still deliver its close event, and `connect()` can create another socket before the old one is fully shut down.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/wsClient.ts",
+        "line": 72,
+        "severity": "medium",
+        "title": "Undefined JSON serialization can enqueue an invalid payload",
+        "explanation": "`JSON.stringify` returns `undefined` for values such as `undefined` or functions, so this method can put a non-string into the string queue and later pass it to `WebSocket.send`, which throws.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/wsClient.ts",
+        "line": 81,
+        "severity": "medium",
+        "title": "Socket construction errors bypass reconnect handling",
+        "explanation": "`new WebSocket(...)` can throw for an invalid URL or protocol configuration, and because construction is outside any error handling the client neither reports nor retries the failure.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/wsClient.ts",
+        "line": 124,
+        "severity": "medium",
+        "title": "One throwing subscriber prevents remaining handlers from running",
+        "explanation": "Handlers are invoked without isolation, so an exception from one subscriber aborts dispatch for all later subscribers and escapes the WebSocket event callback.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/wsClient.ts",
+        "line": 135,
+        "severity": "medium",
+        "title": "Queue is lost when a send fails during flush",
+        "explanation": "The queue is cleared before sending, so if the socket closes or `send` throws partway through the loop, unsent messages are permanently discarded.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/wsClient.ts",
+        "line": 157,
+        "severity": "medium",
+        "title": "Reconnect backoff can overflow and invalid delays are accepted",
+        "explanation": "Unvalidated delay options and the unbounded exponent can produce negative, non-finite, or overflowed delays, causing invalid timer behavior or effectively defeating the intended maximum backoff.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "swift-user-store",
+    "lang": "swift",
+    "condition": "jev",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "Sources/App/UserListViewModel.swift",
+        "line": 72,
+        "severity": "medium",
+        "title": "Refresh returns before the request completes",
+        "explanation": "`refresh()` only starts the callback-based request and returns immediately, so `.refreshable` ends its refresh indicator before the network operation finishes and cannot await its result.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/UserListViewModel.swift",
+        "line": 42,
+        "severity": "medium",
+        "title": "Overlapping loads can publish stale results",
+        "explanation": "Each call starts an independent request, so an older, slower response can overwrite newer data and any completion can set `isLoading` to false while another request is still running.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/UserListView.swift",
+        "line": 11,
+        "severity": "medium",
+        "title": "View task does not manage the request lifecycle",
+        "explanation": "The task starts an untracked callback-based request that is not cancelled when the view disappears, and reappearing or restarting the task can issue duplicate loads.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "Sources/App/UserListViewModel.swift",
+        "rule": "swiftui-expensive-body",
+        "jevProbability": 0.55,
+        "graderConfirms": false
+      }
+    ]
+  },
+  {
+    "task": "swift-user-store",
+    "lang": "swift",
+    "condition": "none",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "Sources/App/UserListViewModel.swift",
+        "line": 1,
+        "severity": "high",
+        "title": "Missing Combine import",
+        "explanation": "`ObservableObject` and `@Published` are provided by Combine, so importing only Foundation can prevent this file from compiling.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/UserListViewModel.swift",
+        "line": 39,
+        "severity": "medium",
+        "title": "HTTP failures are treated as successful responses",
+        "explanation": "The completion handler ignores `URLResponse`, so non-2xx responses are not reported as request failures and may instead produce misleading decode errors or be accepted as valid data.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/UserListViewModel.swift",
+        "line": 64,
+        "severity": "medium",
+        "title": "Overlapping loads can overwrite newer data",
+        "explanation": "The initial `.task` load and pull-to-refresh can run concurrently, and whichever request finishes last replaces the users and error state regardless of which result is newer.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/UserListViewModel.swift",
+        "line": 36,
+        "severity": "medium",
+        "title": "Loading state is incorrect for concurrent requests",
+        "explanation": "Each request independently sets `isLoading` to false on completion, so one request can hide the loading indicator while another request is still in flight.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/UserListView.swift",
+        "line": 26,
+        "severity": "low",
+        "title": "The view task does not manage the network request lifecycle",
+        "explanation": "The task starts a callback-based request without retaining or cancelling it, so leaving the view does not stop the request and its completion can still update the view model.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "Sources/App/UserListViewModel.swift",
+        "rule": "swift-no-force-unwrap",
+        "jevProbability": 0.98,
+        "graderConfirms": true
+      },
+      {
+        "file": "Sources/App/UserListViewModel.swift",
+        "rule": "swiftui-expensive-body",
+        "jevProbability": 0.53,
+        "graderConfirms": false
+      },
+      {
+        "file": "Sources/App/UserListViewModel.swift",
+        "rule": "swift-dispatch-in-async",
+        "jevProbability": 0.92,
+        "graderConfirms": true
+      }
+    ]
+  },
+  {
+    "task": "swift-weather-client",
+    "lang": "swift",
+    "condition": "jev",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "Sources/App/WeatherClient.swift",
+        "line": 67,
+        "severity": "medium",
+        "title": "Cancellation is converted into a request error",
+        "explanation": "The catch also intercepts `CancellationError` and URL-loading cancellation, so callers cannot reliably cancel the async request and instead receive a `requestFailed` error.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/WeatherClient.swift",
+        "line": 34,
+        "severity": "low",
+        "title": "Whitespace-only API keys are accepted",
+        "explanation": "Checking only `isEmpty` accepts a whitespace-only environment value, which then produces avoidable authentication failures instead of reporting a missing key.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/WeatherClient.swift",
+        "line": 54,
+        "severity": "medium",
+        "title": "Existing base URL query parameters are discarded",
+        "explanation": "Assigning a new `queryItems` array overwrites any query items supplied in a custom `baseURL`, which can break clients that need fixed parameters such as a proxy token or routing option.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "swift-user-store",
+    "lang": "swift",
+    "condition": "jev-high",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "Sources/App/UserListViewModel.swift",
+        "line": 39,
+        "severity": "medium",
+        "title": "Canceled requests can still overwrite newer results",
+        "explanation": "Canceling a data task does not guarantee its completion callback cannot arrive, so an older request can set `isLoading` to false or overwrite the users and error state produced by a newer request.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/UserListViewModel.swift",
+        "line": 32,
+        "severity": "medium",
+        "title": "Refresh ignores caller cancellation",
+        "explanation": "`refresh()` does not observe task cancellation or cancel its underlying request, so a canceled SwiftUI refresh can remain suspended until the network callback completes.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "Sources/App/UserListViewModel.swift",
+        "rule": "swiftui-expensive-body",
+        "jevProbability": 0.63,
+        "graderConfirms": false
+      }
+    ]
+  },
+  {
+    "task": "ts-transactions-report",
+    "lang": "typescript",
+    "condition": "jev",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "src/report.ts",
+        "line": 74,
+        "severity": "medium",
+        "title": "Valid multiline CSV fields are split incorrectly",
+        "explanation": "Splitting the input into physical lines before parsing means a quoted description containing a newline is treated as multiple records, so valid CSV fails or produces incorrect transactions.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/report.ts",
+        "line": 42,
+        "severity": "medium",
+        "title": "Malformed CSV quoting is silently accepted",
+        "explanation": "The parser accepts quotes inside unquoted fields and characters after a closing quote, which can silently change field values instead of rejecting malformed input.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/report.ts",
+        "line": 57,
+        "severity": "medium",
+        "title": "Amount parsing accepts malformed values as valid amounts",
+        "explanation": "Removing every comma and passing the result to `Number` makes inputs such as `1,2` become 12 and an empty string or `$` become zero rather than producing an error.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/report.ts",
+        "line": 66,
+        "severity": "medium",
+        "title": "Date validation checks only the date's shape",
+        "explanation": "The regex accepts impossible dates such as `2024-99-99`, causing invalid month keys to enter the report without an error.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "ts-ws-client",
+    "lang": "typescript",
+    "condition": "jev-high",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "src/wsClient.ts",
+        "line": 43,
+        "severity": "high",
+        "title": "Repeated connect calls create competing sockets",
+        "explanation": "Calling `connect()` while a socket is already connecting or open creates another socket, and callbacks from either socket can overwrite state, trigger reconnects, or deliver duplicate messages.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/wsClient.ts",
+        "line": 51,
+        "severity": "high",
+        "title": "Stale socket close events can reconnect after close",
+        "explanation": "`close()` nulls the current socket but its asynchronous close handler still runs and may schedule a reconnect if `connect()` was called in the meantime, reopening a connection despite the caller’s intent.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/wsClient.ts",
+        "line": 81,
+        "severity": "high",
+        "title": "Old socket events mutate current connection state",
+        "explanation": "Event handlers do not check that their socket is still `this.socket`, so a superseded socket can reset retry state, flush through the wrong socket, stop a newer heartbeat, or schedule an unwanted reconnect.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/wsClient.ts",
+        "line": 126,
+        "severity": "medium",
+        "title": "A throwing handler prevents later handlers from receiving messages",
+        "explanation": "Handlers are invoked without isolation, so one subscriber exception aborts dispatch to every remaining subscriber for that message.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/wsClient.ts",
+        "line": 127,
+        "severity": "medium",
+        "title": "Mutating subscriptions during dispatch can skip handlers",
+        "explanation": "Iterating the live `Set` means a handler that removes another handler during dispatch can affect which subscribers receive the current message; dispatch over a snapshot to give subscriptions predictable semantics.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/wsClient.ts",
+        "line": 138,
+        "severity": "high",
+        "title": "Queued messages are lost when a send throws",
+        "explanation": "The queue is cleared before sending and a `send()` exception aborts the loop, permanently dropping the unsent payloads.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/wsClient.ts",
+        "line": 159,
+        "severity": "medium",
+        "title": "Reconnect backoff can overflow and become invalid",
+        "explanation": "Repeated failures can make `2 ** reconnectAttempts` overflow to `Infinity`, and unchecked negative or non-finite delay options can produce invalid or unintended timer delays.",
+        "rule": "ts-no-magic-numbers",
+        "jevProbability": 0.3
+      },
+      {
+        "file": "src/wsClient.ts",
+        "line": 73,
+        "severity": "medium",
+        "title": "Outgoing queue grows without bound while disconnected",
+        "explanation": "Every send while offline is retained indefinitely, so a long outage or high-volume producer can consume unbounded memory.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/wsClient.ts",
+        "line": 69,
+        "severity": "medium",
+        "title": "Unserializable messages silently become invalid payloads",
+        "explanation": "`JSON.stringify` can return `undefined` or throw for unsupported/cyclic values, leaving `send()` to enqueue or transmit an invalid payload instead of reporting serialization failure.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "swift-disk-cache",
+    "lang": "swift",
+    "condition": "none",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "Sources/App/DiskCache.swift",
+        "line": 18,
+        "severity": "medium",
+        "title": "Shared JSONEncoder is used concurrently",
+        "explanation": "`set` encodes before entering the queue’s barrier, so concurrent calls can access the same `JSONEncoder` at once even though it is not documented as thread-safe.",
+        "rule": "swift-unprotected-shared-state",
+        "jevProbability": 0.1
+      },
+      {
+        "file": "Sources/App/DiskCache.swift",
+        "line": 19,
+        "severity": "medium",
+        "title": "Shared JSONDecoder is used concurrently",
+        "explanation": "The concurrent queue allows simultaneous `value(forKey:)` calls to decode with the same `JSONDecoder`, which is not documented as safe for concurrent use.",
+        "rule": "swift-unprotected-shared-state",
+        "jevProbability": 0.1
+      },
+      {
+        "file": "Sources/App/DiskCache.swift",
+        "line": 39,
+        "severity": "medium",
+        "title": "Cache name can escape the caches directory",
+        "explanation": "Because `name` is appended directly as a path component, values containing traversal components can direct cache creation, removal, or eviction outside the intended cache directory.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/DiskCache.swift",
+        "line": 66,
+        "severity": "medium",
+        "title": "Expired-entry removal runs on a concurrent queue",
+        "explanation": "`value(forKey:)` can remove a file while other reads are accessing it because this mutation happens inside an ordinary `queue.sync`, not a barrier, leading to avoidable read/removal races.",
+        "rule": "swift-unprotected-shared-state",
+        "jevProbability": 0.1
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "swift-disk-cache",
+    "lang": "swift",
+    "condition": "jev",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "Sources/App/DiskCache.swift",
+        "line": 100,
+        "severity": "medium",
+        "title": "Hash collisions can return another key’s value",
+        "explanation": "FNV-1a is not collision-free, so distinct keys can map to the same filename and silently overwrite or return each other’s cached values.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/DiskCache.swift",
+        "line": 60,
+        "severity": "medium",
+        "title": "Expired-entry cleanup can delete a newer value",
+        "explanation": "The asynchronous removal is queued after the read, but a later write may run before that barrier and then have its newly written file removed by this cleanup.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/DiskCache.swift",
+        "line": 56,
+        "severity": "medium",
+        "title": "Concurrent reads share a non-thread-safe decoder",
+        "explanation": "The concurrent queue permits multiple `JSONDecoder.decode` calls at once, but `JSONDecoder` is not documented as safe for concurrent use, so reads can race when decoding.",
+        "rule": "swift-unprotected-shared-state",
+        "jevProbability": 0.1
+      },
+      {
+        "file": "Sources/App/DiskCache.swift",
+        "line": 32,
+        "severity": "medium",
+        "title": "Cache name can escape the caches directory",
+        "explanation": "Appending an unchecked name containing path traversal components can place the cache directory outside the intended caches namespace.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "swift-disk-cache",
+    "lang": "swift",
+    "condition": "jev-high",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "Sources/App/DiskCache.swift",
+        "line": 34,
+        "severity": "medium",
+        "title": "Cache name can escape the caches directory",
+        "explanation": "`name` is appended as a path component without validation or standardization, so values containing traversal components can place the cache outside the intended caches subdirectory and make operations such as `removeAll()` affect unintended files.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "swift-config-loader",
+    "lang": "swift",
+    "condition": "jev-high",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "Sources/App/AppConfig.swift",
+        "line": 50,
+        "severity": "medium",
+        "title": "File read errors escape configuration error handling",
+        "explanation": "A missing or unreadable configuration file throws a raw filesystem error rather than an `AppConfigError`, so callers expecting the loader's configuration errors cannot handle this failure consistently.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/AppConfig.swift",
+        "line": 95,
+        "severity": "medium",
+        "title": "Base URL validation accepts malformed HTTPS URLs",
+        "explanation": "Checking only scheme and a nonempty host permits URLs with invalid components such as embedded credentials or malformed ports, despite claiming to require a valid HTTPS URL.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "Sources/App/AppConfig.swift",
+        "rule": "swift-no-force-unwrap",
+        "jevProbability": 0.68,
+        "graderConfirms": true
+      }
+    ]
+  },
+  {
+    "task": "swift-config-loader",
+    "lang": "swift",
+    "condition": "none",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "Sources/App/AppConfig.swift",
+        "line": 119,
+        "severity": "medium",
+        "title": "Reject credentials in base URLs",
+        "explanation": "The URL check accepts HTTPS URLs containing user information, so credentials embedded in configuration can be propagated to requests or exposed in logs.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/AppConfig.swift",
+        "line": 5,
+        "severity": "medium",
+        "title": "Configuration invariants can be bypassed",
+        "explanation": "The public initializer and mutable properties allow callers to create or mutate configurations with invalid URLs, timeouts, or connection counts without invoking validation.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "Sources/App/AppConfig.swift",
+        "rule": "swift-no-force-unwrap",
+        "jevProbability": 0.97,
+        "graderConfirms": true
+      }
+    ]
+  },
+  {
+    "task": "swift-image-loader",
+    "lang": "swift",
+    "condition": "none",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "Sources/App/App.swift",
+        "line": 1,
+        "severity": "low",
+        "title": "Unused Foundation import",
+        "explanation": "This file contains no code that uses Foundation, so the import is unnecessary and should be removed.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "swift-image-loader",
+    "lang": "swift",
+    "condition": "jev",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "Sources/App/App.swift",
+        "line": 1,
+        "severity": "low",
+        "title": "Unused Foundation import",
+        "explanation": "This file contains no code that uses Foundation, so the import is unnecessary and should be removed.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "swift-config-loader",
+    "lang": "swift",
+    "condition": "jev",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "Sources/App/AppConfig.swift",
+        "line": 82,
+        "severity": "medium",
+        "title": "Malformed numeric environment overrides are silently ignored",
+        "explanation": "When `APP_TIMEOUT` or `APP_MAX_CONNECTIONS` is present but cannot be parsed, the loader silently keeps the file/default value, so a typo or invalid deployment setting appears to succeed instead of reporting a configuration error.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/AppConfig.swift",
+        "line": 5,
+        "severity": "medium",
+        "title": "Codable decoding bypasses configuration validation",
+        "explanation": "The synthesized public `Decodable` conformance can construct an `AppConfig` with an invalid timeout, connection count, or base URL without passing through the checks in `load(fromFile:)`, allowing callers to obtain invalid configuration.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "Sources/App/AppConfig.swift",
+        "rule": "swift-no-force-unwrap",
+        "jevProbability": 0.97,
+        "graderConfirms": true
+      },
+      {
+        "file": "Sources/App/AppConfig.swift",
+        "rule": "swift-no-vague-names",
+        "jevProbability": 0.52,
+        "graderConfirms": true
+      }
+    ]
+  },
+  {
+    "task": "swift-todo-view",
+    "lang": "swift",
+    "condition": "none",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "Sources/App/App.swift",
+        "line": 1,
+        "severity": "low",
+        "title": "Unused Foundation import",
+        "explanation": "This file contains no code that uses Foundation, so the import is unnecessary and should be removed.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "swift-todo-view",
+    "lang": "swift",
+    "condition": "jev",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "Sources/App/App.swift",
+        "line": 1,
+        "severity": "low",
+        "title": "Unused Foundation import",
+        "explanation": "This file contains no code that uses Foundation, so the import is unnecessary and should be removed.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "swift-todo-view",
+    "lang": "swift",
+    "condition": "jev-high",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "Sources/App/App.swift",
+        "line": 1,
+        "severity": "low",
+        "title": "Unused Foundation import",
+        "explanation": "This file contains no code that uses Foundation, so the import is unnecessary and should be removed.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "swift-image-loader",
+    "lang": "swift",
+    "condition": "jev-high",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "Sources/App/App.swift",
+        "line": 1,
+        "severity": "low",
+        "title": "Unused Foundation import",
+        "explanation": "This file contains no code that uses Foundation, so the import is unnecessary and should be removed.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "ts-lru-user-cache",
+    "lang": "typescript",
+    "condition": "none",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "src/cache.ts",
+        "line": 17,
+        "severity": "medium",
+        "title": "Validate `maxSize` as a finite positive integer",
+        "explanation": "A `NaN` value bypasses both the constructor check and the eviction comparison, allowing the cache to grow without limit, while fractional values produce a capacity different from the configured maximum.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/cache.ts",
+        "line": 21,
+        "severity": "medium",
+        "title": "Reject invalid TTL values",
+        "explanation": "A `NaN` TTL makes every entry effectively immortal because its expiration comparison is always false, so invalid configuration can silently disable expiration.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/cache.ts",
+        "line": 44,
+        "severity": "medium",
+        "title": "`has` misreports cached `undefined` values",
+        "explanation": "Since `V` can be `undefined`, checking the result of `get` conflates a present entry with a missing or expired one, causing `has` to return false for a cached value.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/cache.ts",
+        "line": 52,
+        "severity": "medium",
+        "title": "Eviction fails when the oldest key is `undefined`",
+        "explanation": "`K` may be `undefined`, but this check treats that valid key as if the map were empty and can let the cache exceed its configured capacity.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/userService.ts",
+        "line": 27,
+        "severity": "medium",
+        "title": "Cached `undefined` users are fetched repeatedly",
+        "explanation": "The cache lookup treats `undefined` as a cache miss, so a valid `T` value of `undefined` is never served from cache.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/userService.ts",
+        "line": 51,
+        "severity": "medium",
+        "title": "Invalidation does not prevent an in-flight request from restoring stale data",
+        "explanation": "If `invalidate` runs while a fetch is pending, that request can later populate the cache with the invalidated result, and subsequent callers may also join that same pending request.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "src/userService.ts",
+        "rule": "ts-no-empty-catch",
+        "jevProbability": 0.98,
+        "graderConfirms": true
+      }
+    ]
+  },
+  {
+    "task": "ts-ws-client",
+    "lang": "typescript",
+    "condition": "none",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "src/wsClient.ts",
+        "line": 48,
+        "severity": "high",
+        "title": "Repeated connect calls create competing sockets",
+        "explanation": "Calling `connect()` while a connection or reconnect is already active opens another socket without closing or invalidating the old one, allowing stale socket events to clear the current socket or schedule duplicate reconnects.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/wsClient.ts",
+        "line": 79,
+        "severity": "medium",
+        "title": "Unserializable messages are silently queued as undefined",
+        "explanation": "`JSON.stringify` can return `undefined` for values such as `undefined` or functions, so the client may later send an invalid payload despite the queue being typed as strings.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/wsClient.ts",
+        "line": 102,
+        "severity": "high",
+        "title": "Stale socket close events can discard the active connection",
+        "explanation": "The close handler unconditionally sets `this.socket` to null and schedules a reconnect, even when that event comes from an older socket replaced by a later `connect()` call.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/wsClient.ts",
+        "line": 132,
+        "severity": "medium",
+        "title": "A throwing handler prevents later handlers from receiving messages",
+        "explanation": "Handler calls are not isolated, so one subscriber exception aborts iteration and can escape the WebSocket event callback, skipping all remaining subscribers.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/wsClient.ts",
+        "line": 143,
+        "severity": "high",
+        "title": "Queue is lost when sending a pending payload throws",
+        "explanation": "The queue is cleared before sends begin, so a `send()` exception during flushing discards the unsent remainder and can also prevent heartbeat startup.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/wsClient.ts",
+        "line": 150,
+        "severity": "medium",
+        "title": "Heartbeat send errors are unhandled",
+        "explanation": "If the socket closes between the ready-state check and `send()`, the interval callback can throw instead of recovering through the normal reconnect flow.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/wsClient.ts",
+        "line": 167,
+        "severity": "medium",
+        "title": "Reconnect backoff can overflow and become ineffective",
+        "explanation": "The exponential expression can overflow to `Infinity` for long failure streaks, and unvalidated negative or non-finite delay options can also produce invalid timer behavior.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "src/wsClient.ts",
+        "rule": "ts-no-non-null-assertion",
+        "jevProbability": 0.97,
+        "graderConfirms": true
+      },
+      {
+        "file": "src/wsClient.ts",
+        "rule": "ts-no-empty-catch",
+        "jevProbability": 0.79,
+        "graderConfirms": false
+      }
+    ]
+  }
+]

@@ -1,0 +1,201 @@
+<title>Jev Lint Trial</title>
+<style>
+{{FONT}}
+:root{
+  --bg:#f6f6f5;--surface:#ececea;--ink:#141414;--muted:#5d5d5b;--rule:#d0d0cd;
+  --s1:#141414;--s2:#6f6f6c;--s3:#a9a9a5;--s4:#d6d6d2;--s4-line:#8a8a86;
+  --good:#1d7a45;--bad:#b3261e;
+  --mono:'Departure Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;--bg:#0b0b0b;--surface:#161616;--ink:#ededea;--muted:#9a9a96;--rule:#2c2c2a;
+  --s1:#f2f2ef;--s2:#9d9d99;--s3:#5c5c59;--s4:#2e2e2c;--s4-line:#7a7a76;--good:#5fd18b;--bad:#ff7b72}}
+:root[data-theme="dark"]{
+  color-scheme:dark;--bg:#0b0b0b;--surface:#161616;--ink:#ededea;--muted:#9a9a96;--rule:#2c2c2a;
+  --s1:#f2f2ef;--s2:#9d9d99;--s3:#5c5c59;--s4:#2e2e2c;--s4-line:#7a7a76;--good:#5fd18b;--bad:#ff7b72}
+body{background:var(--bg);color:var(--ink);font-family:var(--mono);font-size:14.5px;line-height:1.7}
+main{max-width:860px;margin:0 auto;padding-inline:20px;padding-block:48px 96px}
+h1,h2,h3{font-weight:400;line-height:1.25;text-wrap:balance;margin:0}
+h1{font-size:30px;letter-spacing:-.01em}
+h2{font-size:19px;margin-top:56px;padding-top:18px;border-top:1px solid var(--rule)}
+h3{font-size:15px;margin-top:28px}
+p,li{max-width:68ch}
+p{margin:12px 0}
+.eyebrow{font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.lede{font-size:16px;margin-top:18px}
+.verdict{margin-top:28px;padding:18px 20px;background:var(--surface);border-left:3px solid var(--ink)}
+.verdict p{margin:6px 0}
+.verdict strong{font-weight:400;text-decoration:underline;text-underline-offset:3px}
+.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--rule);border:1px solid var(--rule);margin-top:24px}
+.facts div{background:var(--bg);padding:14px 16px}
+.facts b{display:block;font-weight:400;font-size:22px;font-variant-numeric:tabular-nums}
+.facts span{font-size:12px;color:var(--muted)}
+.chart{width:100%;height:auto;display:block;margin-top:10px}
+.chart .grid{stroke:var(--rule);stroke-width:1}
+.chart .tick,.chart .val,.chart .glabel{fill:var(--muted);font-family:var(--mono);font-size:11px}
+.chart .val{fill:var(--ink)}
+.chart .glabel{fill:var(--ink);font-size:12px}
+.s1{fill:var(--s1)}.s2{fill:var(--s2)}.s3{fill:var(--s3)}.s4{fill:var(--s4);stroke:var(--s4-line);stroke-width:1}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:12px;color:var(--muted);margin-top:8px}
+.key{display:inline-flex;align-items:center;gap:7px}
+.sw{display:inline-block;width:11px;height:11px}
+.sw.s1{background:var(--s1)}.sw.s2{background:var(--s2)}.sw.s3{background:var(--s3)}.sw.s4{background:var(--s4);outline:1px solid var(--s4-line)}
+.table{overflow-x:auto;margin-top:12px}
+table{border-collapse:collapse;width:100%;font-size:12.5px;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:7px 10px 7px 0;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-weight:400;color:var(--muted);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase}
+code{font-family:var(--mono);font-size:.92em;background:var(--surface);padding:1px 4px}
+pre{background:var(--surface);padding:14px 16px;overflow-x:auto;font-size:12.5px;line-height:1.55}
+abbr{text-decoration:underline dotted;cursor:help}
+.good{color:var(--good)}.bad{color:var(--bad)}
+.note{font-size:12.5px;color:var(--muted)}
+ol,ul{padding-left:20px}
+li{margin:6px 0}
+dl{display:grid;grid-template-columns:minmax(120px,max-content) 1fr;gap:6px 18px;margin-top:12px}
+dt{color:var(--muted)}dd{margin:0}
+@media (max-width:620px){.facts{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:520px){dl{grid-template-columns:1fr}dd{margin-bottom:8px}h1{font-size:24px}}
+</style>
+
+<main>
+  <div class="eyebrow">Evaluation · 26 Sep 2026 · jev-1.13.0</div>
+  <h1>Jev as a fuzzy linter for coding agents</h1>
+  <p class="lede">We tried the idea from the forwarded post: after every file edit, a hook sends the new code to TypeSafe's Jev model in one call and asks it about a list of small coding rules. Violations come back to the agent in two tiers, <em>fix these</em> and <em>double-check these</em>. We measured it on labeled test edits and on real Claude Code runs, in TypeScript and Swift.</p>
+
+  <div class="verdict">
+    <p class="eyebrow">Recommendation</p>
+    <p><strong>Adopt it</strong>, as a non-blocking hint, with thresholds of 0.8 and 0.5 and a trimmed rule list. It is accurate, fast, nearly free and has never broken a run. But on real tasks it only nudged quality, because the agent already wrote mostly clean code. Treat it as a cheap guardrail, not a quality step-change.</p>
+  </div>
+
+  <div class="facts">
+    <div><b>99%</b><span>F1 on held-out edits, both languages (p ≥ 0.5)</span></div>
+    <div><b>0%</b><span>clean held-out edits that got a false alarm</span></div>
+    <div><b>~270 ms</b><span>median time per check (p90 ≈ 350 ms)</span></div>
+    <div><b>$0.76</b><span>per 10,000 edits checked</span></div>
+    <div><b>19 of 20</b><span>high-tier findings the agent fixed</span></div>
+    <div><b>−0.46</b><span>violations per task in real runs (not significant)</span></div>
+  </div>
+
+  <h2>What we built</h2>
+  <p>A <abbr title="A command Claude Code or Codex runs automatically after a tool call. Its output can be fed back to the agent.">PostToolUse hook</abbr> (<code>src/hook.ts</code>) that works in Claude Code and Codex. It reads the edit event, pulls out only the code the edit added, and sends it to Jev with one yes/no question per rule. Jev answers each with a probability, called a <abbr title="TypeSafe's name for a yes/no question. The answer is the probability that the answer is yes.">Noul</abbr>. The hook then tells the agent:</p>
+  <ul>
+    <li><b>p ≥ 0.8</b>: "Likely violations — fix these"</li>
+    <li><b>0.5 ≤ p &lt; 0.8</b>: "Possible violations — double-check; ignore if the code is actually fine"</li>
+  </ul>
+  <p>Anything below 0.5 is dropped. The findings go back as extra context, so they never block the agent. If Jev is slow or down, the hook stays silent.</p>
+  <p>Following the post, we kept only rules Jev can judge from the snippet alone, with no other files needed: 13 for TypeScript and 13 for Swift. Examples: no <code>any</code>, no force-unwraps, no empty <code>catch</code>, no leftover debug prints, no bare TODOs, no comments that just restate the code, no vague names, no magic numbers. Each rule spells out what counts and what doesn't, in <code>rules/*.json</code>.</p>
+
+  <h2>Experiment 1 · Labeled edits</h2>
+  <p><b>Setup.</b> Subagents wrote {{N_DEV}} tuning edits and {{N_HOLDOUT}} held-out edits. Each one is a realistic hook payload: a Claude <code>Write</code>, <code>Edit</code> or <code>MultiEdit</code>, or a Codex <code>apply_patch</code>. Each edit is labeled with every rule it breaks. They include hard negatives that look like violations but aren't (<code>!==</code>, <code>try?</code>, a TODO with a ticket number), and traps where the violation is only in the removed code. A separate author wrote the held-out set in a messier, more agent-like style and never saw the tuning set.</p>
+  <p>We compared three judges on the same edits:</p>
+  <ul>
+    <li><b>Jev</b>, one call per edit.</li>
+    <li><b>GPT-5.4-mini</b>, a fast general LLM given the same rule text and asked yes / maybe / no per rule.</li>
+    <li><b>Regex</b>, for the 7 rules per language a pattern can express. This is roughly what a classic linter gives you.</li>
+  </ul>
+
+  <h3>Held-out accuracy</h3>
+  <p class="note"><abbr title="The balance of precision (how many flags were real) and recall (how many real violations were flagged). 100% is perfect.">F1</abbr> per language. Regex scores low overall because it can't express half the rules; on the rules it can express, it scores 93–96%.</p>
+  {{F1_CHART}}
+  <div class="legend">{{LEGEND}}</div>
+
+  <h3>False alarms on clean edits</h3>
+  <p class="note">Share of held-out edits with no violations that still got at least one flag. This is what an agent sees as noise.</p>
+  {{FA_CHART}}
+  <div class="legend">{{LEGEND}}</div>
+
+  <div class="table"><table>
+    <thead><tr><th>Judge</th><th>Lang</th><th>Precision</th><th>Recall</th><th>F1</th><th>Clean edits flagged</th><th>Median time</th></tr></thead>
+    <tbody>{{OFFLINE_ROWS}}</tbody>
+  </table></div>
+
+  <h3>What we learned</h3>
+  <ul>
+    <li><b>The medium tier works, and 0.5 is the floor.</b> Of Jev's findings between 0.5 and 0.8, 24 of 28 (86%) were real violations. Including them lifted TypeScript held-out recall from 84% to 98% and added no false alarms. Below 0.5 it turns into noise: 6 of 15 real between 0.3 and 0.5, and 1 of 24 between 0.2 and 0.3. This supports the post's claim that the second tier greatly increases catches for little noise.</li>
+    <li><b>Jev beat the general LLM on noise, speed and cost.</b> GPT-5.4-mini flagged 21% of clean TypeScript edits and 8% of clean Swift edits. It was mostly over-strict on magic numbers, for example numbers inside JSON test fixtures or <code>200..&lt;300</code>. It was also about 4× slower (1.05 s median) and cost about 23× more ($17.86 per 10,000 edits).</li>
+    <li><b>It is stable.</b> Across three repeated runs, no rule probability moved by more than {{CONS_MAX}} (99th percentile {{CONS_P99}}).</li>
+    <li><b>Shape and size don't matter.</b> Precision and recall were 98–100% for every payload shape, Codex <code>apply_patch</code> included. The 12 edits over 80 lines had 17 of 17 violations found and 1 false flag.</li>
+    <li><b>Where it's weak.</b> Rules that need counting or tracing: <code>ts-no-deep-nesting</code> (70% recall at 0.5, 20% at 0.8) and <code>ts-no-floating-promise</code> (75%, missing async calls inside <code>useEffect</code>). TypeSafe's own docs list counting and indirection as known weak spots.</li>
+  </ul>
+  <p class="note">A note on thresholds: 0.8 and 0.5 were set before any data came in. An automatic tuner on the tuning split picked 0.7 and 0.25, from very few examples. On held-out data that tuned choice raised clean-edit false alarms to 4–8%, so we kept 0.8 / 0.5.</p>
+
+  <h2>Experiment 2 · Real agent runs</h2>
+  <p><b>Setup.</b> Claude Code (Sonnet, headless) did 12 realistic tasks, 6 per language. Examples: a GitHub client with pagination, a token-bucket rate limiter, a SwiftUI list with a URLSession view model, an image-loader actor. Each task ran twice under each of three conditions: no hook, Jev with both tiers, and Jev with the high tier only. That makes 72 runs, interleaved so any drift in the model hits all three conditions equally. User hooks, plugins and MCP servers were switched off. GPT-5.5 then graded every final file against the same rules. It did not know which condition produced the file.</p>
+  {{E2E_CHART}}
+  <div class="legend">{{E2E_LEGEND}}</div>
+  <p class="note">Mean graded rule violations per task in the final code. Lower is better.</p>
+
+  <div class="table"><table>
+    <thead><tr><th>Condition</th><th>Violations / task</th><th>Change vs no hook</th><th>Clean tasks</th><th>Builds</th><th>Agent cost / task</th><th>Time / task</th><th>Findings shown (high / medium)</th></tr></thead>
+    <tbody>{{E2E_ROWS}}</tbody>
+  </table></div>
+
+  <h3>What happened inside the runs</h3>
+  <ul>
+    <li><b>The agent takes the feedback.</b> It fixed 19 of 20 high-tier findings, usually in its very next edit, and resolved 8 of 10 medium-tier ones. It didn't argue with the hook or mention it to the user.</li>
+    <li><b>Mechanical rules went to near zero.</b> Swift force-unwraps dropped from 6 to 1, TypeScript non-null assertions from 3 to 0, and empty catches from 1 to 0.</li>
+    <li><b>The overall effect is small and not proven.</b> Violations fell by about 0.5 per task, but the 95% intervals include zero. Sonnet already wrote fairly clean code (2.3 violations per ~125 lines), and most of what was left are judgment calls on names and numbers.</li>
+    <li><b>High-only did as well as both tiers here.</b> It was also cheaper: +7% agent cost and +8 s per task, compared with +15% and +22 s for both tiers. With 24 runs per condition, we can't tell the two apart.</li>
+    <li><b>Reliability.</b> {{HOOK_CALLS}} hook calls, {{HOOK_ERRS}} errors, about 280 ms each. Every run built.</li>
+  </ul>
+
+  <div class="table"><table>
+    <thead><tr><th>Rule (graded violations in final code)</th><th>No hook</th><th>Both tiers</th><th>High only</th></tr></thead>
+    <tbody>{{RULE_ROWS}}</tbody>
+  </table></div>
+
+  <h3>Jev vs the grader on real code</h3>
+  <p>We also ran Jev over the final agent-written files and compared its verdicts with GPT-5.5's. The two agree on mechanical rules. They split on names and numbers:</p>
+  <div class="table"><table>
+    <thead><tr><th>Rule</th><th>Both flag</th><th>Only Jev</th><th>Only grader</th></tr></thead>
+    <tbody>{{AGREE_ROWS}}</tbody>
+  </table></div>
+  <p>Most "only grader" cases are the rule text being read literally:</p>
+  <ul>
+    <li><code>let (data, response) = try await …</code> fails because <code>data</code> is on the banned-name list.</li>
+    <li><code>options.heartbeatIntervalMs ?? 30000</code> counts as a magic number, even though the parameter name explains it.</li>
+  </ul>
+  <p>Jev is more lenient there, which is arguably closer to what a reviewer wants. The "only Jev" empty-catch cases were <code>catch { return; }</code> blocks that do silently drop the error. The one clear Jev miss on real code is nesting depth: four-level CSV-parser loops were scored 0.22–0.37.</p>
+
+  <h2>Recommendation</h2>
+  <ol>
+    <li><b>Turn it on as a hint, not a block.</b> Use <code>additionalContext</code> mode with thresholds 0.8 and 0.5. Keep both tiers: the labeled data supports them strongly, and the real-run difference is too small to measure. Switch to high-only (<code>JEV_LINT_TIERS=high</code>) if the extra ~14 s per task matters.</li>
+    <li><b>Pin the model.</b> Set <code>JEV_LINT_MODEL=jev-1.13.0</code>, so an update to <code>jev-latest</code> can't silently shift the thresholds. Re-run <code>bun eval/run.ts</code> before moving to a new version.</li>
+    <li><b>Fix the rule list before rolling out widely.</b>
+      <ul>
+        <li>Drop <code>ts-no-deep-nesting</code> and use ESLint <code>max-depth</code> or SwiftLint <code>nesting</code> instead.</li>
+        <li>Move <code>ts-no-floating-promise</code> to typescript-eslint's <code>no-floating-promises</code> where type-aware lint exists.</li>
+        <li>Rewrite <code>*-no-vague-names</code> to decide whether <code>data</code> from a network call is acceptable.</li>
+        <li>Rewrite <code>*-no-magic-numbers</code> to allow named default parameter values.</li>
+      </ul>
+      Right now those two rules produce most of the disagreement.</li>
+    <li><b>Keep real linters where they exist.</b> Regex-level rules (<code>any</code>, <code>!</code>, <code>try!</code>, <code>as!</code>, <code>console.log</code>) are free and exact in Biome, ESLint or SwiftLint. Jev's added value is the judgment rules (restating comments, commented-out code, secrets, UI updates off the main thread) and zero setup in any repo.</li>
+    <li><b>Expect the most benefit where agents are sloppier.</b> That means smaller or faster models, long sessions, or larger rule sets. That's the next thing to measure.</li>
+  </ol>
+
+  <h2>What we don't know yet</h2>
+  <ul>
+    <li><b>Codex end to end.</b> The Codex CLI on this machine is broken: the npm package is missing its platform binary, and the desktop app isn't installed. So Codex was only tested through its <code>apply_patch</code> payloads (79 labeled edits, 98% precision and recall). The Claude side was tested end to end.</li>
+    <li><b>Synthetic labels.</b> The labeled edits were written and labeled by Claude subagents, one annotator per edit. The tuning set turned out easy (Jev near 100%), and real code is fuzzier, as the grader comparison shows.</li>
+    <li><b>Small end-to-end sample.</b> One agent model (Sonnet), 12 tasks, 2 repeats. We'd need roughly 5× more runs to detect a 0.5-violation effect reliably.</li>
+    <li><b>The grader is an LLM.</b> GPT-5.5 applies the rules very literally. We spot-checked its disagreements with Jev, but did not hand-label the real files.</li>
+  </ul>
+
+  <h2>How to run it</h2>
+<pre># install (repo: ~/Repos/jev-lint)
+bun install
+security add-generic-password -a "$USER" -s typesafe-api-key -w   # or TYPESAFE_API_KEY
+
+# Claude Code: ~/.claude/settings.json → hooks.PostToolUse
+{ "matcher": "Write|Edit|MultiEdit",
+  "hooks": [{ "type": "command", "command": "JEV_LINT_MODEL=jev-1.13.0 bun ~/Repos/jev-lint/src/hook.ts", "timeout": 15 }] }
+
+# Codex: ~/.codex/hooks.json → hooks.PostToolUse
+{ "matcher": "Edit|Write|apply_patch", "hooks": [ …same command… ] }
+
+# re-run the evals
+bun eval/run.ts --runs 3        # labeled edits: Jev vs GPT-5.4-mini vs regex
+bun eval/e2e/run.ts --reps 2    # real Claude Code runs with / without the hook
+bun eval/e2e/grade.ts           # blind grading</pre>
+  <p class="note">Prices checked 26 Sep 2026: Jev $0.042 per million input tokens (output free); GPT-5.4-mini $0.75 in / $4.50 out per million. Agent costs are from Claude Code's own usage report.</p>
+</main>

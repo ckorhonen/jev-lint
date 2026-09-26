@@ -1,0 +1,86 @@
+{
+  "language": "typescript",
+  "pack": "practices",
+  "extensions": [
+    ".ts",
+    ".tsx",
+    ".mts",
+    ".cts",
+    ".js",
+    ".jsx",
+    ".mjs",
+    ".cjs"
+  ],
+  "rules": [
+    {
+      "id": "react-derived-state-effect",
+      "question": "Does `added_code` use a React `useEffect` whose job is to compute a value from props or other state and store it with a state setter (for example `useEffect(() => { setFullName(first + ' ' + last) }, [first, last])` or filtering a list into another state variable), when that value could simply be calculated during render?",
+      "true": "An effect only derives a value from existing props/state and copies it into another piece of state.",
+      "false": "No such effect. Effects that talk to something outside React (fetching, subscriptions, timers, the DOM, localStorage) are fine, and so is computing the value directly or with useMemo. Copying a prop into state and re-syncing it when the prop changes is a different problem (mirrored props) and does not count here, and neither does state the user can edit afterwards.",
+      "fix": "Delete the effect and extra state; compute the value during render (useMemo if it is expensive)."
+    },
+    {
+      "id": "react-effect-missing-cleanup",
+      "question": "Does `added_code` have a React `useEffect` that starts something ongoing \u2014 `setInterval`, a `setTimeout` that later updates state, `addEventListener`, a subscription, a WebSocket, or an EventSource \u2014 without returning a cleanup function that stops it?",
+      "true": "An effect starts a timer, listener, socket, or subscription and never returns a function that clears, removes, closes, or unsubscribes it.",
+      "false": "Every ongoing thing started in an effect is stopped in the returned cleanup, or the code starts nothing ongoing in an effect.",
+      "fix": "Return a cleanup from the effect that clears the timer, removes the listener, or closes the connection."
+    },
+    {
+      "id": "react-effect-fetch-race",
+      "question": "Does `added_code` make an HTTP request (with `fetch`, axios, or an API-client function that returns a Promise) inside a React `useEffect` and then set state with the response without protecting against stale or unmounted responses \u2014 no `AbortController`, and no `ignore`/`cancelled` flag that the cleanup sets and the code checks before calling the setter?",
+      "true": "An effect awaits a request and then calls a state setter unconditionally, so a slow earlier response can overwrite a newer one.",
+      "false": "The effect aborts the request or checks a cancelled flag in cleanup, or the data comes from a library such as React Query or SWR, or there is no HTTP request inside an effect. WebSockets, EventSource, timers, and subscriptions are not HTTP requests and do not count here.",
+      "fix": "Use an AbortController (or an `ignore` flag set in the cleanup) and skip setState for stale responses."
+    },
+    {
+      "id": "react-effect-for-event",
+      "question": "Does `added_code` use a React `useEffect` to react to a specific user action \u2014 for example watching a `submitted`, `saved`, or `clicked` state flag and then sending a request, navigating, or showing a toast \u2014 when that logic belongs in the event handler that set the flag?",
+      "true": "An effect exists mainly to run action logic after a flag set by an event handler flips.",
+      "false": "User-action logic runs in the event handlers themselves, or effects only synchronize with external systems.",
+      "fix": "Move the logic into the event handler and drop the flag state and effect."
+    },
+    {
+      "id": "react-state-mutation",
+      "question": "Does `added_code` mutate React state in place \u2014 calling `push`, `splice`, `sort`, or `reverse` on an array held in state, or assigning to a property of a state object \u2014 instead of building a new array or object for the setter?",
+      "true": "State is changed in place (e.g. `todos.push(item); setTodos(todos)` or `user.name = v; setUser(user)`).",
+      "false": "State updates always create new values (spread, map, filter, `toSorted`, a copy then sort), or the mutated value is not React state.",
+      "fix": "Create a new array/object (spread, map, filter, toSorted) and pass it to the setter."
+    },
+    {
+      "id": "react-index-key",
+      "question": "Does `added_code` render a list in React using the array index as the `key` (`key={i}`, `key={index}`, `key={idx}`) for items that can be added, removed, reordered, filtered, or edited?",
+      "true": "A dynamic list uses the index as its key.",
+      "false": "Keys come from stable ids, or the list is a fixed, never-changing set of items.",
+      "fix": "Use a stable unique id from the item as the key."
+    },
+    {
+      "id": "react-props-mirrored-in-state",
+      "question": "Does `added_code` copy a prop into `useState` and then use a `useEffect` to keep that state in sync with the prop (e.g. `const [value, setValue] = useState(props.value); useEffect(() => setValue(props.value), [props.value])`)?",
+      "true": "A prop is duplicated into state and an effect re-syncs it when the prop changes.",
+      "false": "Props are used directly, the component is fully controlled or uses a `key` to reset, or no prop is mirrored into state.",
+      "fix": "Use the prop directly, lift the state up, or reset the component with a `key`."
+    },
+    {
+      "id": "ts-unvalidated-external-data",
+      "question": "Does `added_code` itself parse raw external data \u2014 calling `res.json()`, `JSON.parse(...)`, reading `localStorage`/`sessionStorage`, or reading `event.data` from a message \u2014 and then cast it with `as SomeType` or assign it to a typed variable or return type, without checking its shape at runtime?",
+      "true": "External data is cast or assigned straight to a domain type with no runtime validation.",
+      "false": "The parsed data is validated (zod/valibot/arktype schema, a type-guard function, manual field checks) or kept as `unknown` and narrowed. Calling a typed API-client function, React Query, or SWR does not count, because this code does not parse raw data itself. If none of res.json, JSON.parse, storage reads, or event.data appear, the answer is no.",
+      "fix": "Validate external data with a schema or type guard before trusting its type."
+    },
+    {
+      "id": "ts-sequential-await-loop",
+      "question": "Does `added_code` await independent asynchronous calls one at a time inside a loop (e.g. `for (const id of ids) { users.push(await fetchUser(id)) }`), when the calls do not depend on each other and could run concurrently with `Promise.all` or a bounded pool?",
+      "true": "A loop awaits unrelated requests sequentially with no stated reason.",
+      "false": "Calls run concurrently, each call depends on the previous result, or the code explains that sequencing or rate-limiting is intentional (retries, pagination cursors, backoff).",
+      "fix": "Run independent calls with Promise.all (or a bounded concurrency helper)."
+    },
+    {
+      "id": "ts-boolean-trap",
+      "question": "Does `added_code` call or define a function with two or more boolean positional parameters, so call sites read like `createUser(name, true, false)` and the meaning of each flag is unclear?",
+      "true": "A function signature or call passes several bare boolean flags positionally.",
+      "false": "Flags are passed in a named options object, or functions take at most one boolean.",
+      "fix": "Replace boolean flags with an options object (`{ sendEmail: true }`) or separate functions."
+    }
+  ]
+}

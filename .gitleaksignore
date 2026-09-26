@@ -1,0 +1,3 @@
+# Synthetic JWT fixtures for the hardcoded-secret lint rules (decoded payloads: {"sub":"sync-bot"...}, {"sub":"inventory-svc"}).
+eval/cases/typescript.holdout.jsonl:jwt:43
+eval/cases/swift.dev.jsonl:jwt:87

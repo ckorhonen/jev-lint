@@ -1,0 +1,8920 @@
+[
+  {
+    "rule": "ts-no-explicit-any",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-non-null-assertion",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-empty-catch",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-debug-console",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-floating-promise",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-restating-comment",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-vague-names",
+    "jev": 0.08,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-magic-numbers",
+    "jev": 0.15,
+    "grader": 1,
+    "evidence": "`count = 5`",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-commented-out-code",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-hardcoded-secret",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-ts-ignore",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-deep-nesting",
+    "jev": 0.12,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-explicit-any",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-non-null-assertion",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-empty-catch",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-debug-console",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "console.log is user-facing CLI output: `console.log(`${repo.name}: ${repo.stargazers_count}`);`",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-floating-promise",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-restating-comment",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-vague-names",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-magic-numbers",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "`process.argv[2]` and `process.exitCode = 1` use excluded trivial numbers",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-commented-out-code",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-bare-todo",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-hardcoded-secret",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-ts-ignore",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-deep-nesting",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-explicit-any",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-non-null-assertion",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-empty-catch",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-debug-console",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-floating-promise",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-restating-comment",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-vague-names",
+    "jev": 0.09,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-magic-numbers",
+    "jev": 0.19,
+    "grader": 2,
+    "evidence": "`.../repos?per_page=100`; and `count = 5,`",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-commented-out-code",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-hardcoded-secret",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-ts-ignore",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-deep-nesting",
+    "jev": 0.12,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-explicit-any",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-non-null-assertion",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-empty-catch",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-debug-console",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-floating-promise",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-restating-comment",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-vague-names",
+    "jev": 0.1,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-magic-numbers",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-commented-out-code",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-bare-todo",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-hardcoded-secret",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-ts-ignore",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-deep-nesting",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-explicit-any",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-non-null-assertion",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-empty-catch",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-debug-console",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-floating-promise",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-restating-comment",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-vague-names",
+    "jev": 0.08,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-magic-numbers",
+    "jev": 0.18,
+    "grader": 1,
+    "evidence": "`export async function fetchTopStarredRepos(username: string, count = 5): Promise<GitHubRepo[]> {`",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-commented-out-code",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-hardcoded-secret",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-ts-ignore",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-deep-nesting",
+    "jev": 0.11,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-explicit-any",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-non-null-assertion",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-empty-catch",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-debug-console",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none; console.error is usage/error reporting and console.log is CLI user-facing output",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-floating-promise",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none; fetchTopStarredRepos is awaited",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-restating-comment",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-vague-names",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-magic-numbers",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none; argv[2] and exit(1) are conventional/self-explanatory CLI values",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-commented-out-code",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-bare-todo",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-hardcoded-secret",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-ts-ignore",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-deep-nesting",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-explicit-any",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-non-null-assertion",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-empty-catch",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-debug-console",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-floating-promise",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-restating-comment",
+    "jev": 0.09,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-vague-names",
+    "jev": 0.07,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-magic-numbers",
+    "jev": 0.22,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-commented-out-code",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-hardcoded-secret",
+    "jev": 0.01,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-ts-ignore",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-deep-nesting",
+    "jev": 0.18,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-explicit-any",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-non-null-assertion",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-empty-catch",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-debug-console",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-floating-promise",
+    "jev": 0.07,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-restating-comment",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-vague-names",
+    "jev": 0.07,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-magic-numbers",
+    "jev": 0.59,
+    "grader": 3,
+    "evidence": "`attempts: 5,`; `baseDelayMs: 300,`; `maxDelayMs: 10_000,`",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-commented-out-code",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-hardcoded-secret",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-ts-ignore",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-deep-nesting",
+    "jev": 0.16,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-explicit-any",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-non-null-assertion",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-empty-catch",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-debug-console",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-floating-promise",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-restating-comment",
+    "jev": 0.1,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-vague-names",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-magic-numbers",
+    "jev": 0.17,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-commented-out-code",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-hardcoded-secret",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-ts-ignore",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-deep-nesting",
+    "jev": 0.17,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-explicit-any",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-non-null-assertion",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-empty-catch",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-debug-console",
+    "jev": 0.07,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-floating-promise",
+    "jev": 0.09,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-restating-comment",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-vague-names",
+    "jev": 0.08,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-magic-numbers",
+    "jev": 0.13,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-commented-out-code",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-hardcoded-secret",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-ts-ignore",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-deep-nesting",
+    "jev": 0.13,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-explicit-any",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-non-null-assertion",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-empty-catch",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-debug-console",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-floating-promise",
+    "jev": 0.09,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-restating-comment",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-vague-names",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-magic-numbers",
+    "jev": 0.17,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-commented-out-code",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-bare-todo",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-hardcoded-secret",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-ts-ignore",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-deep-nesting",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-explicit-any",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-non-null-assertion",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-empty-catch",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-debug-console",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-floating-promise",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-restating-comment",
+    "jev": 0.12,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-vague-names",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-magic-numbers",
+    "jev": 0.42,
+    "grader": 2,
+    "evidence": "this.staleAfterMs = options.staleAfterMs ?? 10 * 60 * 1000; / this.cleanupIntervalMs = options.cleanupIntervalMs ?? 60 * 1000;",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-commented-out-code",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-bare-todo",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-hardcoded-secret",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-ts-ignore",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-deep-nesting",
+    "jev": 0.1,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-explicit-any",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-non-null-assertion",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-empty-catch",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-debug-console",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-floating-promise",
+    "jev": 0.08,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-restating-comment",
+    "jev": 0.1,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-vague-names",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-magic-numbers",
+    "jev": 0.23,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-commented-out-code",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-bare-todo",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-hardcoded-secret",
+    "jev": 0.01,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-ts-ignore",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-deep-nesting",
+    "jev": 0.21,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-explicit-any",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-non-null-assertion",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-empty-catch",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-debug-console",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-floating-promise",
+    "jev": 0.07,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-restating-comment",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-vague-names",
+    "jev": 0.09,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-magic-numbers",
+    "jev": 0.55,
+    "grader": 4,
+    "evidence": "attempts: 4; baseDelayMs: 500; maxDelayMs: 15_000; jitter: 0.2",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-commented-out-code",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-hardcoded-secret",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-ts-ignore",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-deep-nesting",
+    "jev": 0.14,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-explicit-any",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-non-null-assertion",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-empty-catch",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-debug-console",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-floating-promise",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-restating-comment",
+    "jev": 0.13,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-vague-names",
+    "jev": 0.07,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-magic-numbers",
+    "jev": 0.09,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-commented-out-code",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-hardcoded-secret",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-ts-ignore",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-deep-nesting",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-explicit-any",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-non-null-assertion",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-empty-catch",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-debug-console",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-floating-promise",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-restating-comment",
+    "jev": 0.15,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-vague-names",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-magic-numbers",
+    "jev": 0.14,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-commented-out-code",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-hardcoded-secret",
+    "jev": 0.01,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-ts-ignore",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-deep-nesting",
+    "jev": 0.09,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-explicit-any",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-non-null-assertion",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-empty-catch",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-debug-console",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-floating-promise",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-restating-comment",
+    "jev": 0.12,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-vague-names",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-magic-numbers",
+    "jev": 0.09,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-commented-out-code",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-bare-todo",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-hardcoded-secret",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-ts-ignore",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-deep-nesting",
+    "jev": 0.07,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-explicit-any",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-non-null-assertion",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-empty-catch",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-debug-console",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-floating-promise",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-restating-comment",
+    "jev": 0.1,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-vague-names",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-magic-numbers",
+    "jev": 0.66,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-commented-out-code",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-bare-todo",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-hardcoded-secret",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-ts-ignore",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-deep-nesting",
+    "jev": 0.09,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-explicit-any",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-non-null-assertion",
+    "jev": 0.98,
+    "grader": 2,
+    "evidence": "`const categoryTotals = report.totals.get(month)!;` and `formatCurrency(categoryTotals.get(category)!)`",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-empty-catch",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-debug-console",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-floating-promise",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-restating-comment",
+    "jev": 0.1,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-vague-names",
+    "jev": 0.1,
+    "grader": 5,
+    "evidence": "Vague short names: `.filter((r) => ...` in two places, `rows.map(([c]) => c.length)`, `rows.map(([, a]) => a.length)`, and `for (const t of report.flagged)`",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-magic-numbers",
+    "jev": 0.18,
+    "grader": 2,
+    "evidence": "`const categoryWidth = Math.max(8, ...rows.map(([c]) => c.length));` and `const amountWidth = Math.max(6, ...rows.map(([, a]) => a.length));`",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-commented-out-code",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-hardcoded-secret",
+    "jev": 0.01,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-ts-ignore",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-deep-nesting",
+    "jev": 0.37,
+    "grader": 1,
+    "evidence": "Nested four levels in `parseCsv`: `for (...) {` → `if (inQuotes) {` → `if (char === '\"') {` → `if (input[i + 1] === '\"') {`",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-explicit-any",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-non-null-assertion",
+    "jev": 0.07,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-empty-catch",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-debug-console",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-floating-promise",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-restating-comment",
+    "jev": 0.32,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-vague-names",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-magic-numbers",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-commented-out-code",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-bare-todo",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-hardcoded-secret",
+    "jev": 0.01,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-ts-ignore",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-deep-nesting",
+    "jev": 0.08,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-explicit-any",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-non-null-assertion",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-empty-catch",
+    "jev": 0.98,
+    "grader": 1,
+    "evidence": "`.catch(() => { // Swallow errors for background prefetches; ... });`",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-debug-console",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-floating-promise",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-restating-comment",
+    "jev": 0.07,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-vague-names",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-magic-numbers",
+    "jev": 0.33,
+    "grader": 2,
+    "evidence": "`maxSize: options.maxSize ?? 500,` and `ttlMs: options.ttlMs ?? 60_000,`",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-commented-out-code",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-hardcoded-secret",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-ts-ignore",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-deep-nesting",
+    "jev": 0.08,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-explicit-any",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-non-null-assertion",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-empty-catch",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-debug-console",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-floating-promise",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-restating-comment",
+    "jev": 0.16,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-vague-names",
+    "jev": 0.09,
+    "grader": 1,
+    "evidence": "return rows.filter((r) => r.some((cell) => cell.trim().length > 0));",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-magic-numbers",
+    "jev": 0.19,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-commented-out-code",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-hardcoded-secret",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-ts-ignore",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-deep-nesting",
+    "jev": 0.35,
+    "grader": 1,
+    "evidence": "for (...) { if (inQuotes) { if (char === '\"') { if (input[i + 1] === '\"') { ... } } } }",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-explicit-any",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-non-null-assertion",
+    "jev": 0.12,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-empty-catch",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-debug-console",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-floating-promise",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-restating-comment",
+    "jev": 0.48,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-vague-names",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-magic-numbers",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-commented-out-code",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-bare-todo",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-hardcoded-secret",
+    "jev": 0.01,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-ts-ignore",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-deep-nesting",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-explicit-any",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-non-null-assertion",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-empty-catch",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-debug-console",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-floating-promise",
+    "jev": 0.1,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-restating-comment",
+    "jev": 0.07,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-vague-names",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-magic-numbers",
+    "jev": 0.13,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-commented-out-code",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-hardcoded-secret",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-ts-ignore",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-deep-nesting",
+    "jev": 0.07,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-explicit-any",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-non-null-assertion",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-empty-catch",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-debug-console",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-floating-promise",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-restating-comment",
+    "jev": 0.23,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-vague-names",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-magic-numbers",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-commented-out-code",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-bare-todo",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-hardcoded-secret",
+    "jev": 0.01,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-ts-ignore",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-deep-nesting",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-explicit-any",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-non-null-assertion",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-empty-catch",
+    "jev": 0.12,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-debug-console",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-floating-promise",
+    "jev": 0.08,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-restating-comment",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-vague-names",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-magic-numbers",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-commented-out-code",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-hardcoded-secret",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-ts-ignore",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-deep-nesting",
+    "jev": 0.11,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-explicit-any",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-non-null-assertion",
+    "jev": 0.1,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-empty-catch",
+    "jev": 0.78,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-debug-console",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-floating-promise",
+    "jev": 0.07,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-restating-comment",
+    "jev": 0.14,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-vague-names",
+    "jev": 0.49,
+    "grader": 1,
+    "evidence": "`private handleMessage(data: unknown): void {`",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-magic-numbers",
+    "jev": 0.09,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-commented-out-code",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-hardcoded-secret",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-ts-ignore",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-deep-nesting",
+    "jev": 0.19,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-explicit-any",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-non-null-assertion",
+    "jev": 0.08,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-empty-catch",
+    "jev": 0.74,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-debug-console",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-floating-promise",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-restating-comment",
+    "jev": 0.11,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-vague-names",
+    "jev": 0.46,
+    "grader": 3,
+    "evidence": "`let set = this.handlers.get(type);`; `private handleMessage(data: unknown): void`; `const set = this.handlers.get(message.type);`",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-magic-numbers",
+    "jev": 0.1,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-commented-out-code",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-hardcoded-secret",
+    "jev": 0.01,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-ts-ignore",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-deep-nesting",
+    "jev": 0.22,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "swift-no-force-unwrap",
+    "jev": 0.97,
+    "grader": 1,
+    "evidence": "`baseURL: URL = URL(string: \"https://api.weatherapi.com/v1/current.json\")!,`",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-no-force-try",
+    "jev": 0.21,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-no-force-cast",
+    "jev": 0.37,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-no-debug-print",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-no-empty-catch",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-no-restating-comment",
+    "jev": 0.1,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-no-vague-names",
+    "jev": 0.26,
+    "grader": 1,
+    "evidence": "`let data: Data`",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-no-magic-numbers",
+    "jev": 0.11,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-no-commented-out-code",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-no-hardcoded-secret",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-ui-off-main",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-prefer-guard",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "ts-no-explicit-any",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-non-null-assertion",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-empty-catch",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-debug-console",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-floating-promise",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-restating-comment",
+    "jev": 0.1,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-vague-names",
+    "jev": 0.07,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-magic-numbers",
+    "jev": 0.19,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-commented-out-code",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-hardcoded-secret",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-ts-ignore",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-deep-nesting",
+    "jev": 0.31,
+    "grader": 1,
+    "evidence": "Nested CSV parser control flow reaches four levels: `for (...) {` → `if (inQuotes) {` → `if (char === '\"') {` → `if (line[i + 1] === '\"') {`",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "swift-no-force-unwrap",
+    "jev": 0.1,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-no-force-try",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-no-force-cast",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-no-debug-print",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-no-empty-catch",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-no-restating-comment",
+    "jev": 0.14,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-no-vague-names",
+    "jev": 0.41,
+    "grader": 1,
+    "evidence": "`let data: Data`",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-no-magic-numbers",
+    "jev": 0.12,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-no-commented-out-code",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-no-hardcoded-secret",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-ui-off-main",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-prefer-guard",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-no-force-unwrap",
+    "jev": 0.23,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-no-force-try",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-no-force-cast",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-no-debug-print",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-no-empty-catch",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-no-restating-comment",
+    "jev": 0.15,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-no-vague-names",
+    "jev": 0.29,
+    "grader": 1,
+    "evidence": "`let data: Data`",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-no-magic-numbers",
+    "jev": 0.12,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-no-commented-out-code",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-no-hardcoded-secret",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-ui-off-main",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-prefer-guard",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "ts-no-explicit-any",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-non-null-assertion",
+    "jev": 0.08,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-empty-catch",
+    "jev": 0.09,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-debug-console",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-floating-promise",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-restating-comment",
+    "jev": 0.16,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-vague-names",
+    "jev": 0.5,
+    "grader": 2,
+    "evidence": "`onUnhandledMessage?: (data: unknown) => void;` and `private handleMessage(data: unknown): void {`",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-magic-numbers",
+    "jev": 0.24,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-commented-out-code",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-hardcoded-secret",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-ts-ignore",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-deep-nesting",
+    "jev": 0.15,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "swift-no-force-unwrap",
+    "jev": 0.98,
+    "grader": 1,
+    "evidence": "`init(endpoint: URL = URL(string: \"https://jsonplaceholder.typicode.com/users\")!,`",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-force-try",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-force-cast",
+    "jev": 0.1,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-debug-print",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-empty-catch",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-restating-comment",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-vague-names",
+    "jev": 0.19,
+    "grader": 1,
+    "evidence": "`let request = session.dataTask(with: endpoint) { [weak self] data, _, error in` (`data`)",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-magic-numbers",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-commented-out-code",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-bare-todo",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-hardcoded-secret",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-ui-off-main",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-prefer-guard",
+    "jev": 0.08,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-force-unwrap",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListView.swift"
+  },
+  {
+    "rule": "swift-no-force-try",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListView.swift"
+  },
+  {
+    "rule": "swift-no-force-cast",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListView.swift"
+  },
+  {
+    "rule": "swift-no-debug-print",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListView.swift"
+  },
+  {
+    "rule": "swift-no-empty-catch",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListView.swift"
+  },
+  {
+    "rule": "swift-no-restating-comment",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListView.swift"
+  },
+  {
+    "rule": "swift-no-vague-names",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListView.swift"
+  },
+  {
+    "rule": "swift-no-magic-numbers",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListView.swift"
+  },
+  {
+    "rule": "swift-no-commented-out-code",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListView.swift"
+  },
+  {
+    "rule": "swift-no-bare-todo",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListView.swift"
+  },
+  {
+    "rule": "swift-no-hardcoded-secret",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListView.swift"
+  },
+  {
+    "rule": "swift-ui-off-main",
+    "jev": 0.09,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListView.swift"
+  },
+  {
+    "rule": "swift-prefer-guard",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListView.swift"
+  },
+  {
+    "rule": "swift-no-force-unwrap",
+    "jev": 0.12,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-force-try",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-force-cast",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-debug-print",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-empty-catch",
+    "jev": 0.08,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-restating-comment",
+    "jev": 0.18,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-vague-names",
+    "jev": 0.25,
+    "grader": 3,
+    "evidence": "`let data = try encoder.encode(entry)`; `guard let data = try? Data(contentsOf: url),`; `if let data = try? Data(contentsOf: url),`",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-magic-numbers",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-commented-out-code",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-hardcoded-secret",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-ui-off-main",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-prefer-guard",
+    "jev": 0.14,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-force-unwrap",
+    "jev": 0.09,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-force-try",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-force-cast",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-debug-print",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-empty-catch",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-restating-comment",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-vague-names",
+    "jev": 0.19,
+    "grader": 4,
+    "evidence": "`session.dataTask(with: endpoint) { [weak self] data, response, error in` (twice); `guard let data else {` (twice)",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-magic-numbers",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-commented-out-code",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-hardcoded-secret",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-ui-off-main",
+    "jev": 0.08,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-prefer-guard",
+    "jev": 0.11,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-force-unwrap",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListView.swift"
+  },
+  {
+    "rule": "swift-no-force-try",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListView.swift"
+  },
+  {
+    "rule": "swift-no-force-cast",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListView.swift"
+  },
+  {
+    "rule": "swift-no-debug-print",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListView.swift"
+  },
+  {
+    "rule": "swift-no-empty-catch",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListView.swift"
+  },
+  {
+    "rule": "swift-no-restating-comment",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListView.swift"
+  },
+  {
+    "rule": "swift-no-vague-names",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListView.swift"
+  },
+  {
+    "rule": "swift-no-magic-numbers",
+    "jev": 0.08,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListView.swift"
+  },
+  {
+    "rule": "swift-no-commented-out-code",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListView.swift"
+  },
+  {
+    "rule": "swift-no-bare-todo",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListView.swift"
+  },
+  {
+    "rule": "swift-no-hardcoded-secret",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListView.swift"
+  },
+  {
+    "rule": "swift-ui-off-main",
+    "jev": 0.09,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListView.swift"
+  },
+  {
+    "rule": "swift-prefer-guard",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListView.swift"
+  },
+  {
+    "rule": "swift-no-force-unwrap",
+    "jev": 0.07,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-no-force-try",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-no-force-cast",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-no-debug-print",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-no-empty-catch",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-no-restating-comment",
+    "jev": 0.09,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-no-vague-names",
+    "jev": 0.5,
+    "grader": 1,
+    "evidence": "`let data = try Data(contentsOf: URL(fileURLWithPath: path))`",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-no-magic-numbers",
+    "jev": 0.07,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-no-commented-out-code",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-no-hardcoded-secret",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-ui-off-main",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-prefer-guard",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-no-force-unwrap",
+    "jev": 0.13,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-force-try",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-force-cast",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-debug-print",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-empty-catch",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-restating-comment",
+    "jev": 0.18,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-vague-names",
+    "jev": 0.28,
+    "grader": 2,
+    "evidence": "`guard let data = try? encoder.encode(envelope) else { return }`; `guard let data = try? Data(contentsOf: url),`",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-magic-numbers",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-commented-out-code",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-hardcoded-secret",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-ui-off-main",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-prefer-guard",
+    "jev": 0.07,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-force-unwrap",
+    "jev": 0.09,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-force-try",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-force-cast",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-debug-print",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-empty-catch",
+    "jev": 0.07,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-restating-comment",
+    "jev": 0.21,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-vague-names",
+    "jev": 0.31,
+    "grader": 2,
+    "evidence": "`let data = try encoder.encode(entry)`; `guard let data = try? Data(contentsOf: url) else { return nil }`",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-magic-numbers",
+    "jev": 0.14,
+    "grader": 1,
+    "evidence": "`maxTotalSizeInBytes: Int = 50 * 1024 * 1024`",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-commented-out-code",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-hardcoded-secret",
+    "jev": 0.01,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-ui-off-main",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-prefer-guard",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-force-unwrap",
+    "jev": 0.1,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-force-try",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-force-cast",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-debug-print",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-empty-catch",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-restating-comment",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-vague-names",
+    "jev": 0.17,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-magic-numbers",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-commented-out-code",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-hardcoded-secret",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-ui-off-main",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-prefer-guard",
+    "jev": 0.07,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-force-unwrap",
+    "jev": 0.07,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-no-force-try",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-no-force-cast",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-no-debug-print",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-no-empty-catch",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-no-restating-comment",
+    "jev": 0.11,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-no-vague-names",
+    "jev": 0.48,
+    "grader": 3,
+    "evidence": "`let data = try Data(contentsOf: URL(fileURLWithPath: path))`; `if let override = environment[\"APP_TIMEOUT\"], let value = Int(override)`; `if let override = environment[\"APP_MAX_CONNECTIONS\"], let value = Int(override)`",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-no-magic-numbers",
+    "jev": 0.08,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-no-commented-out-code",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-no-bare-todo",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-no-hardcoded-secret",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-ui-off-main",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-prefer-guard",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-no-force-unwrap",
+    "jev": 0.07,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-no-force-try",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-no-force-cast",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-no-debug-print",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-no-empty-catch",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-no-restating-comment",
+    "jev": 0.07,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-no-vague-names",
+    "jev": 0.47,
+    "grader": 1,
+    "evidence": "`let data: Data`",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-no-magic-numbers",
+    "jev": 0.08,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-no-commented-out-code",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-no-hardcoded-secret",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-ui-off-main",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-prefer-guard",
+    "jev": 0.07,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-no-force-unwrap",
+    "jev": 0.12,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/ImageLoader.swift"
+  },
+  {
+    "rule": "swift-no-force-try",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/ImageLoader.swift"
+  },
+  {
+    "rule": "swift-no-force-cast",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/ImageLoader.swift"
+  },
+  {
+    "rule": "swift-no-debug-print",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/ImageLoader.swift"
+  },
+  {
+    "rule": "swift-no-empty-catch",
+    "jev": 0.09,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/ImageLoader.swift"
+  },
+  {
+    "rule": "swift-no-restating-comment",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/ImageLoader.swift"
+  },
+  {
+    "rule": "swift-no-vague-names",
+    "jev": 0.46,
+    "grader": 3,
+    "evidence": "`let data = try await downloadWithRetry(url: url)`; `let (data, response) = try await session.data(from: url)`; `private func writeDiskCacheData(_ data: Data, for url: URL)`",
+    "path": "Sources/App/ImageLoader.swift"
+  },
+  {
+    "rule": "swift-no-magic-numbers",
+    "jev": 0.41,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/ImageLoader.swift"
+  },
+  {
+    "rule": "swift-no-commented-out-code",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/ImageLoader.swift"
+  },
+  {
+    "rule": "swift-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/ImageLoader.swift"
+  },
+  {
+    "rule": "swift-no-hardcoded-secret",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/ImageLoader.swift"
+  },
+  {
+    "rule": "swift-ui-off-main",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/ImageLoader.swift"
+  },
+  {
+    "rule": "swift-prefer-guard",
+    "jev": 0.13,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/ImageLoader.swift"
+  },
+  {
+    "rule": "swift-no-force-unwrap",
+    "jev": 0.99,
+    "grader": 1,
+    "evidence": "private let url = URL(string: \"https://jsonplaceholder.typicode.com/todos\")!",
+    "path": "Sources/App/TodoScreen.swift"
+  },
+  {
+    "rule": "swift-no-force-try",
+    "jev": 0.13,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/TodoScreen.swift"
+  },
+  {
+    "rule": "swift-no-force-cast",
+    "jev": 0.09,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/TodoScreen.swift"
+  },
+  {
+    "rule": "swift-no-debug-print",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/TodoScreen.swift"
+  },
+  {
+    "rule": "swift-no-empty-catch",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/TodoScreen.swift"
+  },
+  {
+    "rule": "swift-no-restating-comment",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/TodoScreen.swift"
+  },
+  {
+    "rule": "swift-no-vague-names",
+    "jev": 0.25,
+    "grader": 1,
+    "evidence": "URLSession.shared.dataTask(with: url) { data, _, error in",
+    "path": "Sources/App/TodoScreen.swift"
+  },
+  {
+    "rule": "swift-no-magic-numbers",
+    "jev": 0.07,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/TodoScreen.swift"
+  },
+  {
+    "rule": "swift-no-commented-out-code",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/TodoScreen.swift"
+  },
+  {
+    "rule": "swift-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/TodoScreen.swift"
+  },
+  {
+    "rule": "swift-no-hardcoded-secret",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/TodoScreen.swift"
+  },
+  {
+    "rule": "swift-ui-off-main",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/TodoScreen.swift"
+  },
+  {
+    "rule": "swift-prefer-guard",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/TodoScreen.swift"
+  },
+  {
+    "rule": "swift-no-force-unwrap",
+    "jev": 0.1,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/ImageLoader.swift"
+  },
+  {
+    "rule": "swift-no-force-try",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/ImageLoader.swift"
+  },
+  {
+    "rule": "swift-no-force-cast",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/ImageLoader.swift"
+  },
+  {
+    "rule": "swift-no-debug-print",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/ImageLoader.swift"
+  },
+  {
+    "rule": "swift-no-empty-catch",
+    "jev": 0.1,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/ImageLoader.swift"
+  },
+  {
+    "rule": "swift-no-restating-comment",
+    "jev": 0.26,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/ImageLoader.swift"
+  },
+  {
+    "rule": "swift-no-vague-names",
+    "jev": 0.33,
+    "grader": 6,
+    "evidence": "`let fm = FileManager.default`; `let base = (try? fm.url(...`; `let data = try await downloadWithRetry(url: url)`; `let (data, response) = try await session.data(from: url)`; `private func saveToDisk(data: Data, url: URL)`; `guard let data = try? Data(contentsOf: path) else { return nil }`",
+    "path": "Sources/App/ImageLoader.swift"
+  },
+  {
+    "rule": "swift-no-magic-numbers",
+    "jev": 0.24,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/ImageLoader.swift"
+  },
+  {
+    "rule": "swift-no-commented-out-code",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/ImageLoader.swift"
+  },
+  {
+    "rule": "swift-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/ImageLoader.swift"
+  },
+  {
+    "rule": "swift-no-hardcoded-secret",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/ImageLoader.swift"
+  },
+  {
+    "rule": "swift-ui-off-main",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/ImageLoader.swift"
+  },
+  {
+    "rule": "swift-prefer-guard",
+    "jev": 0.08,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/ImageLoader.swift"
+  },
+  {
+    "rule": "swift-no-force-unwrap",
+    "jev": 0.11,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/ImageLoader.swift"
+  },
+  {
+    "rule": "swift-no-force-try",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/ImageLoader.swift"
+  },
+  {
+    "rule": "swift-no-force-cast",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/ImageLoader.swift"
+  },
+  {
+    "rule": "swift-no-debug-print",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/ImageLoader.swift"
+  },
+  {
+    "rule": "swift-no-empty-catch",
+    "jev": 0.09,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/ImageLoader.swift"
+  },
+  {
+    "rule": "swift-no-restating-comment",
+    "jev": 0.21,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/ImageLoader.swift"
+  },
+  {
+    "rule": "swift-no-vague-names",
+    "jev": 0.28,
+    "grader": 2,
+    "evidence": "`let (data, response) = try await session.data(from: url)`; `let data = bitmap.representation(using: .png, properties: [:])`",
+    "path": "Sources/App/ImageLoader.swift"
+  },
+  {
+    "rule": "swift-no-magic-numbers",
+    "jev": 0.49,
+    "grader": 1,
+    "evidence": "`return UInt64(seconds * 1_000_000_000)`",
+    "path": "Sources/App/ImageLoader.swift"
+  },
+  {
+    "rule": "swift-no-commented-out-code",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/ImageLoader.swift"
+  },
+  {
+    "rule": "swift-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/ImageLoader.swift"
+  },
+  {
+    "rule": "swift-no-hardcoded-secret",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/ImageLoader.swift"
+  },
+  {
+    "rule": "swift-ui-off-main",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/ImageLoader.swift"
+  },
+  {
+    "rule": "swift-prefer-guard",
+    "jev": 0.12,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/ImageLoader.swift"
+  },
+  {
+    "rule": "swift-no-force-unwrap",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/TodoScreen.swift"
+  },
+  {
+    "rule": "swift-no-force-try",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/TodoScreen.swift"
+  },
+  {
+    "rule": "swift-no-force-cast",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/TodoScreen.swift"
+  },
+  {
+    "rule": "swift-no-debug-print",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/TodoScreen.swift"
+  },
+  {
+    "rule": "swift-no-empty-catch",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/TodoScreen.swift"
+  },
+  {
+    "rule": "swift-no-restating-comment",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/TodoScreen.swift"
+  },
+  {
+    "rule": "swift-no-vague-names",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/TodoScreen.swift"
+  },
+  {
+    "rule": "swift-no-magic-numbers",
+    "jev": 0.07,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/TodoScreen.swift"
+  },
+  {
+    "rule": "swift-no-commented-out-code",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/TodoScreen.swift"
+  },
+  {
+    "rule": "swift-no-bare-todo",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/TodoScreen.swift"
+  },
+  {
+    "rule": "swift-no-hardcoded-secret",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/TodoScreen.swift"
+  },
+  {
+    "rule": "swift-ui-off-main",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/TodoScreen.swift"
+  },
+  {
+    "rule": "swift-prefer-guard",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/TodoScreen.swift"
+  },
+  {
+    "rule": "swift-no-force-unwrap",
+    "jev": 0.09,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/TodoService.swift"
+  },
+  {
+    "rule": "swift-no-force-try",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/TodoService.swift"
+  },
+  {
+    "rule": "swift-no-force-cast",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/TodoService.swift"
+  },
+  {
+    "rule": "swift-no-debug-print",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/TodoService.swift"
+  },
+  {
+    "rule": "swift-no-empty-catch",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/TodoService.swift"
+  },
+  {
+    "rule": "swift-no-restating-comment",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/TodoService.swift"
+  },
+  {
+    "rule": "swift-no-vague-names",
+    "jev": 0.29,
+    "grader": 2,
+    "evidence": "`let task = session.dataTask(with: url) { data, response, error in`; `let data = data else {`",
+    "path": "Sources/App/TodoService.swift"
+  },
+  {
+    "rule": "swift-no-magic-numbers",
+    "jev": 0.12,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/TodoService.swift"
+  },
+  {
+    "rule": "swift-no-commented-out-code",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/TodoService.swift"
+  },
+  {
+    "rule": "swift-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/TodoService.swift"
+  },
+  {
+    "rule": "swift-no-hardcoded-secret",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/TodoService.swift"
+  },
+  {
+    "rule": "swift-ui-off-main",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/TodoService.swift"
+  },
+  {
+    "rule": "swift-prefer-guard",
+    "jev": 0.07,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/TodoService.swift"
+  },
+  {
+    "rule": "ts-no-explicit-any",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-non-null-assertion",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-empty-catch",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-debug-console",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-floating-promise",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-restating-comment",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-vague-names",
+    "jev": 0.08,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-magic-numbers",
+    "jev": 0.22,
+    "grader": 1,
+    "evidence": "`count = 5,`",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-commented-out-code",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-bare-todo",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-hardcoded-secret",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-ts-ignore",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-deep-nesting",
+    "jev": 0.1,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-explicit-any",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-non-null-assertion",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-empty-catch",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-debug-console",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-floating-promise",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-restating-comment",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-vague-names",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-magic-numbers",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-commented-out-code",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-bare-todo",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-hardcoded-secret",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-ts-ignore",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-deep-nesting",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "swift-no-force-unwrap",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/TodoScreen.swift"
+  },
+  {
+    "rule": "swift-no-force-try",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/TodoScreen.swift"
+  },
+  {
+    "rule": "swift-no-force-cast",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/TodoScreen.swift"
+  },
+  {
+    "rule": "swift-no-debug-print",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/TodoScreen.swift"
+  },
+  {
+    "rule": "swift-no-empty-catch",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/TodoScreen.swift"
+  },
+  {
+    "rule": "swift-no-restating-comment",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/TodoScreen.swift"
+  },
+  {
+    "rule": "swift-no-vague-names",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/TodoScreen.swift"
+  },
+  {
+    "rule": "swift-no-magic-numbers",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/TodoScreen.swift"
+  },
+  {
+    "rule": "swift-no-commented-out-code",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/TodoScreen.swift"
+  },
+  {
+    "rule": "swift-no-bare-todo",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/TodoScreen.swift"
+  },
+  {
+    "rule": "swift-no-hardcoded-secret",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/TodoScreen.swift"
+  },
+  {
+    "rule": "swift-ui-off-main",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/TodoScreen.swift"
+  },
+  {
+    "rule": "swift-prefer-guard",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/TodoScreen.swift"
+  },
+  {
+    "rule": "swift-no-force-unwrap",
+    "jev": 0.07,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/TodoService.swift"
+  },
+  {
+    "rule": "swift-no-force-try",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/TodoService.swift"
+  },
+  {
+    "rule": "swift-no-force-cast",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/TodoService.swift"
+  },
+  {
+    "rule": "swift-no-debug-print",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/TodoService.swift"
+  },
+  {
+    "rule": "swift-no-empty-catch",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/TodoService.swift"
+  },
+  {
+    "rule": "swift-no-restating-comment",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/TodoService.swift"
+  },
+  {
+    "rule": "swift-no-vague-names",
+    "jev": 0.25,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/TodoService.swift"
+  },
+  {
+    "rule": "swift-no-magic-numbers",
+    "jev": 0.14,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/TodoService.swift"
+  },
+  {
+    "rule": "swift-no-commented-out-code",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/TodoService.swift"
+  },
+  {
+    "rule": "swift-no-bare-todo",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/TodoService.swift"
+  },
+  {
+    "rule": "swift-no-hardcoded-secret",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/TodoService.swift"
+  },
+  {
+    "rule": "swift-ui-off-main",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/TodoService.swift"
+  },
+  {
+    "rule": "swift-prefer-guard",
+    "jev": 0.07,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/TodoService.swift"
+  },
+  {
+    "rule": "ts-no-explicit-any",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-non-null-assertion",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-empty-catch",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-debug-console",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-floating-promise",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-restating-comment",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-vague-names",
+    "jev": 0.08,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-magic-numbers",
+    "jev": 0.17,
+    "grader": 2,
+    "evidence": "`count = 5,`; ``${GITHUB_API_BASE}/users/${encodeURIComponent(username)}/repos?per_page=100`;`",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-commented-out-code",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-hardcoded-secret",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-ts-ignore",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-deep-nesting",
+    "jev": 0.1,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-explicit-any",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-non-null-assertion",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-empty-catch",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-debug-console",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-floating-promise",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "main().catch((error) => { ... }); is handled with .catch",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-restating-comment",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-vague-names",
+    "jev": 0.07,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-magic-numbers",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "process.argv[2] and process.exit(1) are conventional/self-explanatory CLI usage",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-commented-out-code",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-hardcoded-secret",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-ts-ignore",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-deep-nesting",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-explicit-any",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-non-null-assertion",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-empty-catch",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-debug-console",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-floating-promise",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-restating-comment",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-vague-names",
+    "jev": 0.08,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-magic-numbers",
+    "jev": 0.18,
+    "grader": 1,
+    "evidence": "`count = 5,`",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-commented-out-code",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-hardcoded-secret",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-ts-ignore",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-deep-nesting",
+    "jev": 0.11,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/github.ts"
+  },
+  {
+    "rule": "ts-no-explicit-any",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-non-null-assertion",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-empty-catch",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-debug-console",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "console.log(`${repo.name}: ${repo.stargazers_count}`); is user-facing CLI output, not debug output",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-floating-promise",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "main().catch((error) => { ... });",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-restating-comment",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-vague-names",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-magic-numbers",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "process.argv[2] is a conventional CLI argument index; process.exit(1) is a conventional error exit code",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-commented-out-code",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-bare-todo",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-hardcoded-secret",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-ts-ignore",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-deep-nesting",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cli.ts"
+  },
+  {
+    "rule": "ts-no-explicit-any",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-non-null-assertion",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-empty-catch",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-debug-console",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-floating-promise",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-restating-comment",
+    "jev": 0.1,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-vague-names",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-magic-numbers",
+    "jev": 0.25,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-commented-out-code",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-bare-todo",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-hardcoded-secret",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-ts-ignore",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-deep-nesting",
+    "jev": 0.16,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-explicit-any",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-non-null-assertion",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-empty-catch",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-debug-console",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "console.log in reportResult appears to be CLI user-facing status output, not leftover debugging.",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-floating-promise",
+    "jev": 0.07,
+    "grader": 0,
+    "evidence": "main().catch((error) => { ... });",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-restating-comment",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-vague-names",
+    "jev": 0.1,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-magic-numbers",
+    "jev": 0.12,
+    "grader": 0,
+    "evidence": "const BATCH_SIZE = 50; is a named constant; process.exitCode = 1 is conventional failure exit code.",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-commented-out-code",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-hardcoded-secret",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-ts-ignore",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-deep-nesting",
+    "jev": 0.16,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-explicit-any",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-non-null-assertion",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-empty-catch",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-debug-console",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-floating-promise",
+    "jev": 0.07,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-restating-comment",
+    "jev": 0.09,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-vague-names",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-magic-numbers",
+    "jev": 0.2,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-commented-out-code",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-hardcoded-secret",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-ts-ignore",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-deep-nesting",
+    "jev": 0.18,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-explicit-any",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-non-null-assertion",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-empty-catch",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-debug-console",
+    "jev": 0.09,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-floating-promise",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-restating-comment",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-vague-names",
+    "jev": 0.08,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-magic-numbers",
+    "jev": 0.12,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-commented-out-code",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-hardcoded-secret",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-ts-ignore",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-deep-nesting",
+    "jev": 0.15,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-explicit-any",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-non-null-assertion",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-empty-catch",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-debug-console",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-floating-promise",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-restating-comment",
+    "jev": 0.1,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-vague-names",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-magic-numbers",
+    "jev": 0.2,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-commented-out-code",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-bare-todo",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-hardcoded-secret",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-ts-ignore",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-deep-nesting",
+    "jev": 0.19,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/retry.ts"
+  },
+  {
+    "rule": "ts-no-explicit-any",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-non-null-assertion",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-empty-catch",
+    "jev": 0.08,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-debug-console",
+    "jev": 0.09,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-floating-promise",
+    "jev": 0.08,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-restating-comment",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-vague-names",
+    "jev": 0.11,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-magic-numbers",
+    "jev": 0.12,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-commented-out-code",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-hardcoded-secret",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-ts-ignore",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-deep-nesting",
+    "jev": 0.14,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/sync.ts"
+  },
+  {
+    "rule": "ts-no-explicit-any",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-non-null-assertion",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-empty-catch",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-debug-console",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-floating-promise",
+    "jev": 0.07,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-restating-comment",
+    "jev": 0.1,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-vague-names",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-magic-numbers",
+    "jev": 0.34,
+    "grader": 1,
+    "evidence": "const cleanupIntervalMs = options.cleanupIntervalMs ?? options.staleAfterMs ?? 10 * 60 * 1000;",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-commented-out-code",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-hardcoded-secret",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-ts-ignore",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-deep-nesting",
+    "jev": 0.07,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-explicit-any",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-non-null-assertion",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-empty-catch",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-debug-console",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-floating-promise",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-restating-comment",
+    "jev": 0.15,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-vague-names",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-magic-numbers",
+    "jev": 0.52,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-commented-out-code",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-hardcoded-secret",
+    "jev": 0.01,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-ts-ignore",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-deep-nesting",
+    "jev": 0.1,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-explicit-any",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-non-null-assertion",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-empty-catch",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-debug-console",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-floating-promise",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-restating-comment",
+    "jev": 0.11,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-vague-names",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-magic-numbers",
+    "jev": 0.27,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-commented-out-code",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-hardcoded-secret",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-ts-ignore",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-deep-nesting",
+    "jev": 0.09,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-explicit-any",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-non-null-assertion",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-empty-catch",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-debug-console",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-floating-promise",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-restating-comment",
+    "jev": 0.21,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-vague-names",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-magic-numbers",
+    "jev": 0.1,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-commented-out-code",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-hardcoded-secret",
+    "jev": 0.01,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-ts-ignore",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-deep-nesting",
+    "jev": 0.09,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-explicit-any",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-non-null-assertion",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-empty-catch",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-debug-console",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-floating-promise",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-restating-comment",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-vague-names",
+    "jev": 0.08,
+    "grader": 3,
+    "evidence": "`months.map((m) => m.length)`; `months.flatMap((m) => ...)`; `.map((c) => c.length)`",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-magic-numbers",
+    "jev": 0.19,
+    "grader": 1,
+    "evidence": "`lines.push(\"-\".repeat(monthWidth + categoryWidth + amountWidth + 4));`",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-commented-out-code",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-hardcoded-secret",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-ts-ignore",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-deep-nesting",
+    "jev": 0.31,
+    "grader": 1,
+    "evidence": "`for (...) { if (inQuotes) { if (char === '\"') { if (line[i + 1] === '\"') { ... } } } }`",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-explicit-any",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-non-null-assertion",
+    "jev": 0.07,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-empty-catch",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-debug-console",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-floating-promise",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-restating-comment",
+    "jev": 0.15,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-vague-names",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-magic-numbers",
+    "jev": 0.16,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-commented-out-code",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-hardcoded-secret",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-ts-ignore",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-deep-nesting",
+    "jev": 0.13,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/middleware.ts"
+  },
+  {
+    "rule": "ts-no-explicit-any",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-non-null-assertion",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-empty-catch",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-debug-console",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-floating-promise",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-restating-comment",
+    "jev": 0.28,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-vague-names",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-magic-numbers",
+    "jev": 0.16,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-commented-out-code",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-hardcoded-secret",
+    "jev": 0.01,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-ts-ignore",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-deep-nesting",
+    "jev": 0.1,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/rateLimiter.ts"
+  },
+  {
+    "rule": "ts-no-explicit-any",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-non-null-assertion",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-empty-catch",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-debug-console",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-floating-promise",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-restating-comment",
+    "jev": 0.49,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-vague-names",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-magic-numbers",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-commented-out-code",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-bare-todo",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-hardcoded-secret",
+    "jev": 0.01,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-ts-ignore",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-deep-nesting",
+    "jev": 0.08,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-explicit-any",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-non-null-assertion",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-empty-catch",
+    "jev": 0.98,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-debug-console",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-floating-promise",
+    "jev": 0.07,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-restating-comment",
+    "jev": 0.07,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-vague-names",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-magic-numbers",
+    "jev": 0.14,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-commented-out-code",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-hardcoded-secret",
+    "jev": 0.01,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-ts-ignore",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-deep-nesting",
+    "jev": 0.08,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-explicit-any",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-non-null-assertion",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-empty-catch",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-debug-console",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-floating-promise",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-restating-comment",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-vague-names",
+    "jev": 0.07,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-magic-numbers",
+    "jev": 0.19,
+    "grader": 6,
+    "evidence": "`return date.slice(0, 7);`; `lines.push(\"-\".repeat(45));` (twice); `${month.padEnd(11)}${category.padEnd(21)}${formatCurrency(total).padStart(10)}`",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-commented-out-code",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-bare-todo",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-hardcoded-secret",
+    "jev": 0.01,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-ts-ignore",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-deep-nesting",
+    "jev": 0.22,
+    "grader": 1,
+    "evidence": "`for (...) { if (inQuotes) { if (char === '\"') { if (line[i + 1] === '\"') { ... } } } }` in `parseCSVLine`",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-explicit-any",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-non-null-assertion",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-empty-catch",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-debug-console",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-floating-promise",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-restating-comment",
+    "jev": 0.3,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-vague-names",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-magic-numbers",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-commented-out-code",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-bare-todo",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-hardcoded-secret",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-ts-ignore",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-deep-nesting",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-explicit-any",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-non-null-assertion",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-empty-catch",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-debug-console",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-floating-promise",
+    "jev": 0.08,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-restating-comment",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-vague-names",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-magic-numbers",
+    "jev": 0.13,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-commented-out-code",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-hardcoded-secret",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-ts-ignore",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-deep-nesting",
+    "jev": 0.07,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-explicit-any",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-non-null-assertion",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-empty-catch",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-debug-console",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-floating-promise",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-restating-comment",
+    "jev": 0.2,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-vague-names",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-magic-numbers",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-commented-out-code",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-bare-todo",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-hardcoded-secret",
+    "jev": 0.01,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-ts-ignore",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-deep-nesting",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/cache.ts"
+  },
+  {
+    "rule": "ts-no-explicit-any",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-non-null-assertion",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-empty-catch",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-debug-console",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-floating-promise",
+    "jev": 0.08,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-restating-comment",
+    "jev": 0.08,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-vague-names",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-magic-numbers",
+    "jev": 0.12,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-commented-out-code",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-hardcoded-secret",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-ts-ignore",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-deep-nesting",
+    "jev": 0.08,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/userService.ts"
+  },
+  {
+    "rule": "ts-no-explicit-any",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-non-null-assertion",
+    "jev": 0.96,
+    "grader": 1,
+    "evidence": "`set!.delete(handler as MessageHandler);`",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-empty-catch",
+    "jev": 0.78,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-debug-console",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-floating-promise",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-restating-comment",
+    "jev": 0.09,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-vague-names",
+    "jev": 0.47,
+    "grader": 1,
+    "evidence": "`private handleMessage(data: unknown): void {`",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-magic-numbers",
+    "jev": 0.14,
+    "grader": 3,
+    "evidence": "`this.heartbeatIntervalMs = options.heartbeatIntervalMs ?? 30000;`; `this.reconnectBaseDelayMs = options.reconnectBaseDelayMs ?? 1000;`; `this.reconnectMaxDelayMs = options.reconnectMaxDelayMs ?? 30000;`",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-commented-out-code",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-bare-todo",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-hardcoded-secret",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-ts-ignore",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-deep-nesting",
+    "jev": 0.2,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-explicit-any",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-non-null-assertion",
+    "jev": 0.09,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-empty-catch",
+    "jev": 0.09,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-debug-console",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-floating-promise",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-restating-comment",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-vague-names",
+    "jev": 0.5,
+    "grader": 1,
+    "evidence": "private handleMessage(data: unknown): void {",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-magic-numbers",
+    "jev": 0.22,
+    "grader": 3,
+    "evidence": "this.heartbeatIntervalMs = options.heartbeatIntervalMs ?? 30_000; / this.minReconnectDelayMs = options.minReconnectDelayMs ?? 1_000; / this.maxReconnectDelayMs = options.maxReconnectDelayMs ?? 30_000;",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-commented-out-code",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-hardcoded-secret",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-ts-ignore",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-deep-nesting",
+    "jev": 0.19,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-explicit-any",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-non-null-assertion",
+    "jev": 0.07,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-empty-catch",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-debug-console",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-floating-promise",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-restating-comment",
+    "jev": 0.15,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-vague-names",
+    "jev": 0.08,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-magic-numbers",
+    "jev": 0.22,
+    "grader": 8,
+    "evidence": "`firstFields[3]`; `fields.length !== 4`; `category.padEnd(20)` / `padStart(15)`; `\"Total\".padEnd(20)` / `padStart(15)`; `transaction.category.padEnd(15)` / `padStart(15)`",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-commented-out-code",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-hardcoded-secret",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-ts-ignore",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "ts-no-deep-nesting",
+    "jev": 0.31,
+    "grader": 1,
+    "evidence": "`for (...) { if (inQuotes) { if (char === '\"') { if (line[i + 1] === '\"') { ... } } } }` in `parseCsvLine`",
+    "path": "src/report.ts"
+  },
+  {
+    "rule": "swift-no-force-unwrap",
+    "jev": 0.97,
+    "grader": 1,
+    "evidence": "`baseURL: URL = URL(string: \"https://api.weatherapi.com/v1/current.json\")!`",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-no-force-try",
+    "jev": 0.15,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-no-force-cast",
+    "jev": 0.46,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-no-debug-print",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-no-empty-catch",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-no-restating-comment",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-no-vague-names",
+    "jev": 0.36,
+    "grader": 1,
+    "evidence": "`let data: Data`",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-no-magic-numbers",
+    "jev": 0.12,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-no-commented-out-code",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-no-hardcoded-secret",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-ui-off-main",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-prefer-guard",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "ts-no-explicit-any",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-non-null-assertion",
+    "jev": 0.08,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-empty-catch",
+    "jev": 0.09,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-debug-console",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-floating-promise",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-restating-comment",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-vague-names",
+    "jev": 0.48,
+    "grader": 1,
+    "evidence": "`private handleMessage(data: unknown): void {`",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-magic-numbers",
+    "jev": 0.21,
+    "grader": 3,
+    "evidence": "`this.heartbeatIntervalMs = options.heartbeatIntervalMs ?? 30_000;`; `this.initialReconnectDelayMs = options.initialReconnectDelayMs ?? 1_000;`; `this.maxReconnectDelayMs = options.maxReconnectDelayMs ?? 30_000;`",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-commented-out-code",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-hardcoded-secret",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-ts-ignore",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "ts-no-deep-nesting",
+    "jev": 0.19,
+    "grader": 0,
+    "evidence": "none",
+    "path": "src/wsClient.ts"
+  },
+  {
+    "rule": "swift-no-force-unwrap",
+    "jev": 0.1,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-no-force-try",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-no-force-cast",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-no-debug-print",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-no-empty-catch",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-no-restating-comment",
+    "jev": 0.21,
+    "grader": 1,
+    "evidence": "`/// Temperature in degrees Celsius.` above `public let temperatureCelsius: Double`",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-no-vague-names",
+    "jev": 0.41,
+    "grader": 1,
+    "evidence": "`let data: Data`",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-no-magic-numbers",
+    "jev": 0.11,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-no-commented-out-code",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-no-hardcoded-secret",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-ui-off-main",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-prefer-guard",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-no-force-unwrap",
+    "jev": 0.11,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-force-try",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-force-cast",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-debug-print",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-empty-catch",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-restating-comment",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-vague-names",
+    "jev": 0.17,
+    "grader": 2,
+    "evidence": "`session.dataTask(with: endpoint) { [weak self] data, response, error in`; `guard let data else {`",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-magic-numbers",
+    "jev": 0.13,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-commented-out-code",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-hardcoded-secret",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-ui-off-main",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-prefer-guard",
+    "jev": 0.07,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-force-unwrap",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListView.swift"
+  },
+  {
+    "rule": "swift-no-force-try",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListView.swift"
+  },
+  {
+    "rule": "swift-no-force-cast",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListView.swift"
+  },
+  {
+    "rule": "swift-no-debug-print",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListView.swift"
+  },
+  {
+    "rule": "swift-no-empty-catch",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListView.swift"
+  },
+  {
+    "rule": "swift-no-restating-comment",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListView.swift"
+  },
+  {
+    "rule": "swift-no-vague-names",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListView.swift"
+  },
+  {
+    "rule": "swift-no-magic-numbers",
+    "jev": 0.08,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListView.swift"
+  },
+  {
+    "rule": "swift-no-commented-out-code",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListView.swift"
+  },
+  {
+    "rule": "swift-no-bare-todo",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListView.swift"
+  },
+  {
+    "rule": "swift-no-hardcoded-secret",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListView.swift"
+  },
+  {
+    "rule": "swift-ui-off-main",
+    "jev": 0.08,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListView.swift"
+  },
+  {
+    "rule": "swift-prefer-guard",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListView.swift"
+  },
+  {
+    "rule": "swift-no-force-unwrap",
+    "jev": 0.98,
+    "grader": 1,
+    "evidence": "endpoint: URL = URL(string: \"https://jsonplaceholder.typicode.com/users\")!",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-force-try",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-force-cast",
+    "jev": 0.08,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-debug-print",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-empty-catch",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-restating-comment",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-vague-names",
+    "jev": 0.16,
+    "grader": 2,
+    "evidence": "session.dataTask(with: endpoint) { [weak self] data, response, error in (appears in loadUsers and refresh; `data` is vague)",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-magic-numbers",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-commented-out-code",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-hardcoded-secret",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-ui-off-main",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-prefer-guard",
+    "jev": 0.13,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-force-unwrap",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListView.swift"
+  },
+  {
+    "rule": "swift-no-force-try",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListView.swift"
+  },
+  {
+    "rule": "swift-no-force-cast",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListView.swift"
+  },
+  {
+    "rule": "swift-no-debug-print",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListView.swift"
+  },
+  {
+    "rule": "swift-no-empty-catch",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListView.swift"
+  },
+  {
+    "rule": "swift-no-restating-comment",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListView.swift"
+  },
+  {
+    "rule": "swift-no-vague-names",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListView.swift"
+  },
+  {
+    "rule": "swift-no-magic-numbers",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListView.swift"
+  },
+  {
+    "rule": "swift-no-commented-out-code",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListView.swift"
+  },
+  {
+    "rule": "swift-no-bare-todo",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListView.swift"
+  },
+  {
+    "rule": "swift-no-hardcoded-secret",
+    "jev": 0.01,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListView.swift"
+  },
+  {
+    "rule": "swift-ui-off-main",
+    "jev": 0.09,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListView.swift"
+  },
+  {
+    "rule": "swift-prefer-guard",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListView.swift"
+  },
+  {
+    "rule": "swift-no-force-unwrap",
+    "jev": 0.1,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-no-force-try",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-no-force-cast",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-no-debug-print",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-no-empty-catch",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-no-restating-comment",
+    "jev": 0.27,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-no-vague-names",
+    "jev": 0.28,
+    "grader": 1,
+    "evidence": "`let data: Data`",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-no-magic-numbers",
+    "jev": 0.12,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-no-commented-out-code",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-no-hardcoded-secret",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-ui-off-main",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-prefer-guard",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/WeatherClient.swift"
+  },
+  {
+    "rule": "swift-no-force-unwrap",
+    "jev": 0.08,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-force-try",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-force-cast",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-debug-print",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-empty-catch",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-restating-comment",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-vague-names",
+    "jev": 0.15,
+    "grader": 2,
+    "evidence": "`let task = session.dataTask(with: endpoint) { [weak self] data, response, error in`; `private func handleResponse(data: Data?, response: URLResponse?, error: Error?)`",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-magic-numbers",
+    "jev": 0.12,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-commented-out-code",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-hardcoded-secret",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-ui-off-main",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-prefer-guard",
+    "jev": 0.07,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListViewModel.swift"
+  },
+  {
+    "rule": "swift-no-force-unwrap",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListView.swift"
+  },
+  {
+    "rule": "swift-no-force-try",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListView.swift"
+  },
+  {
+    "rule": "swift-no-force-cast",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListView.swift"
+  },
+  {
+    "rule": "swift-no-debug-print",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListView.swift"
+  },
+  {
+    "rule": "swift-no-empty-catch",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListView.swift"
+  },
+  {
+    "rule": "swift-no-restating-comment",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListView.swift"
+  },
+  {
+    "rule": "swift-no-vague-names",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListView.swift"
+  },
+  {
+    "rule": "swift-no-magic-numbers",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListView.swift"
+  },
+  {
+    "rule": "swift-no-commented-out-code",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListView.swift"
+  },
+  {
+    "rule": "swift-no-bare-todo",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListView.swift"
+  },
+  {
+    "rule": "swift-no-hardcoded-secret",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListView.swift"
+  },
+  {
+    "rule": "swift-ui-off-main",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListView.swift"
+  },
+  {
+    "rule": "swift-prefer-guard",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/UserListView.swift"
+  },
+  {
+    "rule": "swift-no-force-unwrap",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/User.swift"
+  },
+  {
+    "rule": "swift-no-force-try",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/User.swift"
+  },
+  {
+    "rule": "swift-no-force-cast",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/User.swift"
+  },
+  {
+    "rule": "swift-no-debug-print",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/User.swift"
+  },
+  {
+    "rule": "swift-no-empty-catch",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/User.swift"
+  },
+  {
+    "rule": "swift-no-restating-comment",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/User.swift"
+  },
+  {
+    "rule": "swift-no-vague-names",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/User.swift"
+  },
+  {
+    "rule": "swift-no-magic-numbers",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/User.swift"
+  },
+  {
+    "rule": "swift-no-commented-out-code",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/User.swift"
+  },
+  {
+    "rule": "swift-no-bare-todo",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/User.swift"
+  },
+  {
+    "rule": "swift-no-hardcoded-secret",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/User.swift"
+  },
+  {
+    "rule": "swift-ui-off-main",
+    "jev": 0.01,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/User.swift"
+  },
+  {
+    "rule": "swift-prefer-guard",
+    "jev": 0.01,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/User.swift"
+  },
+  {
+    "rule": "swift-no-force-unwrap",
+    "jev": 0.08,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-force-try",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-force-cast",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-debug-print",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-empty-catch",
+    "jev": 0.08,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-restating-comment",
+    "jev": 0.17,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-vague-names",
+    "jev": 0.35,
+    "grader": 2,
+    "evidence": "`let data = try encoder.encode(entry)`; `guard let data = try? Data(contentsOf: url),`",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-magic-numbers",
+    "jev": 0.07,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-commented-out-code",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-hardcoded-secret",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-ui-off-main",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-prefer-guard",
+    "jev": 0.08,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-force-unwrap",
+    "jev": 0.09,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-force-try",
+    "jev": 0.07,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-force-cast",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-debug-print",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-empty-catch",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-restating-comment",
+    "jev": 0.15,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-vague-names",
+    "jev": 0.22,
+    "grader": 2,
+    "evidence": "`guard let data = try? encoder.encode(entry) else { return }`; `guard let data = try? Data(contentsOf: url),`",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-magic-numbers",
+    "jev": 0.29,
+    "grader": 2,
+    "evidence": "`var hash: UInt64 = 14_695_981_039_346_656_037`; `hash = hash &* 1_099_511_628_211`",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-commented-out-code",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-hardcoded-secret",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-ui-off-main",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-prefer-guard",
+    "jev": 0.08,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-force-unwrap",
+    "jev": 0.08,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-force-try",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-force-cast",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-debug-print",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-empty-catch",
+    "jev": 0.08,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-restating-comment",
+    "jev": 0.2,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-vague-names",
+    "jev": 0.32,
+    "grader": 2,
+    "evidence": "`let data = try JSONEncoder().encode(entry)`; `guard let data = try? Data(contentsOf: url),`",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-magic-numbers",
+    "jev": 0.13,
+    "grader": 1,
+    "evidence": "`maxTotalSize: Int = 50 * 1024 * 1024,`",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-commented-out-code",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-hardcoded-secret",
+    "jev": 0.01,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-ui-off-main",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-prefer-guard",
+    "jev": 0.07,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/DiskCache.swift"
+  },
+  {
+    "rule": "swift-no-force-unwrap",
+    "jev": 0.97,
+    "grader": 1,
+    "evidence": "`public static let defaultBaseURL = URL(string: \"https://api.example.com\")!`",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-no-force-try",
+    "jev": 0.25,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-no-force-cast",
+    "jev": 0.08,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-no-debug-print",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-no-empty-catch",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-no-restating-comment",
+    "jev": 0.22,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-no-vague-names",
+    "jev": 0.39,
+    "grader": 1,
+    "evidence": "`let data: Data`",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-no-magic-numbers",
+    "jev": 0.08,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-no-commented-out-code",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-no-hardcoded-secret",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-ui-off-main",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-prefer-guard",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-no-force-unwrap",
+    "jev": 0.78,
+    "grader": 1,
+    "evidence": "`!url.host!.isEmpty`",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-no-force-try",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-no-force-cast",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-no-debug-print",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-no-empty-catch",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-no-restating-comment",
+    "jev": 0.08,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-no-vague-names",
+    "jev": 0.44,
+    "grader": 1,
+    "evidence": "`let data = try Data(contentsOf: URL(fileURLWithPath: path))`",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-no-magic-numbers",
+    "jev": 0.1,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-no-commented-out-code",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-no-hardcoded-secret",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-ui-off-main",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-prefer-guard",
+    "jev": 0.06,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-no-force-unwrap",
+    "jev": 0.97,
+    "grader": 1,
+    "evidence": "`public static let defaultBaseURL = URL(string: \"https://api.example.com\")!`",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-no-force-try",
+    "jev": 0.22,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-no-force-cast",
+    "jev": 0.09,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-no-debug-print",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-no-empty-catch",
+    "jev": 0.03,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-no-restating-comment",
+    "jev": 0.1,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-no-vague-names",
+    "jev": 0.45,
+    "grader": 1,
+    "evidence": "`let data = try Data(contentsOf: URL(fileURLWithPath: path))`",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-no-magic-numbers",
+    "jev": 0.08,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-no-commented-out-code",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-no-bare-todo",
+    "jev": 0.04,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-no-hardcoded-secret",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-ui-off-main",
+    "jev": 0.02,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  },
+  {
+    "rule": "swift-prefer-guard",
+    "jev": 0.05,
+    "grader": 0,
+    "evidence": "none",
+    "path": "Sources/App/AppConfig.swift"
+  }
+]

@@ -1,0 +1,62 @@
+[
+  {
+    "id": "ts-github-top-repos",
+    "lang": "typescript",
+    "prompt": "In src/github.ts, write a function that fetches all of a GitHub user's public repositories (follow pagination via the Link header) and returns the five with the most stars. Then add src/cli.ts that takes a username from process.argv and prints name and star count for each. Use the global fetch; an optional GITHUB_TOKEN env var should be sent as a bearer token when present. Make sure `npx tsc --noEmit` passes."
+  },
+  {
+    "id": "ts-retry-sync",
+    "lang": "typescript",
+    "prompt": "Create src/retry.ts with a generic retry-with-exponential-backoff helper for async functions (configurable attempts, base delay, max delay, jitter). Then create src/sync.ts that uploads an array of records to an HTTP endpoint in batches of 50 using that helper; the endpoint URL and an auth token come from environment variables. Failed batches should be reported at the end. Make sure `npx tsc --noEmit` passes."
+  },
+  {
+    "id": "ts-rate-limiter",
+    "lang": "typescript",
+    "prompt": "Implement a token-bucket rate limiter in src/rateLimiter.ts (per-key buckets, refill over time, stale buckets cleaned up). Then write src/middleware.ts with an Express-style middleware `(req, res, next)` that limits by client IP and responds 429 with a Retry-After header. Don't add dependencies; define minimal request/response types yourself. Make sure `npx tsc --noEmit` passes."
+  },
+  {
+    "id": "ts-transactions-report",
+    "lang": "typescript",
+    "prompt": "Write src/report.ts that parses a CSV string of transactions (date,description,category,amount — quoted fields may contain commas) and returns monthly totals per category. Retail purchases get 8.25% sales tax added, and any single transaction over $10,000 must be flagged for review. Export a function that formats the report as a plain-text table. Make sure `npx tsc --noEmit` passes."
+  },
+  {
+    "id": "ts-lru-user-cache",
+    "lang": "typescript",
+    "prompt": "Create src/cache.ts: an LRU cache with a max size and per-entry TTL. Then create src/userService.ts that wraps an injected async `fetchUser(id)` function with that cache, deduplicates concurrent requests for the same id, and exposes `getUser`, `invalidate`, and `prefetch(ids)` (prefetch should kick off loads in the background). Make sure `npx tsc --noEmit` passes."
+  },
+  {
+    "id": "ts-ws-client",
+    "lang": "typescript",
+    "prompt": "Write src/wsClient.ts: a WebSocket client wrapper (use the global WebSocket type) that reconnects with backoff after unexpected closes, sends heartbeats, queues outgoing messages while disconnected, and dispatches parsed JSON messages to typed handlers by a `type` field. Make sure `npx tsc --noEmit` passes."
+  },
+  {
+    "id": "swift-weather-client",
+    "lang": "swift",
+    "prompt": "Add Sources/App/WeatherClient.swift: a client that fetches the current weather for a city from a JSON HTTP API using URLSession async/await and decodes it with Codable into a `CurrentWeather` model (temperature in Celsius, condition, wind speed). The API key comes from the WEATHER_API_KEY environment variable. Include sensible error types. Make sure `swift build` succeeds."
+  },
+  {
+    "id": "swift-user-store",
+    "lang": "swift",
+    "prompt": "Add Sources/App/UserListViewModel.swift: an ObservableObject for a SwiftUI user list that loads users from a JSON endpoint using URLSession's completion-handler API (dataTask), exposes `users`, `isLoading` and an error message as @Published properties, and supports pull-to-refresh and search filtering. Also add a small SwiftUI `UserListView` that uses it. Make sure `swift build` succeeds."
+  },
+  {
+    "id": "swift-disk-cache",
+    "lang": "swift",
+    "prompt": "Add Sources/App/DiskCache.swift: a generic disk cache for Codable values stored as JSON files in the caches directory, with per-entry expiration, a max total size with oldest-first eviction, and thread safety. Make sure `swift build` succeeds."
+  },
+  {
+    "id": "swift-config-loader",
+    "lang": "swift",
+    "prompt": "Add Sources/App/AppConfig.swift: load an app configuration from a JSON file (path given), apply defaults for missing fields, validate ranges (timeout between 1 and 120 seconds, maxConnections 1–64, a valid https baseURL), and merge overrides from environment variables prefixed APP_. Make sure `swift build` succeeds."
+  },
+  {
+    "id": "swift-image-loader",
+    "lang": "swift",
+    "prompt": "Add Sources/App/ImageLoader.swift: an actor that downloads images by URL with async/await, caches decoded NSImage values in memory (NSCache) and on disk, coalesces concurrent requests for the same URL, and retries transient failures with backoff. Make sure `swift build` succeeds."
+  },
+  {
+    "id": "swift-todo-view",
+    "lang": "swift",
+    "prompt": "Add Sources/App/TodoScreen.swift: a SwiftUI screen showing todos fetched from https://jsonplaceholder.typicode.com/todos, with a toggle to hide completed items, a loading indicator, and an error banner. Put networking in a separate TodoService class that fetches on a background queue. Make sure `swift build` succeeds."
+  }
+]

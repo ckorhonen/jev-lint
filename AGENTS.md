@@ -1,0 +1,49 @@
+# jev-lint — agent instructions
+
+A PostToolUse hook that sends the code an agent just added to TypeSafe Jev (one call,
+one Noul per rule) and feeds findings back in two tiers, plus the harness that
+evaluates it. Results live in an experiment notebook:
+https://claude.ai/artifact/BUZG9LEnaiJyaJuaP7tajs (source: `report/`).
+
+For evaluation work (new rules, new judges or models, new E2E rounds, notebook
+entries) use the `jev-lint-eval` skill in `.agents/skills/jev-lint-eval/`. To generate
+`.jev-lint/` rules for any repo from its guidelines, use `jev-lint-rules`. Both skills
+are symlinked into `.claude/skills/`.
+
+## Layout
+
+- `src/hook.ts` — hook entry (Claude Code `Write|Edit|MultiEdit`, Codex `apply_patch`). Must fail open: never throw, never block, always exit 0.
+- `src/extract.ts` — hook payload → code the edit added (Codex: `+` lines only).
+- `src/lint.ts` — rule packs, tiers (0.8 fix / 0.5 double-check), feedback text.
+- `src/repoRules.ts` — loads repo packs from the nearest `.jev-lint/`; `src/validate.ts` validates them against labeled cases.
+- `src/jev.ts` — minimal TypeSafe client; key from `TYPESAFE_API_KEY` or Keychain service `typesafe-api-key`.
+- `rules/*.json` — hygiene pack; `rules/*.practices.json` — best-practice pack; `.jev-lint/` — this repo's own dogfooded repo pack (run `bun src/validate.ts .jev-lint` after changing it).
+- `eval/cases/` — labeled hook payloads: `<lang>[.practices].<dev|holdout>.jsonl`.
+- `eval/run.ts`, `eval/systems.ts` — offline eval (Jev vs LLM judge vs regex).
+- `eval/e2e/` — headless Claude Code runs with/without the hook, grading, AI review mapping.
+- `eval/results/` — committed result files; `snapshots/` keeps superseded evidence; `cache/` is local only.
+- `report/notebook.html` + `report/build.py` → `report/index.html` (the published notebook).
+
+## Commands
+
+```sh
+bun install
+bun test && bunx tsc --noEmit && bunx biome check .   # required before committing
+bun eval/run.ts --runs 3                               # offline eval (cached)
+python3 report/build.py <DepartureMono-Regular.woff2>  # rebuild notebook
+```
+
+## Rules for changes
+
+- **Hook safety:** keep the hook fail-open and fast (default timeout 8 s). Never print anything except the final JSON on stdout.
+- **Rule wording:** rules must be judgeable from the added code alone. Every rule needs:
+  - labeled positives and hard negatives in both the dev and holdout sets;
+  - wording tuned on dev only;
+  - reported holdout numbers.
+- **Evidence is append-only:** don't overwrite or delete earlier results.
+  - Copy `eval/results/summary.json` (and any E2E file you will regenerate) into `eval/results/snapshots/` with a dated, descriptive name first.
+  - Add a new dated notebook entry; label replaced numbers "superseded" instead of removing them.
+- **LLM judging** (baseline judge, grader, reviewer, mapper) uses `gpt-6-luna` at `reasoning_effort: low` unless the user says otherwise.
+- **Thresholds:** don't retune them on holdout data. Show alternatives with the sweep instead.
+- **Secrets:** never commit `.env` or print keys. Test fixtures with fake secrets live only in `eval/cases/`.
+- **Package manager:** use bun. JSON and TS are formatted by biome.

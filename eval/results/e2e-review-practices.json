@@ -1,0 +1,2181 @@
+[
+  {
+    "task": "react-chat-room",
+    "lang": "typescript",
+    "condition": "none",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "src/ChatRoom.tsx",
+        "line": 38,
+        "severity": "medium",
+        "title": "Old room messages can briefly appear after a room change",
+        "explanation": "Because messages are cleared in a passive effect, the component can render the previous room’s messages once with the new `roomId` before the effect runs, briefly exposing content from the wrong room.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/ChatRoom.tsx",
+        "line": 57,
+        "severity": "medium",
+        "title": "Message history grows without bound",
+        "explanation": "Every received message is appended and none are removed, so a long-lived chat session can accumulate an unbounded array and increasingly expensive renders.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/ChatRoom.tsx",
+        "line": 17,
+        "severity": "low",
+        "title": "`sentAt` is not validated as a usable date",
+        "explanation": "Any string passes validation, so malformed timestamps produce `Invalid Date` in the rendered message time instead of being rejected or handled safely.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "src/ChatRoom.tsx",
+        "rule": "ts-no-empty-catch",
+        "jevProbability": 0.98,
+        "graderConfirms": true
+      }
+    ]
+  },
+  {
+    "task": "react-user-search",
+    "lang": "typescript",
+    "condition": "jev",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "src/UserSearch.tsx",
+        "line": 65,
+        "severity": "medium",
+        "title": "Stale requests can overwrite newer search results",
+        "explanation": "Aborting the previous request does not guarantee its already-resolved promise chain cannot run, so an older response can overwrite the latest results and incorrectly update loading or error state; guard updates with a request identity or cancellation flag.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "src/UserSearch.tsx",
+        "rule": "react-derived-state-effect",
+        "jevProbability": 0.59,
+        "graderConfirms": false
+      }
+    ]
+  },
+  {
+    "task": "react-signup-form",
+    "lang": "typescript",
+    "condition": "none",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "src/SignupForm.tsx",
+        "line": 60,
+        "severity": "high",
+        "title": "Insufficiently validates server error payloads",
+        "explanation": "The guard accepts `errors: null`, arrays, and objects whose field values are non-strings, so `setErrors` can later cause a crash or React rendering errors when those values are used as children.",
+        "rule": "ts-unvalidated-external-data",
+        "jevProbability": 0.67
+      },
+      {
+        "file": "src/SignupForm.tsx",
+        "line": 81,
+        "severity": "medium",
+        "title": "Submission is not guarded against duplicate requests",
+        "explanation": "A second submit can run while the first request is pending (for example, via Enter), since `submitting` only disables the button and is not checked in the handler, potentially creating duplicate accounts.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/SignupForm.tsx",
+        "line": 115,
+        "severity": "medium",
+        "title": "Success response is trusted without runtime validation",
+        "explanation": "Casting arbitrary JSON to `SignupSuccessResponse` does not verify that `id` is a string, so malformed successful responses can leave the form visible with its values cleared or render an unexpected account ID.",
+        "rule": "ts-unvalidated-external-data",
+        "jevProbability": 0.67
+      },
+      {
+        "file": "src/SignupForm.tsx",
+        "line": 91,
+        "severity": "medium",
+        "title": "In-flight edits can be lost or receive stale errors",
+        "explanation": "The fields remain editable while the request is pending, but success resets all values and server validation errors are applied to the current form, potentially discarding newer edits or associating errors with values that were not submitted.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "src/SignupForm.tsx",
+        "rule": "ts-no-vague-names",
+        "jevProbability": 0.67,
+        "graderConfirms": true
+      }
+    ]
+  },
+  {
+    "task": "react-metrics-poller",
+    "lang": "typescript",
+    "condition": "jev",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "src/MetricsPanel.tsx",
+        "line": 93,
+        "severity": "medium",
+        "title": "Visibility refresh can start overlapping requests",
+        "explanation": "A visibility event starts a new `load()` without cancelling or deduplicating an in-flight request, so responses can arrive out of order and each request's `finally` schedules another polling timer, creating duplicate polling chains.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/MetricsPanel.tsx",
+        "line": 17,
+        "severity": "low",
+        "title": "Metric validation accepts non-finite values",
+        "explanation": "A JSON number such as `1e400` parses to `Infinity`, so checking only `typeof value === \"number\"` allows invalid metric values to be rendered and compared.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "src/MetricsPanel.tsx",
+        "rule": "ts-no-vague-names",
+        "jevProbability": 0.67,
+        "graderConfirms": true
+      }
+    ]
+  },
+  {
+    "task": "react-user-search",
+    "lang": "typescript",
+    "condition": "none",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "src/UserSearch.tsx",
+        "line": 41,
+        "severity": "medium",
+        "title": "Guard against stale request results",
+        "explanation": "Aborting a request does not guarantee that an already-completed response or queued callback cannot update state, so an older search can overwrite the results for a newer query or repopulate results after the query is cleared.",
+        "rule": "react-effect-fetch-race",
+        "jevProbability": 0.05
+      },
+      {
+        "file": "src/UserSearch.tsx",
+        "line": 15,
+        "severity": "medium",
+        "title": "Clear or hide results while the query changes",
+        "explanation": "Existing users remain visible throughout the debounce and fetch for a new query, so the UI can present results for the previous term as if they matched the current one.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/UserSearch.tsx",
+        "line": 40,
+        "severity": "medium",
+        "title": "Validate the API response before using it as users",
+        "explanation": "The `User[]` annotation does not validate the JSON at runtime, so malformed or unexpected API data can reach the sort and render logic and cause errors such as calling `localeCompare` on a non-string value.",
+        "rule": "ts-unvalidated-external-data",
+        "jevProbability": 0.97
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "src/UserSearch.tsx",
+        "rule": "ts-no-vague-names",
+        "jevProbability": 0.51,
+        "graderConfirms": true
+      }
+    ]
+  },
+  {
+    "task": "react-metrics-poller",
+    "lang": "typescript",
+    "condition": "none",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "src/MetricsPanel.tsx",
+        "line": 72,
+        "severity": "medium",
+        "title": "Visibility refresh can create overlapping polling loops",
+        "explanation": "If a visibility refresh starts while a poll request is in flight, both requests can finish and schedule their own timeout, causing duplicate polling and potentially allowing an older response to overwrite newer metrics.",
+        "rule": "react-effect-fetch-race",
+        "jevProbability": 0.04
+      },
+      {
+        "file": "src/MetricsPanel.tsx",
+        "line": 27,
+        "severity": "medium",
+        "title": "API response is trusted without runtime validation",
+        "explanation": "The TypeScript annotation does not validate JSON, so malformed payloads can break the iteration or render invalid metric values and names instead of being handled as an API error.",
+        "rule": "ts-unvalidated-external-data",
+        "jevProbability": 0.96
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "react-todo-board",
+    "lang": "typescript",
+    "condition": "none",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "src/TodoBoard.tsx",
+        "line": 19,
+        "severity": "medium",
+        "title": "Persisted data is trusted without validation",
+        "explanation": "Any array from localStorage is treated as `TodoItem[]`, so malformed entries (such as `null` or objects without `done`/`text`) can cause render-time errors or invalid UI state.",
+        "rule": "ts-unvalidated-external-data",
+        "jevProbability": 0.36
+      },
+      {
+        "file": "src/TodoBoard.tsx",
+        "line": 26,
+        "severity": "medium",
+        "title": "Stored items can cause a hydration mismatch",
+        "explanation": "When server-rendered, the server initializes with an empty list while the browser may initialize from localStorage, producing different initial markup during hydration.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/TodoBoard.tsx",
+        "line": 33,
+        "severity": "medium",
+        "title": "Storage write failures are uncaught",
+        "explanation": "`localStorage.setItem` can throw (for example, when storage is blocked or full), and the effect currently lets that exception escape instead of handling persistence failure.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/TodoBoard.tsx",
+        "line": 166,
+        "severity": "medium",
+        "title": "Reordering filtered items can appear to do nothing",
+        "explanation": "The move controls reorder the full list using each item's global index, so moving an item past a hidden item may leave the visible filtered order unchanged.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "react-signup-form",
+    "lang": "typescript",
+    "condition": "jev",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "src/SignupForm.tsx",
+        "line": 113,
+        "severity": "high",
+        "title": "Prevent overlapping submissions",
+        "explanation": "The disabled button does not prevent another submit event (for example, via Enter) while the request is pending, so duplicate signup requests can be sent and their responses can race.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/SignupForm.tsx",
+        "line": 135,
+        "severity": "medium",
+        "title": "Do not overwrite edits made during submission",
+        "explanation": "Inputs remain editable while the request is pending, but a successful response resets all values to the initial state and can discard edits the user made after submitting.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/SignupForm.tsx",
+        "line": 142,
+        "severity": "medium",
+        "title": "Validate server error keys before accepting them",
+        "explanation": "This guard accepts any object whose values are strings, including an empty object or errors for unknown fields, which can leave a failed signup with no visible feedback.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/SignupForm.tsx",
+        "line": 134,
+        "severity": "medium",
+        "title": "Show success even when the response omits an ID",
+        "explanation": "If a successful API response has no usable `id`, `successId` becomes an empty string and the truthy check at line 159 hides the success message entirely.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/SignupForm.tsx",
+        "line": 85,
+        "severity": "low",
+        "title": "Clear dependent confirmation errors when the password changes",
+        "explanation": "Changing the password only clears that field's error, so a stale “Passwords do not match” error can remain on the confirmation field even after the values match.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "react-chat-room",
+    "lang": "typescript",
+    "condition": "jev",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "src/ChatRoom.tsx",
+        "line": 44,
+        "severity": "medium",
+        "title": "Encode the room ID as a URL path segment",
+        "explanation": "Interpolating `roomId` directly into the URL lets values containing `/`, `?`, or `#` change the requested path or query, potentially connecting to a different room; encode it with `encodeURIComponent`.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/ChatRoom.tsx",
+        "line": 67,
+        "severity": "medium",
+        "title": "Use bounded reconnect backoff",
+        "explanation": "A fixed two-second retry loop continues indefinitely during an outage, which can cause unnecessary load on the server and synchronized reconnect storms; use an increasing, capped delay (ideally with jitter) and reset it after a successful connection.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/ChatRoom.tsx",
+        "line": 122,
+        "severity": "low",
+        "title": "Validate timestamps before formatting",
+        "explanation": "The message guard accepts any string for `sentAt`, so malformed server data renders `Invalid Date` rather than being rejected or handled explicitly.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "react-todo-board",
+    "lang": "typescript",
+    "condition": "jev",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "src/TodoBoard.tsx",
+        "line": 37,
+        "severity": "medium",
+        "title": "Persisted state can cause an SSR hydration mismatch",
+        "explanation": "When rendered on the server, the initializer returns an empty list, while the browser initializer reads `localStorage`, so a user with saved todos can hydrate markup that differs from the server-rendered markup.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/TodoBoard.tsx",
+        "line": 44,
+        "severity": "medium",
+        "title": "Storage write failures are uncaught",
+        "explanation": "`localStorage.setItem` can throw when storage is unavailable or its quota is exceeded, leaving an uncaught error in the effect whenever todos change.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/TodoBoard.tsx",
+        "line": 19,
+        "severity": "low",
+        "title": "Loaded todos are not checked for duplicate IDs",
+        "explanation": "The loader accepts duplicate IDs, which creates duplicate React keys and makes ID-based edits, toggles, and deletes affect multiple todos unexpectedly.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "react-profile-editor",
+    "lang": "typescript",
+    "condition": "jev",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "src/useUserProfiles.ts",
+        "line": 27,
+        "severity": "high",
+        "title": "Comma-delimited IDs are ambiguous",
+        "explanation": "Joining IDs with commas and splitting them later corrupts IDs containing commas and can make distinct ID lists share the same key, causing the wrong profiles to be fetched.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/useUserProfiles.ts",
+        "line": 70,
+        "severity": "medium",
+        "title": "Untrusted IDs can mutate object prototypes",
+        "explanation": "Writing arbitrary IDs into ordinary objects lets an ID such as `__proto__` alter the object's prototype instead of creating a profile entry, so use a `Map` or a null-prototype record.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/useUserProfiles.ts",
+        "line": 70,
+        "severity": "medium",
+        "title": "Response profiles are stored under the requested ID without verification",
+        "explanation": "The response's `user.id` is never checked against the requested ID, so a mismatched server response can be exposed as the requested user's profile.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/ProfileEditor.tsx",
+        "line": 16,
+        "severity": "medium",
+        "title": "Editor state does not follow changes to the user prop",
+        "explanation": "The state is initialized only on mount, so reusing this component for a different user leaves the previous user's name and bio in the form and can save them to the new user's profile.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/ProfileEditor.tsx",
+        "line": 52,
+        "severity": "medium",
+        "title": "Input IDs collide when multiple editors are rendered",
+        "explanation": "Every instance uses the same `displayName` and `bio` IDs, making labels point to the wrong controls and producing invalid duplicate IDs in the document.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "swiftui-stopwatch",
+    "lang": "swift",
+    "condition": "none",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "Sources/App/Stopwatch.swift",
+        "line": 18,
+        "severity": "medium",
+        "title": "Timer is not invalidated when the view model is released",
+        "explanation": "The run loop retains the scheduled timer and its closure only weakly references the view model, so releasing the view model does not stop the timer and it continues firing indefinitely.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/Stopwatch.swift",
+        "line": 19,
+        "severity": "medium",
+        "title": "Creates an unstructured task for every timer firing",
+        "explanation": "At 100 firings per second, hopping each callback through a new main-actor task can build up queued work when the main actor is busy and waste resources.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/Stopwatch.swift",
+        "line": 30,
+        "severity": "medium",
+        "title": "Stopping can discard elapsed time since the last tick",
+        "explanation": "`elapsed` is only refreshed by the timer, so copying it into `accumulated` can lose nearly one timer interval when Stop is pressed between ticks.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/Stopwatch.swift",
+        "line": 48,
+        "severity": "medium",
+        "title": "Uses wall-clock time for elapsed duration",
+        "explanation": "`Date` can jump due to clock adjustments, causing the stopwatch to gain or lose time; use a monotonic clock for measuring elapsed duration.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/Stopwatch.swift",
+        "line": 89,
+        "severity": "low",
+        "title": "Lap rows use unstable identities",
+        "explanation": "Using the array offset as the row ID means inserting a new lap at the front changes every existing row's identity, which can produce incorrect list animations and row state reuse.",
+        "rule": "swiftui-foreach-unstable-id",
+        "jevProbability": 0.82
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "swiftui-stopwatch",
+    "lang": "swift",
+    "condition": "jev",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "Sources/App/Stopwatch.swift",
+        "line": 24,
+        "severity": "medium",
+        "title": "Use a monotonic clock for elapsed time",
+        "explanation": "`Date` can jump when the system clock or time zone is adjusted, causing the stopwatch to gain, lose, or even display negative time; use a monotonic source such as `ContinuousClock` or `ProcessInfo.processInfo.systemUptime`.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/Stopwatch.swift",
+        "line": 37,
+        "severity": "medium",
+        "title": "Stopping can discard elapsed time",
+        "explanation": "`stop()` copies the last timer-published `elapsedTime`, which may be nearly one timer interval stale, so stopping (and recording a lap at line 51) can report less than the actual elapsed duration; compute the current duration directly when stopping or recording a lap.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/Stopwatch.swift",
+        "line": 25,
+        "severity": "low",
+        "title": "Avoid creating an unstructured task for every timer fire",
+        "explanation": "Each 10 ms timer callback enqueues a separate main-actor task, which can build up while the main actor is busy and waste work; update on the main run loop directly or use a cancellable, lifecycle-aware clock task.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "swiftui-search",
+    "lang": "swift",
+    "condition": "none",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "Sources/App/SearchScreen.swift",
+        "line": 49,
+        "severity": "medium",
+        "title": "Search task can retain the view model",
+        "explanation": "The task captures `self` weakly, but calling the async `search` method retains the view model across its suspension while the view model retains the task, creating a cycle that can keep the model alive until the request finishes.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/SearchScreen.swift",
+        "line": 70,
+        "severity": "medium",
+        "title": "Cancellation can leave loading state stuck",
+        "explanation": "A task cancelled before it begins can still set `isLoading` to `true` and then return through the cancellation checks without resetting it, leaving the UI loading after the query was cleared.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/SearchScreen.swift",
+        "line": 31,
+        "severity": "low",
+        "title": "Old results remain visible while the query is changing",
+        "explanation": "Because cancellation and result clearing wait for the debounce, an in-flight request can publish results for the previous query after the user has entered a new one, so the displayed results can temporarily disagree with the search field.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "Sources/App/SearchScreen.swift",
+        "rule": "swift-no-magic-numbers",
+        "jevProbability": 0.56,
+        "graderConfirms": false
+      }
+    ]
+  },
+  {
+    "task": "react-profile-editor",
+    "lang": "typescript",
+    "condition": "none",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "src/useUserProfiles.ts",
+        "line": 19,
+        "severity": "medium",
+        "title": "Comma-joined IDs can collide",
+        "explanation": "Different ID arrays such as `[\"a,b\", \"c\"]` and `[\"a\", \"b,c\"]` produce the same key, so the effect will not refetch when the requested IDs change.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/useUserProfiles.ts",
+        "line": 35,
+        "severity": "medium",
+        "title": "User IDs are interpolated into the URL without encoding",
+        "explanation": "IDs containing `/`, `?`, `#`, or other URL-sensitive characters can address the wrong endpoint or produce a malformed request; encode the path segment before fetching.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/useUserProfiles.ts",
+        "line": 39,
+        "severity": "medium",
+        "title": "Response JSON is trusted as a User without validation",
+        "explanation": "The type assertion does not validate server data, so malformed or unexpected payloads are stored as profiles and can break consumers at runtime.",
+        "rule": "ts-unvalidated-external-data",
+        "jevProbability": 0.97
+      },
+      {
+        "file": "src/useUserProfiles.ts",
+        "line": 47,
+        "severity": "medium",
+        "title": "Previous results remain visible while new IDs load",
+        "explanation": "The effect only sets `loading` on a changed ID set, leaving profiles and errors from the previous request exposed until the new batch finishes, which can show stale data as belonging to the current IDs.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/useUserProfiles.ts",
+        "line": 19,
+        "severity": "low",
+        "title": "The caller's IDs array is assumed to be immutable",
+        "explanation": "The effect depends on a derived key rather than the array itself, so in-place mutation that preserves the key or equivalent keys with changed ordering can make its behavior surprising; canonicalize or document the input contract.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/ProfileEditor.tsx",
+        "line": 16,
+        "severity": "medium",
+        "title": "Editor state does not follow a changed user prop",
+        "explanation": "`displayName` and `bio` are initialized only on mount, so reusing this component for another user or receiving refreshed profile data leaves the inputs and dirty-state comparison tied to the previous values.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/ProfileEditor.tsx",
+        "line": 30,
+        "severity": "medium",
+        "title": "Repeated submissions can invoke onSave concurrently",
+        "explanation": "`isSaving` is set asynchronously and is not checked in the handler, so rapid submits can start multiple saves before the disabled state renders and create overlapping writes.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "swiftui-settings",
+    "lang": "swift",
+    "condition": "none",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "Sources/App/SettingsScreen.swift",
+        "line": 20,
+        "severity": "high",
+        "title": "Selector observer requires an NSObject-compatible class",
+        "explanation": "`SettingsStore` does not inherit from `NSObject`, so it cannot be used with this selector-based `NotificationCenter.addObserver` API; make it NSObject-based or use a block-based observer.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/SettingsScreen.swift",
+        "line": 49,
+        "severity": "medium",
+        "title": "Persisted refresh interval is not validated",
+        "explanation": "A stored `NaN`, infinity, or out-of-range value is accepted, and converting it with `Int(store.refreshInterval)` can trap for non-finite or unrepresentable values.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/SettingsScreen.swift",
+        "line": 20,
+        "severity": "medium",
+        "title": "Store mutations are not isolated to the main actor",
+        "explanation": "The published properties can be changed from any thread even though they drive SwiftUI, which can cause off-main-thread publishing and data races; isolate the store to `@MainActor` or otherwise enforce main-thread access.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "swift-legacy-bridge",
+    "lang": "swift",
+    "condition": "none",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "Sources/App/LegacyBridge.swift",
+        "line": 52,
+        "severity": "high",
+        "title": "Concurrent uploads can strand or double-resume continuations",
+        "explanation": "Each call overwrites the legacy uploader’s shared callbacks, so overlapping uploads can route both completions to the latest continuation, leaving an earlier task suspended and potentially resuming the latest checked continuation more than once.",
+        "rule": "swift-continuation-misuse",
+        "jevProbability": 0.34
+      },
+      {
+        "file": "Sources/App/LegacyBridge.swift",
+        "line": 51,
+        "severity": "medium",
+        "title": "Upload does not respond to task cancellation",
+        "explanation": "Cancelling the calling task neither cancels the legacy operation nor resumes its continuation, so the task can remain suspended until the legacy callback eventually fires.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/LegacyBridge.swift",
+        "line": 56,
+        "severity": "medium",
+        "title": "Progress stream is permanently finished after the first upload",
+        "explanation": "The uploader owns one stream for its lifetime and finishes it on completion, so later uploads cannot deliver progress to its consumer even if repeated uploads are otherwise supported.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/LegacyBridge.swift",
+        "line": 47,
+        "severity": "medium",
+        "title": "Progress buffering is unbounded",
+        "explanation": "The default AsyncStream buffering policy is unbounded, so a slow or absent consumer can accumulate every progress update in memory during a long upload.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/LegacyBridge.swift",
+        "line": 30,
+        "severity": "medium",
+        "title": "Geocoding bridge does not propagate cancellation",
+        "explanation": "Cancelling a task awaiting this continuation does not stop the legacy request or promptly end the async operation, leaving work running and the task suspended until completion.",
+        "rule": "swift-continuation-misuse",
+        "jevProbability": 0.34
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "Sources/App/LegacyBridge.swift",
+        "rule": "swift-unprotected-shared-state",
+        "jevProbability": 0.66,
+        "graderConfirms": true
+      }
+    ]
+  },
+  {
+    "task": "swift-legacy-bridge",
+    "lang": "swift",
+    "condition": "jev",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "Sources/App/LegacyBridge.swift",
+        "line": 58,
+        "severity": "high",
+        "title": "Concurrent uploads can resume the wrong continuation",
+        "explanation": "`legacy` has one shared set of callbacks, so overlapping `upload` calls overwrite each other’s handlers and can cause one completion to resume a continuation multiple times, which traps.",
+        "rule": "swift-continuation-misuse",
+        "jevProbability": 0.39
+      },
+      {
+        "file": "Sources/App/LegacyBridge.swift",
+        "line": 58,
+        "severity": "medium",
+        "title": "The uploader is effectively single-use",
+        "explanation": "After the first upload, `progressContinuation.finish()` permanently ends the one shared stream, so a later upload cannot deliver progress and its progress stream is already finished.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/LegacyBridge.swift",
+        "line": 62,
+        "severity": "medium",
+        "title": "Cancellation does not stop or complete the upload",
+        "explanation": "If the awaiting task is cancelled, the legacy operation continues and the checked continuation remains suspended until the legacy callback eventually fires, with no cancellation handler to stop the work or resume promptly.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/LegacyBridge.swift",
+        "line": 18,
+        "severity": "medium",
+        "title": "Legacy callbacks are accessed across threads without synchronization",
+        "explanation": "The wrapper writes these callback properties while the legacy worker reads and invokes them on a background queue, creating unsynchronized access that can race, especially when uploads overlap.",
+        "rule": "swift-unprotected-shared-state",
+        "jevProbability": 0.63
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "Sources/App/LegacyBridge.swift",
+        "rule": "swift-dispatch-in-async",
+        "jevProbability": 0.53,
+        "graderConfirms": false
+      }
+    ]
+  },
+  {
+    "task": "swiftui-thumbnail-grid",
+    "lang": "swift",
+    "condition": "none",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "Sources/App/ThumbnailGrid.swift",
+        "line": 20,
+        "severity": "high",
+        "title": "NSImage is not safe to store in this actor",
+        "explanation": "`NSImage` is not `Sendable`, so transferring it into and out of the actor can fail Swift 6 concurrency checking and otherwise violates the actor-isolation boundary; cache immutable `Data` or use a safely isolated image representation instead.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/ThumbnailGrid.swift",
+        "line": 58,
+        "severity": "medium",
+        "title": "Cancelled tasks can still update a reused cell",
+        "explanation": "When a cell's task is cancelled because it disappears or its URL changes, `loadImage()` does not check cancellation after the network request and can still populate the cache and assign an image for the old URL.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/ThumbnailGrid.swift",
+        "line": 69,
+        "severity": "medium",
+        "title": "HTTP failures are treated as valid image responses",
+        "explanation": "The response from `URLSession.data(from:)` is ignored, so non-success HTTP responses are passed to `NSImage` and silently treated as failed downloads instead of being validated or surfaced.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/ThumbnailGrid.swift",
+        "line": 20,
+        "severity": "medium",
+        "title": "The thumbnail cache grows without bound",
+        "explanation": "The shared dictionary retains every downloaded `NSImage` for the process lifetime and has no eviction or memory-pressure policy, so browsing a large collection can cause excessive memory use.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/ThumbnailGrid.swift",
+        "line": 83,
+        "severity": "medium",
+        "title": "Column count is not validated",
+        "explanation": "A zero or negative `columnCount` creates an empty grid-column configuration and can result in a blank grid or invalid layout rather than rejecting or clamping the input.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "swiftui-thumbnail-grid",
+    "lang": "swift",
+    "condition": "jev",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "Sources/App/ThumbnailGrid.swift",
+        "line": 103,
+        "severity": "medium",
+        "title": "Canceled tasks can still publish stale thumbnails",
+        "explanation": "When a cell disappears or its URL changes, `.task(id:)` cancels the prior task, but this code neither checks cancellation nor verifies the URL before updating state and the shared cache, so an obsolete request can overwrite the cell’s current image.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/ThumbnailGrid.swift",
+        "line": 104,
+        "severity": "medium",
+        "title": "Downloaded response is not validated",
+        "explanation": "The response is discarded and the data is decoded without checking the HTTP status, MIME type, or a size limit, so error pages and unexpectedly large responses can be treated as images or consume excessive memory.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/ThumbnailGrid.swift",
+        "line": 15,
+        "severity": "low",
+        "title": "Cached image wrapper is not declared Sendable",
+        "explanation": "The wrapper is passed through a shared `NSCache` marked `@unchecked Sendable`, but it is not itself declared `Sendable`, which undermines the stated cross-thread safety under Swift concurrency checking.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/ThumbnailGrid.swift",
+        "line": 34,
+        "severity": "low",
+        "title": "Count-only cache limit can retain excessive image memory",
+        "explanation": "A limit of 500 entries does not bound the decoded image memory footprint, so a grid of large images can make this shared cache consume substantial memory.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "Sources/App/ThumbnailGrid.swift",
+        "rule": "swift-unprotected-shared-state",
+        "jevProbability": 0.63,
+        "graderConfirms": false
+      }
+    ]
+  },
+  {
+    "task": "swiftui-search",
+    "lang": "swift",
+    "condition": "jev",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "Sources/App/SearchScreen.swift",
+        "line": 43,
+        "severity": "medium",
+        "title": "Combine callback crosses actor isolation",
+        "explanation": "`RunLoop.main` does not make the `sink` closure statically `MainActor`-isolated, so calling the `@MainActor` `search(for:)` here can fail under strict concurrency checking and should be hopped to the main actor explicitly.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/SearchScreen.swift",
+        "line": 64,
+        "severity": "medium",
+        "title": "Stored task can retain the view model",
+        "explanation": "The task is stored by the view model and strongly captures `self` after the `guard let self`, forming a retain cycle until the request finishes (which may be indefinitely), preventing normal deallocation and cleanup.",
+        "rule": "swift-escaping-closure-retain-cycle",
+        "jevProbability": 0.08
+      },
+      {
+        "file": "Sources/App/SearchScreen.swift",
+        "line": 40,
+        "severity": "medium",
+        "title": "Old results remain active during debounce",
+        "explanation": "A changed query does not cancel the in-flight search until the debounced publisher emits, so the old request can publish results or an error for the previous query while the text field already shows the new one.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "react-user-search",
+    "lang": "typescript",
+    "condition": "none",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "src/UserSearch.tsx",
+        "line": 47,
+        "severity": "medium",
+        "title": "Guard against stale request results",
+        "explanation": "Aborting the previous request does not guarantee its promise chain cannot complete, so an older response or error can overwrite the state for a newer search; use a request identity or active flag before committing results and errors.",
+        "rule": "react-effect-fetch-race",
+        "jevProbability": 0.05
+      },
+      {
+        "file": "src/UserSearch.tsx",
+        "line": 56,
+        "severity": "medium",
+        "title": "An obsolete request can clear the loading state",
+        "explanation": "The previous request's `finally` runs after cleanup and can set `loading` to false while a newer request is still pending; only update loading for the current request.",
+        "rule": "react-effect-fetch-race",
+        "jevProbability": 0.05
+      },
+      {
+        "file": "src/UserSearch.tsx",
+        "line": 45,
+        "severity": "medium",
+        "title": "Validate the decoded response shape",
+        "explanation": "The type assertion does not validate server data, so malformed JSON or users with missing/non-string fields can crash sorting or rendering; validate the response before storing it.",
+        "rule": "ts-unvalidated-external-data",
+        "jevProbability": 0.97
+      },
+      {
+        "file": "src/UserSearch.tsx",
+        "line": 21,
+        "severity": "low",
+        "title": "Old results remain visible while the query is being debounced",
+        "explanation": "When the input changes, the prior results continue to be displayed for up to 300 ms and can appear to match the new query; clear or explicitly mark them stale when the query changes.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "src/UserSearch.tsx",
+        "rule": "react-derived-state-effect",
+        "jevProbability": 0.52,
+        "graderConfirms": false
+      }
+    ]
+  },
+  {
+    "task": "swiftui-settings",
+    "lang": "swift",
+    "condition": "jev",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "Sources/App/SettingsScreen.swift",
+        "line": 82,
+        "severity": "medium",
+        "title": "Handle defaults notifications on the main actor",
+        "explanation": "`UserDefaults.didChangeNotification` can be delivered on the thread that changed the defaults, so this sink may call the main-actor-isolated reload method and publish UI changes off the main actor, causing concurrency violations or Swift 6 isolation errors.",
+        "rule": "swift-ui-off-main",
+        "jevProbability": 0.08
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "swiftui-chat",
+    "lang": "swift",
+    "condition": "jev",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "Sources/App/ChatScreen.swift",
+        "line": 28,
+        "severity": "medium",
+        "title": "Reconnect backoff is reset on every attempt",
+        "explanation": "Resetting the delay immediately after starting a socket means connections that repeatedly fail before becoming usable always retry after one second, so the exponential backoff never takes effect.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/ChatScreen.swift",
+        "line": 43,
+        "severity": "medium",
+        "title": "Draft is discarded before the send succeeds",
+        "explanation": "The draft is cleared before the asynchronous send completes, so a send failure loses the user's message without restoring it or otherwise notifying them.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/ChatScreen.swift",
+        "line": 57,
+        "severity": "medium",
+        "title": "Late receive callbacks can update a disconnected screen",
+        "explanation": "A receive callback that succeeds after `disconnect()` still appends its message and starts another receive on the old task because this path does not verify that the task is still current.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "swiftui-chat",
+    "lang": "swift",
+    "condition": "none",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "Sources/App/ChatScreen.swift",
+        "line": 48,
+        "severity": "medium",
+        "title": "Stale send failures can tear down a newer connection",
+        "explanation": "The send completion does not verify that it belongs to the current WebSocket, so an error from an older task can call `handleFailure()` and clear a connection established after that send began.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/ChatScreen.swift",
+        "line": 54,
+        "severity": "medium",
+        "title": "Failed sends are still shown as delivered messages",
+        "explanation": "The message is appended immediately regardless of the send result, so a failed send remains in the chat as though it were accepted, with no rollback or failed-send indication.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/ChatScreen.swift",
+        "line": 61,
+        "severity": "medium",
+        "title": "Connection state is published before the socket is open",
+        "explanation": "Calling `resume()` only starts the WebSocket connection attempt, so setting `isConnected` to `true` immediately can expose a false connected state and allow sends before the connection is ready.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/ChatScreen.swift",
+        "line": 107,
+        "severity": "medium",
+        "title": "Reconnect backoff resets before a connection succeeds",
+        "explanation": "`connect()` resets `reconnectAttempt` as soon as it starts a connection attempt, so repeated connection failures keep scheduling the minimum two-second delay instead of applying exponential backoff.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/ChatScreen.swift",
+        "line": 27,
+        "severity": "medium",
+        "title": "Repeated starts can leave multiple sockets active",
+        "explanation": "`start()` unconditionally creates another connection without cancelling an existing task or pending reconnect, so repeated appearances or starts can overwrite the current task and leave another socket running.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "Sources/App/ChatScreen.swift",
+        "rule": "swift-no-force-unwrap",
+        "jevProbability": 0.98,
+        "graderConfirms": true
+      },
+      {
+        "file": "Sources/App/ChatScreen.swift",
+        "rule": "swift-no-magic-numbers",
+        "jevProbability": 0.8,
+        "graderConfirms": true
+      }
+    ]
+  },
+  {
+    "task": "react-metrics-poller",
+    "lang": "typescript",
+    "condition": "none",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "src/MetricsPanel.tsx",
+        "line": 47,
+        "severity": "medium",
+        "title": "Overlapping polls can apply stale results",
+        "explanation": "If a request takes longer than the polling interval, or an in-flight request resolves after the tab is hidden and polling resumes, responses can complete out of order and overwrite newer metrics and change tracking with stale data.",
+        "rule": "react-effect-fetch-race",
+        "jevProbability": 0.09
+      },
+      {
+        "file": "src/MetricsPanel.tsx",
+        "line": 23,
+        "severity": "medium",
+        "title": "Request failures are unhandled",
+        "explanation": "A network failure or non-JSON error response rejects `fetchMetrics` without being caught, producing an unhandled rejection and leaving the UI stuck on stale data or “Loading...” while polling continues.",
+        "rule": "ts-no-floating-promise",
+        "jevProbability": 0.1
+      },
+      {
+        "file": "src/MetricsPanel.tsx",
+        "line": 24,
+        "severity": "medium",
+        "title": "API response is trusted without validation",
+        "explanation": "The TypeScript annotation does not validate JSON at runtime, so an unexpected payload or malformed metric can make iteration or rendering fail.",
+        "rule": "ts-unvalidated-external-data",
+        "jevProbability": 0.96
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "react-user-search",
+    "lang": "typescript",
+    "condition": "jev",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "src/UserSearch.tsx",
+        "line": 38,
+        "severity": "medium",
+        "title": "Old results remain visible while the query is debouncing",
+        "explanation": "When the input changes, the previous results and result count remain visible for 300 ms (and when cleared, until the debounce completes), so the UI can present results for a different query as if they matched the current input.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/UserSearch.tsx",
+        "line": 24,
+        "severity": "low",
+        "title": "User IDs are not checked for uniqueness",
+        "explanation": "The parsed response is rendered with `user.id` as the React key, so duplicate IDs from the server produce duplicate keys and can cause incorrect list reconciliation.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "src/UserSearch.tsx",
+        "rule": "react-derived-state-effect",
+        "jevProbability": 0.58,
+        "graderConfirms": false
+      }
+    ]
+  },
+  {
+    "task": "react-chat-room",
+    "lang": "typescript",
+    "condition": "jev",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "src/ChatRoom.tsx",
+        "line": 45,
+        "severity": "medium",
+        "title": "Encode the room ID in the WebSocket URL",
+        "explanation": "If `roomId` contains `/`, `?`, `#`, or other URL-special characters, it can change the requested path or query and connect to the wrong room; encode it as a path segment.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/ChatRoom.tsx",
+        "line": 58,
+        "severity": "medium",
+        "title": "Bound the in-memory message history",
+        "explanation": "Every incoming message is appended indefinitely, so a long-lived room can consume increasing memory and make rendering progressively more expensive; consider a retention limit or list virtualization.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/ChatRoom.tsx",
+        "line": 107,
+        "severity": "low",
+        "title": "Handle send failures and unavailable connections",
+        "explanation": "When the socket is closed or still reconnecting, submitting does nothing and gives no indication that the message was not sent, leaving the user to infer why the composer did not respond.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/ChatRoom.tsx",
+        "line": 142,
+        "severity": "low",
+        "title": "Validate timestamps before formatting",
+        "explanation": "The guard accepts any string for `sentAt`, so malformed server data renders as `Invalid Date`; validate that it parses to a finite date before displaying it.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "react-signup-form",
+    "lang": "typescript",
+    "condition": "jev",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "src/SignupForm.tsx",
+        "line": 69,
+        "severity": "high",
+        "title": "Error-response guard accepts invalid error payloads",
+        "explanation": "The guard treats `errors: null`, arrays, and objects with non-string field values as valid, so `setErrors` can put data of the wrong shape into state and cause rendering to crash or display invalid content.",
+        "rule": "ts-unvalidated-external-data",
+        "jevProbability": 0.72
+      },
+      {
+        "file": "src/SignupForm.tsx",
+        "line": 110,
+        "severity": "medium",
+        "title": "Terms acceptance is not included in the signup request",
+        "explanation": "The form requires the user to accept the terms but omits `acceptTerms` from the request, so the server cannot enforce or record that consent.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/SignupForm.tsx",
+        "line": 133,
+        "severity": "medium",
+        "title": "Success response can overwrite edits made during submission",
+        "explanation": "Inputs remain editable while the request is pending, but a successful response resets the entire form, discarding any changes the user made after submitting.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "react-todo-board",
+    "lang": "typescript",
+    "condition": "none",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "src/TodoBoard.tsx",
+        "line": 43,
+        "severity": "medium",
+        "title": "Storage writes can throw",
+        "explanation": "Unlike `loadTodos`, this write is not guarded, so unavailable storage or quota/security errors can throw from the effect whenever the list changes.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/TodoBoard.tsx",
+        "line": 19,
+        "severity": "medium",
+        "title": "Duplicate IDs from storage are accepted",
+        "explanation": "Persisted entries with duplicate IDs pass validation, causing duplicate React keys and making toggles, edits, deletes, and reordering affect multiple todos with the same ID.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/TodoBoard.tsx",
+        "line": 36,
+        "severity": "medium",
+        "title": "Local-storage initialization can mismatch server-rendered markup",
+        "explanation": "On the server the guarded storage read returns an empty list, while the browser may initialize from saved todos, so hydrating this component can produce different markup and hydration warnings.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/TodoBoard.tsx",
+        "line": 172,
+        "severity": "low",
+        "title": "Repeated linear lookup makes rendering quadratic",
+        "explanation": "Calling `findIndex` for every visible todo makes each render O(n²), which can become costly for large lists; derive indices once or retain indices during filtering.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/TodoBoard.tsx",
+        "line": 221,
+        "severity": "medium",
+        "title": "Reordering filtered items can move them across hidden todos",
+        "explanation": "The controls swap items in the full list even when the displayed neighbors are non-adjacent, so moving an item in a filtered view may leave the visible order unchanged or unexpectedly reorder hidden items.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "react-signup-form",
+    "lang": "typescript",
+    "condition": "none",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "src/SignupForm.tsx",
+        "line": 63,
+        "severity": "high",
+        "title": "Error response guard accepts malformed payloads",
+        "explanation": "The guard accepts values such as `{ errors: null }` or `{ errors: { email: {} } }`, which can set invalid state and cause rendering to crash when an error value is rendered as a React child.",
+        "rule": "ts-unvalidated-external-data",
+        "jevProbability": 0.72
+      },
+      {
+        "file": "src/SignupForm.tsx",
+        "line": 119,
+        "severity": "high",
+        "title": "Success response is trusted without validation",
+        "explanation": "Casting arbitrary JSON to `SignupSuccessResponse` allows a malformed success response to set `accountId` to `undefined` and show a false success message instead of reporting an invalid response.",
+        "rule": "ts-unvalidated-external-data",
+        "jevProbability": 0.72
+      },
+      {
+        "file": "src/SignupForm.tsx",
+        "line": 84,
+        "severity": "medium",
+        "title": "Concurrent submissions are not prevented",
+        "explanation": "The handler never checks `submitting`, so rapid submits before React rerenders can issue multiple signup requests and potentially create duplicate accounts.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/SignupForm.tsx",
+        "line": 121,
+        "severity": "medium",
+        "title": "Success can discard edits made while the request is pending",
+        "explanation": "Inputs remain editable during submission, but a successful response resets the entire form, silently discarding any changes made after the submitted values were captured.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/SignupForm.tsx",
+        "line": 100,
+        "severity": "medium",
+        "title": "Terms acceptance is omitted from the signup request",
+        "explanation": "The form requires terms acceptance but does not send that choice to the API, so the server cannot enforce or record the user's acceptance.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/SignupForm.tsx",
+        "line": 80,
+        "severity": "low",
+        "title": "Changing the password leaves confirmation errors stale",
+        "explanation": "When the password changes, an existing `confirmPassword` mismatch error is not cleared or recomputed, so the UI can continue showing an error even when the values now match.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "src/SignupForm.tsx",
+        "rule": "ts-no-vague-names",
+        "jevProbability": 0.69,
+        "graderConfirms": true
+      }
+    ]
+  },
+  {
+    "task": "react-chat-room",
+    "lang": "typescript",
+    "condition": "none",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "src/ChatRoom.tsx",
+        "line": 38,
+        "severity": "medium",
+        "title": "Old-room messages can flash after a room change",
+        "explanation": "The messages are cleared in a passive effect, so the first render with a new `roomId` can still display messages from the previous room, briefly exposing the wrong room's content.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/ChatRoom.tsx",
+        "line": 69,
+        "severity": "medium",
+        "title": "Messages can be silently dropped while disconnected",
+        "explanation": "The send button remains enabled while reconnecting, but `handleSend` returns without sending or clearing the draft when the socket is unavailable, with no feedback that the action failed.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/ChatRoom.tsx",
+        "line": 126,
+        "severity": "low",
+        "title": "Invalid timestamps render as an invalid-date string",
+        "explanation": "Validation only checks that `sentAt` is a string, so malformed timestamp values pass through and produce an invalid date in the UI.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/ChatRoom.tsx",
+        "line": 59,
+        "severity": "medium",
+        "title": "Message history grows without bound",
+        "explanation": "Every received message is retained in component state indefinitely, so long-lived or high-volume rooms can consume increasing memory and make each append and render progressively more expensive.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "src/ChatRoom.tsx",
+        "rule": "ts-no-empty-catch",
+        "jevProbability": 0.98,
+        "graderConfirms": true
+      }
+    ]
+  },
+  {
+    "task": "react-todo-board",
+    "lang": "typescript",
+    "condition": "jev",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "src/TodoBoard.tsx",
+        "line": 19,
+        "severity": "high",
+        "title": "Persisted data is trusted without validation",
+        "explanation": "`JSON.parse` can return arbitrary array contents, so malformed or stale storage values can produce undefined fields and crash rendering or filtering; validate each todo's `id`, `text`, and `done` before returning it.",
+        "rule": "ts-unvalidated-external-data",
+        "jevProbability": 0.32
+      },
+      {
+        "file": "src/TodoBoard.tsx",
+        "line": 15,
+        "severity": "medium",
+        "title": "Storage access can fail during initialization",
+        "explanation": "`localStorage` can be unavailable or throw in restricted environments and server-side rendering, but `loadTodos` is called directly by the state initializer and will crash before its `try` can catch access errors only if the global itself is unavailable; ensure the storage API is guarded for non-browser contexts.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/TodoBoard.tsx",
+        "line": 33,
+        "severity": "medium",
+        "title": "Storage writes can throw from an effect",
+        "explanation": "`localStorage.setItem` may throw (for example, when storage is disabled or quota is exceeded), and the uncaught effect error can disrupt the app; handle persistence failures explicitly.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/TodoBoard.tsx",
+        "line": 41,
+        "severity": "medium",
+        "title": "UUID generation assumes browser support",
+        "explanation": "`crypto.randomUUID()` is unavailable in some supported browsers or non-secure contexts, so adding a todo can throw; provide a compatible ID strategy or handle unsupported environments.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/TodoBoard.tsx",
+        "line": 186,
+        "severity": "medium",
+        "title": "Reordering filtered todos uses the wrong neighbors",
+        "explanation": "The displayed index is the todo's position in the full array, so moving up or down while a filter is active swaps it with a potentially hidden todo and makes ordering behavior surprising.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/TodoBoard.tsx",
+        "line": 170,
+        "severity": "medium",
+        "title": "Edit controls accidentally submit the add form",
+        "explanation": "The Save and Cancel buttons are rendered inside the form and default to `type=\"submit\"`, so clicking either also invokes `addTodo` and may add the current new-todo text.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/TodoBoard.tsx",
+        "line": 151,
+        "severity": "low",
+        "title": "Todo IDs are assumed unique for React keys",
+        "explanation": "Because loaded storage is not checked for duplicate IDs, duplicate entries can produce colliding React keys and incorrect reconciliation; enforce unique IDs when loading or rendering.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "react-metrics-poller",
+    "lang": "typescript",
+    "condition": "jev",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "src/MetricsPanel.tsx",
+        "line": 19,
+        "severity": "medium",
+        "title": "Accepts non-finite metric values",
+        "explanation": "`typeof NaN` and `typeof Infinity` are both `number`, so malformed API values can pass validation and render as `NaN` or `Infinity` instead of being rejected.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/MetricsPanel.tsx",
+        "line": 64,
+        "severity": "medium",
+        "title": "Duplicate metric names produce unstable comparisons and keys",
+        "explanation": "The validator permits duplicate names, but the comparison map overwrites duplicates and React receives duplicate list keys, which can cause incorrect change highlighting and reconciliation.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/MetricsPanel.tsx",
+        "line": 73,
+        "severity": "medium",
+        "title": "Failed refresh leaves stale metrics presented as current",
+        "explanation": "On request or validation failure, the old metrics and `lastUpdated` remain visible without being marked stale, so users may mistake outdated values for current data.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/MetricsPanel.tsx",
+        "line": 78,
+        "severity": "medium",
+        "title": "Refresh can run after unmount in React Strict Mode",
+        "explanation": "Strict Mode can run effect cleanup and setup again while the first `refresh()` is still pending; the second call replaces the controller ref, so cleanup only aborts the newer request and the first request can update state after unmount.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "react-profile-editor",
+    "lang": "typescript",
+    "condition": "jev",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "src/useUserProfiles.ts",
+        "line": 26,
+        "severity": "medium",
+        "title": "Comma-joined IDs are ambiguous",
+        "explanation": "Joining IDs with commas and splitting them later makes inputs such as `[\"a,b\"]` indistinguishable from `[\"a\", \"b\"]`, and can prevent the effect from refetching when the actual IDs change.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/useUserProfiles.ts",
+        "line": 29,
+        "severity": "low",
+        "title": "Duplicate IDs trigger duplicate requests",
+        "explanation": "The `uniqueIds` array is not actually deduplicated, so repeated IDs cause redundant fetches and can overwrite the same profile entry.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/useUserProfiles.ts",
+        "line": 45,
+        "severity": "medium",
+        "title": "Encode IDs in the request URL",
+        "explanation": "Interpolating an ID directly into the path lets slashes, query delimiters, or other reserved characters alter the requested URL instead of addressing that ID as a single path segment.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/useUserProfiles.ts",
+        "line": 50,
+        "severity": "medium",
+        "title": "Validate the returned user ID",
+        "explanation": "The response is stored under the requested ID without checking that `responseBody.id` matches it, so a mismatched API response can associate the wrong profile with an ID.",
+        "rule": "ts-unvalidated-external-data",
+        "jevProbability": 0.97
+      },
+      {
+        "file": "src/ProfileEditor.tsx",
+        "line": 16,
+        "severity": "medium",
+        "title": "Editor state does not follow a changed user prop",
+        "explanation": "The draft fields are initialized only on mount, so when the editor receives a different `user` without remounting, it can display and save the previous user's draft.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/ProfileEditor.tsx",
+        "line": 29,
+        "severity": "medium",
+        "title": "Save handler permits concurrent submissions",
+        "explanation": "`handleSave` has no synchronous in-flight guard, so rapid repeated form submissions before React applies the `isSaving` update can invoke `onSave` multiple times.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "react-profile-editor",
+    "lang": "typescript",
+    "condition": "none",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "src/useUserProfiles.ts",
+        "line": 15,
+        "severity": "medium",
+        "title": "The dependency key can collide",
+        "explanation": "Joining IDs with commas is ambiguous, so different ID lists such as `[\"a,b\", \"c\"]` and `[\"a\", \"b,c\"]` produce the same key and prevent the effect from fetching the new profiles.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/useUserProfiles.ts",
+        "line": 31,
+        "severity": "medium",
+        "title": "URL-encode user IDs",
+        "explanation": "Interpolating an ID directly into the URL lets characters such as `/`, `?`, or `#` change the request path or query, causing incorrect requests and potentially targeting unintended endpoints.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/useUserProfiles.ts",
+        "line": 35,
+        "severity": "medium",
+        "title": "Treat API response data as unvalidated",
+        "explanation": "A type assertion does not validate the JSON, so malformed or unexpected API data is exposed as a `User` and can cause consumers to fail when they use its fields.",
+        "rule": "ts-unvalidated-external-data",
+        "jevProbability": 0.97
+      },
+      {
+        "file": "src/useUserProfiles.ts",
+        "line": 26,
+        "severity": "medium",
+        "title": "Old profiles remain visible during a new request",
+        "explanation": "When `ids` change, the hook leaves the previous profiles in state until the request succeeds, and also keeps them if it fails, so callers can mistake stale profiles for the requested users.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/ProfileEditor.tsx",
+        "line": 16,
+        "severity": "medium",
+        "title": "Editor state is not updated when the user prop changes",
+        "explanation": "The fields are initialized only on mount, so reusing this component for another user can display and save the previous user's edits against the new user object.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/ProfileEditor.tsx",
+        "line": 52,
+        "severity": "medium",
+        "title": "Form field IDs collide across editor instances",
+        "explanation": "Every instance uses the same `displayName` and `bio` IDs, so labels in pages with multiple editors may focus the wrong input and the document contains duplicate IDs.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "swiftui-search",
+    "lang": "swift",
+    "condition": "none",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "Sources/App/SearchScreen.swift",
+        "line": 56,
+        "severity": "medium",
+        "title": "Cancellation can leave the loading state stuck",
+        "explanation": "Both cancellation paths return without clearing `isLoading`, so if the view task is cancelled while a request is active (for example, when the screen disappears), the model can remain in the loading state until another search updates it.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/SearchScreen.swift",
+        "line": 55,
+        "severity": "low",
+        "title": "Previous results remain visible during the debounce",
+        "explanation": "A new query waits through the debounce before setting `isLoading` or clearing `results`, so results for the previous query can briefly be presented as results for the newly entered query.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "Sources/App/SearchScreen.swift",
+        "rule": "swift-no-empty-catch",
+        "jevProbability": 0.58,
+        "graderConfirms": false
+      }
+    ]
+  },
+  {
+    "task": "swiftui-stopwatch",
+    "lang": "swift",
+    "condition": "none",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "Sources/App/Stopwatch.swift",
+        "line": 25,
+        "severity": "medium",
+        "title": "Scheduled timer is not invalidated when the model is deallocated",
+        "explanation": "The run loop retains the scheduled timer, so if the view model is released while running, the weak-self callback keeps firing indefinitely as a no-op; invalidate the timer during teardown or otherwise ensure it is stopped.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/Stopwatch.swift",
+        "line": 27,
+        "severity": "low",
+        "title": "Creates a main-actor task for every timer firing",
+        "explanation": "The timer fires every 10 ms and enqueues a new task each time, which can build up redundant work if the main actor is busy; update on the main actor without per-tick task creation or use a lower-frequency display timer.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/Stopwatch.swift",
+        "line": 52,
+        "severity": "low",
+        "title": "Lap time can lag behind the actual lap action",
+        "explanation": "`lap()` records the last timer-published `elapsedTime`, which may be almost one timer interval stale; calculate the current elapsed value when recording a lap so the split and total reflect the button press.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "swiftui-search",
+    "lang": "swift",
+    "condition": "jev",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "Sources/App/SearchScreen.swift",
+        "line": 39,
+        "severity": "medium",
+        "title": "Search task can retain the view model",
+        "explanation": "The task closure calls `self.performSearch`, so the view model retains a task that in turn retains the view model until the sleep and request finish, potentially keeping a dismissed screen alive for an arbitrarily long request.",
+        "rule": "swift-escaping-closure-retain-cycle",
+        "jevProbability": 0.23
+      },
+      {
+        "file": "Sources/App/SearchScreen.swift",
+        "line": 78,
+        "severity": "low",
+        "title": "Cancellation can leave the loading indicator stuck during debounce",
+        "explanation": "When a request is cancelled because the query changes, this branch leaves `isLoading` true until the replacement search starts, so the UI shows a spinner throughout the debounce interval even though no request is running.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/SearchScreen.swift",
+        "line": 67,
+        "severity": "low",
+        "title": "Non-HTTP responses are accepted",
+        "explanation": "If the response is not an `HTTPURLResponse`, the code skips status validation and attempts to decode its body as successful search data.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "Sources/App/SearchScreen.swift",
+        "rule": "swift-no-empty-catch",
+        "jevProbability": 0.86,
+        "graderConfirms": false
+      }
+    ]
+  },
+  {
+    "task": "swiftui-settings",
+    "lang": "swift",
+    "condition": "none",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "Sources/App/SettingsScreen.swift",
+        "line": 126,
+        "severity": "high",
+        "title": "Unvalidated refresh interval can crash rendering",
+        "explanation": "A persisted or externally supplied non-finite or out-of-range `TimeInterval` can reach `Int(store.refreshInterval)`, which traps for values such as infinity or values outside `Int`’s range.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/SettingsScreen.swift",
+        "line": 30,
+        "severity": "medium",
+        "title": "Store mutations are not constrained to the main actor",
+        "explanation": "`SettingsStore` publishes changes to SwiftUI but is not main-actor isolated, so callers can mutate its published properties off the main thread and cause UI consistency issues or Swift concurrency violations.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "swiftui-stopwatch",
+    "lang": "swift",
+    "condition": "jev",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "Sources/App/Stopwatch.swift",
+        "line": 16,
+        "severity": "medium",
+        "title": "Use a monotonic clock for elapsed time",
+        "explanation": "`Date` can jump when the system clock or time zone is adjusted, causing the stopwatch to gain or lose time; measure elapsed duration with a monotonic clock such as `ContinuousClock` instead.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/Stopwatch.swift",
+        "line": 17,
+        "severity": "medium",
+        "title": "Timer may stop refreshing during interaction",
+        "explanation": "A timer scheduled in the run loop’s default mode can pause while the run loop is tracking UI interactions, leaving the displayed time frozen during scrolling or other tracking.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/Stopwatch.swift",
+        "line": 43,
+        "severity": "medium",
+        "title": "Lap records a stale elapsed value",
+        "explanation": "`elapsed` is only refreshed by timer callbacks, so a lap can record the previous tick’s value rather than the time at the moment the user pressed Lap.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "swiftui-settings",
+    "lang": "swift",
+    "condition": "jev",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "Sources/App/SettingsScreen.swift",
+        "line": 116,
+        "severity": "high",
+        "title": "Invalid persisted intervals can crash the view",
+        "explanation": "`Int(store.refreshInterval)` traps for values such as NaN, infinity, or an out-of-range number, and the value is loaded directly from defaults without validation.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/SettingsScreen.swift",
+        "line": 55,
+        "severity": "medium",
+        "title": "Defaults notifications do not provide reliable cross-process synchronization",
+        "explanation": "`UserDefaults.didChangeNotification` is not a dependable cross-process change signal, so changes made by another process or extension may never reach `reloadFromDefaults()` despite the store's documented synchronization promise.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "swiftui-thumbnail-grid",
+    "lang": "swift",
+    "condition": "none",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "Sources/App/ThumbnailGrid.swift",
+        "line": 113,
+        "severity": "medium",
+        "title": "A cancelled load can still update the view",
+        "explanation": "After awaiting the shared unstructured task, this assigns the result without checking cancellation, so a cell whose URL changed or disappeared can briefly display an image for the old URL.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/ThumbnailGrid.swift",
+        "line": 33,
+        "severity": "medium",
+        "title": "The thumbnail cache grows without bound",
+        "explanation": "Every successfully fetched image remains in the shared dictionary indefinitely, so scrolling through many distinct URLs can cause substantial and persistent memory growth.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/ThumbnailGrid.swift",
+        "line": 47,
+        "severity": "low",
+        "title": "HTTP error responses are treated as image downloads",
+        "explanation": "The response is discarded without checking its status code, causing HTTP failures to be reported later as image-decoding errors and potentially hiding useful server error information.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "swift-legacy-bridge",
+    "lang": "swift",
+    "condition": "jev",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "Sources/App/LegacyBridge.swift",
+        "line": 50,
+        "severity": "high",
+        "title": "Concurrent uploads share one completion handler",
+        "explanation": "Calling `upload(file:)` concurrently overwrites `legacy.onFinish`, so one continuation can remain suspended forever while the other may be resumed by the wrong upload.",
+        "rule": "swift-continuation-misuse",
+        "jevProbability": 0.52
+      },
+      {
+        "file": "Sources/App/LegacyBridge.swift",
+        "line": 53,
+        "severity": "medium",
+        "title": "Finishing one upload permanently closes progress stream",
+        "explanation": "`progressContinuation.finish()` runs when any upload finishes, so later uploads can no longer deliver progress through the bridge's exposed stream.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/LegacyBridge.swift",
+        "line": 42,
+        "severity": "low",
+        "title": "Force-unwrapped continuation storage is unnecessary",
+        "explanation": "The implicitly unwrapped optional relies on `AsyncStream`'s builder executing synchronously; initialize and capture the continuation without force-unwrapped mutable state to avoid a fragile initialization assumption.",
+        "rule": "swift-no-force-unwrap",
+        "jevProbability": 0.14
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "swift-legacy-bridge",
+    "lang": "swift",
+    "condition": "none",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "Sources/App/LegacyBridge.swift",
+        "line": 60,
+        "severity": "high",
+        "title": "Concurrent uploads can strand continuations",
+        "explanation": "Each `upload` call replaces the legacy uploader’s shared callbacks, so overlapping calls can have one upload’s completion resume another call’s continuation and leave the first call suspended indefinitely.",
+        "rule": "swift-continuation-misuse",
+        "jevProbability": 0.29
+      },
+      {
+        "file": "Sources/App/LegacyBridge.swift",
+        "line": 64,
+        "severity": "medium",
+        "title": "Progress stream cannot be reused after the first upload",
+        "explanation": "The shared `AsyncStream` is finished when any upload completes, so subsequent uploads cannot deliver progress to consumers even if the uploader otherwise supports reuse.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/LegacyBridge.swift",
+        "line": 59,
+        "severity": "medium",
+        "title": "Task cancellation does not stop or release an upload",
+        "explanation": "Cancelling the task leaves it suspended on the checked continuation while the legacy operation continues, and there is no cancellation handler to cancel the operation or resume the task.",
+        "rule": "swift-continuation-misuse",
+        "jevProbability": 0.29
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "Sources/App/LegacyBridge.swift",
+        "rule": "swift-no-magic-numbers",
+        "jevProbability": 0.52,
+        "graderConfirms": true
+      },
+      {
+        "file": "Sources/App/LegacyBridge.swift",
+        "rule": "swift-unprotected-shared-state",
+        "jevProbability": 0.53,
+        "graderConfirms": false
+      }
+    ]
+  },
+  {
+    "task": "swiftui-chat",
+    "lang": "swift",
+    "condition": "none",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "Sources/App/ChatScreen.swift",
+        "line": 140,
+        "severity": "high",
+        "title": "The view model cannot reconnect after the screen reappears",
+        "explanation": "`onDisappear` permanently sets `isStopped`, so if SwiftUI later reuses this `StateObject` the existing socket is canceled and future reconnect attempts are suppressed.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/ChatScreen.swift",
+        "line": 92,
+        "severity": "medium",
+        "title": "Reconnect attempts can create multiple concurrent sockets",
+        "explanation": "Each failure starts an untracked delayed task, and none of those tasks is canceled when another attempt succeeds, so multiple timers can later call `connect()` and replace the active socket.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/ChatScreen.swift",
+        "line": 89,
+        "severity": "medium",
+        "title": "A stale send failure can discard the current socket reference",
+        "explanation": "The send completion schedules a reconnect without checking that its task is still the active socket, allowing a delayed failure from an old task to set `webSocketTask` to `nil` and disrupt a newer connection.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/ChatScreen.swift",
+        "line": 33,
+        "severity": "medium",
+        "title": "Reconnect backoff is reset before connection succeeds",
+        "explanation": "Resetting `reconnectDelay` as soon as a socket is created means repeated fast connection failures always retry at the initial delay instead of backing off.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/ChatScreen.swift",
+        "line": 50,
+        "severity": "medium",
+        "title": "Draft is discarded before the send succeeds",
+        "explanation": "The draft is cleared immediately after starting the asynchronous send, so a send error loses the user's message without retaining it for retry.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "Sources/App/ChatScreen.swift",
+        "rule": "swift-no-force-unwrap",
+        "jevProbability": 0.98,
+        "graderConfirms": true
+      }
+    ]
+  },
+  {
+    "task": "swiftui-thumbnail-grid",
+    "lang": "swift",
+    "condition": "jev",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "Sources/App/ThumbnailGrid.swift",
+        "line": 32,
+        "severity": "medium",
+        "title": "Cached image crosses actor isolation without Sendable",
+        "explanation": "`entry(for:)` and `store` move `CachedThumbnail` across the actor boundary, but the type does not conform to `Sendable`, which can produce Swift 6 strict-concurrency errors and leaves the image’s cross-isolation safety unspecified.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/ThumbnailGrid.swift",
+        "line": 51,
+        "severity": "medium",
+        "title": "Shared date formatter is not concurrency-safe",
+        "explanation": "`RelativeDateTimeFormatter` is shared mutable reference state and is not safe for concurrent use; access it through a suitably isolated formatter or create a formatter per use.",
+        "rule": "swift-unprotected-shared-state",
+        "jevProbability": 0.68
+      },
+      {
+        "file": "Sources/App/ThumbnailGrid.swift",
+        "line": 98,
+        "severity": "medium",
+        "title": "HTTP error responses are treated as image downloads",
+        "explanation": "`data(from:)` does not reject non-2xx responses, so an error response containing image data can be cached and displayed as a successful thumbnail.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/ThumbnailGrid.swift",
+        "line": 93,
+        "severity": "medium",
+        "title": "Concurrent cells can download the same URL repeatedly",
+        "explanation": "The cache lookup and later store are separate actor calls, so cells loading the same uncached URL concurrently can all start a download before any result is stored.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/ThumbnailGrid.swift",
+        "line": 120,
+        "severity": "medium",
+        "title": "Negative column counts trap during initialization",
+        "explanation": "The public initializer passes an unchecked `columnCount` to `Array(repeating:count:)`, which traps for negative values and can also create an unusable grid for zero.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "Sources/App/ThumbnailGrid.swift",
+        "rule": "swift-no-empty-catch",
+        "jevProbability": 0.51,
+        "graderConfirms": false
+      }
+    ]
+  },
+  {
+    "task": "swiftui-chat",
+    "lang": "swift",
+    "condition": "jev",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "Sources/App/ChatScreen.swift",
+        "line": 46,
+        "severity": "high",
+        "title": "Explicit disconnect triggers an automatic reconnect",
+        "explanation": "`disconnect()` cancels the socket, whose receive callback can take this failure path and schedule `connect()` after three seconds, so leaving the screen can unexpectedly reopen the connection.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/ChatScreen.swift",
+        "line": 69,
+        "severity": "medium",
+        "title": "Reconnect attempts are not tied to the failed connection",
+        "explanation": "Each failure can schedule an independent reconnect, and callbacks from an old socket can clear or interfere with a newer socket because `handleDisconnect()` does not verify which task failed.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/ChatScreen.swift",
+        "line": 78,
+        "severity": "medium",
+        "title": "Messages are silently dropped while disconnected",
+        "explanation": "`send(text:)` does nothing when `task` is `nil`, but the UI clears the draft immediately afterward, so a transient disconnect loses the user's message without feedback.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/ChatScreen.swift",
+        "line": 66,
+        "severity": "medium",
+        "title": "Received messages accumulate without a bound",
+        "explanation": "Every decoded message is retained for the lifetime of the connection, so a long-running or high-volume chat can grow memory usage indefinitely.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  }
+]

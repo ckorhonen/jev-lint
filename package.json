@@ -1,0 +1,18 @@
+{
+  "name": "jev-lint",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "hook": "bun src/hook.ts",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome check .",
+    "format": "biome format --write .",
+    "eval": "bun eval/run.ts"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.5.14",
+    "bun-types": "^1.4.2",
+    "typescript": "^7.0.2"
+  }
+}

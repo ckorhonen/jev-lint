@@ -1,0 +1,5 @@
+.env
+node_modules/
+eval/results/cache/
+eval/e2e/runs/
+eval/e2e/scaffold/*/node_modules/

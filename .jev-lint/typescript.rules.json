@@ -1,0 +1,37 @@
+{
+  "language": "typescript",
+  "extensions": [
+    ".ts",
+    ".tsx"
+  ],
+  "rules": [
+    {
+      "id": "repo-hook-stdout-noise",
+      "question": "Is `file_path` inside `src/` and does `added_code` print output with `console.log`, `console.info`, `console.debug`, or `process.stdout.write`, other than one final `process.stdout.write(JSON.stringify(output))` of the hook's result?",
+      "true": "Code under src/ prints something to stdout that is not the hook's single final JSON result.",
+      "false": "No stdout printing, or the only stdout write is the final JSON result, or the file is outside src/ (eval scripts and tests may print). Writing to stderr behind a debug flag is fine.",
+      "fix": "Keep stdout clean in src/ \u2014 the hook's stdout is parsed as JSON (AGENTS.md: hook safety)."
+    },
+    {
+      "id": "repo-hook-must-fail-open",
+      "question": "Is `file_path` `src/hook.ts` or `src/lint.ts` and does `added_code` let an error escape to the caller \u2014 a `throw`, a `process.exit` with a non-zero code, or a rejected promise that is not caught?",
+      "true": "The hook path can crash or exit non-zero instead of exiting 0 silently.",
+      "false": "Errors are caught and ignored or logged behind a debug flag and the process exits 0, or the file is not src/hook.ts or src/lint.ts.",
+      "fix": "Catch the error and exit 0; the hook must fail open (AGENTS.md: hook safety)."
+    },
+    {
+      "id": "repo-judge-model-luna",
+      "question": "Does `added_code` set a default OpenAI model name for an LLM judge, grader, reviewer, or baseline (for example `process.env.GRADER_MODEL ?? \"gpt-5.5\"` or `model: \"gpt-5.4-mini\"`) to anything other than `\"gpt-6-luna\"`?",
+      "true": "A judging model default is a model other than gpt-6-luna.",
+      "false": "The default model is \"gpt-6-luna\" (an environment override is fine), or the code sets no judging model.",
+      "fix": "Default LLM judging to gpt-6-luna (AGENTS.md: LLM judging)."
+    },
+    {
+      "id": "repo-judge-effort-low",
+      "question": "Does `added_code` set a default `reasoning_effort` for an LLM judge, grader, reviewer, or baseline (for example `process.env.REVIEW_EFFORT ?? \"high\"` or `reasoning_effort: \"medium\"`) to anything other than `\"low\"`?",
+      "true": "A judging reasoning_effort default is \"none\", \"medium\", \"high\" or another value that is not \"low\".",
+      "false": "The default reasoning_effort is \"low\" (an environment override is fine), or the code sets no reasoning_effort.",
+      "fix": "Default judging reasoning_effort to low (AGENTS.md: LLM judging)."
+    }
+  ]
+}

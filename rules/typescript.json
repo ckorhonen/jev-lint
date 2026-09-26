@@ -1,0 +1,97 @@
+{
+  "language": "typescript",
+  "extensions": [".ts", ".tsx", ".mts", ".cts", ".js", ".jsx", ".mjs", ".cjs"],
+  "rules": [
+    {
+      "id": "ts-no-explicit-any",
+      "question": "Does `added_code` use the TypeScript type `any`, such as a `: any` annotation, `as any`, `any[]`, or `<any>`?",
+      "true": "The added code writes the `any` type somewhere.",
+      "false": "The added code never writes the `any` type. The word `any` inside a string, comment, or a name like `anyMatch` does not count, and `unknown` is fine.",
+      "fix": "Replace `any` with a precise type or `unknown` plus narrowing."
+    },
+    {
+      "id": "ts-no-non-null-assertion",
+      "question": "Does `added_code` use the TypeScript non-null assertion operator, a `!` placed directly after an expression such as `user!.name`, `map.get(k)!`, or `el!`?",
+      "true": "A postfix `!` asserts that a value is not null or undefined.",
+      "false": "No postfix non-null `!`. Logical not (`!x`), `!=`, `!==`, and definite assignment on class fields do not count.",
+      "fix": "Handle the null/undefined case explicitly (guard, optional chaining, or a thrown error with context)."
+    },
+    {
+      "id": "ts-no-empty-catch",
+      "question": "Does `added_code` contain a catch block (or `.catch` handler) that silently swallows the error, doing nothing or only containing a comment?",
+      "true": "A catch or .catch handler is empty or only has comments, so the error disappears.",
+      "false": "Every catch handler logs, rethrows, returns an error value, or otherwise handles the error, or there is no catch at all.",
+      "fix": "Log, rethrow, or convert the error into a handled result; never swallow it silently."
+    },
+    {
+      "id": "ts-no-debug-console",
+      "question": "Does `added_code` add a `console.log`, `console.debug`, or `console.dir` call that looks like leftover debugging output?",
+      "true": "There is a console.log/debug/dir call printing values for debugging, e.g. `console.log('here', data)`.",
+      "false": "No debug console calls. `console.error`/`console.warn` for real error reporting, or output in a CLI program's main user-facing path, does not count.",
+      "fix": "Remove debug logging or use the project's logger."
+    },
+    {
+      "id": "ts-no-floating-promise",
+      "question": "Does `added_code` call a function that returns a Promise (an async function, fetch, or a method like `save()` that is clearly async) without `await`, `return`, `void`, `.then`, or `.catch` on it?",
+      "true": "A promise is created and ignored, so failures are unhandled, e.g. `saveUser(user);` where `saveUser` is async.",
+      "false": "Every promise is awaited, returned, chained, collected, or explicitly marked with `void`, or there are no async calls.",
+      "fix": "Await the promise, return it, or attach error handling."
+    },
+    {
+      "id": "ts-no-restating-comment",
+      "question": "Does `added_code` contain a comment that merely restates what the next line of code obviously does, adding no information (e.g. `// increment i` above `i++`)?",
+      "true": "At least one comment just narrates the code in plain words without explaining why or adding context.",
+      "false": "Comments explain intent, reasons, constraints, or non-obvious behavior, or there are no comments.",
+      "fix": "Delete comments that narrate the code; keep only ones that explain why."
+    },
+    {
+      "id": "ts-no-vague-names",
+      "question": "Does `added_code` declare a variable, parameter, or function with a vague or meaningless name such as `data`, `temp`, `tmp`, `foo`, `thing`, `stuff`, `x`, `val2`, or `obj`, outside of short loop indices or conventional names like `i`, `e`, `err`, `id`, `req`, `res`?",
+      "true": "A newly declared name gives no clue what it holds.",
+      "false": "All newly declared names are descriptive or conventional.",
+      "fix": "Rename to say what the value is."
+    },
+    {
+      "id": "ts-no-magic-numbers",
+      "question": "Does `added_code` use an unexplained numeric literal in logic (like `if (retries > 7)`, `setTimeout(fn, 86400000)`, or `price * 0.0825`) instead of a named constant, excluding 0, 1, -1, 2 and numbers that are obvious from context?",
+      "true": "A bare number with non-obvious meaning appears in logic.",
+      "false": "Numbers are named constants, trivial values, or self-explanatory in context (array index 0, HTTP status 404, percent 100).",
+      "fix": "Extract the number into a well-named constant."
+    },
+    {
+      "id": "ts-no-commented-out-code",
+      "question": "Does `added_code` contain commented-out code, meaning lines of source code disabled by putting them in comments?",
+      "true": "A comment contains code that was disabled, e.g. `// const old = compute(x);`.",
+      "false": "Comments are prose only; code examples inside doc comments (JSDoc @example) do not count.",
+      "fix": "Delete dead code; version control keeps history."
+    },
+    {
+      "id": "ts-no-bare-todo",
+      "question": "Does `added_code` add a TODO, FIXME, or XXX comment without an issue link, ticket number, or owner?",
+      "true": "A TODO/FIXME/XXX comment has no ticket reference (like #123, ABC-45, a URL) or owner name.",
+      "false": "No TODO-style comments, or each one references a ticket, URL, or owner.",
+      "fix": "Either do it now or reference a tracked issue."
+    },
+    {
+      "id": "ts-no-hardcoded-secret",
+      "question": "Does `added_code` hardcode a real-looking secret such as an API key, password, access token, or private key as a literal string?",
+      "true": "A credential-like literal value is embedded, e.g. `const apiKey = \"sk_live_51H...\"` or `password: \"hunter2\"`.",
+      "false": "Secrets come from environment variables, config, or a secret store; placeholders like `\"<YOUR_KEY>\"` or empty strings do not count.",
+      "fix": "Load the secret from the environment or a secret manager."
+    },
+    {
+      "id": "ts-no-ts-ignore",
+      "question": "Does `added_code` add a `@ts-ignore` or `@ts-nocheck` comment, or a `@ts-expect-error` comment with no explanation after it?",
+      "true": "A TypeScript suppression directive silences the type checker without a stated reason.",
+      "false": "No suppression directives, or a `@ts-expect-error` followed by an explanation.",
+      "fix": "Fix the type error; if suppression is unavoidable use `@ts-expect-error` with a reason."
+    },
+    {
+      "id": "ts-no-deep-nesting",
+      "question": "Does `added_code` contain logic nested four or more levels deep (if/for/try blocks inside each other) where early returns or guard clauses would flatten it?",
+      "true": "There is a pyramid of nested conditionals or loops that could be flattened with early returns.",
+      "false": "Control flow is flat or shallow (three levels or fewer), or uses early returns.",
+      "fix": "Use guard clauses and early returns to flatten the logic."
+    }
+  ]
+}

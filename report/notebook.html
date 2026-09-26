@@ -1,0 +1,381 @@
+<title>Jev Lint Notebook</title>
+<style>
+{{FONT}}
+:root{
+  --bg:#f6f6f5;--surface:#ececea;--ink:#141414;--muted:#5d5d5b;--rule:#d0d0cd;
+  --s1:#141414;--s2:#6f6f6c;--s3:#a9a9a5;--s4:#d9d9d5;--s4-line:#8a8a86;--on-s1:#f6f6f5;--on-s2:#f6f6f5;--on-s3:#141414;--on-s4:#141414;
+  --good:#1d7a45;--warn:#8a5a00;
+  --mono:'Departure Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;--bg:#0b0b0b;--surface:#161616;--ink:#ededea;--muted:#9a9a96;--rule:#2c2c2a;
+  --s1:#f2f2ef;--s2:#9d9d99;--s3:#5c5c59;--s4:#2e2e2c;--s4-line:#7a7a76;--on-s1:#0b0b0b;--on-s2:#0b0b0b;--on-s3:#f2f2ef;--on-s4:#ededea;
+  --good:#5fd18b;--warn:#e8b25a}}
+:root[data-theme="dark"]{
+  color-scheme:dark;--bg:#0b0b0b;--surface:#161616;--ink:#ededea;--muted:#9a9a96;--rule:#2c2c2a;
+  --s1:#f2f2ef;--s2:#9d9d99;--s3:#5c5c59;--s4:#2e2e2c;--s4-line:#7a7a76;--on-s1:#0b0b0b;--on-s2:#0b0b0b;--on-s3:#f2f2ef;--on-s4:#ededea;
+  --good:#5fd18b;--warn:#e8b25a}
+html{scroll-behavior:smooth;scroll-padding-top:24px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{background:var(--bg);color:var(--ink);font-family:var(--mono);font-size:14.5px;line-height:1.7}
+.progress{position:fixed;top:0;left:0;height:3px;background:var(--ink);width:0;z-index:20}
+.layout{display:grid;grid-template-columns:250px minmax(0,1fr);gap:48px;max-width:1180px;margin:0 auto;padding-inline:20px;padding-block:40px 120px}
+nav.toc{position:sticky;top:calc(env(safe-area-inset-top,0px) + 24px);align-self:start;max-height:calc(100vh - 48px);overflow-y:auto;font-size:12.5px;line-height:1.5;padding-right:6px}
+nav.toc .eyebrow{margin-bottom:10px}
+nav.toc ol{list-style:none;margin:0;padding:0}
+nav.toc li{margin:0}
+nav.toc a{display:block;color:var(--muted);text-decoration:none;padding:4px 0 4px 10px;border-left:2px solid transparent}
+nav.toc a:hover{color:var(--ink)}
+nav.toc a.active{color:var(--ink);border-left-color:var(--ink)}
+nav.toc ol ol a{padding-left:22px;font-size:12px}
+nav.toc .tag{margin-left:4px}
+.toc-mobile{display:none}
+main{min-width:0;max-width:820px}
+h1,h2,h3{font-weight:400;line-height:1.25;text-wrap:balance;margin:0}
+h1{font-size:30px;letter-spacing:-.01em}
+h2{font-size:20px;margin-top:64px;padding-top:18px;border-top:1px solid var(--ink)}
+h3{font-size:15.5px;margin-top:36px}
+section.entry>h2{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 12px}
+.date{font-size:12px;color:var(--muted);letter-spacing:.06em}
+p,li{max-width:70ch}
+p{margin:12px 0}
+.eyebrow{font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.lede{font-size:15.5px;margin-top:16px}
+.tag{display:inline-block;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;padding:1px 6px;border:1px solid var(--rule);color:var(--muted);vertical-align:2px}
+.tag.new{border-color:var(--good);color:var(--good)}
+.tag.old{border-color:var(--warn);color:var(--warn)}
+.verdict{margin-top:24px;padding:18px 20px;background:var(--surface);border-left:3px solid var(--ink)}
+.verdict p{margin:6px 0}
+.facts{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--rule);border:1px solid var(--rule);margin-top:22px}
+.facts div{background:var(--bg);padding:13px 15px}
+.facts b{display:block;font-weight:400;font-size:21px;font-variant-numeric:tabular-nums}
+.facts span{font-size:11.5px;color:var(--muted);line-height:1.45;display:block}
+figure{margin:14px 0 6px}
+.chart{width:100%;height:auto;display:block}
+.chart .grid{stroke:var(--rule);stroke-width:1}
+.chart .marker{stroke:var(--muted);stroke-width:1;stroke-dasharray:2 3}
+.chart .tick,.chart .val,.chart .glabel,.chart .inbar{font-family:var(--mono);font-size:11px;fill:var(--muted)}
+.chart .val{fill:var(--ink)}
+.chart .glabel{fill:var(--ink);font-size:11.5px}
+.chart .inbar{font-size:10.5px}
+.chart .inbar.s1-t{fill:var(--on-s1)}.chart .inbar.s2-t{fill:var(--on-s2)}.chart .inbar.s3-t{fill:var(--on-s3)}.chart .inbar.s4-t{fill:var(--on-s4)}
+.s1{fill:var(--s1)}.s2{fill:var(--s2)}.s3{fill:var(--s3)}.s4{fill:var(--s4);stroke:var(--s4-line);stroke-width:1}
+.s1-t{fill:var(--on-s1)}.s2-t{fill:var(--on-s2)}.s3-t{fill:var(--on-s3)}.s4-t{fill:var(--on-s4)}
+.ln{fill:none;stroke-width:2}.ln.s1{stroke:var(--s1)}.ln.s2{stroke:var(--s2)}
+.pt.s1{fill:var(--s1)}.pt.s2{fill:var(--s2)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:11.5px;color:var(--muted);margin-top:6px}
+.key{display:inline-flex;align-items:center;gap:7px}
+.sw{display:inline-block;width:11px;height:11px}
+.sw.s1{background:var(--s1)}.sw.s2{background:var(--s2)}.sw.s3{background:var(--s3)}.sw.s4{background:var(--s4);outline:1px solid var(--s4-line)}
+.sw.dash{background:repeating-linear-gradient(90deg,var(--s2) 0 4px,transparent 4px 7px);height:3px}
+.sw.marker{height:11px;width:0;border-left:1px dashed var(--muted)}
+.minis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 24px;margin-top:10px}
+.mini-title{font-size:12px;color:var(--ink)}
+.caption{font-size:12px;color:var(--muted);margin-top:4px}
+.table{overflow-x:auto;margin-top:12px}
+table{border-collapse:collapse;width:100%;font-size:12.5px;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:7px 12px 7px 0;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-weight:400;color:var(--muted);font-size:11px;letter-spacing:.06em;text-transform:uppercase}
+code{font-family:var(--mono);font-size:.92em;background:var(--surface);padding:1px 4px}
+pre{background:var(--surface);padding:14px 16px;overflow-x:auto;font-size:12.5px;line-height:1.55}
+abbr{text-decoration:underline dotted;cursor:help}
+.note{font-size:12.5px;color:var(--muted)}
+ol,ul{padding-left:20px}
+li{margin:6px 0}
+details.more{margin-top:14px;border:1px solid var(--rule);padding:8px 14px}
+details.more summary{cursor:pointer;color:var(--muted);font-size:12.5px}
+.superseded{border-left:3px solid var(--warn);padding:6px 14px;margin:14px 0;font-size:13px;background:var(--surface)}
+.jump{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(env(safe-area-inset-bottom,0px) + 16px);display:flex;gap:6px;z-index:30}
+.jump button{font:inherit;font-size:12px;background:var(--bg);color:var(--ink);border:1px solid var(--ink);padding:7px 11px;cursor:pointer;min-width:40px}
+.jump button:hover{background:var(--ink);color:var(--bg)}
+.jump .where{display:none}
+:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.kbd{font-size:11px;border:1px solid var(--rule);padding:0 4px}
+@media (max-width:980px){
+  .layout{grid-template-columns:minmax(0,1fr);gap:0}
+  nav.toc{display:none}
+  .toc-mobile{display:block;margin-top:20px;border:1px solid var(--rule);padding:8px 14px}
+  .toc-mobile summary{cursor:pointer;font-size:12.5px}
+  .toc-mobile ol{padding-left:16px;font-size:12.5px}
+  .toc-mobile a{color:var(--ink)}
+}
+@media (max-width:640px){.facts{grid-template-columns:repeat(2,1fr)}.minis{grid-template-columns:minmax(0,1fr)}h1{font-size:24px}}
+</style>
+
+<div class="progress" id="progress"></div>
+<div class="layout">
+<nav class="toc" aria-label="Contents">
+  <div class="eyebrow">Contents</div>
+  <ol id="toc-list">
+    <li><a href="#answer">Current answer</a></li>
+    <li><a href="#e3">Entry 3 · Best practices <span class="tag new">latest</span></a>
+      <ol>
+        <li><a href="#e3-rules">The rules</a></li>
+        <li><a href="#e3-labeled">Labeled edits</a></li>
+        <li><a href="#e3-tiers">Tiers and thresholds</a></li>
+        <li><a href="#e3-review">Before the AI reviewer</a></li>
+        <li><a href="#e3-hook">Hook on vs off</a></li>
+        <li><a href="#e3-learned">What we learned</a></li>
+      </ol>
+    </li>
+    <li><a href="#e2">Entry 2 · Luna re-baseline</a></li>
+    <li><a href="#e1">Entry 1 · Hygiene pack</a>
+      <ol>
+        <li><a href="#e1-labeled">Labeled edits</a></li>
+        <li><a href="#e1-runs">Real agent runs</a></li>
+        <li><a href="#e1-agree">Jev vs grader</a></li>
+      </ol>
+    </li>
+    <li><a href="#rec">Recommendation</a></li>
+    <li><a href="#next">Next experiments</a></li>
+    <li><a href="#methods">Methods</a></li>
+    <li><a href="#log">Changelog</a></li>
+  </ol>
+  <p class="note" style="margin-top:18px">Keys: <span class="kbd">j</span> next section · <span class="kbd">k</span> previous · <span class="kbd">t</span> top</p>
+</nav>
+
+<main>
+  <div class="eyebrow">Experiment notebook · jev-lint · updated 26 Sep 2026</div>
+  <h1>Jev as a fuzzy linter for coding agents</h1>
+  <p class="lede">Can a small, fast judgment model check an agent's code after every edit, against rules no deterministic linter can express, and does the agent get better for it? This notebook logs each experiment, newest first. Older results stay here; when a newer run replaces a number, the old one is marked <span class="tag old">superseded</span>.</p>
+
+  <details class="toc-mobile"><summary>Contents</summary><ol id="toc-mobile-list"></ol></details>
+
+  <section id="answer">
+    <h2>Current answer</h2>
+    <div class="verdict">
+      <p class="eyebrow">Recommendation as of Entry 3</p>
+      <p><b>Adopt it with both rule packs, as a non-blocking hint.</b> On best-practice rules like "don't mirror a prop into state with an effect", Jev is accurate once each rule is worded narrowly. In real agent runs it cut graded rule violations by about a third. On React tasks, it cut the review comments our rules cover from 1.42 to 0.25 per task. SwiftUI tasks had too few of those comments to show an effect. It does not replace an AI code reviewer. About three quarters of what the reviewer raised was logic and design problems that no snippet-level rule can see.</p>
+    </div>
+    <div class="facts">
+      <div><b>96%</b><span>held-out F1 on best-practice rules, TS and Swift</span></div>
+      <div><b>99%</b><span>held-out F1 on hygiene rules, TS and Swift</span></div>
+      <div><b>{{FP_CAUGHT}} of {{FP_IN}}</b><span>rule-covered reviewer issues Jev flagged during the edits, before review</span></div>
+      <div><b>{{IN_NONE}} → {{IN_JEV}}</b><span>rule-covered reviewer findings per task, hook off → on</span></div>
+      <div><b>−37%</b><span>graded rule violations per task with the hook (2.12 → 1.33)</span></div>
+      <div><b>~0.3 s</b><span>per check (Luna: ~1.6 s)</span></div>
+      <div><b>$1.51</b><span>per 10,000 edits, both packs in one call</span></div>
+      <div><b>+26%</b><span>agent cost per task, +14 s, from extra fix-up edits</span></div>
+    </div>
+
+    <h3>Held-out accuracy, all packs</h3>
+    <p class="note"><abbr title="Balances precision (share of flags that were real) and recall (share of real violations that were flagged). 100% is perfect.">F1</abbr> on edits the rules were never tuned on. Regex only applies to hygiene rules.</p>
+    {{CHART_HEADLINE}}
+    <h3>Noise on clean edits</h3>
+    <p class="note">Share of held-out edits with nothing wrong that still got at least one flag. This is what the agent experiences as false alarms.</p>
+    {{CHART_FA}}
+    <h3>Speed</h3>
+    <p class="note">Median seconds per check on the held-out edits. Jev also costs less ($0.76 vs $2.41 per 10,000 single-pack checks for Luna), but at these prices cost is not the deciding factor; the extra second or more per edit is.</p>
+    {{CHART_LATENCY}}
+  </section>
+
+  <section class="entry" id="e3">
+    <h2>Entry 3 · Best-practice rules <span class="date">26 Sep 2026</span> <span class="tag new">latest</span></h2>
+    <p><b>Question.</b> Entry 1's rules were mostly hygiene. Half of them a regex can check. Can Jev check the practices a deterministic linter can't? Examples: using <code>useEffect</code> only to sync with outside systems, SwiftUI state ownership, and continuation safety. And how much of what an AI code reviewer would later say does it catch first?</p>
+
+    <h3 id="e3-rules">The rules</h3>
+    <p>We seeded 10 opinionated rules per language. Each describes one concrete pattern and lists its exceptions, so it can be judged from the edit alone. We skipped anything that needs other files or deep reasoning. The table shows the fix text the agent sees, and whether a mainstream linter can already do the job.</p>
+    <details class="more"><summary>Show all 20 rules</summary>{{PRACTICE_RULE_LIST}}</details>
+
+    <h3 id="e3-labeled">Labeled edits</h3>
+    <p><b>Setup.</b> Subagents wrote {{N_P_DEV}} tuning edits and {{N_P_HO}} held-out edits. Each is a realistic Claude <code>Write</code>/<code>Edit</code>/<code>MultiEdit</code> or Codex <code>apply_patch</code> payload. They include hard negatives, such as an effect that talks to a WebSocket and cleans up properly, or <code>@StateObject</code> used correctly. A different author wrote the held-out set in a messier style. The comparison judge is GPT-6-Luna at low reasoning, given the same rule text.</p>
+    <p><b>One wording pass.</b> The first TypeScript rules (v1) read too literally. For example, the fetch-race rule fired on WebSockets, and the external-data rule fired on typed API clients. We rewrote three rules using only the tuning split, then measured the held-out split. Swift rules were unchanged.</p>
+    {{CHART_V1V2}}
+    <p class="caption">The wording pass generalized. Held-out F1 with both tiers rose from 87% to 96%, and clean held-out edits with a false alarm fell from 3 of 24 to 1 of 24. v1 numbers are kept in <code>eval/results/snapshots/</code>.</p>
+    {{PRACTICE_TABLE}}
+    <details class="more"><summary>Per-rule results on held-out edits (TypeScript)</summary>{{PRACTICE_RULES_TS}}</details>
+    <details class="more"><summary>Per-rule results on held-out edits (Swift)</summary>{{PRACTICE_RULES_SW}}</details>
+    <p>Luna is slightly more accurate on these rules: 98–99% held-out F1 vs Jev's 96%. Jev's misses are mostly high-tier recall on Swift (87%), where true violations sat in the 0.3–0.8 range. Jev's high tier stayed at 100% precision on held-out edits in both languages.</p>
+
+    <h3 id="e3-tiers">Tiers and thresholds</h3>
+    <p>Jev returns a probability per rule. The hook says "fix" at p ≥ 0.8 and "double-check" at 0.5–0.8, and drops anything lower. These sweeps show held-out precision and recall at every cut-off:</p>
+    <div class="minis">{{SWEEPS}}</div>
+    {{SWEEP_LEGEND}}
+    {{CHART_BANDS}}
+    <p class="caption">Tuning and held-out edits combined. Everything at p ≥ 0.8 was real in both packs. The double-check band is 86% real for hygiene rules but 64% for practice rules, so it's noisier there but still more right than wrong. Below 0.5 it's mostly noise.</p>
+
+    <h3 id="e3-review">Before the AI reviewer</h3>
+    <p><b>Setup.</b> Claude Code (Sonnet) built 12 new features, 6 React and 6 SwiftUI, with no hook, twice each. Examples: debounced search, a polling dashboard, a WebSocket chat, a stopwatch, and async wrappers around a callback SDK. An AI reviewer (GPT-6-Luna) then reviewed the final code with no knowledge of our rules. A second pass matched each review finding to a rule, or to "none". We replayed Jev over every edit the agent made, to see what the hook would have said before the review.</p>
+    {{CHART_FUNNEL}}
+    <p>In the practices round the reviewer raised {{FP_FINDINGS}} issues. {{FP_IN}} ({{FP_IN_PCT}}) matched one of our rules, and Jev had flagged {{FP_CAUGHT}} of those ({{FP_CAUGHT_PCT}}) during the edits: {{FP_C8}} at "fix" and {{FP_C5}} at "double-check". It reliably caught the literal patterns, such as <code>await res.json()</code> cast to a type without validation.</p>
+    <p>The {{FP_MISS}} misses are subtler relatives of a rule:
+      <ul>
+        <li>overlapping polling loops or debounce races outside a <code>useEffect</code> fetch, scored 0.04–0.10;</li>
+        <li>a concurrent-upload bug that could strand a continuation, scored about 0.3.</li>
+      </ul>
+    The round-1 tasks (retry helpers, rate limiters, caches) show the same limit more starkly. Only {{R1_IN}} of {{R1_FINDINGS}} reviewer findings touched any rule; the rest were logic bugs.</p>
+    {{CHART_EXTRA}}
+    <p class="caption">Jev also flagged issues the reviewer never mentioned, mostly hygiene items like empty catches, force-unwraps and vague names. A separate rule grader confirmed most of them as real.</p>
+
+    <h3 id="e3-hook">Hook on vs off</h3>
+    <p>Same 12 tasks, same repeats, with the hook on (both packs, both tiers).</p>
+    {{CHART_HOOK_REVIEW}}
+    {{CHART_HOOK_OUT}}
+    {{HOOK_TABLE}}
+    <ul>
+      <li><b>Rule violations fell, and this time the drop is significant.</b> The paired change in graded violations per task was {{PD_ALL}}. Practice-rule violations alone changed by {{PD_P}}; most of that was unvalidated JSON (10 → 2).</li>
+      <li><b>The review improvement came from the React tasks.</b> There, rule-covered review findings fell from 1.42 to 0.25 per task. On the SwiftUI tasks, the reviewer raised few rule-covered issues either way, and slightly more with the hook (0.42 → 0.67 per task, that is 5 → 8 findings). That's too few to read anything into, but it isn't an improvement.</li>
+      <li><b>The reviewer's other findings didn't change overall.</b> Findings no rule covers stayed at about 3 per task. They moved in opposite directions on React (2.83 → 3.50) and SwiftUI (3.25 → 2.50), which looks like noise. The hook fixes what it checks, and nothing else.</li>
+      <li><b>Cost.</b> Every run built. There were {{HOOK_CALLS}} hook calls with {{HOOK_ERRS}} errors, at about 0.32 s each. Agent cost rose 26% and time rose 14 s per task, from the fix-up edits.</li>
+    </ul>
+
+    <h3 id="e3-learned">What we learned</h3>
+    <ol>
+      <li><b>Wording is the whole game.</b> Jev answers the words, not the intent. Rules need the exact pattern plus explicit exceptions ("WebSockets are not HTTP requests"). One tuning pass, checked on unseen edits, removed most false alarms.</li>
+      <li><b>Jev catches patterns, not reasoning.</b> It finds "cast JSON without validating" every time, but not "two polling loops can race".</li>
+      <li><b>A hint beats a review comment, where the rules match the work.</b> The agent fixed hook findings in its next edit. On React tasks, the reviewer had far fewer rule-covered issues to raise. The Swift practice rules rarely matched what the reviewer cared about (5 of 44 findings), so there was little to prevent.</li>
+      <li><b>Luna is a strong alternative judge.</b> It's slightly more accurate on these rules, but about 5× slower per edit, and it doesn't return probabilities for tiering. Jev's speed matters because the hook runs on every edit.</li>
+    </ol>
+  </section>
+
+  <section class="entry" id="e2">
+    <h2>Entry 2 · GPT-6-Luna re-baseline <span class="date">26 Sep 2026</span></h2>
+    <p><b>Why.</b> You asked that GPT-6-Luna at low reasoning be the comparison judge and the grader in every scenario. We re-ran the hygiene labeled edits with Luna, and re-graded the round-1 agent runs with Luna. The Jev judgments were unchanged (cached).</p>
+    <div class="superseded">Replaces Entry 1's GPT-5.4-mini baseline and GPT-5.5 grading. Entry 1's numbers are kept below as they were.</div>
+    {{R1_TABLE}}
+    <p>Luna is a much stronger baseline than GPT-5.4-mini: 96–97% held-out F1 vs 90–94%, and far fewer false alarms. Jev still leads on hygiene rules (99%), with 0% clean-edit false alarms, and is about 6× faster.</p>
+    {{CHART_R1}}
+    <p class="caption">Luna counts fewer violations than GPT-5.5 did, but the direction is the same. Paired change with both tiers: {{R1D_LUNA}} under Luna vs {{R1D_GPT}} under GPT-5.5. With 24 runs per condition, neither is conclusive.</p>
+  </section>
+
+  <section class="entry" id="e1">
+    <h2>Entry 1 · Hygiene pack <span class="date">26 Sep 2026</span></h2>
+    <p><b>Question.</b> Following the forwarded post: convert coding guidelines into tiny rules that are easy to judge, and run Jev on every edit in a <abbr title="A command Claude Code or Codex runs after each tool call; its output is fed back to the agent.">PostToolUse hook</abbr>. Findings come back in two tiers. Does it work in TypeScript and Swift?</p>
+    <p><b>What we built.</b> <code>src/hook.ts</code> works in Claude Code and Codex. It extracts only the code the edit added, including the <code>+</code> lines of a Codex patch. It asks one yes/no question per rule in a single Jev call, and returns findings as extra context. It never blocks, and if Jev is slow or down it stays silent. There are 13 rules per language, such as no <code>any</code>, no empty catch, no restating comments, and no magic numbers.</p>
+
+    <h3 id="e1-labeled">Labeled edits</h3>
+    <p>{{N_H_ALL}} synthetic hook payloads, split into tuning and held-out sets. The original comparison used GPT-5.4-mini as the LLM judge (see Entry 2 for both baselines side by side).</p>
+    <ul>
+      <li><b>Jev:</b> 99% held-out F1 in both languages at p ≥ 0.5, and no false alarms on clean edits.</li>
+      <li><b>GPT-5.4-mini:</b> 90–94% F1, and it flagged 8–21% of clean edits <span class="tag old">superseded baseline</span>.</li>
+      <li><b>Regex:</b> 61–66% F1 overall, because it can express only half the rules.</li>
+      <li><b>Run-to-run stability:</b> Jev's probabilities moved by at most {{CONS_MAX}} across repeats (99th percentile {{CONS_P99}}).</li>
+      <li><b>Weak spots:</b> rules that need counting (nesting depth: 70% recall) or tracing (floating promises: 75%).</li>
+    </ul>
+
+    <h3 id="e1-runs">Real agent runs</h3>
+    <p>Claude Code (Sonnet) did 12 general tasks, such as a GitHub client, a rate limiter and a disk cache. Each ran twice under three conditions: no hook, both tiers, and high tier only. GPT-5.5 graded the final files blind.</p>
+    <ul>
+      <li><b>The agent acted on the feedback.</b> It fixed 19 of 20 high-tier findings, and mechanical violations went to near zero. For example, Swift force-unwraps fell from 6 to 1.</li>
+      <li><b>The overall effect was small.</b> Violations per task went from 2.29 to 1.83 with both tiers, and to 1.71 with the high tier only. The 95% interval includes zero.</li>
+      <li><b>Why.</b> The agent already wrote fairly clean code, and most of what remained were judgment calls on names and numbers.</li>
+    </ul>
+    <p class="note">These numbers used the hygiene pack only. The full v1 page is kept at <code>report/archive/2026-09-26-v1-hygiene-report.html</code>.</p>
+
+    <h3 id="e1-agree">Jev vs the grader on real code</h3>
+    <p>On 98 real agent-written files, Jev and GPT-5.5 agreed on mechanical rules. They split on vague names and magic numbers. Mostly that was the grader reading the rule literally: <code>let (data, _) = …</code> fails because <code>data</code> is on the banned list, and defaulted option values count as magic numbers. Jev's one clear miss was four-level nesting.</p>
+    <details class="more"><summary>Agreement table (GPT-5.5 grader)</summary>{{AGREE_TABLE}}</details>
+  </section>
+
+  <section id="rec">
+    <h2>Recommendation</h2>
+    <ol>
+      <li><b>Install the hook with both packs</b> in Claude Code (and Codex once its CLI is fixed on this machine). Run it as a non-blocking hint with thresholds 0.8 / 0.5, and pin <code>JEV_LINT_MODEL=jev-1.13.0</code>.</li>
+      <li><b>Keep the AI code reviewer.</b> The hook handles the pattern-level issues cheaply before review, so review time goes to logic and design, which is where about 75% of review findings were.</li>
+      <li><b>Treat rule wording like code.</b> Before adding a rule, add labeled examples and hard negatives, tune on the dev split, and accept it only if the held-out split holds up. The harness does this in one command.</li>
+      <li><b>Consider the high tier only for practice rules if noise shows up in practice.</b> Their double-check band was 64% real, compared with 86% for hygiene rules.</li>
+      <li><b>Move nesting depth and floating promises to ESLint/SwiftLint.</b> Jev is weak at counting and tracing.</li>
+    </ol>
+  </section>
+
+  <section id="next">
+    <h2>Next experiments</h2>
+    <ul>
+      <li><b>Local models on the Apple Neural Engine.</b> Run the same harness with fine-tuned Jev-like models, such as <a href="https://github.com/jaredpalmer/kev">Kev</a> and <a href="https://github.com/NandhaKishorM/laya">Laya</a>. The goal is zero cost per call and lower latency than the ~0.3 s API call.</li>
+      <li><b>More coverage of the reviewer's categories.</b> Try rules for the misses (debounce and poll races, continuation cancellation), and check whether they stay precise.</li>
+      <li><b>Bigger end-to-end runs.</b> More repeats, a weaker and a stronger agent model, and real repositories instead of scaffolds.</li>
+      <li><b>Codex end to end.</b> Blocked for now: the Codex CLI's platform binary is missing on this machine.</li>
+    </ul>
+  </section>
+
+  <section id="methods">
+    <h2>Methods</h2>
+    <ul>
+      <li><b>Jev:</b> <code>jev-latest</code> (jev-1.13.0), one call per edit, one yes/no question (a Noul) per rule. $0.042 per million input tokens; output tokens are free.</li>
+      <li><b>LLM judge, grader, reviewer and mapper:</b> GPT-6-Luna at <code>reasoning_effort: low</code>. $0.10 per million input tokens and $0.50 per million output, standard tier, checked 26 Sep 2026. Entry 1 originally used GPT-5.4-mini and GPT-5.5.</li>
+      <li><b>Agent:</b> Claude Code headless (Sonnet). User hooks, plugins and MCP servers were off. Hook conditions were interleaved.</li>
+      <li><b>Labels:</b> written by Claude subagents, one labeler per edit. Tuning and held-out sets come from different authors. Thresholds were fixed at 0.8 / 0.5 before any data came in.</li>
+      <li><b>Caveats:</b>
+        <ul>
+          <li>The labels are synthetic.</li>
+          <li>Luna is both the competitor and the grader, so shared blind spots could favour it.</li>
+          <li>The end-to-end samples are small: 24 runs per condition.</li>
+        </ul>
+      </li>
+    </ul>
+<pre># everything is cached; reruns are free unless rules or models change
+bun eval/run.ts --runs 3                                    # labeled edits, both packs
+bun eval/e2e/run.ts --tasks-file eval/e2e/tasks.practices.json --tag practices --conditions none,jev --reps 2
+E2E_TAG=practices bun eval/e2e/grade.ts                     # rule grading of final code
+E2E_TAG=practices bun eval/e2e/review.ts                    # AI review + rule mapping + Jev replay
+python3 report/build.py path/to/DepartureMono-Regular.woff2 # rebuild this page</pre>
+  </section>
+
+  <section id="log">
+    <h2>Changelog</h2>
+    <ul>
+      <li><b>26 Sep 2026, Entry 3.</b> Added 20 best-practice rules, a v1→v2 wording pass for TypeScript, the pre-review catch analysis, and hook on/off runs on 12 React/SwiftUI tasks. The page became a notebook.</li>
+      <li><b>26 Sep 2026, Entry 2.</b> Switched every LLM judging role to GPT-6-Luna (low). Re-ran the baseline and re-graded round 1.</li>
+      <li><b>26 Sep 2026, Entry 1.</b> First hook, hygiene pack, labeled edits, and 72 agent runs.</li>
+    </ul>
+  </section>
+</main>
+</div>
+
+<div class="jump" role="group" aria-label="Jump between sections">
+  <button type="button" id="jump-prev" aria-label="Previous section" title="Previous section (k)">↑ prev</button>
+  <button type="button" id="jump-next" aria-label="Next section" title="Next section (j)">next ↓</button>
+  <button type="button" id="jump-top" aria-label="Back to top" title="Top (t)">top</button>
+</div>
+
+<script>
+(() => {
+  const links = [...document.querySelectorAll('#toc-list a')];
+  const targets = links.map(a => document.getElementById(a.getAttribute('href').slice(1))).filter(Boolean);
+
+  // Mobile contents mirrors the sidebar.
+  const mobile = document.getElementById('toc-mobile-list');
+  links.forEach(a => {
+    const li = document.createElement('li');
+    const copy = document.createElement('a');
+    copy.href = a.getAttribute('href');
+    copy.textContent = a.textContent.replace('latest', '').trim();
+    if (a.closest('ol ol')) li.style.marginLeft = '14px';
+    li.appendChild(copy);
+    mobile.appendChild(li);
+  });
+
+  // Scroll-spy: the last heading above the upper third of the viewport is current.
+  const setActive = () => {
+    const line = window.innerHeight * 0.3;
+    let current = targets[0];
+    for (const t of targets) if (t.getBoundingClientRect().top <= line) current = t;
+    links.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + current.id));
+    const doc = document.documentElement;
+    const max = doc.scrollHeight - doc.clientHeight;
+    document.getElementById('progress').style.width = (max > 0 ? (doc.scrollTop / max) * 100 : 0) + '%';
+  };
+  document.addEventListener('scroll', setActive, { passive: true });
+  window.addEventListener('resize', setActive);
+  setActive();
+
+  const jump = dir => {
+    const line = 40;
+    const tops = targets.map(t => t.getBoundingClientRect().top);
+    let idx;
+    if (dir > 0) idx = tops.findIndex(top => top > line + 2);
+    else { idx = -1; tops.forEach((top, i) => { if (top < line - 2) idx = i; }); }
+    if (idx >= 0 && targets[idx]) targets[idx].scrollIntoView();
+    else if (dir < 0) window.scrollTo(0, 0);
+  };
+  document.getElementById('jump-next').addEventListener('click', () => jump(1));
+  document.getElementById('jump-prev').addEventListener('click', () => jump(-1));
+  document.getElementById('jump-top').addEventListener('click', () => window.scrollTo(0, 0));
+  document.addEventListener('keydown', e => {
+    if (e.metaKey || e.ctrlKey || e.altKey || /input|textarea|select/i.test(e.target.tagName)) return;
+    if (e.key === 'j') jump(1);
+    else if (e.key === 'k') jump(-1);
+    else if (e.key === 't') window.scrollTo(0, 0);
+  });
+})();
+</script>
