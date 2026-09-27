@@ -1,5 +1,6 @@
 // jev-lint.dev — progressive enhancement only. The page is complete without this file.
 (() => {
+  document.documentElement.classList.add("js");
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -38,6 +39,8 @@ for me to approve before writing anything.`;
     agent = a;
     for (const b of $$("[data-agent]")) b.setAttribute("aria-pressed", String(b.dataset.agent === a));
     for (const el of $$("[data-agent-name]")) el.textContent = AGENTS[a].name;
+    const m = $("[data-term-mode]");
+    if (m) m.textContent = m.textContent.replace(/^(Claude Code|Codex)/, AGENTS[a].name);
     const pre = $("[data-prompt]");
     if (pre) pre.textContent = promptFor(a);
     try {
@@ -84,7 +87,7 @@ for me to approve before writing anything.`;
       const ok = await copyText(promptFor(agent));
       if (ok) {
         btn.dataset.done = "1";
-        btn.firstChild.textContent = "Copied. Now paste it ";
+        btn.firstChild.textContent = "Copied. Now paste it.";
         say(`Copied. Paste it into ${AGENTS[agent].name}.`);
         setTimeout(() => {
           btn.dataset.done = "";
@@ -130,12 +133,12 @@ for me to approve before writing anything.`;
     { rootMargin: "0px 0px -12% 0px", threshold: 0.15 },
   );
   if (!reduce) {
-    for (const el of $$(".rv, [data-anim]")) io.observe(el);
+    for (const el of $$(".rv, [data-anim], [data-draw]")) io.observe(el);
     // Standalone counters not inside an animated block
     for (const el of $$("[data-count]")) if (!el.closest("[data-anim]") && !el.closest(".rv")) io.observe(el);
     // Counters inside reveal blocks animate when their block reveals
   } else {
-    for (const el of $$(".rv, [data-anim]")) el.classList.add("in");
+    for (const el of $$(".rv, [data-anim], [data-draw]")) el.classList.add("in");
   }
 
   /* ── Stopwatch gag ──────────────────────────────────────────────────── */
@@ -174,7 +177,6 @@ for me to approve before writing anything.`;
   /* ── Hero terminal loop: type → flag (red) → fix (green) → no findings ── */
   const code = $("[data-term-code]");
   const hook = $("[data-term-hook]");
-  const watch = $("[data-term-watch]");
   const mode = $("[data-term-mode]");
   if (!code || !hook || reduce) return;
 
@@ -212,76 +214,83 @@ for me to approve before writing anything.`;
     for (const t of TAIL) html += line(++n, "", toks(t));
     code.innerHTML = html;
   };
-  const hookHTML = {
-    bad: `<div class="h"><b>jev-lint</b><span>PostToolUse hook</span><span class="watch" data-w>0.300 s</span></div>
-<div class="red" style="margin-top:6px">Likely violations — fix these:</div><div>- react-effect-fetch-race (p=0.93)</div>
-<div class="dim" style="padding-left:1.4em">Use an AbortController (or an \`ignore\` flag set in the cleanup) and skip setState for stale responses.</div>`,
-    ok: `<div class="h"><b>jev-lint</b><span>PostToolUse hook</span><span class="watch" data-w>0.300 s</span></div>
-<div class="dim" style="margin-top:6px">src/UserCard.tsx</div><div class="green" style="font-size:1.3em;margin-top:6px">no findings</div>`,
-    wait: `<div class="h"><b>jev-lint</b><span>PostToolUse hook</span><span class="watch" data-w>0.000 s</span></div><div class="dim" style="margin-top:6px">checking…</div>`,
-    idle: `<div class="h"><b>jev-lint</b><span>PostToolUse hook</span><span class="watch">waiting for an edit</span></div>`,
+  // All hook states are rendered up front in one grid cell, so the panel's height never changes.
+  const setHook = (state) => {
+    hook.className = `hook ${state === "bad" || state === "ok" ? state : ""}`.trim();
+    for (const el of $$("[data-state]", hook)) el.toggleAttribute("data-on", el.dataset.state === state);
   };
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  const nap = async (ms) => {
+    await sleep(ms);
+    await gate();
+  };
   let visible = true;
+  let paused = false;
   new IntersectionObserver((es) => {
     visible = es[0].isIntersecting;
   }).observe(code);
+  const toggle = $("[data-term-toggle]");
+  toggle?.addEventListener("click", () => {
+    paused = !paused;
+    toggle.setAttribute("aria-pressed", String(paused));
+    toggle.textContent = paused ? "play" : "pause";
+  });
+  const gate = async () => {
+    while (!visible || paused) await sleep(250);
+  };
   const typeLines = async (lines, cls) => {
     const done = [];
     for (let i = 0; i < lines.length; i++) {
       for (let c = 0; c <= lines[i].length; c += 2) {
         render([...done, lines[i].slice(0, c)], cls, done.length);
-        await sleep(TYPE_MS);
+        await nap(TYPE_MS);
       }
       done.push(lines[i]);
     }
     render(done, cls);
   };
   const check = async (result) => {
-    hook.className = "hook";
-    hook.innerHTML = hookHTML.wait;
+    setHook("wait");
     const w = $("[data-w]", hook);
     const t0 = performance.now();
     while (performance.now() - t0 < CHECK_MS) {
       w.textContent = `${((performance.now() - t0) / 1000).toFixed(3)} s`;
       await sleep(16);
     }
-    hook.className = `hook ${result}`;
-    hook.innerHTML = hookHTML[result];
+    setHook(result);
   };
   const loop = async () => {
     await sleep(2600); // let the static first frame (the "flagged" state) be seen
     for (;;) {
-      while (!visible) await sleep(400);
-      mode.textContent = "Claude Code · Edit";
-      hook.className = "hook";
-      hook.innerHTML = hookHTML.idle;
+      await gate();
+      mode.textContent = `${AGENTS[agent].name} · Edit`;
+      setHook("idle");
       render([], "");
-      await sleep(500);
+      await nap(500);
       await typeLines(BAD, "");
       await check("bad");
       render(BAD, "flag");
-      await sleep(HOLD_FLAG_MS);
-      mode.textContent = "Claude Code · Edit (fix)";
+      await nap(HOLD_FLAG_MS);
+      mode.textContent = `${AGENTS[agent].name} · Edit (fix)`;
       render(BAD, (i) => (i === 1 ? "del" : "flag"));
       code.querySelectorAll(".ln.del span .tx").forEach((s) => {
         s.outerHTML = `<s>${s.innerHTML}</s>`;
       });
-      await sleep(900);
+      await nap(900);
       const kept = GOOD.slice(0, 1);
       render(kept, "");
       for (let i = 1; i < GOOD.length - 1; i++) {
         const line = GOOD[i];
         for (let c = 0; c <= line.length; c += 2) {
           render([...kept, line.slice(0, c), GOOD[GOOD.length - 1]], (k) => (k > 0 && k <= i ? "add" : ""), kept.length);
-          await sleep(TYPE_MS);
+          await nap(TYPE_MS);
         }
         kept.push(line);
       }
       render(GOOD, (k) => (k > 0 && k < GOOD.length - 1 ? "add" : ""));
       await check("ok");
-      await sleep(HOLD_OK_MS);
+      await nap(HOLD_OK_MS);
     }
   };
-  if (watch) loop();
+  loop();
 })();
