@@ -109,7 +109,8 @@ Requires [bun](https://bun.sh) and a TypeSafe API key.
 ```sh
 git clone https://github.com/ckorhonen/jev-lint ~/Repos/jev-lint && cd ~/Repos/jev-lint
 bun install
-security add-generic-password -a "$USER" -s typesafe-api-key -w   # or export TYPESAFE_API_KEY
+security add-generic-password -a "$USER" -s typesafe-api-key -w   # macOS Keychain, or:
+# (umask 077; mkdir -p ~/.config/jev-lint; cat > ~/.config/jev-lint/api-key)   # Linux / SSH-only Macs; must be mode 600
 ```
 
 Then let the installer do the rest. It checks first and writes only with `--apply`. It backs
@@ -292,6 +293,7 @@ python3 report/build.py <DepartureMono-Regular.woff2>   # rebuild the notebook
 - [`AGENTS.md`](AGENTS.md) (and `CLAUDE.md`) cover the layout, commands and rules for changes.
 - Skills live in `.agents/skills/`, symlinked for Claude Code at `.claude/skills/`:
   - **`jev-lint-eval`** — the evaluation workflow: rules, labeled cases, offline eval, E2E rounds and notebook entries.
+  - **`jev-lint-write-rule`** — write, reword or evaluate one rule: the gates, evidence sources (incl. web research on official docs), cases and validation.
   - **`jev-lint-setup`** — install and verify the hook (`src/install.ts`), then hand off to rules.
   - **`jev-lint-rules`** — onboard a repo: read its guidance and linters, propose rules, write and validate the approved ones.
   - **`jev-lint-learn`** — cluster the findings log, act on the few changes with evidence, measure them.

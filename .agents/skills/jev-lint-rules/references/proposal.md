@@ -18,13 +18,19 @@ Present this to the user before writing anything. Keep each line short and cite 
 - …
 
 ### Rules to add (<k> of budget 8–12 per language)
-| id | checks | source | why not a linter | when gate | paths |
+| id | checks | evidence (grade) | why not a linter | when gate | paths |
 |---|---|---|---|---|---|
-| repo-… | <one line> | AGENTS.md:42 | needs intent: … | `useEffect` | `src/components/**` or all |
+| repo-… | <one line> | AGENTS.md:42 (A); 4 PRs of review comments (A) | needs intent: … | `useEffect` | `src/components/**` or all |
 
-### Best practices for <language> (from the best-practices menu)
-| id | checks | why here | skip-if checked |
-|---|---|---|---|
+### Best practices for <frameworks/languages>
+| id | checks | evidence (URL + date checked, or menu) | why here | skip-if checked |
+|---|---|---|---|---|
+| repo-… | <one line> | https://react.dev/learn/you-might-not-need-an-effect (checked <date>, React <version>) | … | react-hooks plugin has no rule for it |
+
+Research: <frameworks and versions researched, or "no network: used built-in menus only">
+
+### Next candidates (qualified, over budget)
+- repo-… (<one line>). Evidence: <file:line (A)>. Why it ranked lower: <reason>.
 
 ### Linter config changes instead (not Jev)
 - Enable <rule> in <config>. Reason: <guideline> is literal and syntactic.

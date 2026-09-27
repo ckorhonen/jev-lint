@@ -2,6 +2,9 @@
 // hook starts fast under bun.
 
 import { spawnSync } from "node:child_process";
+import { readFileSync, statSync } from "node:fs";
+import { homedir } from "node:os";
+import { join } from "node:path";
 
 export type NoulQuestion = {
   type: "noul";
@@ -23,8 +26,25 @@ const KEYCHAIN_SERVICE = "typesafe-api-key";
 
 let cachedKey: string | undefined;
 
+// A user-only file, for machines where the Keychain can't be used (Linux, SSH sessions).
+export function keyFilePath(): string {
+  return process.env.TYPESAFE_API_KEY_FILE ?? join(process.env.XDG_CONFIG_HOME ?? join(homedir(), ".config"), "jev-lint/api-key");
+}
+
+function readKeyFile(): string | undefined {
+  try {
+    const path = keyFilePath();
+    if ((statSync(path).mode & 0o077) !== 0) return undefined; // refuse a key others can read
+    return readFileSync(path, "utf8").trim() || undefined;
+  } catch {
+    return undefined; // no key file
+  }
+}
+
+// Order: TYPESAFE_API_KEY, then the key file, then the macOS Keychain (typesafe-api-key).
 export function apiKey(): string | undefined {
   if (!cachedKey && process.env.TYPESAFE_API_KEY) cachedKey = process.env.TYPESAFE_API_KEY;
+  if (!cachedKey) cachedKey = readKeyFile();
   if (!cachedKey && process.platform === "darwin") {
     // Bounded: a locked keychain can show an unlock prompt and block forever.
     const out = spawnSync("security", ["find-generic-password", "-s", KEYCHAIN_SERVICE, "-w"], { encoding: "utf8", timeout: 2000 });

@@ -17,12 +17,14 @@ import {
   mkdtempSync,
   readdirSync,
   readFileSync,
+  statSync,
   symlinkSync,
   writeFileSync,
 } from "node:fs";
 import { homedir, tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { parseArgs } from "node:util";
+import { keyFilePath } from "./jev";
 
 const REPO = resolve(import.meta.dir, "..");
 const HOOK = join(REPO, "src/hook.ts");
@@ -84,6 +86,12 @@ export function mergeHook(config: HookConfig, group: HookGroup): { config: HookC
 
 function keyStatus(): string {
   if (process.env.TYPESAFE_API_KEY) return "present (TYPESAFE_API_KEY)";
+  try {
+    const mode = statSync(keyFilePath()).mode & 0o777;
+    return mode & 0o077 ? `IGNORED: ${keyFilePath()} is readable by others (chmod 600 it)` : `present (${keyFilePath()})`;
+  } catch {
+    // no key file; try the Keychain
+  }
   const found = spawnSync("security", ["find-generic-password", "-s", "typesafe-api-key"], { stdio: "ignore" });
   return found.status === 0 ? "present (Keychain: typesafe-api-key)" : "MISSING";
 }

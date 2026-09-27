@@ -102,3 +102,17 @@ Skip if: brakeman runs in CI and flags UnsafeReflection and dangerous send.
 }
 ```
 Skip if: none. rubocop only checks memoized variable naming.
+
+```json
+{
+  "id": "rb-test-cannot-fail",
+  "question": "Does `added_code` add a test (RSpec `it`/`specify` examples or Minitest `test_…` methods) that could not fail if the code it is named after were broken, because it (a) has no assertion at all (`expect(...).to`, `assert_…`), (b) only asserts a tautology or a value the test itself just created (`expect(true).to be true`, `expect(x).to eq(x)`), (c) only checks that a mock returns what the test configured (`allow(x).to receive(:y).and_return(v)` then expecting only `v`, or `expect(x).to have_received(:y)` after the test called `x.y` itself), or (d) mocks the very unit it claims to test (stubbing the method under test on the subject (`allow(subject).to receive(:call)`))?",
+  "true": "At least one added test has no assertion that depends on the real behaviour of the code under test: no assertion, a tautology, an assertion on the test's own stub or input, or the unit under test is itself mocked.",
+  "false": "Every added test calls real code and asserts on its output, error, returned value or a side effect it causes (including calls the unit makes to a mock, with arguments the unit computed). Weak but real assertions do not count. Fixtures, factories, helpers and setup code without tests do not count, and neither does code that is not a test.",
+  "fix": "Make the test exercise the real code and assert on a result that would change if that code broke; delete it if it can't.",
+  "when": [
+    "\\bit\\s+['\"]|\\bspecify\\b|def test_|describe\\b"
+  ]
+}
+```
+Propose by default whenever the repo has tests. It mirrors the validated built-in `ts-test-cannot-fail` / `swift-test-cannot-fail` (holdout 12/12, no false alarms, 2026-09-27). Skip if: never, but still validate it on the repo's own test style.

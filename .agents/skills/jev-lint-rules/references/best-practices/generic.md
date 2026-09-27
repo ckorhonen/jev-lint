@@ -151,3 +151,17 @@ Skip if: bandit/ruff S501, gosec G402, or Semgrep TLS rules already gate CI.
 }
 ```
 Skip if: the repo deliberately scaffolds stubs (for example, generated API handlers that are filled in later).
+
+```json
+{
+  "id": "gen-test-cannot-fail",
+  "question": "Does `added_code` add a test that could not fail if the code it is named after were broken, because it (a) has no assertion at all, (b) only asserts a tautology or a value the test itself just created, (c) only checks that a mock or stub returns what the test configured it to return, or that a function the test called directly was called, or (d) mocks or fakes the very unit it claims to test?",
+  "true": "At least one added test has no assertion that depends on the real behaviour of the code under test.",
+  "false": "Every added test calls real code and asserts on its output, error, returned value or a side effect it causes (including calls the unit makes to a mock, with arguments the unit computed). Weak but real assertions do not count. Fixtures, helpers and setup code without tests do not count, and neither does non-test code.",
+  "fix": "Make the test exercise the real code and assert on a result that would change if that code broke; delete it if it can't.",
+  "when": [
+    "test|spec|assert|expect|should"
+  ]
+}
+```
+Propose by default for any language whose menu lacks a `*-test-cannot-fail` rule; replace the `when` gate with the language's test syntax. Skip if: never.

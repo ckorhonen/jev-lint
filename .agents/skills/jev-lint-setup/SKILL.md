@@ -36,7 +36,8 @@ This dry run writes nothing. It reports:
 
 **If the key is missing,** ask the user to add it themselves. Don't handle the value.
 - **macOS:** `security add-generic-password -a "$USER" -s typesafe-api-key -w`, which prompts for it.
-- **Anywhere else:** `TYPESAFE_API_KEY` in their shell profile.
+- **Linux, or a Mac reached only over SSH** (where the Keychain is locked): a user-only file at `~/.config/jev-lint/api-key` (mode 600; override with `TYPESAFE_API_KEY_FILE`). The hook ignores a key file that others can read.
+- **Or** `TYPESAFE_API_KEY` in the environment the agent runs in.
 
 Then re-run the check.
 

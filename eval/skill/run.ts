@@ -37,6 +37,7 @@ const BUDGET_PER_LANGUAGE = 12;
 const RUN_TIMEOUT_MS = 30 * 60_000;
 const JUDGE_TIMEOUT_MS = 180_000;
 const RETRY_BASE_MS = 2000;
+const JUDGE_VOTES = 3;
 
 const { values: args } = parseArgs({
   options: {
@@ -188,28 +189,38 @@ function transcriptStats(transcript: string) {
   return { costUsd };
 }
 
-// Sources look like "AGENTS.md:17; src/a.ts:109,134 (adapted from best-practices/generic.md …)".
-// Valid when every cited file exists at the pinned commit and every line number is in range.
+// Sources are free text: "AGENTS.md:17; src/a.ts:109,134", "AGENTS.md § Queue Consumer Contract",
+// "commits f9b8ebc", "docs/x.md:70-72 (names the anti-pattern)", a URL, or a best-practices menu
+// entry. Valid when the source cites something checkable and every cited repo file exists at the
+// pinned commit with its line numbers in range, and cited commits exist.
+const CITED_FILE = /(?<![\w/.-])((?:[\w.-]+\/)*[\w-][\w.-]*\.[a-z]{1,6})(?::(\d+(?:[-–]\d+)?(?:,\s*\d+(?:[-–]\d+)?)*))?/gi;
+
 export function citationValid(source: string, workDir: string): boolean {
-  const parts = source
-    .replace(/\([^)]*\)/g, "")
-    .split(";")
-    .map((p) => p.trim())
-    .filter(Boolean);
-  if (!parts.length) return false;
-  return parts.every((part) => {
-    if (part.includes("best-practices/") || /^https?:\/\//.test(part)) return true; // menus and web sources aren't files
-    const m = /^([^\s:]+)(?::([\d,\s–-]+))?$/.exec(part);
-    if (!m) return false;
-    const file = join(workDir, m[1]);
-    if (!existsSync(file)) return false;
-    const lines = readFileSync(file, "utf8").split("\n").length;
-    const numbers = (m[2] ?? "")
+  if (/https?:\/\/|best-practices\//.test(source)) return true; // web sources and menus aren't repo files
+  let cited = 0;
+  for (const m of source.matchAll(CITED_FILE)) {
+    const [, path, lines] = m;
+    if (/^\d/.test(path) || !/[/.]/.test(path)) continue;
+    const file = join(workDir, path);
+    if (!existsSync(file)) {
+      if (path.includes("/")) return false; // a path-like citation that doesn't exist
+      continue; // a bare word with a dot (e.g. "msg.retry") isn't a citation
+    }
+    cited++;
+    const count = readFileSync(file, "utf8").split("\n").length;
+    const numbers = (lines ?? "")
       .split(/[^\d]+/)
       .filter(Boolean)
       .map(Number);
-    return numbers.every((n) => n >= 1 && n <= lines);
-  });
+    if (!numbers.every((n) => n >= 1 && n <= count)) return false;
+  }
+  for (const m of source.matchAll(/\bcommits?\s+([0-9a-f]{7,40}(?:[,\s]+[0-9a-f]{7,40})*)/gi)) {
+    for (const sha of m[1].split(/[,\s]+/).filter(Boolean)) {
+      if (spawnSync("git", ["-C", workDir, "cat-file", "-e", `${sha}^{commit}`]).status !== 0) return false;
+      cited++;
+    }
+  }
+  return cited > 0;
 }
 
 function wellFormed(r: ProposedRule): boolean {
@@ -309,7 +320,20 @@ async function score(c: Case, runDir: string, workDir: string) {
   const proposal = parseProposal(readFileSync(proposalPath, "utf8"));
   if (!proposal) return { case: c.name, run: runDir, error: "proposal.json does not match the requested shape" };
   const opened = filesOpened(transcript, workDir, c.mustRead);
-  const mapping = await judge(c, proposal);
+  // The judge is noisy (recall moved ~10 points between regrades), so take a per-rule
+  // majority over JUDGE_VOTES independent calls.
+  const votes = await Promise.all(Array.from({ length: JUDGE_VOTES }, () => judge(c, proposal)));
+  const mapping = proposal.rules.map((r) => {
+    const mine = votes.map((v) => v.find((m) => m.id === r.id)).filter((m) => m !== undefined);
+    const mode = (xs: string[]) =>
+      [...new Set(xs)].sort((a, b) => xs.filter((x) => x === b).length - xs.filter((x) => x === a).length)[0] ?? "none";
+    return {
+      id: r.id,
+      convention: mode(mine.map((m) => m.convention)),
+      duplicates: mode(mine.map((m) => m.duplicates)),
+      grounded: mine.filter((m) => m.grounded).length * 2 > mine.length,
+    };
+  });
   const checkable = c.conventions.filter((x) => x.jevCheckable);
   const addressed = new Set(mapping.map((m) => m.convention));
   const perLanguage = new Map<string, number>();

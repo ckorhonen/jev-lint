@@ -8,8 +8,8 @@ https://claude.ai/artifact/BUZG9LEnaiJyaJuaP7tajs (source: `report/`).
 For evaluation work (new rules, new judges or models, new E2E rounds, notebook
 entries) use the `jev-lint-eval` skill in `.agents/skills/jev-lint-eval/`. To generate
 `.jev-lint/` rules for any repo from its guidelines, use `jev-lint-rules`; to feed the
-findings log back into a repo's instructions, use `jev-lint-learn`. To install the hook, use `jev-lint-setup`. All four
-skills are symlinked into `.claude/skills/`.
+findings log back into a repo's instructions, use `jev-lint-learn`. To install the hook, use `jev-lint-setup`; to write or
+reword a single rule, use `jev-lint-write-rule`. All five skills are symlinked into `.claude/skills/`.
 
 ## Layout
 

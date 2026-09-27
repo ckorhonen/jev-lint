@@ -102,3 +102,17 @@ Skip if: the snippet is a `main` package or startup code where exiting on error 
 }
 ```
 Skip if: none. No standard linter checks this.
+
+```json
+{
+  "id": "go-test-cannot-fail",
+  "question": "Does `added_code` add a test (`func TestXxx(t *testing.T)` functions) that could not fail if the code it is named after were broken, because it (a) has no assertion at all (`t.Error`/`t.Fatal`/`t.Errorf`, testify `assert`/`require`, or `cmp.Diff` checks), (b) only asserts a tautology or a value the test itself just created (`if got := 1; got != 1`, `assert.Equal(t, x, x)`, `assert.NotNil(t, &Foo{})`), (c) only checks that a mock returns what the test configured (a fake that returns what the test configured, then asserting that value unchanged), or (d) mocks the very unit it claims to test (replacing the function under test with a stub variable)?",
+  "true": "At least one added test has no assertion that depends on the real behaviour of the code under test: no assertion, a tautology, an assertion on the test's own stub or input, or the unit under test is itself mocked.",
+  "false": "Every added test calls real code and asserts on its output, error, returned value or a side effect it causes (including calls the unit makes to a mock, with arguments the unit computed). Weak but real assertions do not count. Fixtures, factories, helpers and setup code without tests do not count, and neither does code that is not a test.",
+  "fix": "Make the test exercise the real code and assert on a result that would change if that code broke; delete it if it can't.",
+  "when": [
+    "func Test\\w*\\("
+  ]
+}
+```
+Propose by default whenever the repo has tests. It mirrors the validated built-in `ts-test-cannot-fail` / `swift-test-cannot-fail` (holdout 12/12, no false alarms, 2026-09-27). Skip if: never, but still validate it on the repo's own test style.
