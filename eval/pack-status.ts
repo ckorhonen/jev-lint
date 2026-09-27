@@ -5,11 +5,12 @@
 // Writes eval/results/pack-status.json (per-rule holdout numbers, used by the pack docs) and,
 // with --apply, drops "status": "candidate" from rules that pass. Rules that fail stay candidates.
 
-import { readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { parseArgs } from "node:util";
 
 const ROOT = join(import.meta.dir, "..");
+const STATUS_FILE = join(ROOT, "eval/results/pack-status.json");
 const BAR = { precisionAtHigh: 0.9, precisionAtMedium: 0.75, recallAtMedium: 0.8, minPositives: 3 };
 
 type RuleStats = { tp: number; fp: number; fn: number; precision: number; recall: number };
@@ -40,7 +41,7 @@ const status: Record<
     pass: boolean;
     reasons: string[];
   }
-> = {};
+> = existsSync(STATUS_FILE) ? JSON.parse(readFileSync(STATUS_FILE, "utf8")) : {}; // merged: a partial summary updates only its own rules
 const rulesDir = join(ROOT, "rules");
 const files = readdirSync(rulesDir).filter((n) => n.endsWith(".json"));
 let shipped = 0;
@@ -74,6 +75,6 @@ for (const name of files) {
   }
   if (changed) writeFileSync(path, `${JSON.stringify(set, null, 2)}\n`);
 }
-writeFileSync(join(ROOT, "eval/results/pack-status.json"), `${JSON.stringify(status, null, 2)}\n`);
+writeFileSync(STATUS_FILE, `${JSON.stringify(status, null, 2)}\n`);
 console.log(`${shipped} candidates pass${values.apply ? " (status removed)" : ""}, ${held} stay candidates`);
-for (const [id, s] of Object.entries(status)) if (!s.pass) console.log(`  hold ${id}: ${s.reasons.join("; ")}`);
+for (const [id, s] of Object.entries(status)) if (!s.pass && medium[id]) console.log(`  hold ${id}: ${s.reasons.join("; ")}`);

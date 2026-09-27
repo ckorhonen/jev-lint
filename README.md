@@ -26,7 +26,7 @@ which of your team's rules it just broke, and fixes them before anyone reviews t
   blocks the agent: if anything fails, the edit goes through unchanged.
 - **Starts with opinionated defaults.** Tested rule packs for TypeScript and React, Swift and
   SwiftUI, Kotlin, Rust, Python, Ruby and Bazel, plus cross-language packs for security,
-  test hygiene (tests that can't fail, flaky tests) and performance (158 rules). Every
+  test hygiene (tests that can't fail, flaky tests) and performance (170 rules). Every
   rule passed an evaluation on held-out examples before it was switched on. See
   [the pack docs](docs/packs/) for a good and bad example of each.
 - **Your rules, not just ours.** The packs are only defaults: turn any pack or rule off, scope
@@ -275,7 +275,8 @@ Each pack has a page with a good and a bad example of every rule, and its holdou
 | Pack | Rules | Languages | What it checks |
 | --- | --- | --- | --- |
 | [`hygiene`](docs/packs/hygiene.md) | 24 | swift, typescript | `any`, non-null / force-unwrap, empty catch, debug prints, restating comments, vague names, magic numbers, bare TODOs, hard-coded secrets |
-| [`practices`](docs/packs/practices.md) | 86 | bazel, kotlin, python, ruby, rust, swift, typescript | React effects and Server Actions, SwiftUI and Swift concurrency, Kotlin coroutines/Flow/Compose, Rust async and `unsafe`, Python async and ORMs, Rails, Bazel, and common security mistakes |
+| [`practices`](docs/packs/practices.md) | 65 | bazel, kotlin, python, ruby, rust, swift, typescript | React effects and rendering, SwiftUI and Swift concurrency, Kotlin coroutines/Flow/Compose, Rust async and `unsafe`, Python async and ORMs, Rails, Bazel |
+| [`security`](docs/packs/security.md) | 33 | python, ruby, rust, typescript | Secrets in client bundles or logs, unverified JWTs, SQL/shell built from input, SSRF, path traversal, mass assignment, unscoped record lookups, Server Actions without auth, unsafe deserialization, weak password hashing |
 | [`tests`](docs/packs/tests.md) | 35 | bazel, kotlin, python, ruby, rust, swift, typescript | Tests that can't fail; flaky tests (real clock, unseeded randomness, real network, fixed sleeps, order-dependent assertions, shared state); tests bent to pass |
 | [`performance`](docs/packs/performance.md) | 13 | kotlin, python, ruby, rust, swift, typescript | N+1 queries and per-item writes, sync I/O on request paths, unbounded queries, independent calls awaited one by one, unbounded fan-out |
 | `repo` | yours | any | Your team's rules in `.jev-lint/*.rules.json`, written with the `jev-lint-rules` and `jev-lint-write-rule` skills |

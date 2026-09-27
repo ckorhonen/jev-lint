@@ -29,10 +29,10 @@ export type Finding = { ruleId: string; probability: number; tier: Tier; fix: st
 
 // Built-in packs live in rules/<language>.json ("hygiene") and rules/<language>.<pack>.json.
 // "hygiene": small code-hygiene rules. "practices": opinionated framework and language best
-// practices. "tests": test hygiene (tests that can't fail, and other test smells).
+// practices. "security": security mistakes visible in the added code. "tests": test hygiene (tests that can't fail, and other test smells).
 // "performance": snippet-visible performance problems. "repo": rules from the nearest
 // `.jev-lint/` directory (see repoRules.ts). One Jev call covers all packs.
-export const BUILT_IN_PACKS = ["hygiene", "practices", "tests", "performance"] as const;
+export const BUILT_IN_PACKS = ["hygiene", "practices", "security", "tests", "performance"] as const;
 export type BuiltInPack = (typeof BUILT_IN_PACKS)[number];
 export type Pack = BuiltInPack | "repo";
 
@@ -54,7 +54,7 @@ function loadBuiltIns(): Record<BuiltInPack, RuleSet[]> {
 export const RULE_FILES: Record<BuiltInPack, RuleSet[]> = loadBuiltIns();
 export const LANGUAGES = [...new Set(Object.values(RULE_FILES).flatMap((sets) => sets.map((s) => s.language)))];
 
-export const DEFAULT_PACKS = (process.env.JEV_LINT_PACKS ?? "hygiene,practices,tests,performance,repo").split(",") as Pack[];
+export const DEFAULT_PACKS = (process.env.JEV_LINT_PACKS ?? "hygiene,practices,security,tests,performance,repo").split(",") as Pack[];
 
 function mergeRuleSets(sets: RuleSet[]): RuleSet | undefined {
   if (!sets.length) return undefined;

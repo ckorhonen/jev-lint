@@ -271,114 +271,6 @@
     "pass": true,
     "reasons": []
   },
-  "ts-secret-in-public-env": {
-    "precision": 1,
-    "recall": 1,
-    "precisionAtHigh": 1,
-    "positives": 5,
-    "falsePositives": 0,
-    "pass": true,
-    "reasons": []
-  },
-  "ts-secret-env-fallback": {
-    "precision": 1,
-    "recall": 1,
-    "precisionAtHigh": 1,
-    "positives": 4,
-    "falsePositives": 0,
-    "pass": true,
-    "reasons": []
-  },
-  "ts-insecure-random-secret": {
-    "precision": 1,
-    "recall": 1,
-    "precisionAtHigh": 1,
-    "positives": 4,
-    "falsePositives": 0,
-    "pass": true,
-    "reasons": []
-  },
-  "ts-secret-compare-not-constant-time": {
-    "precision": 1,
-    "recall": 1,
-    "precisionAtHigh": 1,
-    "positives": 6,
-    "falsePositives": 0,
-    "pass": true,
-    "reasons": []
-  },
-  "ts-jwt-decode-without-verify": {
-    "precision": 1,
-    "recall": 1,
-    "precisionAtHigh": 1,
-    "positives": 4,
-    "falsePositives": 0,
-    "pass": true,
-    "reasons": []
-  },
-  "ts-sql-interpolated-raw-query": {
-    "precision": 1,
-    "recall": 1,
-    "precisionAtHigh": 1,
-    "positives": 4,
-    "falsePositives": 0,
-    "pass": true,
-    "reasons": []
-  },
-  "ts-shell-command-interpolation": {
-    "precision": 1,
-    "recall": 1,
-    "precisionAtHigh": 1,
-    "positives": 5,
-    "falsePositives": 0,
-    "pass": true,
-    "reasons": []
-  },
-  "ts-regexp-from-input": {
-    "precision": 1,
-    "recall": 1,
-    "precisionAtHigh": 1,
-    "positives": 4,
-    "falsePositives": 0,
-    "pass": true,
-    "reasons": []
-  },
-  "ts-open-redirect": {
-    "precision": 1,
-    "recall": 1,
-    "precisionAtHigh": 1,
-    "positives": 4,
-    "falsePositives": 0,
-    "pass": true,
-    "reasons": []
-  },
-  "react-server-action-missing-auth": {
-    "precision": 1,
-    "recall": 1,
-    "precisionAtHigh": 1,
-    "positives": 5,
-    "falsePositives": 0,
-    "pass": true,
-    "reasons": []
-  },
-  "react-server-action-client-identity": {
-    "precision": 1,
-    "recall": 0.8333333333333334,
-    "precisionAtHigh": 1,
-    "positives": 6,
-    "falsePositives": 0,
-    "pass": true,
-    "reasons": []
-  },
-  "react-server-action-returns-record": {
-    "precision": 1,
-    "recall": 1,
-    "precisionAtHigh": 1,
-    "positives": 5,
-    "falsePositives": 0,
-    "pass": true,
-    "reasons": []
-  },
   "react-effect-notifies-parent": {
     "precision": 1,
     "recall": 1,
@@ -393,15 +285,6 @@
     "recall": 1,
     "precisionAtHigh": 1,
     "positives": 4,
-    "falsePositives": 0,
-    "pass": true,
-    "reasons": []
-  },
-  "react-unsanitized-html": {
-    "precision": 1,
-    "recall": 1,
-    "precisionAtHigh": 1,
-    "positives": 5,
     "falsePositives": 0,
     "pass": true,
     "reasons": []
@@ -534,48 +417,12 @@
     "pass": true,
     "reasons": []
   },
-  "rb-unscoped-find": {
-    "precision": 1,
-    "recall": 1,
-    "precisionAtHigh": 1,
-    "positives": 5,
-    "falsePositives": 0,
-    "pass": true,
-    "reasons": []
-  },
-  "rb-sql-interpolation": {
-    "precision": 1,
-    "recall": 1,
-    "precisionAtHigh": 1,
-    "positives": 5,
-    "falsePositives": 0,
-    "pass": true,
-    "reasons": []
-  },
   "rb-side-effect-before-commit": {
     "precision": 0.8333333333333334,
     "recall": 1,
     "precisionAtHigh": 1,
     "positives": 5,
     "falsePositives": 1,
-    "pass": true,
-    "reasons": []
-  },
-  "rb-privileged-attrs-permitted": {
-    "precision": 1,
-    "recall": 0.8,
-    "precisionAtHigh": 1,
-    "positives": 5,
-    "falsePositives": 0,
-    "pass": true,
-    "reasons": []
-  },
-  "rb-line-anchor-validation-regex": {
-    "precision": 1,
-    "recall": 1,
-    "precisionAtHigh": 1,
-    "positives": 4,
-    "falsePositives": 0,
     "pass": true,
     "reasons": []
   },
@@ -598,6 +445,24 @@
     "reasons": []
   },
   "rb-rescue-swallowed": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "rs-debug-derive-secret": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "rs-sql-built-with-format": {
     "precision": 1,
     "recall": 1,
     "precisionAtHigh": 1,
@@ -833,6 +698,123 @@
     "pass": true,
     "reasons": []
   },
+  "ts-secret-in-public-env": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "ts-secret-env-fallback": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 4,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "ts-insecure-random-secret": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 4,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "ts-secret-compare-not-constant-time": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 6,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "ts-jwt-decode-without-verify": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 4,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "ts-sql-interpolated-raw-query": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 4,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "ts-shell-command-interpolation": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "ts-regexp-from-input": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 4,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "ts-open-redirect": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 4,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "react-server-action-missing-auth": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "react-server-action-client-identity": {
+    "precision": 1,
+    "recall": 0.8333333333333334,
+    "precisionAtHigh": 1,
+    "positives": 6,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "react-server-action-returns-record": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "react-unsanitized-html": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
   "kt-perf-sequential-suspend-calls": {
     "precision": 1,
     "recall": 1,
@@ -948,6 +930,24 @@
     "recall": 1,
     "precisionAtHigh": 1,
     "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "py-unscoped-object-lookup": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 4,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "py-secret-compare-eq": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 4,
     "falsePositives": 0,
     "pass": true,
     "reasons": []
@@ -1186,6 +1186,42 @@
     "pass": true,
     "reasons": []
   },
+  "rb-unscoped-find": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "rb-sql-interpolation": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "rb-privileged-attrs-permitted": {
+    "precision": 1,
+    "recall": 0.8,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "rb-line-anchor-validation-regex": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 4,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
   "rb-perf-n-plus-one": {
     "precision": 1,
     "recall": 1,
@@ -1214,24 +1250,6 @@
     "reasons": []
   },
   "py-swallowed-cancellation": {
-    "precision": 1,
-    "recall": 1,
-    "precisionAtHigh": 1,
-    "positives": 4,
-    "falsePositives": 0,
-    "pass": true,
-    "reasons": []
-  },
-  "py-unscoped-object-lookup": {
-    "precision": 1,
-    "recall": 1,
-    "precisionAtHigh": 1,
-    "positives": 4,
-    "falsePositives": 0,
-    "pass": true,
-    "reasons": []
-  },
-  "py-secret-compare-eq": {
     "precision": 1,
     "recall": 1,
     "precisionAtHigh": 1,
@@ -1485,29 +1503,119 @@
     "pass": true,
     "reasons": []
   },
-  "rs-debug-derive-secret": {
-    "precision": 1,
-    "recall": 1,
-    "precisionAtHigh": 1,
-    "positives": 5,
-    "falsePositives": 0,
-    "pass": true,
-    "reasons": []
-  },
-  "rs-sql-built-with-format": {
-    "precision": 1,
-    "recall": 1,
-    "precisionAtHigh": 1,
-    "positives": 5,
-    "falsePositives": 0,
-    "pass": true,
-    "reasons": []
-  },
   "rs-http-client-per-call": {
     "precision": 1,
     "recall": 1,
     "precisionAtHigh": 1,
     "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "ts-sec-ssrf": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "ts-sec-path-traversal": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "ts-sec-mass-assignment": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 6,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "ts-sec-unscoped-record-lookup": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 6,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "ts-sec-secret-in-log": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 6,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "ts-sec-cors-credentials": {
+    "precision": 1,
+    "recall": 0.8,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "ts-sec-weak-password-hash": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "py-sec-ssrf": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 6,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "py-sec-path-traversal": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 7,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "py-sec-mass-assignment": {
+    "precision": 1,
+    "recall": 0.8333333333333334,
+    "precisionAtHigh": 1,
+    "positives": 6,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "py-sec-unsafe-deserialization": {
+    "precision": 0.8571428571428571,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 6,
+    "falsePositives": 1,
+    "pass": true,
+    "reasons": []
+  },
+  "py-sec-weak-password-hash": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 6,
     "falsePositives": 0,
     "pass": true,
     "reasons": []

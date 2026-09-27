@@ -1,0 +1,22 @@
+{
+  "language": "rust",
+  "extensions": [".rs"],
+  "rules": [
+    {
+      "id": "rs-debug-derive-secret",
+      "question": "Does `added_code` `#[derive(Debug)]` on a struct or enum that has a field holding a secret — `password`, `secret`, `token`, `access_token`, `refresh_token`, `api_key`, `private_key`, `client_secret`, session cookie, `Authorization` header value, card number — as a plain `String`, `Vec<u8>` or similar, so `{:?}`, `tracing` field capture or `unwrap` panic messages print it?",
+      "true": "A secret-bearing field is printed verbatim by the derived Debug implementation.",
+      "false": "Secret fields use a redacting wrapper (`secrecy::SecretString`/`SecretBox`, a newtype whose manual `Debug` prints `***`); the type implements `Debug` by hand and skips or redacts the field; or the field only names or points to a secret (`token_expires_at`, `api_key_id`, `secret_name`, `password_hash`).",
+      "fix": "Wrap the secret in secrecy::SecretString or a redacting newtype, or implement Debug by hand to redact it (OWASP Logging Cheat Sheet).",
+      "when": ["Debug"]
+    },
+    {
+      "id": "rs-sql-built-with-format",
+      "question": "Does `added_code` build a SQL statement with `format!`, `push_str`, `+` or `concat!` that interpolates a runtime value (a function parameter, request field, user input, id or search term) and pass it to a database call (`sqlx::query`/`query_as`/`query_scalar`, `execute`, `diesel::sql_query`, rusqlite `execute`/`prepare`/`query_row`, `tokio_postgres` `query`/`execute`), instead of using bind parameters?",
+      "true": "Runtime values are spliced into SQL text, opening SQL injection and breaking on quotes.",
+      "false": "Values are passed as bind parameters (`$1`/`?` with `.bind(v)`, `params![]`, `&[&v]`, `sqlx::query!`); the interpolated part is a compile-time constant or chosen from a fixed allowlist or enum of identifiers (table or column names, `ASC`/`DESC`); a query builder adds the values (`QueryBuilder::push_bind`, SeaQuery, Diesel DSL); or the string isn't SQL.",
+      "fix": "Pass values as bind parameters ($1 + .bind(v), params![]) instead of formatting them into the SQL string (OWASP SQL Injection Prevention Cheat Sheet).",
+      "when": ["select\\b|insert\\b|update\\b|delete\\b|\\bsql|query"]
+    }
+  ]
+}

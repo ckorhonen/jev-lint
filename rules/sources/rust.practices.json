@@ -99,48 +99,6 @@
     "languageFile": "rust",
     "evidenceStatus": "meets bar (1 A or 2 B)"
   },
-  "rs-debug-derive-secret": {
-    "evidence": [
-      {
-        "grade": "B",
-        "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html",
-        "checked": "2026-09-27",
-        "note": "Lists access tokens, authentication passwords and encryption keys among data that should not be recorded directly in logs."
-      },
-      {
-        "grade": "C",
-        "url": "https://docs.rs/secrecy",
-        "checked": "2026-09-27",
-        "note": "secrecy crate exists to 'prevent accidental leakage of secrets via channels like debug logging'; its SecretBox Debug impl redacts."
-      }
-    ],
-    "whyNotLinter": "Clippy has no secret-aware lint (only `missing_fields_in_debug` for manual impls). Recognizing that a field holds a secret takes judgment about its name and type.",
-    "aiRelevance": "High. Agents add `#[derive(Debug, Clone, Serialize, Deserialize)]` to every struct by reflex, including config and credential structs.",
-    "expectedNoise": "low — both the field names and the derive are visible in the snippet.",
-    "languageFile": "rust",
-    "evidenceStatus": "single official B source for the exact API; needs a second B (or A from a repo) before shipping as built-in, or accept it on the strength of the vendor doc"
-  },
-  "rs-sql-built-with-format": {
-    "evidence": [
-      {
-        "grade": "B",
-        "url": "https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html",
-        "checked": "2026-09-27",
-        "note": "Primary defense: prepared statements with parameterized queries (standard reference, not re-fetched)."
-      },
-      {
-        "grade": "B",
-        "url": "https://cwe.mitre.org/data/definitions/89.html",
-        "checked": "2026-09-27",
-        "note": "CWE-89 SQL injection."
-      }
-    ],
-    "whyNotLinter": "Clippy has no SQL lint, and the compiler can't tell SQL text from other strings. Telling identifiers from an allowlist apart from user values takes judgment.",
-    "aiRelevance": "Medium-high. Agents use `format!` for dynamic filters and `IN (...)` lists when the bind syntax for the driver is unfamiliar.",
-    "expectedNoise": "low — allowlisted identifiers are the only common look-alike, and they're a listed negative.",
-    "languageFile": "rust",
-    "evidenceStatus": "meets bar (1 A or 2 B)"
-  },
   "rs-http-client-per-call": {
     "evidence": [
       {

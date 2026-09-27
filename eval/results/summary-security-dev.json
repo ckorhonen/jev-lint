@@ -1,0 +1,919 @@
+{
+  "generatedAt": "2026-09-27T17:56:19.163Z",
+  "gateStats": {
+    "security.python": {
+      "cases": 64,
+      "rules": 7,
+      "asked": 102
+    },
+    "security.typescript": {
+      "cases": 81,
+      "rules": 20,
+      "asked": 219
+    }
+  },
+  "llmModel": "gpt-6-luna",
+  "thresholds": {
+    "HIGH": 0.8,
+    "MEDIUM": 0.5
+  },
+  "caseCounts": {
+    "security.python.dev": 64,
+    "security.typescript.dev": 81
+  },
+  "errors": {
+    "jev": 0
+  },
+  "results": [
+    {
+      "system": "jev",
+      "pack": "security",
+      "lang": "typescript",
+      "split": "dev",
+      "policy": "high",
+      "threshold": 0.8,
+      "tp": 39,
+      "fp": 0,
+      "fn": 4,
+      "precision": 1,
+      "recall": 0.9069767441860465,
+      "f1": 0.951219512195122,
+      "cleanCases": 42,
+      "cleanFalseAlarmRate": 0,
+      "perRule": {
+        "ts-sec-ssrf": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-sec-path-traversal": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-sec-mass-assignment": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 1,
+          "precision": 1,
+          "recall": 0.8333333333333334,
+          "f1": 0.9090909090909091
+        },
+        "ts-sec-unscoped-record-lookup": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-sec-secret-in-log": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-sec-cors-credentials": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 2,
+          "precision": 1,
+          "recall": 0.6,
+          "f1": 0.7499999999999999
+        },
+        "ts-sec-weak-password-hash": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 1,
+          "precision": 1,
+          "recall": 0.8333333333333334,
+          "f1": 0.9090909090909091
+        }
+      },
+      "latency": {
+        "p50": 496.235917,
+        "p90": 875.6408340000007,
+        "n": 81,
+        "tokens": {
+          "input": 503992,
+          "output": 0
+        }
+      }
+    },
+    {
+      "system": "jev",
+      "pack": "security",
+      "lang": "typescript",
+      "split": "dev",
+      "policy": "high+medium",
+      "threshold": 0.5,
+      "tp": 42,
+      "fp": 2,
+      "fn": 1,
+      "precision": 0.9545454545454546,
+      "recall": 0.9767441860465116,
+      "f1": 0.9655172413793104,
+      "cleanCases": 42,
+      "cleanFalseAlarmRate": 0.047619047619047616,
+      "perRule": {
+        "ts-sec-ssrf": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-sec-path-traversal": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-sec-mass-assignment": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-sec-unscoped-record-lookup": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-sec-secret-in-log": {
+          "tp": 7,
+          "fp": 1,
+          "fn": 0,
+          "precision": 0.875,
+          "recall": 1,
+          "f1": 0.9333333333333333
+        },
+        "ts-sec-cors-credentials": {
+          "tp": 5,
+          "fp": 1,
+          "fn": 0,
+          "precision": 0.8333333333333334,
+          "recall": 1,
+          "f1": 0.9090909090909091
+        },
+        "ts-sec-weak-password-hash": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 1,
+          "precision": 1,
+          "recall": 0.8333333333333334,
+          "f1": 0.9090909090909091
+        }
+      },
+      "latency": {
+        "p50": 496.235917,
+        "p90": 875.6408340000007,
+        "n": 81,
+        "tokens": {
+          "input": 503992,
+          "output": 0
+        }
+      }
+    },
+    {
+      "system": "jev",
+      "pack": "security",
+      "lang": "typescript",
+      "split": "dev",
+      "policy": "gated high",
+      "threshold": 0.8,
+      "tp": 39,
+      "fp": 0,
+      "fn": 4,
+      "precision": 1,
+      "recall": 0.9069767441860465,
+      "f1": 0.951219512195122,
+      "cleanCases": 42,
+      "cleanFalseAlarmRate": 0,
+      "perRule": {
+        "ts-sec-ssrf": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-sec-path-traversal": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-sec-mass-assignment": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 1,
+          "precision": 1,
+          "recall": 0.8333333333333334,
+          "f1": 0.9090909090909091
+        },
+        "ts-sec-unscoped-record-lookup": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-sec-secret-in-log": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-sec-cors-credentials": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 2,
+          "precision": 1,
+          "recall": 0.6,
+          "f1": 0.7499999999999999
+        },
+        "ts-sec-weak-password-hash": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 1,
+          "precision": 1,
+          "recall": 0.8333333333333334,
+          "f1": 0.9090909090909091
+        }
+      },
+      "latency": {
+        "p50": 496.235917,
+        "p90": 875.6408340000007,
+        "n": 81,
+        "tokens": {
+          "input": 503992,
+          "output": 0
+        }
+      }
+    },
+    {
+      "system": "jev",
+      "pack": "security",
+      "lang": "typescript",
+      "split": "dev",
+      "policy": "gated high+medium",
+      "threshold": 0.5,
+      "tp": 42,
+      "fp": 2,
+      "fn": 1,
+      "precision": 0.9545454545454546,
+      "recall": 0.9767441860465116,
+      "f1": 0.9655172413793104,
+      "cleanCases": 42,
+      "cleanFalseAlarmRate": 0.047619047619047616,
+      "perRule": {
+        "ts-sec-ssrf": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-sec-path-traversal": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-sec-mass-assignment": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-sec-unscoped-record-lookup": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-sec-secret-in-log": {
+          "tp": 7,
+          "fp": 1,
+          "fn": 0,
+          "precision": 0.875,
+          "recall": 1,
+          "f1": 0.9333333333333333
+        },
+        "ts-sec-cors-credentials": {
+          "tp": 5,
+          "fp": 1,
+          "fn": 0,
+          "precision": 0.8333333333333334,
+          "recall": 1,
+          "f1": 0.9090909090909091
+        },
+        "ts-sec-weak-password-hash": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 1,
+          "precision": 1,
+          "recall": 0.8333333333333334,
+          "f1": 0.9090909090909091
+        }
+      },
+      "latency": {
+        "p50": 496.235917,
+        "p90": 875.6408340000007,
+        "n": 81,
+        "tokens": {
+          "input": 503992,
+          "output": 0
+        }
+      }
+    },
+    {
+      "system": "jev",
+      "pack": "security",
+      "lang": "python",
+      "split": "dev",
+      "policy": "high",
+      "threshold": 0.8,
+      "tp": 32,
+      "fp": 0,
+      "fn": 1,
+      "precision": 1,
+      "recall": 0.9696969696969697,
+      "f1": 0.9846153846153847,
+      "cleanCases": 35,
+      "cleanFalseAlarmRate": 0,
+      "perRule": {
+        "py-sec-ssrf": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "py-sec-path-traversal": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 1,
+          "precision": 1,
+          "recall": 0.8333333333333334,
+          "f1": 0.9090909090909091
+        },
+        "py-sec-mass-assignment": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "py-sec-unsafe-deserialization": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "py-sec-weak-password-hash": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        }
+      },
+      "latency": {
+        "p50": 296.97470799999974,
+        "p90": 490.60966699999994,
+        "n": 64,
+        "tokens": {
+          "input": 179550,
+          "output": 0
+        }
+      }
+    },
+    {
+      "system": "jev",
+      "pack": "security",
+      "lang": "python",
+      "split": "dev",
+      "policy": "high+medium",
+      "threshold": 0.5,
+      "tp": 33,
+      "fp": 1,
+      "fn": 0,
+      "precision": 0.9705882352941176,
+      "recall": 1,
+      "f1": 0.9850746268656716,
+      "cleanCases": 35,
+      "cleanFalseAlarmRate": 0,
+      "perRule": {
+        "py-sec-ssrf": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "py-sec-path-traversal": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "py-sec-mass-assignment": {
+          "tp": 6,
+          "fp": 1,
+          "fn": 0,
+          "precision": 0.8571428571428571,
+          "recall": 1,
+          "f1": 0.923076923076923
+        },
+        "py-sec-unsafe-deserialization": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "py-sec-weak-password-hash": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        }
+      },
+      "latency": {
+        "p50": 296.97470799999974,
+        "p90": 490.60966699999994,
+        "n": 64,
+        "tokens": {
+          "input": 179550,
+          "output": 0
+        }
+      }
+    },
+    {
+      "system": "jev",
+      "pack": "security",
+      "lang": "python",
+      "split": "dev",
+      "policy": "gated high",
+      "threshold": 0.8,
+      "tp": 32,
+      "fp": 0,
+      "fn": 1,
+      "precision": 1,
+      "recall": 0.9696969696969697,
+      "f1": 0.9846153846153847,
+      "cleanCases": 35,
+      "cleanFalseAlarmRate": 0,
+      "perRule": {
+        "py-sec-ssrf": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "py-sec-path-traversal": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 1,
+          "precision": 1,
+          "recall": 0.8333333333333334,
+          "f1": 0.9090909090909091
+        },
+        "py-sec-mass-assignment": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "py-sec-unsafe-deserialization": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "py-sec-weak-password-hash": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        }
+      },
+      "latency": {
+        "p50": 296.97470799999974,
+        "p90": 490.60966699999994,
+        "n": 64,
+        "tokens": {
+          "input": 179550,
+          "output": 0
+        }
+      }
+    },
+    {
+      "system": "jev",
+      "pack": "security",
+      "lang": "python",
+      "split": "dev",
+      "policy": "gated high+medium",
+      "threshold": 0.5,
+      "tp": 33,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "cleanCases": 35,
+      "cleanFalseAlarmRate": 0,
+      "perRule": {
+        "py-sec-ssrf": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "py-sec-path-traversal": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "py-sec-mass-assignment": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "py-sec-unsafe-deserialization": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "py-sec-weak-password-hash": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        }
+      },
+      "latency": {
+        "p50": 296.97470799999974,
+        "p90": 490.60966699999994,
+        "n": 64,
+        "tokens": {
+          "input": 179550,
+          "output": 0
+        }
+      }
+    }
+  ],
+  "sweeps": [
+    {
+      "system": "jev",
+      "pack": "security",
+      "lang": "typescript",
+      "split": "dev",
+      "threshold": 0.1,
+      "precision": 0.7413793103448276,
+      "recall": 1,
+      "f1": 0.8514851485148515,
+      "cleanFalseAlarmRate": 0.30952380952380953
+    },
+    {
+      "system": "jev",
+      "pack": "security",
+      "lang": "typescript",
+      "split": "dev",
+      "threshold": 0.2,
+      "precision": 0.9148936170212766,
+      "recall": 1,
+      "f1": 0.9555555555555556,
+      "cleanFalseAlarmRate": 0.09523809523809523
+    },
+    {
+      "system": "jev",
+      "pack": "security",
+      "lang": "typescript",
+      "split": "dev",
+      "threshold": 0.3,
+      "precision": 0.9347826086956522,
+      "recall": 1,
+      "f1": 0.9662921348314606,
+      "cleanFalseAlarmRate": 0.07142857142857142
+    },
+    {
+      "system": "jev",
+      "pack": "security",
+      "lang": "typescript",
+      "split": "dev",
+      "threshold": 0.4,
+      "precision": 0.9555555555555556,
+      "recall": 1,
+      "f1": 0.9772727272727273,
+      "cleanFalseAlarmRate": 0.047619047619047616
+    },
+    {
+      "system": "jev",
+      "pack": "security",
+      "lang": "typescript",
+      "split": "dev",
+      "threshold": 0.5,
+      "precision": 0.9545454545454546,
+      "recall": 0.9767441860465116,
+      "f1": 0.9655172413793104,
+      "cleanFalseAlarmRate": 0.047619047619047616
+    },
+    {
+      "system": "jev",
+      "pack": "security",
+      "lang": "typescript",
+      "split": "dev",
+      "threshold": 0.6,
+      "precision": 0.9767441860465116,
+      "recall": 0.9767441860465116,
+      "f1": 0.9767441860465116,
+      "cleanFalseAlarmRate": 0.023809523809523808
+    },
+    {
+      "system": "jev",
+      "pack": "security",
+      "lang": "typescript",
+      "split": "dev",
+      "threshold": 0.7,
+      "precision": 0.975609756097561,
+      "recall": 0.9302325581395349,
+      "f1": 0.9523809523809524,
+      "cleanFalseAlarmRate": 0.023809523809523808
+    },
+    {
+      "system": "jev",
+      "pack": "security",
+      "lang": "typescript",
+      "split": "dev",
+      "threshold": 0.8,
+      "precision": 1,
+      "recall": 0.9069767441860465,
+      "f1": 0.951219512195122,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "security",
+      "lang": "typescript",
+      "split": "dev",
+      "threshold": 0.9,
+      "precision": 1,
+      "recall": 0.8372093023255814,
+      "f1": 0.9113924050632911,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "security",
+      "lang": "python",
+      "split": "dev",
+      "threshold": 0.1,
+      "precision": 0.6875,
+      "recall": 1,
+      "f1": 0.8148148148148148,
+      "cleanFalseAlarmRate": 0.3142857142857143
+    },
+    {
+      "system": "jev",
+      "pack": "security",
+      "lang": "python",
+      "split": "dev",
+      "threshold": 0.2,
+      "precision": 0.868421052631579,
+      "recall": 1,
+      "f1": 0.9295774647887324,
+      "cleanFalseAlarmRate": 0.11428571428571428
+    },
+    {
+      "system": "jev",
+      "pack": "security",
+      "lang": "python",
+      "split": "dev",
+      "threshold": 0.3,
+      "precision": 0.9428571428571428,
+      "recall": 1,
+      "f1": 0.9705882352941176,
+      "cleanFalseAlarmRate": 0.02857142857142857
+    },
+    {
+      "system": "jev",
+      "pack": "security",
+      "lang": "python",
+      "split": "dev",
+      "threshold": 0.4,
+      "precision": 0.9705882352941176,
+      "recall": 1,
+      "f1": 0.9850746268656716,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "security",
+      "lang": "python",
+      "split": "dev",
+      "threshold": 0.5,
+      "precision": 0.9705882352941176,
+      "recall": 1,
+      "f1": 0.9850746268656716,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "security",
+      "lang": "python",
+      "split": "dev",
+      "threshold": 0.6,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "security",
+      "lang": "python",
+      "split": "dev",
+      "threshold": 0.7,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "security",
+      "lang": "python",
+      "split": "dev",
+      "threshold": 0.8,
+      "precision": 1,
+      "recall": 0.9696969696969697,
+      "f1": 0.9846153846153847,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "security",
+      "lang": "python",
+      "split": "dev",
+      "threshold": 0.9,
+      "precision": 1,
+      "recall": 0.8484848484848485,
+      "f1": 0.9180327868852458,
+      "cleanFalseAlarmRate": 0
+    }
+  ],
+  "bands": [
+    {
+      "system": "jev",
+      "pack": "security",
+      "lang": "typescript",
+      "split": "dev",
+      "lo": 0.8,
+      "hi": 1.01,
+      "findings": 39,
+      "real": 39,
+      "precision": 1
+    },
+    {
+      "system": "jev",
+      "pack": "security",
+      "lang": "typescript",
+      "split": "dev",
+      "lo": 0.5,
+      "hi": 0.8,
+      "findings": 5,
+      "real": 3,
+      "precision": 0.6
+    },
+    {
+      "system": "jev",
+      "pack": "security",
+      "lang": "typescript",
+      "split": "dev",
+      "lo": 0.3,
+      "hi": 0.5,
+      "findings": 2,
+      "real": 1,
+      "precision": 0.5
+    },
+    {
+      "system": "jev",
+      "pack": "security",
+      "lang": "typescript",
+      "split": "dev",
+      "lo": 0.1,
+      "hi": 0.3,
+      "findings": 12,
+      "real": 0,
+      "precision": 0
+    },
+    {
+      "system": "jev",
+      "pack": "security",
+      "lang": "python",
+      "split": "dev",
+      "lo": 0.8,
+      "hi": 1.01,
+      "findings": 32,
+      "real": 32,
+      "precision": 1
+    },
+    {
+      "system": "jev",
+      "pack": "security",
+      "lang": "python",
+      "split": "dev",
+      "lo": 0.5,
+      "hi": 0.8,
+      "findings": 2,
+      "real": 1,
+      "precision": 0.5
+    },
+    {
+      "system": "jev",
+      "pack": "security",
+      "lang": "python",
+      "split": "dev",
+      "lo": 0.3,
+      "hi": 0.5,
+      "findings": 1,
+      "real": 0,
+      "precision": 0
+    },
+    {
+      "system": "jev",
+      "pack": "security",
+      "lang": "python",
+      "split": "dev",
+      "lo": 0.1,
+      "hi": 0.3,
+      "findings": 13,
+      "real": 0,
+      "precision": 0
+    }
+  ]
+}

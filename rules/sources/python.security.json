@@ -1,0 +1,194 @@
+{
+  "py-unscoped-object-lookup": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://api-security.owasp.org/editions/2023/en/0xa1-broken-object-level-authorization",
+        "checked": "2026-09-27",
+        "note": "API1:2023, the #1 API risk: validate that the logged-in user may access the record the request id names."
+      },
+      {
+        "grade": "C",
+        "url": "https://semgrep.dev/blog/2025/can-llms-detect-idors-understanding-the-boundaries-of-ai-reasoning/",
+        "checked": "2026-09-27",
+        "note": "Maintainer blog: LLM judges detect missing authorization best when the check is self-contained in the function or absent entirely -- the snippet-visible case this rule targets."
+      },
+      {
+        "grade": "C",
+        "url": "https://www.coderabbit.ai/blog/state-of-ai-vs-human-code-generation-report",
+        "checked": "2026-09-27",
+        "note": "Vendor study of 470 OSS PRs: AI-authored PRs had ~1.7x more issues; performance inefficiencies (excessive I/O, N+1 queries, unindexed lookups) ~8x more often; security issues 1.5-2x."
+      }
+    ],
+    "whyNotLinter": "Authorization is business logic; ruff/bandit have no rule, and CodeQL/Semgrep need app-specific models of the owner field.",
+    "aiRelevance": "High: agents generate CRUD endpoints from a model's fields and routinely omit ownership scoping; CodeRabbit (C) reports 1.5-2x more security issues in AI PRs.",
+    "expectedNoise": "med -- scoping can live in middleware, a base class, or a `get_queryset` outside the snippet; the `false` list covers the visible cases. Dry-run on real repos before enabling by default.",
+    "languageFile": "python"
+  },
+  "py-secret-compare-eq": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://docs.python.org/3/library/hmac.html",
+        "checked": "2026-09-27",
+        "note": "Warning: when comparing digest()/hexdigest() to an externally supplied digest, use compare_digest() instead of == to reduce vulnerability to timing attacks."
+      }
+    ],
+    "whyNotLinter": "Needs to know that the operands are secrets; `==` on strings is otherwise fine. No ruff/bandit rule exists for it.",
+    "aiRelevance": "Medium (inferred): agents hand-roll webhook signature checks (`if sig != expected:`). No direct study.",
+    "expectedNoise": "low -- operand names (`signature`, `expected_digest`, `api_key`) make intent visible.",
+    "languageFile": "python"
+  },
+  "py-sec-ssrf": {
+    "meta": {
+      "evidence": [
+        {
+          "grade": "B",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Server_Side_Request_Forgery_Prevention_Cheat_Sheet.html",
+          "checked": "2026-09-27",
+          "note": "Fetched: 'Match the host against an allowlist, and build the request yourself' rather than accepting full URLs; disable redirects; guard against DNS resolving allow-listed names to private IPs."
+        },
+        {
+          "grade": "B",
+          "url": "https://cwe.mitre.org/data/definitions/918.html",
+          "checked": "2026-09-27",
+          "note": "Fetched: server 'retrieves the contents of this URL, but it does not sufficiently ensure that the request is being sent to the expected destination.'"
+        },
+        {
+          "grade": "B",
+          "url": "https://owasp.org/API-Security/editions/2023/en/0xa7-server-side-request-forgery/",
+          "checked": "2026-09-27",
+          "note": "OWASP API Security Top 10 2023, API7 SSRF (URL now redirects to api-security.owasp.org; page body not fetched today -- cited by title only)."
+        },
+        {
+          "grade": "C",
+          "url": "https://arxiv.org/abs/2512.03262",
+          "checked": "2026-09-27",
+          "note": "'Is Vibe Coding Safe?' (SusVibes, 2025): 186 real-repo feature tasks, 79 CWEs; SWE-Agent + Claude 4 Sonnet 57% functionally correct but only 10.5-11.8% secure. Agent-level evidence, not CWE-specific to this rule."
+        },
+        {
+          "grade": "C",
+          "url": "https://github.com/semgrep/semgrep-rules/pull/4058",
+          "checked": "2026-09-27",
+          "note": "Semgrep community PR adding a FastAPI SSRF rule for httpx fed by route parameters (2025/26) -- shows FastAPI sources were uncovered until recently."
+        }
+      ],
+      "whyNotLinter": "Ruff S310 (`suspicious-url-open-usage`) only flags `urlopen` with non-http schemes; bandit has no SSRF check; Semgrep's `ssrf-requests` covers Flask `request.*` into `requests` but not FastAPI parameters/httpx in most versions, and cannot judge whether a hand-written check is a real allow-list.",
+      "aiRelevance": "Same feature shapes as TS (URL preview, import-from-URL, webhook test); FastAPI's `url: HttpUrl` gives agents a false sense that the URL is 'validated'.",
+      "expectedNoise": "low-med -- fixed-host + user path is the main look-alike and is listed in `false`.",
+      "languageFile": "python"
+    },
+    "languageFile": "python"
+  },
+  "py-sec-path-traversal": {
+    "meta": {
+      "evidence": [
+        {
+          "grade": "B",
+          "url": "https://cwe.mitre.org/data/definitions/22.html",
+          "checked": "2026-09-27",
+          "note": "CWE-22."
+        },
+        {
+          "grade": "B",
+          "url": "https://arxiv.org/abs/2502.11844",
+          "checked": "2026-09-27",
+          "note": "BaxBench (2025): 392 backend tasks across 14 frameworks incl. Express, Flask, Django, Rails; ~half of functionally correct LLM backends were exploitable by end-to-end exploits. CWE-22 exploit-tested in Flask/Django/FastAPI backends."
+        },
+        {
+          "grade": "B",
+          "url": "https://arxiv.org/abs/2108.09293",
+          "checked": "2026-09-27",
+          "note": "Pearce et al., 'Asleep at the Keyboard?' (IEEE S&P 2022), 89 scenarios / 1,689 Copilot programs, ~40% vulnerable. Scenario 22-1 is a Python web image handler; all top Copilot suggestions vulnerable. Older model generation: supports prevalence of the pattern in model output, not current-agent rates."
+        }
+      ],
+      "whyNotLinter": "Ruff/bandit have no path-traversal rule (S202 covers only tarfile extraction; S108 temp files). Semgrep's Flask 'request data in open()' taint rule misses FastAPI parameters and `UploadFile.filename`, and can't judge whether a `startswith`/`normpath` check is adequate.",
+      "aiRelevance": "Strong (see TS rule); Python file-upload and download endpoints are standard agent tasks.",
+      "expectedNoise": "low-med -- scripts reading argv paths are excluded; `filename` in the gate broadens asks but not findings.",
+      "languageFile": "python"
+    },
+    "languageFile": "python"
+  },
+  "py-sec-mass-assignment": {
+    "meta": {
+      "evidence": [
+        {
+          "grade": "B",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Mass_Assignment_Cheat_Sheet.html",
+          "checked": "2026-09-27",
+          "note": "Fetched: allow-list bindable fields or use DTOs; Node/Mongoose example uses `_.pick()`; GitHub 2012 incident."
+        },
+        {
+          "grade": "B",
+          "url": "https://owasp.org/API-Security/editions/2023/en/0xa3-broken-object-property-level-authorization/",
+          "checked": "2026-09-27",
+          "note": "Fetched (via api-security.owasp.org redirect): API3:2023 -- 'Avoid using functions that automatically bind a client's input into code variables, internal objects, or object properties'; 'Allow changes only to the object's properties that should be updated by the client.'"
+        },
+        {
+          "grade": "B",
+          "url": "https://cwe.mitre.org/data/definitions/915.html",
+          "checked": "2026-09-27",
+          "note": "Fetched: CWE-915 Improperly Controlled Modification of Dynamically-Determined Object Attributes."
+        },
+        {
+          "grade": "B",
+          "url": "https://docs.djangoproject.com/en/5.2/topics/forms/modelforms/",
+          "checked": "2026-09-27",
+          "note": "Fetched: 'strongly recommended that you explicitly set all fields ... Failure to do so can easily lead to security problems'; `__all__`/`exclude` 'much less secure and has led to serious exploits on major websites (e.g. GitHub)'."
+        }
+      ],
+      "whyNotLinter": "Ruff/bandit have no mass-assignment rule; Django's own `fields='__all__'` is allowed by design (it only forbids omitting `fields`). Whether a dict came from the request and whether the model has privileged fields needs judgment; pylint-django doesn't check it.",
+      "aiRelevance": "Agents reach for `**request.json`/`fields = \"__all__\"` as the shortest CRUD scaffold; generic-update helpers (`for k, v in data.items(): setattr(...)`) are a common LLM idiom for PATCH endpoints.",
+      "expectedNoise": "med -- `fields = \"__all__\"` on models with no privileged fields is benign; the question requires the privileged field to be visible or named, so pure-content models should not fire. Dry-run on real Django repos before default-on.",
+      "languageFile": "python"
+    },
+    "languageFile": "python"
+  },
+  "py-sec-unsafe-deserialization": {
+    "meta": {
+      "evidence": [
+        {
+          "grade": "B",
+          "url": "https://docs.python.org/3/library/pickle.html",
+          "checked": "2026-09-27",
+          "note": "Fetched warning: 'The pickle module is not secure ... possible to construct malicious pickle data which will execute arbitrary code during unpickling. Never unpickle data that could have come from an untrusted source'."
+        },
+        {
+          "grade": "B",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Deserialization_Cheat_Sheet.html",
+          "checked": "2026-09-27",
+          "note": "Fetched: pickle load/loads, PyYAML `yaml.load` and jsonpickle flagged as unsafe with untrusted data."
+        },
+        {
+          "grade": "B",
+          "url": "https://arxiv.org/abs/2108.09293",
+          "checked": "2026-09-27",
+          "note": "Pearce et al., 'Asleep at the Keyboard?' (IEEE S&P 2022), 89 scenarios / 1,689 Copilot programs, ~40% vulnerable. CWE-502 scenarios 502-0..2: web endpoints receiving YAML; the paper's discussion stresses `safe_load` is required. Older model generation: supports prevalence of the pattern in model output, not current-agent rates."
+        }
+      ],
+      "whyNotLinter": "Ruff S301/S506 and bandit B301/B506 flag every pickle/unsafe yaml call regardless of where the data came from; that noise (own caches, ML artifacts) means S is often not selected or is `# noqa`-ed wholesale, and ruff's default `select` excludes S. `torch.load(weights_only=False)` and `np.load(allow_pickle=True)` aren't covered by ruff. Jev adds the judgment the linter lacks: is the input untrusted? If the repo enforces S301/S506, keep this rule for the untrusted-source judgment only.",
+      "aiRelevance": "Agents use pickle for 'save this object to Redis/send over the socket' and `yaml.load` from older examples; ML-serving code loads uploaded model files with `torch.load`/`joblib.load`. Pearce et al. (B, older models) tested exactly this CWE.",
+      "expectedNoise": "low -- the rule requires a visible untrusted source; own-cache and pipeline-artifact loads are listed as fine.",
+      "languageFile": "python"
+    },
+    "languageFile": "python"
+  },
+  "py-sec-weak-password-hash": {
+    "languageFile": "python",
+    "evidence": [
+      {
+        "grade": "A",
+        "url": "https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html",
+        "checked": "2026-09-27"
+      },
+      {
+        "grade": "B",
+        "url": "https://cwe.mitre.org/data/definitions/916.html",
+        "checked": "2026-09-27 (not re-fetched)"
+      }
+    ],
+    "whyNotLinter": "ruff S324 flags md5/sha1 everywhere (mostly legitimate checksums); no linter knows whether the input is a password or whether sha256 is being used for passwords.",
+    "aiRelevance": "Pearce et al. (IEEE S&P 2022) note Copilot repeatedly suggests MD5/fast hashes for password storage.",
+    "expectedNoise": "low: gated on password-ish names; checksums and fingerprints are excluded."
+  }
+}

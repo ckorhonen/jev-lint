@@ -27,22 +27,6 @@
       "when": ["CancelledError|BaseException|except\\s*:"]
     },
     {
-      "id": "py-unscoped-object-lookup",
-      "question": "Does `added_code` add a request handler (FastAPI/Flask route, Django view, or DRF view method) that has an authenticated user available (`current_user`, `request.user`, a `Depends(get_current_user)` parameter) and loads, returns, changes or deletes a record by an id taken from the path, query or body -- `session.get(Invoice, invoice_id)`, `Invoice.objects.get(pk=pk)`, `get_object_or_404(Invoice, pk=pk)`, `db.query(Invoice).filter(Invoice.id == invoice_id).first()` -- without filtering by the owner or tenant or checking permission on the loaded record?",
-      "true": "An authenticated handler fetches a user-owned record by a client-supplied id with no ownership or permission check, so any signed-in user can read or change any record (IDOR/BOLA).",
-      "false": "The query is scoped to the user or tenant (`user_id=current_user.id`, `request.user.invoices.get(...)`, `tenant_id=`), an object-level check runs on the record (`if obj.owner_id != user.id: raise`, `self.check_object_permissions`, `has_object_permission`, a policy call), the view relies on a scoped `get_queryset()`, the endpoint is admin-only by an explicit dependency or decorator, the resource is public by nature (published articles, product catalog), or the handler fetches the user's own record (`/me`).",
-      "fix": "Scope the lookup to the current user or tenant (or run the object-level permission check) before returning or changing the record (OWASP API1:2023).",
-      "when": ["current_user|request\\.user|get_current_user|Depends\\(|login_required|IsAuthenticated|auth"]
-    },
-    {
-      "id": "py-secret-compare-eq",
-      "question": "Does `added_code` compare a secret or a signature with `==` or `!=` -- an HMAC digest (`hmac.new(...).hexdigest()`), a webhook signature header, an API key, a bearer, reset or CSRF token, or a password hash -- instead of `hmac.compare_digest` / `secrets.compare_digest` or the library's verify function?",
-      "true": "A secret or signature is checked with `==`/`!=`, which leaks timing information.",
-      "false": "The comparison uses `hmac.compare_digest`, `secrets.compare_digest`, or a library verifier (`bcrypt.checkpw`, `argon2` `verify`, passlib `verify`, `stripe.Webhook.construct_event`, `jwt.decode`); or the values compared are not secrets (ids, status strings, usernames, content types, token *types*); or the code only checks that a secret is present (`if not token:`).",
-      "fix": "Compare secrets with `hmac.compare_digest(a, b)` (Python docs, hmac).",
-      "when": ["digest|signature|token|secret|api_?key|password|hmac"]
-    },
-    {
       "id": "py-side-effect-in-transaction",
       "question": "Does `added_code` send an email, make an HTTP request, publish a message, or enqueue a background task (`send_mail`, `requests.post`, `httpx`, `task.delay(...)`, `.apply_async(...)`, `producer.send`) inside a database transaction block -- Django `with transaction.atomic():` or an `@transaction.atomic` function, SQLAlchemy `with session.begin():` / `async with session.begin():`, or `async with conn.transaction():` -- instead of after the commit?",
       "true": "An external side effect runs inside the transaction, so it can fire for data that later rolls back, or a worker can run before the row it needs is committed.",

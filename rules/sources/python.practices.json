@@ -53,46 +53,6 @@
     "expectedNoise": "low -- the legitimate 'await the task I cancelled' idiom is named in `false`.",
     "languageFile": "python"
   },
-  "py-unscoped-object-lookup": {
-    "evidence": [
-      {
-        "grade": "B",
-        "url": "https://api-security.owasp.org/editions/2023/en/0xa1-broken-object-level-authorization",
-        "checked": "2026-09-27",
-        "note": "API1:2023, the #1 API risk: validate that the logged-in user may access the record the request id names."
-      },
-      {
-        "grade": "C",
-        "url": "https://semgrep.dev/blog/2025/can-llms-detect-idors-understanding-the-boundaries-of-ai-reasoning/",
-        "checked": "2026-09-27",
-        "note": "Maintainer blog: LLM judges detect missing authorization best when the check is self-contained in the function or absent entirely -- the snippet-visible case this rule targets."
-      },
-      {
-        "grade": "C",
-        "url": "https://www.coderabbit.ai/blog/state-of-ai-vs-human-code-generation-report",
-        "checked": "2026-09-27",
-        "note": "Vendor study of 470 OSS PRs: AI-authored PRs had ~1.7x more issues; performance inefficiencies (excessive I/O, N+1 queries, unindexed lookups) ~8x more often; security issues 1.5-2x."
-      }
-    ],
-    "whyNotLinter": "Authorization is business logic; ruff/bandit have no rule, and CodeQL/Semgrep need app-specific models of the owner field.",
-    "aiRelevance": "High: agents generate CRUD endpoints from a model's fields and routinely omit ownership scoping; CodeRabbit (C) reports 1.5-2x more security issues in AI PRs.",
-    "expectedNoise": "med -- scoping can live in middleware, a base class, or a `get_queryset` outside the snippet; the `false` list covers the visible cases. Dry-run on real repos before enabling by default.",
-    "languageFile": "python"
-  },
-  "py-secret-compare-eq": {
-    "evidence": [
-      {
-        "grade": "B",
-        "url": "https://docs.python.org/3/library/hmac.html",
-        "checked": "2026-09-27",
-        "note": "Warning: when comparing digest()/hexdigest() to an externally supplied digest, use compare_digest() instead of == to reduce vulnerability to timing attacks."
-      }
-    ],
-    "whyNotLinter": "Needs to know that the operands are secrets; `==` on strings is otherwise fine. No ruff/bandit rule exists for it.",
-    "aiRelevance": "Medium (inferred): agents hand-roll webhook signature checks (`if sig != expected:`). No direct study.",
-    "expectedNoise": "low -- operand names (`signature`, `expected_digest`, `api_key`) make intent visible.",
-    "languageFile": "python"
-  },
   "py-side-effect-in-transaction": {
     "evidence": [
       {

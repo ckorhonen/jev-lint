@@ -95,102 +95,6 @@
       ]
     },
     {
-      "id": "ts-secret-in-public-env",
-      "question": "Does `added_code` read or declare a client-exposed environment variable — one prefixed `NEXT_PUBLIC_`, `VITE_`, `REACT_APP_`, `EXPO_PUBLIC_`, `NUXT_PUBLIC_`, `GATSBY_`, or SvelteKit/Astro `PUBLIC_` — that holds a server secret: a secret or private API key for a paid or privileged service (OpenAI, Anthropic, Stripe secret key, SendGrid), an access token, a password, a signing or encryption key, a database URL, or a service-role/admin key (e.g. `import.meta.env.VITE_OPENAI_API_KEY`, `process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY`, `NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY`)?",
-      "true": "A secret credential is read through a public-prefixed env var, so the bundler inlines it into the JavaScript shipped to every visitor.",
-      "false": "The public-prefixed variable is meant to be public: a publishable key (`NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `pk_…`), a Supabase/Firebase anon or client-config key, an analytics id, a Sentry DSN, a browser-restricted Maps key, a public API base URL, or a feature flag. Unprefixed server-only variables (`process.env.OPENAI_API_KEY` in a route handler or server module) do not count. Literal secret values written in the code belong to ts-no-hardcoded-secret.",
-      "fix": "Move the call behind a server route or function that reads an unprefixed env var; never put secrets in NEXT_PUBLIC_/VITE_-style variables (Vite env docs, Next.js data security guide).",
-      "when": ["NEXT_PUBLIC_|VITE_|REACT_APP_|EXPO_PUBLIC_|NUXT_PUBLIC_|GATSBY_|\\bPUBLIC_\\w+"]
-    },
-    {
-      "id": "ts-secret-env-fallback",
-      "question": "Does `added_code` read a secret or security setting from the environment with a hardcoded fallback — `process.env.JWT_SECRET || 'secret'`, `process.env.SESSION_SECRET ?? 'dev-secret'`, `const { API_KEY = 'changeme' } = process.env`, `ADMIN_PASSWORD ?? 'admin'`, or an env schema entry like `JWT_SECRET: z.string().default('dev')` — so the app silently runs with a known value when the variable is missing, instead of failing at startup?",
-      "true": "A secret, signing key, password or credential falls back to a literal value when its env var is unset.",
-      "false": "A missing secret throws or fails validation (an env schema without a default, `requireEnv('JWT_SECRET')`, `if (!secret) throw …`); fallbacks for non-secret settings (port, host, log level, public base URL, timeouts, feature flags, region); the fallback is inside a branch that is explicitly test-only. Real-looking literal secrets (e.g. `sk_live_…`) belong to ts-no-hardcoded-secret.",
-      "fix": "Fail fast when the secret is missing (validate env at startup and throw) instead of falling back to a known value (CWE-1188).",
-      "when": ["env[^\\n]*(\\|\\||\\?\\?)", "=\\s*(process|import\\.meta|Bun|Deno)\\.env", "\\.default\\("]
-    },
-    {
-      "id": "ts-insecure-random-secret",
-      "question": "Does `added_code` use `Math.random()` (directly or through a helper built on it, e.g. `Math.random().toString(36).slice(2)`) to produce a value that must be unguessable — a session, API or refresh token, password or password-reset code, OTP or verification code, invite or share-link id, nonce, CSRF token, or salt — instead of `crypto.randomUUID()`, `crypto.getRandomValues()`, or `crypto.randomBytes()`?",
-      "true": "A security-sensitive value is generated with Math.random.",
-      "false": "Math.random is used for something that need not be unguessable: UI or animation jitter, retry backoff jitter, sampling rates, shuffling display order, games, test or seed data, temporary DOM ids, log correlation ids; or the value comes from `crypto`, `nanoid`, `uuid`, or a library token generator.",
-      "fix": "Generate secrets with crypto.randomUUID()/crypto.getRandomValues()/crypto.randomBytes(), never Math.random (MDN Math.random, CWE-338).",
-      "when": ["Math\\.random"]
-    },
-    {
-      "id": "ts-secret-compare-not-constant-time",
-      "question": "Does `added_code` compare a secret against caller-supplied input with `===`, `==`, `!==`, `!=`, or `buf.equals(…)` — e.g. a webhook signature or HMAC digest (`signature === expected`), an API key or bearer token from a request header (`req.headers['x-api-key'] === process.env.API_KEY`), or a stored reset token — instead of `crypto.timingSafeEqual` on equal-length buffers or `crypto.subtle.verify`?",
-      "true": "A secret or signature is checked with an ordinary equality comparison against request input.",
-      "false": "The comparison uses `crypto.timingSafeEqual`, `crypto.subtle.verify`, or a library verifier (`stripe.webhooks.constructEvent`, `jwt.verify`/`jwtVerify`, `bcrypt.compare`, `argon2.verify`); the compared values are not secrets (ids, roles, status strings, event types, usernames, public keys); only lengths are compared; there is no comparison of a secret.",
-      "fix": "Compare secrets with crypto.timingSafeEqual on equal-length buffers or use the provider's verifier (GitHub webhook validation docs).",
-      "when": ["signature|hmac|digest|token|secret|api.?key|password|passwd|x-hub|webhook"]
-    },
-    {
-      "id": "ts-jwt-decode-without-verify",
-      "question": "Does `added_code` read claims from a JWT with a decode-only function — `jwt.decode(…)` (jsonwebtoken), `jwtDecode(…)` (jwt-decode), `decodeJwt(…)` (jose), or manual `JSON.parse(atob(token.split('.')[1]))` / `Buffer.from(part, 'base64')` — in server, API or middleware code and then use those claims to authenticate or authorize (user id, role, tenant, scopes, `exp`) without verifying the signature?",
-      "true": "Server-side code trusts claims from a token whose signature was never verified.",
-      "false": "The token is verified first (`jwt.verify`, jose `jwtVerify`, `verifyIdToken`, a framework auth helper such as NextAuth/Auth.js, Clerk or Auth0 SDK); decoding happens in browser code only to show the user's name or schedule a refresh while the server still verifies; the test itself created the token; there is no JWT decoding.",
-      "fix": "Verify the signature (jwt.verify / jose jwtVerify) before trusting any claim (jsonwebtoken README: decode 'will not verify whether the signature is valid').",
-      "when": ["decode|atob|base64|split\\(\\s*['\"]\\.['\"]"]
-    },
-    {
-      "id": "ts-sql-interpolated-raw-query",
-      "question": "Does `added_code` build SQL text by inserting a runtime value with string concatenation or an untagged template literal (`` `SELECT * FROM users WHERE id = ${id}` ``, `'… WHERE name = \\'' + name + '\\''`) and execute it — with `db.query`, `pool.query`, `client.query`, `connection.execute`, `knex.raw`, `sequelize.query`, `prisma.$queryRawUnsafe`/`$executeRawUnsafe`, `sql.raw`/`sql.unsafe`, or `db.exec` — instead of bound parameters?",
-      "true": "A runtime value is spliced into SQL text that is executed.",
-      "false": "Values go through parameterizing tagged templates (`sql`…${id}…``, `prisma.$queryRaw`…``, Drizzle `sql`…``, postgres.js, slonik), placeholders with a params array (`query('… WHERE id = $1', [id])`, `?`), or an ORM/query builder (`where({ id })`); only constants or identifiers checked against an allow-list are interpolated; no SQL is executed.",
-      "fix": "Pass values as bound parameters or use a parameterizing tagged template; never splice them into SQL text (OWASP SQL Injection Prevention; Prisma raw-query docs).",
-      "when": ["select|insert|update|delete|query|execute|exec\\(|raw"]
-    },
-    {
-      "id": "ts-shell-command-interpolation",
-      "question": "Does `added_code` run a shell command whose text includes a runtime value — `exec(`git checkout ${branch}`)`, `execSync('convert ' + file + ' out.png')`, `spawn(cmd, { shell: true })` or `execFile(…, { shell: true })` with an interpolated command, or `spawn('sh', ['-c', `… ${x}`])` — instead of passing arguments as an array to a no-shell API?",
-      "true": "A variable is interpolated into a command string that a shell parses.",
-      "false": "`execFile`/`execFileSync`/`spawn(bin, [args])` without `shell: true`; Bun Shell `$`…${x}`` and zx `$`…`` tagged templates (they quote interpolations); a constant command; values quoted with a proper library (`shell-quote`); no command is run.",
-      "fix": "Pass arguments as an array to execFile/spawn without a shell (Node child_process docs: 'Never pass unsanitized user input to this function').",
-      "when": ["exec|spawn|shell|['\"]-c['\"]"]
-    },
-    {
-      "id": "ts-regexp-from-input",
-      "question": "Does `added_code` pass a runtime string that comes from user or external input — a search query, request or URL parameter, form field, filename, or API field — into `new RegExp(…)`/`RegExp(…)` without escaping it (`RegExp.escape`, lodash `escapeRegExp`, or a `replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&')` helper), so special characters change the pattern or enable ReDoS?",
-      "true": "Unescaped user or external text becomes part of a regular expression.",
-      "false": "The string is escaped first; the pattern is a constant or built only from constants; the pattern is intentionally supplied by a trusted developer or admin setting and the code says so; the input is matched with `includes`/`indexOf`/`startsWith`/`localeCompare` instead; there is no RegExp constructor.",
-      "fix": "Escape the input with RegExp.escape (or escapeRegExp), or use string methods like includes() (MDN RegExp.escape; OWASP ReDoS).",
-      "when": ["RegExp\\("]
-    },
-    {
-      "id": "ts-open-redirect",
-      "question": "Does `added_code` redirect to a URL taken from request or page input — `res.redirect(req.query.next)`, `redirect(searchParams.get('returnTo'))`, `NextResponse.redirect(new URL(callbackUrl))`, `window.location.href = params.get('redirect')` — without checking that it is a same-site relative path or on an allow-list of hosts?",
-      "true": "A redirect target comes straight from a query/body/form parameter.",
-      "false": "The target is a constant or an internal route built by the code; the input is validated (starts with a single `/` and not `//` or `/\\`, or is parsed with `new URL` and its origin compared to an allow-list); an id or slug is inserted into a fixed internal path (`/users/${id}`); the auth library validates `callbackUrl` itself; there is no redirect.",
-      "fix": "Redirect only to relative paths or allow-listed hosts, or map an id to a known URL (OWASP Unvalidated Redirects and Forwards Cheat Sheet).",
-      "when": ["redirect|location\\.(href|assign|replace)|location\\s*=|returnTo|callbackUrl|next="]
-    },
-    {
-      "id": "react-server-action-missing-auth",
-      "question": "Does `added_code` define a Server Function / Server Action (an `async` function in a `'use server'` file or containing a `'use server'` directive) that changes data by calling the database client or an external service SDK directly (`db.`, `prisma.`, `sql\\``, `stripe.`, `resend.`, `fs.writeFile`) — an insert, update, delete, payment, email send, file write, or privileged API call — without first checking the caller's session or permission inside that function (`auth()`, `getSession()`, `currentUser()`, `verifySession()` or equivalent, followed by a throw/redirect/return when it fails)? An action that only calls imported data-access functions (`archiveProject(id)` from `@/lib/dal`) does not count: authorization may live there.",
-      "true": "A mutating Server Action calls the DB or a privileged service with no session or permission check in its body.",
-      "false": "The action checks the session and permission before mutating; it is wrapped by an auth-enforcing helper (`authedAction(…)`, a next-safe-action client with auth middleware); it only calls named data-access functions rather than the DB client directly (authorization may live there); it is a public, read-only action (search, contact form that only sends to the site owner with rate limiting) or only sets UI cookies such as theme or locale; the code is not a server function.",
-      "fix": "Verify the session and the user's permission inside every Server Action before mutating (Next.js data security guide; react.dev 'use server').",
-      "when": ["use server"]
-    },
-    {
-      "id": "react-server-action-client-identity",
-      "question": "Does `added_code`, inside a Server Function / Server Action (`'use server'`), take the acting user's identity, privileges or a trusted amount from its arguments or `formData` — a `userId`, `ownerId`, `authorId`, `role`, `isAdmin`, `tenantId`/`orgId`, or a price/total the server should compute — and use it to decide what to write or whether the caller is allowed, instead of reading it from the server-side session or database?",
-      "true": "The action trusts a client-sent user id, role, tenant or price.",
-      "false": "Identity and role come from the session (`session.user.id`, `auth().userId`); client-sent ids only name the target resource and the code checks ownership against the session; amounts are recomputed on the server from product ids; the action is not a server function.",
-      "fix": "Derive the user, role, tenant and amounts from the server session and database, never from Server Action arguments (react.dev: arguments are fully client-controlled).",
-      "when": ["use server"]
-    },
-    {
-      "id": "react-server-action-returns-record",
-      "question": "Does `added_code`, inside a Server Function / Server Action (`'use server'`), return a raw database or ORM record to the client — `return db.user.update(…)`, `return await prisma.user.findUnique({ where })` with no `select`, or `return user` straight from a query — instead of returning only the fields the UI needs?",
-      "true": "A Server Action serializes a whole database record back to the browser.",
-      "false": "It returns a small object built for the client (`{ success: true }`, `{ id, name }`, a validation-error object), a query with an explicit `select` of public fields, the result of a DTO/mapping function, nothing (redirect/revalidate only); the code is not a server function.",
-      "fix": "Return only the fields the UI needs, not the database record (Next.js data security guide, 'Controlling return values').",
-      "when": ["use server"]
-    },
-    {
       "id": "react-effect-notifies-parent",
       "question": "Does `added_code` use a React `useEffect` or `useLayoutEffect` whose job is to call a callback prop — `onChange`, `onSelect`, `onValueChange`, `onFetched`, `onToggle` — with the component's own state after that state changes (e.g. `useEffect(() => { onChange(isOn) }, [isOn, onChange])`), instead of calling the callback in the event handler that changed the state?",
       "true": "An Effect exists only to forward local state to a parent callback.",
@@ -205,14 +109,6 @@
       "false": "The Promise comes from props, context, a module-level cache or `cache()`d function, or a data library that returns a stable Promise; `use` is called with a Context (`use(ThemeContext)`); a Server Component `await`s instead; there is no `use()` call.",
       "fix": "Pass use() a cached Promise: create it in a Server Component or a cached function, not during render (react.dev use reference).",
       "when": ["\\buse\\("]
-    },
-    {
-      "id": "react-unsanitized-html",
-      "question": "Does `added_code` pass content that may come from users or external sources — a database field, API or CMS response, markdown rendered to an HTML string, a URL parameter, or a prop of unknown origin — to `dangerouslySetInnerHTML` (or assign it to `innerHTML`/`outerHTML`/`insertAdjacentHTML` inside a component or effect) without sanitizing it with DOMPurify `sanitize`, `sanitize-html`, or an equivalent sanitizer?",
-      "true": "Untrusted HTML reaches the DOM unsanitized.",
-      "false": "The HTML is sanitized first; it is a static string or built only from constants in the code; it is JSON-LD produced by a serializer that escapes `<`; markdown is rendered to React elements (react-markdown without `rehype-raw`) instead of an HTML string; there is no raw-HTML sink.",
-      "fix": "Sanitize with DOMPurify (or render to React elements) before dangerouslySetInnerHTML (react.dev: 'Only use dangerouslySetInnerHTML with trusted and sanitized data').",
-      "when": ["dangerouslySetInnerHTML|innerHTML|outerHTML|insertAdjacentHTML"]
     },
     {
       "id": "react-hydration-unsafe-render",

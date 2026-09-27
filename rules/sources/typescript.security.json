@@ -1,0 +1,506 @@
+{
+  "ts-secret-in-public-env": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://vite.dev/guide/env-and-mode",
+        "checked": "2026-09-27",
+        "note": "'VITE_* variables should not contain sensitive information such as API keys. The values ... are bundled into your source code at build time.'"
+      },
+      {
+        "grade": "B",
+        "url": "https://nextjs.org/docs/app/guides/data-security",
+        "checked": "2026-09-27",
+        "note": "Next.js 16.3 docs: NEXT_PUBLIC_ vars are exposed to the client; verify auth and authorization inside every Server Action; validate client input; return only what the UI needs, not raw DB records."
+      },
+      {
+        "grade": "D",
+        "url": "https://escape.tech/blog/methodology-how-we-discovered-vulnerabilities-apps-built-with-vibe-coding/",
+        "checked": "2026-09-27",
+        "note": "Vendor scan of 5,600 vibe-coded apps: 2k+ vulnerabilities, 400+ exposed secrets, many via client bundles (lead only)."
+      }
+    ],
+    "whyNotLinter": "A regex finds prefixed variables but cannot tell a publishable/anon/DSN key from a secret one (`VITE_OPENAI_API_KEY` has no 'secret' in its name; `VITE_MAPS_API_KEY` is meant to be public). Secret scanners (gitleaks, push protection) match literal key formats, not env references; bundle scanners run after build.",
+    "aiRelevance": "Agents asked to 'call OpenAI from the app' in a Vite/Next front end reach for `import.meta.env.VITE_…_API_KEY` to make the browser call work; vendor scans of vibe-coded apps report hundreds of secrets exposed in client bundles.",
+    "expectedNoise": "low — fires only on public-prefixed names; the judgment is whether the named key is a secret, which names like OPENAI_API_KEY/SECRET/SERVICE_ROLE make clear.",
+    "languageFile": "typescript"
+  },
+  "ts-secret-env-fallback": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://cwe.mitre.org/data/definitions/1188.html",
+        "checked": "2026-09-27",
+        "note": "CWE-1188 Initialization of a Resource with an Insecure Default."
+      },
+      {
+        "grade": "C",
+        "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html",
+        "checked": "2026-09-27",
+        "note": "Fetched: warns against secrets hardcoded in source/config; does NOT explicitly address env fallbacks, so graded C for this rule."
+      }
+    ],
+    "whyNotLinter": "`process.env.X || 'literal'` is matchable, but most such fallbacks are fine (PORT, LOG_LEVEL); only the meaning of the variable (secret vs setting) decides it.",
+    "aiRelevance": "Agents make the app 'run out of the box' by adding `|| 'your-secret-key'` placeholders; these ship to production when the env var is forgotten and make JWTs/sessions forgeable.",
+    "expectedNoise": "low — the judgment (is this a secret?) is usually obvious from the variable name.",
+    "languageFile": "typescript",
+    "notes": "Evidence is one B (CWE) plus a C; below the 2xB bar for built-ins until eval data or findings-log evidence is added."
+  },
+  "ts-insecure-random-secret": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random",
+        "checked": "2026-09-27",
+        "note": "'Math.random() does not provide cryptographically secure random numbers. Do not use them for anything related to security.'"
+      },
+      {
+        "grade": "B",
+        "url": "https://cwe.mitre.org/data/definitions/338.html",
+        "checked": "2026-09-27 (cited, page not fetched)",
+        "note": "CWE-338 Use of Cryptographically Weak PRNG."
+      },
+      {
+        "grade": "C",
+        "url": "https://www.veracode.com/blog/genai-code-security-report/",
+        "checked": "2026-09-27",
+        "note": "Vendor study, 100+ LLMs x 80 tasks: security flaws in 45% of outputs; XSS (CWE-80) 86% failure; SQL injection and weak crypto among tested CWEs."
+      }
+    ],
+    "whyNotLinter": "Banning Math.random outright (no-restricted-properties) is noisy because most uses are legitimate; eslint-plugin-security only flags `pseudoRandomBytes`. Whether the value is a token needs the surrounding meaning.",
+    "aiRelevance": "The `Math.random().toString(36).substring(2)` token idiom is extremely common in training data and agents reuse it for reset codes, invite links and API keys.",
+    "expectedNoise": "low — purpose is usually named (token, code, secret, invite).",
+    "languageFile": "typescript"
+  },
+  "ts-secret-compare-not-constant-time": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://docs.github.com/en/webhooks/using-webhooks/validating-webhook-deliveries",
+        "checked": "2026-09-27",
+        "note": "'Never use a plain == operator. Instead consider ... crypto.timingSafeEqual, which performs a constant time string comparison.'"
+      },
+      {
+        "grade": "B",
+        "url": "https://nodejs.org/api/crypto.html#cryptotimingsafeequala-b",
+        "checked": "2026-09-27",
+        "note": "crypto.timingSafeEqual exists for constant-time comparison (section body not extracted by the fetcher)."
+      }
+    ],
+    "whyNotLinter": "eslint-plugin-security `detect-possible-timing-attacks` flags any `===` whose operand name looks secret-ish, which is too noisy for most teams and misses `expected`/`computed` names; knowing which operand is a secret derived from request input needs judgment.",
+    "aiRelevance": "Agents writing webhook handlers from memory compute the HMAC correctly and then compare with `===`; GitHub's docs call this out explicitly.",
+    "expectedNoise": "low-med — token/role comparisons that are not secrets must be excluded by the `false` list.",
+    "languageFile": "typescript"
+  },
+  "ts-jwt-decode-without-verify": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://github.com/auth0/node-jsonwebtoken",
+        "checked": "2026-09-27",
+        "note": "jwt.decode: 'This will not verify whether the signature is valid. You should not use this for untrusted messages.'"
+      },
+      {
+        "grade": "B",
+        "url": "https://nextjs.org/docs/app/guides/data-security",
+        "checked": "2026-09-27",
+        "note": "Next.js 16.3 docs: NEXT_PUBLIC_ vars are exposed to the client; verify auth and authorization inside every Server Action; validate client input; return only what the UI needs, not raw DB records."
+      }
+    ],
+    "whyNotLinter": "`jwt.decode` is legitimate in clients and for reading headers before verification; whether the decoded claims feed an authorization decision on the server is semantic.",
+    "aiRelevance": "When verification fails with a wrong key or algorithm, agents 'fix' auth by switching to decode; middleware that decodes Supabase/Firebase tokens for a user id is a common generated pattern.",
+    "expectedNoise": "low",
+    "languageFile": "typescript"
+  },
+  "ts-sql-interpolated-raw-query": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html",
+        "checked": "2026-09-27 (cited, page not fetched)",
+        "note": "Primary defense: parameterized queries."
+      },
+      {
+        "grade": "B",
+        "url": "https://www.prisma.io/docs/orm/prisma-client/using-raw-sql/raw-queries",
+        "checked": "2026-09-27",
+        "note": "$queryRawUnsafe/$executeRawUnsafe with interpolated input opens SQL injection; tagged $queryRaw creates prepared statements."
+      },
+      {
+        "grade": "C",
+        "url": "https://www.veracode.com/blog/genai-code-security-report/",
+        "checked": "2026-09-27",
+        "note": "Vendor study, 100+ LLMs x 80 tasks: security flaws in 45% of outputs; XSS (CWE-80) 86% failure; SQL injection and weak crypto among tested CWEs."
+      }
+    ],
+    "whyNotLinter": "Standard ESLint presets have no SQL-injection rule; telling a safe tagged template (`sql`…``) from an unsafe untagged one passed to `$queryRawUnsafe` is the judgment. Semgrep/CodeQL can cover it when they gate CI.",
+    "aiRelevance": "Veracode tests SQL injection among its CWEs; agents switch from tagged `$queryRaw` to `$queryRawUnsafe` or string templates to get dynamic ORDER BY/IN lists working.",
+    "expectedNoise": "low",
+    "languageFile": "typescript",
+    "notes": "Refines generic-menu gen-sql-string-building with TS-specific safe look-alikes. Skip if Semgrep/CodeQL SQLi rules gate CI."
+  },
+  "ts-shell-command-interpolation": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://nodejs.org/api/child_process.html",
+        "checked": "2026-09-27",
+        "note": "exec/execSync: 'Never pass unsanitized user input to this function. Any input containing shell metacharacters may be used to trigger arbitrary command execution.' Same for spawn/execFile with shell enabled."
+      },
+      {
+        "grade": "B",
+        "url": "https://cheatsheetseries.owasp.org/cheatsheets/OS_Command_Injection_Defense_Cheat_Sheet.html",
+        "checked": "2026-09-27",
+        "note": "Primary defense: avoid the shell; pass command and arguments separately (argument arrays) with allow-list validation."
+      }
+    ],
+    "whyNotLinter": "eslint-plugin-security `detect-child-process` flags every non-literal exec, including safe constant-plus-escaped cases, and is rarely enabled; recognising safe Bun/zx tagged templates versus plain template strings needs judgment.",
+    "aiRelevance": "Agents writing CLI tools and build scripts default to `execSync(`…${x}`)` because it is shortest.",
+    "expectedNoise": "low",
+    "languageFile": "typescript",
+    "notes": "Refines generic-menu gen-shell-command-string with Bun Shell/zx safe look-alikes."
+  },
+  "ts-regexp-from-input": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/escape",
+        "checked": "2026-09-27",
+        "note": "RegExp.escape (Baseline 2025) exists to make user-provided strings safe inside new RegExp(); MDN example of an unescaped '.' matching the wrong domain."
+      },
+      {
+        "grade": "B",
+        "url": "https://owasp.org/www-community/attacks/Regular_expression_Denial_of_Service_-_ReDoS",
+        "checked": "2026-09-27 (cited, page not fetched)",
+        "note": "User-controlled patterns enable ReDoS."
+      }
+    ],
+    "whyNotLinter": "eslint-plugin-security `detect-non-literal-regexp` flags every dynamic RegExp, including ones built from constants or already-escaped values; whether the value is external input and whether it is escaped is the judgment.",
+    "aiRelevance": "Search/filter features generated by agents commonly do `new RegExp(query, 'i')` to get case-insensitive matching.",
+    "expectedNoise": "low",
+    "languageFile": "typescript"
+  },
+  "ts-open-redirect": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://cheatsheetseries.owasp.org/cheatsheets/Unvalidated_Redirects_and_Forwards_Cheat_Sheet.html",
+        "checked": "2026-09-27",
+        "note": "Redirecting to a request parameter enables phishing; map ids to server-side URLs or validate against an allow-list."
+      },
+      {
+        "grade": "B",
+        "url": "https://nextjs.org/docs/app/guides/data-security",
+        "checked": "2026-09-27",
+        "note": "Next.js 16.3 docs: NEXT_PUBLIC_ vars are exposed to the client; verify auth and authorization inside every Server Action; validate client input; return only what the UI needs, not raw DB records."
+      }
+    ],
+    "whyNotLinter": "Requires knowing the redirect argument is request input and that no validation happened; CodeQL can track this but standard ESLint presets cannot.",
+    "aiRelevance": "Login flows generated by agents add `?next=`/`?returnTo=` support and pass it straight to redirect.",
+    "expectedNoise": "low",
+    "languageFile": "typescript",
+    "notes": "Evidence note: next_sec supports input validation generally, not redirects specifically."
+  },
+  "react-server-action-missing-auth": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://react.dev/reference/rsc/use-server",
+        "checked": "2026-09-27",
+        "note": "'Arguments to Server Functions are fully client-controlled ... treat them as untrusted input'; 'In any Server Function, make sure to validate that the logged-in user is allowed to perform that action.'"
+      },
+      {
+        "grade": "B",
+        "url": "https://nextjs.org/docs/app/guides/data-security",
+        "checked": "2026-09-27",
+        "note": "Next.js 16.3 docs: NEXT_PUBLIC_ vars are exposed to the client; verify auth and authorization inside every Server Action; validate client input; return only what the UI needs, not raw DB records."
+      }
+    ],
+    "whyNotLinter": "No lint rule knows which calls are mutations or which helpers authenticate; the page-level auth check that agents rely on does not protect the action, and that is a semantic judgment.",
+    "aiRelevance": "Agents protect the page (redirect if logged out) and assume the action inside is protected; Next.js docs single this out because actions are reachable by direct POST.",
+    "expectedNoise": "low-med — repos with a DAL doing auth are handled by the 'named data-access function' exception.",
+    "languageFile": "typescript"
+  },
+  "react-server-action-client-identity": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://react.dev/reference/rsc/use-server",
+        "checked": "2026-09-27",
+        "note": "'Arguments to Server Functions are fully client-controlled ... treat them as untrusted input'; 'In any Server Function, make sure to validate that the logged-in user is allowed to perform that action.'"
+      },
+      {
+        "grade": "B",
+        "url": "https://nextjs.org/docs/app/guides/data-security",
+        "checked": "2026-09-27",
+        "note": "Next.js 16.3 docs: NEXT_PUBLIC_ vars are exposed to the client; verify auth and authorization inside every Server Action; validate client input; return only what the UI needs, not raw DB records."
+      }
+    ],
+    "whyNotLinter": "Whether an argument named `userId` is the actor or the target resource is a semantic distinction no AST rule can make.",
+    "aiRelevance": "Agents thread `userId` from a client component into the action because the client already has it; this is the classic IDOR the Next.js guide warns about.",
+    "expectedNoise": "low",
+    "languageFile": "typescript"
+  },
+  "react-server-action-returns-record": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://nextjs.org/docs/app/guides/data-security",
+        "checked": "2026-09-27",
+        "note": "Next.js 16.3 docs: NEXT_PUBLIC_ vars are exposed to the client; verify auth and authorization inside every Server Action; validate client input; return only what the UI needs, not raw DB records."
+      },
+      {
+        "grade": "B",
+        "url": "https://react.dev/reference/rsc/use-server",
+        "checked": "2026-09-27",
+        "note": "'Arguments to Server Functions are fully client-controlled ... treat them as untrusted input'; 'In any Server Function, make sure to validate that the logged-in user is allowed to perform that action.'"
+      }
+    ],
+    "whyNotLinter": "Whether a returned value is a raw row or a trimmed DTO depends on what the called function returns and on field semantics.",
+    "aiRelevance": "Returning the updated record is the shortest way to refresh client state, so agents do it by default; records often include password hashes, emails, internal flags.",
+    "expectedNoise": "low",
+    "languageFile": "typescript"
+  },
+  "react-unsanitized-html": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://react.dev/reference/react-dom/components/common",
+        "checked": "2026-09-27",
+        "note": "dangerouslySetInnerHTML: 'Unless the markup is coming from a completely trusted source, it is trivial to introduce an XSS vulnerability'; 'Only use ... with trusted and sanitized data.'"
+      },
+      {
+        "grade": "B",
+        "url": "https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html",
+        "checked": "2026-09-27",
+        "note": "Lists React dangerouslySetInnerHTML without sanitizing as an XSS sink; recommends DOMPurify.sanitize for user-authored HTML."
+      },
+      {
+        "grade": "C",
+        "url": "https://www.veracode.com/blog/genai-code-security-report/",
+        "checked": "2026-09-27",
+        "note": "Vendor study, 100+ LLMs x 80 tasks: security flaws in 45% of outputs; XSS (CWE-80) 86% failure; SQL injection and weak crypto among tested CWEs."
+      }
+    ],
+    "whyNotLinter": "`react/no-danger` bans the prop outright (opt-in) and cannot tell sanitized or constant HTML from untrusted content.",
+    "aiRelevance": "Veracode reports an 86% failure rate on XSS tasks for generated code; agents render markdown/CMS content with `marked()` + dangerouslySetInnerHTML.",
+    "expectedNoise": "low",
+    "languageFile": "typescript"
+  },
+  "ts-sec-ssrf": {
+    "meta": {
+      "evidence": [
+        {
+          "grade": "B",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Server_Side_Request_Forgery_Prevention_Cheat_Sheet.html",
+          "checked": "2026-09-27",
+          "note": "Fetched: 'Match the host against an allowlist, and build the request yourself' rather than accepting full URLs; disable redirects; guard against DNS resolving allow-listed names to private IPs."
+        },
+        {
+          "grade": "B",
+          "url": "https://cwe.mitre.org/data/definitions/918.html",
+          "checked": "2026-09-27",
+          "note": "Fetched: server 'retrieves the contents of this URL, but it does not sufficiently ensure that the request is being sent to the expected destination.'"
+        },
+        {
+          "grade": "B",
+          "url": "https://owasp.org/API-Security/editions/2023/en/0xa7-server-side-request-forgery/",
+          "checked": "2026-09-27",
+          "note": "OWASP API Security Top 10 2023, API7 SSRF (URL now redirects to api-security.owasp.org; page body not fetched today -- cited by title only)."
+        },
+        {
+          "grade": "C",
+          "url": "https://arxiv.org/abs/2512.03262",
+          "checked": "2026-09-27",
+          "note": "'Is Vibe Coding Safe?' (SusVibes, 2025): 186 real-repo feature tasks, 79 CWEs; SWE-Agent + Claude 4 Sonnet 57% functionally correct but only 10.5-11.8% secure. Agent-level evidence, not CWE-specific to this rule."
+        },
+        {
+          "grade": "C",
+          "url": "https://semgrep.dev/blog/2021/new-high-signal-rules-for-the-javascript-ecosystem/",
+          "checked": "2026-09-27",
+          "note": "Semgrep maintainers call their express-ssrf taint rule one of the most valuable for Express codebases -- evidence the pattern recurs; the rule itself is Express-only."
+        }
+      ],
+      "whyNotLinter": "eslint-plugin-security has no SSRF rule (checked its 15-rule list). Semgrep's `express-ssrf` taint rule only models Express `req.*` sources; it misses Hono `c.req`, Next route handlers/Server Actions and `formData`, and cannot judge whether an added check is a real allow-list or a bypassable `includes`/`startsWith` on the raw string. Most agent-driven repos don't run Semgrep in CI.",
+      "aiRelevance": "Agents build 'link preview', 'import from URL', 'webhook tester', image-proxy and 'fetch this feed' features by passing the user's URL straight to fetch; Pearce et al. excluded SSRF only because it was hard to test, not because it was rare. Evidence for agent-specific rates is indirect (C/D).",
+      "expectedNoise": "low-med -- the main look-alike is a fixed host with a user-supplied path/id, which `false` names; allow-list checks living in another file are the residual false-positive source.",
+      "languageFile": "typescript"
+    },
+    "languageFile": "typescript"
+  },
+  "ts-sec-path-traversal": {
+    "meta": {
+      "evidence": [
+        {
+          "grade": "B",
+          "url": "https://cwe.mitre.org/data/definitions/22.html",
+          "checked": "2026-09-27",
+          "note": "CWE-22 Improper Limitation of a Pathname to a Restricted Directory; #5 in the 2024 CWE Top 25 (per BaxBench's table)."
+        },
+        {
+          "grade": "B",
+          "url": "https://arxiv.org/abs/2502.11844",
+          "checked": "2026-09-27",
+          "note": "BaxBench (2025): 392 backend tasks across 14 frameworks incl. Express, Flask, Django, Rails; ~half of functionally correct LLM backends were exploitable by end-to-end exploits. CWE-22 is one of its 13 exploit-tested CWEs (FileSearch and upload scenarios)."
+        },
+        {
+          "grade": "B",
+          "url": "https://arxiv.org/abs/2108.09293",
+          "checked": "2026-09-27",
+          "note": "Pearce et al., 'Asleep at the Keyboard?' (IEEE S&P 2022), 89 scenarios / 1,689 Copilot programs, ~40% vulnerable. CWE-22: 'Copilot struggled with all scenarios, with all top suggestions being vulnerable'; 60% of options vulnerable (C and Python web image handler, tar extraction). Older model generation: supports prevalence of the pattern in model output, not current-agent rates."
+        }
+      ],
+      "whyNotLinter": "eslint-plugin-security `detect-non-literal-fs-filename` flags every non-literal fs path (config paths, temp files, build scripts) -- famously noisy and usually disabled -- and cannot tell a contained path from an escaping one. Semgrep `express-path-join-resolve-traversal` models Express `req` only and flags `path.join` even when a resolve+startsWith check follows. The judgment 'is this input client-controlled and is the containment check real' needs meaning.",
+      "aiRelevance": "Strong: Pearce et al. found every top Copilot suggestion vulnerable for path traversal; BaxBench exploit-tests it in LLM-generated Express backends. Agents write 'serve uploaded file by name' and 'save upload with original name' routes with `path.join(UPLOAD_DIR, req.params.name)`.",
+      "expectedNoise": "low-med -- CLI/build scripts with paths from argv are the main look-alike and are excluded in `false`; dry-run on scripts/ folders.",
+      "languageFile": "typescript"
+    },
+    "languageFile": "typescript"
+  },
+  "ts-sec-mass-assignment": {
+    "meta": {
+      "evidence": [
+        {
+          "grade": "B",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Mass_Assignment_Cheat_Sheet.html",
+          "checked": "2026-09-27",
+          "note": "Fetched: allow-list bindable fields or use DTOs; Node/Mongoose example uses `_.pick()`; GitHub 2012 incident."
+        },
+        {
+          "grade": "B",
+          "url": "https://owasp.org/API-Security/editions/2023/en/0xa3-broken-object-property-level-authorization/",
+          "checked": "2026-09-27",
+          "note": "Fetched (via api-security.owasp.org redirect): API3:2023 -- 'Avoid using functions that automatically bind a client's input into code variables, internal objects, or object properties'; 'Allow changes only to the object's properties that should be updated by the client.'"
+        },
+        {
+          "grade": "B",
+          "url": "https://cwe.mitre.org/data/definitions/915.html",
+          "checked": "2026-09-27",
+          "note": "Fetched: CWE-915 Improperly Controlled Modification of Dynamically-Determined Object Attributes."
+        },
+        {
+          "grade": "C",
+          "url": "https://www.prisma.io/docs/orm/prisma-client/queries/crud",
+          "checked": "2026-09-27",
+          "note": "Prisma CRUD docs pass typed `data` objects; Prisma's generated input types accept every scalar column, so a cast body type-checks with privileged fields (inference from the docs' type model, not an explicit warning)."
+        }
+      ],
+      "whyNotLinter": "No ESLint/typescript-eslint rule flags `data: req.body`; types don't help because `req.body` is `any` or cast. Whether the payload was narrowed is a judgment about the surrounding lines (schema parse vs cast vs spread), which Jev sees in the snippet. Semgrep has only Mongoose-specific community rules.",
+      "aiRelevance": "Agents generating CRUD 'update profile' endpoints commonly write `prisma.user.update({ where: { id }, data: req.body })` for brevity; API3 is the class LLM backends in BaxBench most often get wrong alongside access control (BaxBench covers CWE-284/863 rather than 915 directly -- indirect).",
+      "expectedNoise": "low-med -- named schema parses are accepted even if the schema might contain privileged fields (precision over recall); spreads of already-validated objects are the main look-alike.",
+      "languageFile": "typescript"
+    },
+    "languageFile": "typescript"
+  },
+  "ts-sec-unscoped-record-lookup": {
+    "meta": {
+      "evidence": [
+        {
+          "grade": "B",
+          "url": "https://owasp.org/API-Security/editions/2023/en/0xa1-broken-object-level-authorization/",
+          "checked": "2026-09-27",
+          "note": "API1:2023 BOLA, the #1 API risk (already cited for py-unscoped-object-lookup)."
+        },
+        {
+          "grade": "B",
+          "url": "https://owasp.org/Top10/A01_2021-Broken_Access_Control/",
+          "checked": "2026-09-27",
+          "note": "OWASP Top 10 2021 A01 Broken Access Control (#1). 2025 edition ranking not re-checked today."
+        },
+        {
+          "grade": "B",
+          "url": "https://arxiv.org/abs/2502.11844",
+          "checked": "2026-09-27",
+          "note": "BaxBench (2025): 392 backend tasks across 14 frameworks incl. Express, Flask, Django, Rails; ~half of functionally correct LLM backends were exploitable by end-to-end exploits. CWE-284/CWE-863 (access control/authorization) are among its exploit-tested CWEs."
+        },
+        {
+          "grade": "C",
+          "url": "https://semgrep.dev/blog/2025/can-llms-detect-idors-understanding-the-boundaries-of-ai-reasoning/",
+          "checked": "2026-09-27",
+          "note": "LLM judges detect IDOR best when the check is self-contained or absent in the function -- the snippet-visible case."
+        }
+      ],
+      "whyNotLinter": "Authorization is business logic: no ESLint/Semgrep rule knows which column is the owner. Fills the TypeScript gap next to the existing py-unscoped-object-lookup and rb-unscoped-find.",
+      "aiRelevance": "High: agents scaffold CRUD by id and verify the session but not ownership; mirrors the Python/Ruby rules already in the practices pack.",
+      "expectedNoise": "med -- ownership can be enforced by RLS, middleware or a scoped client outside the snippet; `false` covers visible cases. Dry-run before default-on.",
+      "languageFile": "typescript"
+    },
+    "languageFile": "typescript"
+  },
+  "ts-sec-secret-in-log": {
+    "meta": {
+      "evidence": [
+        {
+          "grade": "B",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html",
+          "checked": "2026-09-27",
+          "note": "Fetched: must not be recorded directly -- 'Session identification values', 'Access tokens', 'Authentication passwords', 'Encryption keys and other primary secrets', payment card data; also connection strings."
+        },
+        {
+          "grade": "B",
+          "url": "https://cwe.mitre.org/data/definitions/532.html",
+          "checked": "2026-09-27",
+          "note": "Fetched: CWE-532 'The product writes sensitive information to a log file.'"
+        },
+        {
+          "grade": "D",
+          "url": "https://www.veracode.com/blog/genai-code-security-report/",
+          "checked": "2026-09-27",
+          "note": "Vendor report (2025): 100+ LLMs, 80 tasks, 45% of samples introduced a flaw; log injection (CWE-117) and XSS the worst. Lead only."
+        }
+      ],
+      "whyNotLinter": "`no-console` bans all console calls (and misses logger calls); no linter knows whether the argument is a secret. Secret scanners find literal key formats, not `logger.info({ token })`. The judgment is semantic: is this value a credential?",
+      "aiRelevance": "Agents add debug logging while fixing auth flows (`console.log('token', token)`, `logger.debug({ headers: req.headers })`) and often leave it; Veracode's vendor data rates log-related CWEs among the worst for LLMs (D, lead only). Rust has the analogous rs-debug-derive-secret.",
+      "expectedNoise": "low-med -- logging emails/user objects is left out on purpose (PII policy varies by repo; add a repo rule if the team bans it).",
+      "languageFile": "typescript"
+    },
+    "languageFile": "typescript"
+  },
+  "ts-sec-cors-credentials": {
+    "meta": {
+      "evidence": [
+        {
+          "grade": "B",
+          "url": "https://github.com/expressjs/cors",
+          "checked": "2026-09-27",
+          "note": "Fetched: `origin: true` 'reflect[s] the request origin'; `credentials: true` sends Access-Control-Allow-Credentials; README warns 'CORS is not access control'."
+        },
+        {
+          "grade": "B",
+          "url": "https://cwe.mitre.org/data/definitions/942.html",
+          "checked": "2026-09-27",
+          "note": "Fetched: CWE-942 Permissive Cross-domain Security Policy with Untrusted Domains."
+        },
+        {
+          "grade": "C",
+          "url": "https://portswigger.net/web-security/cors",
+          "checked": "2026-09-27",
+          "note": "Fetched: server-generated ACAO from the Origin header with `Access-Control-Allow-Credentials: true` lets any domain read responses; prefix/suffix origin matching is bypassable (`hackersnormal-website.com`). Vendor research, widely cited."
+        }
+      ],
+      "whyNotLinter": "No ESLint/eslint-plugin-security rule. Semgrep has a `cors-misconfiguration` rule for Express reflecting `req.headers.origin`, but it misses `origin: true`/always-true callbacks across Hono/Fastify/NestJS and cannot judge whether an origin check is anchored. Whether a callback 'always allows' or an `endsWith` is safe needs reading the logic.",
+      "aiRelevance": "When a browser shows a CORS error, agents' shortest fix is `cors({ origin: true, credentials: true })` or an echo-origin middleware; evidence is practitioner/lead-level (no peer-reviewed CWE-942 rate for LLMs found) -- flag as the weakest-evidence rule in this pack.",
+      "expectedNoise": "low -- fires only on credentialed reflection or loose matching; public token APIs without credentials are excluded.",
+      "languageFile": "typescript"
+    },
+    "languageFile": "typescript"
+  },
+  "ts-sec-weak-password-hash": {
+    "languageFile": "typescript",
+    "evidence": [
+      {
+        "grade": "A",
+        "url": "https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html",
+        "checked": "2026-09-27"
+      },
+      {
+        "grade": "B",
+        "url": "https://cwe.mitre.org/data/definitions/916.html",
+        "checked": "2026-09-27 (not re-fetched)"
+      }
+    ],
+    "whyNotLinter": "No ESLint rule knows whether a createHash input is a password; literal bans on md5/sha1 hit checksums.",
+    "aiRelevance": "Pearce et al. (IEEE S&P 2022) note Copilot repeatedly suggests fast hashes for passwords.",
+    "expectedNoise": "low: gated on password-ish names; checksums and HMAC excluded."
+  }
+}

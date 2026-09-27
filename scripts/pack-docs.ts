@@ -28,6 +28,8 @@ const PACK_INTRO: Record<BuiltInPack, string> = {
   hygiene: "Small code-hygiene rules: the things a careful reviewer flags in any language.",
   practices:
     "Opinionated framework and language practices: React and Server Actions, SwiftUI and Swift concurrency, Kotlin coroutines and Compose, Rust async, Python async and ORMs, Rails, Bazel, and common security mistakes. Each one needs judgment about what the code means, so no linter can check it.",
+  security:
+    "Security mistakes you can see in the added code: secrets in client bundles or logs, unverified JWTs, SQL and shell commands built from input, SSRF, path traversal, mass assignment, record lookups not scoped to the user, Server Actions without auth, unsafe deserialization, weak password hashing and CORS that reflects any origin with credentials. It complements a SAST tool (it can't follow data across files) and is best at judgments SAST can't make, like whether a handler trusts a client-sent user id.",
   tests:
     "Test hygiene: tests that can't fail, flaky tests (real clocks, unseeded randomness, real network, fixed sleeps, order-dependent assertions, shared state), and tests bent to pass (titles that contradict their assertions, test-only branches in production code). Coding agents are prone to all of these, because a passing test looks like success.",
   performance:
