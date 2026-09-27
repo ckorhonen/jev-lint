@@ -45,6 +45,15 @@ export function repoRoot(absoluteFile: string, fallback: string): string {
   }
 }
 
+// A file counts as part of the work when it sits under the repo that contains the session's
+// cwd (or the cwd itself when there is no repo). Files elsewhere, such as scratchpads, are skipped.
+export function isInsideRepo(filePath: string, cwd: string): boolean {
+  const absolute = isAbsolute(filePath) ? filePath : resolve(cwd, filePath);
+  const root = repoRoot(join(cwd, "_"), cwd);
+  const rel = relative(root, absolute);
+  return rel !== "" && !rel.startsWith("..") && !isAbsolute(rel);
+}
+
 export function toRecords(
   results: LintResult[],
   changes: ChangedFile[],

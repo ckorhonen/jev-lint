@@ -11,7 +11,7 @@
 
 import { appendFileSync } from "node:fs";
 import { extractChanges } from "./extract";
-import { appendRecords, toErrorRecords, toRecords } from "./findingsLog";
+import { appendRecords, isInsideRepo, toErrorRecords, toRecords } from "./findingsLog";
 import { formatFeedback, type LintResult, lintChange } from "./lint";
 
 const MAX_FILES = 8;
@@ -29,7 +29,12 @@ async function main() {
 
   // A large multi-file patch must not fan out into dozens of API calls from one edit:
   // lint at most MAX_FILES files, MAX_PARALLEL at a time.
-  const changes = extractChanges(event).slice(0, MAX_FILES);
+  // Skip files outside the working repo (scratchpad and /tmp debug scripts): printing and
+  // throwaway code are the point there, and real-world logs showed them as pure noise.
+  const cwd = event.cwd ?? process.cwd();
+  const changes = extractChanges(event)
+    .filter((c) => isInsideRepo(c.filePath, cwd))
+    .slice(0, MAX_FILES);
   const settled: PromiseSettledResult<LintResult | undefined>[] = [];
   for (let i = 0; i < changes.length; i += MAX_PARALLEL) {
     const batch = changes.slice(i, i + MAX_PARALLEL);

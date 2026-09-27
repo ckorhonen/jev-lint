@@ -61,3 +61,15 @@ describe("hook resolves Codex relative paths against the event cwd", () => {
     expect(ruleSetFor("src/file.ts", undefined, process.cwd())?.rules.map((r) => r.id)).not.toContain("repo-x");
   });
 });
+
+describe("files outside the working repo are skipped", () => {
+  test("scratchpad and /tmp files are outside; repo files and relative patch paths are inside", async () => {
+    const { isInsideRepo } = await import("../src/findingsLog");
+    const repo = makeRepo("g");
+    mkdirSync(join(repo, ".git"), { recursive: true });
+    expect(isInsideRepo(join(repo, "src/deep/file.ts"), join(repo, "src"))).toBe(true);
+    expect(isInsideRepo("src/file.ts", repo)).toBe(true);
+    expect(isInsideRepo("/private/tmp/claude-501/scratchpad/dbg.ts", repo)).toBe(false);
+    expect(isInsideRepo(join(root, "elsewhere/x.ts"), repo)).toBe(false);
+  });
+});
