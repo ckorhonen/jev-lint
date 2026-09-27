@@ -26,6 +26,7 @@ skills are symlinked into `.claude/skills/`.
 - `rules/*.json` — hygiene pack; `rules/*.practices.json` — best-practice pack; `.jev-lint/` — this repo's own dogfooded repo pack (run `bun src/validate.ts .jev-lint` after changing it).
 - `eval/cases/` — labeled hook payloads: `<lang>[.practices].<dev|holdout>.jsonl`.
 - `eval/run.ts`, `eval/systems.ts` — offline eval (Jev vs LLM judge vs regex).
+- `eval/skill/run.ts` — skill eval: runs `jev-lint-rules` headless (dry run) on pinned real repos and scores the proposal against gold annotations. Fixtures, gold and results are private and live outside the repo (`~/.local/share/jev-lint/skill-evals`, or `JEV_LINT_SKILL_EVALS`); never commit them or name the repos in public results.
 - `eval/e2e/` — headless Claude Code runs with/without the hook, grading, AI review mapping.
 - `eval/results/` — committed result files; `snapshots/` keeps superseded evidence; `cache/` is local only.
 - `report/notebook.html` + `report/build.py` → `report/index.html` (the published notebook).

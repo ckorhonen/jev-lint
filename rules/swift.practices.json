@@ -21,7 +21,7 @@
     },
     {
       "id": "swiftui-expensive-body",
-      "question": "Does `added_code` do expensive work inside a SwiftUI view's `body` (or a computed property or helper that `body` calls each render) \u2014 creating a `DateFormatter`, `NumberFormatter`, `JSONDecoder`, or regex; sorting or filtering a large collection; decoding data; or reading files?",
+      "question": "Does `added_code` do expensive work inside a SwiftUI view's `body` (or a computed property or helper that `body` calls each render) — creating a `DateFormatter`, `NumberFormatter`, `JSONDecoder`, or regex; sorting or filtering a large collection; decoding data; or reading files?",
       "true": "Work that should be cached or done once runs on every render of the view.",
       "false": "Formatters and decoders are static or cached, heavy work happens in the model or a `.task`, or the body only lays out views.",
       "fix": "Cache formatters as static properties and move heavy work into the model or `.task`.",
@@ -37,7 +37,7 @@
     },
     {
       "id": "swift-escaping-closure-retain-cycle",
-      "question": "Does `added_code` store or register an escaping closure that captures `self` strongly inside a class \u2014 a `Timer` block, a `NotificationCenter` observer block, a Combine `sink` stored in `cancellables`, or a closure assigned to a property \u2014 without `[weak self]` or `[unowned self]`, creating a retain cycle?",
+      "question": "Does `added_code` store or register an escaping closure that captures `self` strongly inside a class — a `Timer` block, a `NotificationCenter` observer block, a Combine `sink` stored in `cancellables`, or a closure assigned to a property — without `[weak self]` or `[unowned self]`, creating a retain cycle?",
       "true": "A long-lived closure owned (directly or indirectly) by self references self strongly.",
       "false": "Such closures capture `[weak self]`/`[unowned self]`, or the closures are non-escaping or one-shot (map, forEach, withAnimation, a single URLSession or DispatchQueue call), or the code is a SwiftUI struct.",
       "fix": "Capture `[weak self]` in stored or registered closures and cancel them when done.",
@@ -45,7 +45,7 @@
     },
     {
       "id": "swift-blocking-main-thread",
-      "question": "Does `added_code` do blocking work on the main thread or in UI code \u2014 `Data(contentsOf:)` or `String(contentsOf:)` on a network URL, `Thread.sleep`, `DispatchSemaphore.wait()`, or a synchronous network request \u2014 inside a view, view controller, or `@MainActor` type?",
+      "question": "Does `added_code` do blocking work on the main thread or in UI code — `Data(contentsOf:)` or `String(contentsOf:)` on a network URL, `Thread.sleep`, `DispatchSemaphore.wait()`, or a synchronous network request — inside a view, view controller, or `@MainActor` type?",
       "true": "UI code blocks the main thread waiting on I/O, a sleep, or a semaphore.",
       "false": "Blocking I/O happens off the main actor, or the code uses async APIs such as `URLSession.data(from:)` and `Task.sleep`.",
       "fix": "Use async APIs (URLSession.data, Task.sleep) or move the work off the main actor.",
@@ -61,7 +61,7 @@
     },
     {
       "id": "swift-unprotected-shared-state",
-      "question": "Does `added_code` declare mutable state that is shared across threads or tasks \u2014 a `static var`, a global `var`, or a mutable property on a class singleton or cache used from background queues or concurrent tasks \u2014 without an actor, a lock, a serial queue, or `@MainActor` protecting it?",
+      "question": "Does `added_code` declare mutable state that is shared across threads or tasks — a `static var`, a global `var`, or a mutable property on a class singleton or cache used from background queues or concurrent tasks — without an actor, a lock, a serial queue, or `@MainActor` protecting it?",
       "true": "Shared mutable state can be read and written concurrently with no synchronization.",
       "false": "Shared state is inside an actor, guarded by a lock/serial queue/Mutex, main-actor isolated, or immutable (`let`).",
       "fix": "Put the state in an actor, guard it with a lock, or isolate it to the main actor.",
@@ -98,6 +98,14 @@
       "false": "Concurrent calls are rejected or queued while one is pending, continuations are kept per request (for example in a dictionary keyed by id), or the continuation is only a local variable.",
       "fix": "Reject or queue calls while a continuation is pending, or key continuations by request id.",
       "when": ["Continuation"]
+    },
+    {
+      "id": "swift-test-cannot-fail",
+      "question": "Does `added_code` add a test (an `XCTestCase` method named `test…` or a Swift Testing `@Test` function) that could not fail if the code it is named after were broken, because it (a) has no `XCTAssert…`/`#expect`/`#require` at all, (b) only asserts a tautology or a value the test itself just created (`XCTAssertTrue(true)`, `XCTAssertNotNil(Foo())`, `#expect(x == x)`), (c) only checks that a mock or stub returns what the test configured it to return, or that a method the test called directly was called, or (d) replaces the very type or function it claims to test with a fake?",
+      "true": "At least one added test has no assertion that depends on the real behaviour of the code under test: no assertion, a tautology, an assertion on the test's own stub or input, or the unit under test is itself faked.",
+      "false": "Every added test calls real code and asserts on its output, thrown error, published state, or a side effect it causes (including calls the unit under test makes to a fake, with arguments the unit computed). Weak but real assertions (`XCTAssertNotNil` on a computed result) do not count. Test helpers, fakes, fixtures and setUp code without test methods do not count, and neither does code that is not a test.",
+      "fix": "Make the test exercise the real code and assert on a result that would change if that code broke; delete it if it can't.",
+      "when": ["XCTestCase|@Test\\b|func\\s+test\\w*\\s*\\("]
     }
   ]
 }

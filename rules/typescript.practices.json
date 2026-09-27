@@ -13,7 +13,7 @@
     },
     {
       "id": "react-effect-missing-cleanup",
-      "question": "Does `added_code` have a React `useEffect` that starts something ongoing \u2014 `setInterval`, a `setTimeout` that later updates state, `addEventListener`, a subscription, a WebSocket, or an EventSource \u2014 without returning a cleanup function that stops it?",
+      "question": "Does `added_code` have a React `useEffect` that starts something ongoing — `setInterval`, a `setTimeout` that later updates state, `addEventListener`, a subscription, a WebSocket, or an EventSource — without returning a cleanup function that stops it?",
       "true": "An effect starts a timer, listener, socket, or subscription and never returns a function that clears, removes, closes, or unsubscribes it.",
       "false": "Every ongoing thing started in an effect is stopped in the returned cleanup, or the code starts nothing ongoing in an effect.",
       "fix": "Return a cleanup from the effect that clears the timer, removes the listener, or closes the connection.",
@@ -21,7 +21,7 @@
     },
     {
       "id": "react-effect-fetch-race",
-      "question": "Does `added_code` make an HTTP request (with `fetch`, axios, or an API-client function that returns a Promise) inside a React `useEffect` and then set state with the response without protecting against stale or unmounted responses \u2014 no `AbortController`, and no `ignore`/`cancelled` flag that the cleanup sets and the code checks before calling the setter?",
+      "question": "Does `added_code` make an HTTP request (with `fetch`, axios, or an API-client function that returns a Promise) inside a React `useEffect` and then set state with the response without protecting against stale or unmounted responses — no `AbortController`, and no `ignore`/`cancelled` flag that the cleanup sets and the code checks before calling the setter?",
       "true": "An effect awaits a request and then calls a state setter unconditionally, so a slow earlier response can overwrite a newer one.",
       "false": "The effect aborts the request or checks a cancelled flag in cleanup, or the data comes from a library such as React Query or SWR, or there is no HTTP request inside an effect. WebSockets, EventSource, timers, and subscriptions are not HTTP requests and do not count here. Repeated or delayed requests (polling, debounced or per-keystroke requests, retry loops) belong to the separate async-overlap rule and do not count here.",
       "fix": "Use an AbortController (or an `ignore` flag set in the cleanup) and skip setState for stale responses.",
@@ -29,7 +29,7 @@
     },
     {
       "id": "react-effect-for-event",
-      "question": "Does `added_code` use a React `useEffect` to react to a specific user action \u2014 for example watching a `submitted`, `saved`, or `clicked` state flag and then sending a request, navigating, or showing a toast \u2014 when that logic belongs in the event handler that set the flag?",
+      "question": "Does `added_code` use a React `useEffect` to react to a specific user action — for example watching a `submitted`, `saved`, or `clicked` state flag and then sending a request, navigating, or showing a toast — when that logic belongs in the event handler that set the flag?",
       "true": "An effect exists mainly to run action logic after a flag set by an event handler flips.",
       "false": "User-action logic runs in the event handlers themselves, or effects only synchronize with external systems.",
       "fix": "Move the logic into the event handler and drop the flag state and effect.",
@@ -37,7 +37,7 @@
     },
     {
       "id": "react-state-mutation",
-      "question": "Does `added_code` mutate React state in place \u2014 calling `push`, `splice`, `sort`, or `reverse` on an array held in state, or assigning to a property of a state object \u2014 instead of building a new array or object for the setter?",
+      "question": "Does `added_code` mutate React state in place — calling `push`, `splice`, `sort`, or `reverse` on an array held in state, or assigning to a property of a state object — instead of building a new array or object for the setter?",
       "true": "State is changed in place (e.g. `todos.push(item); setTodos(todos)` or `user.name = v; setUser(user)`).",
       "false": "State updates always create new values (spread, map, filter, `toSorted`, a copy then sort), or the mutated value is not React state.",
       "fix": "Create a new array/object (spread, map, filter, toSorted) and pass it to the setter.",
@@ -61,7 +61,7 @@
     },
     {
       "id": "ts-unvalidated-external-data",
-      "question": "Does `added_code` itself parse raw external data \u2014 calling `res.json()`, `JSON.parse(...)`, reading `localStorage`/`sessionStorage`, or reading `event.data` from a message \u2014 and then cast it with `as SomeType` or assign it to a typed variable or return type, without checking its shape at runtime?",
+      "question": "Does `added_code` itself parse raw external data — calling `res.json()`, `JSON.parse(...)`, reading `localStorage`/`sessionStorage`, or reading `event.data` from a message — and then cast it with `as SomeType` or assign it to a typed variable or return type, without checking its shape at runtime?",
       "true": "External data is cast or assigned straight to a domain type with no runtime validation.",
       "false": "The parsed data is validated (zod/valibot/arktype schema, a type-guard function, manual field checks) or kept as `unknown` and narrowed. Calling a typed API-client function, React Query, or SWR does not count, because this code does not parse raw data itself. If none of res.json, JSON.parse, storage reads, or event.data appear, the answer is no.",
       "fix": "Validate external data with a schema or type guard before trusting its type.",
@@ -85,7 +85,7 @@
     },
     {
       "id": "react-async-overlap",
-      "question": "Does `added_code` start repeated or delayed requests \u2014 polling with `setInterval` or a loop, a debounced `setTimeout`, or a new request on every keystroke or prop change \u2014 where a slower earlier response can still arrive after a newer request and overwrite state, because nothing cancels or ignores the older ones (no AbortController, no request id or sequence check, no clearing of the previous timer's request)?",
+      "question": "Does `added_code` start repeated or delayed requests — polling with `setInterval` or a loop, a debounced `setTimeout`, or a new request on every keystroke or prop change — where a slower earlier response can still arrive after a newer request and overwrite state, because nothing cancels or ignores the older ones (no AbortController, no request id or sequence check, no clearing of the previous timer's request)?",
       "true": "Repeated or delayed requests can race: an out-of-date response may land last and set state.",
       "false": "Earlier requests are aborted, ignored by id/sequence, or a new poll only starts after the previous one finishes; or the code makes a single one-off request (a single request inside one effect run belongs to the fetch-race rule); or there are no repeated or delayed requests. A single request that runs once per effect run is the separate fetch-race rule, not this one.",
       "fix": "Abort or ignore stale requests (AbortController or a request id) and only start a new poll after the previous one finishes.",
@@ -93,6 +93,14 @@
         "setInterval|setTimeout|debounce|throttle|while\\s*\\(|poll|onChange|onInput|keystroke|retry",
         "fetch|axios|\\.get\\(|\\.post\\(|request|query"
       ]
+    },
+    {
+      "id": "ts-test-cannot-fail",
+      "question": "Does `added_code` add a test (`it(...)`/`test(...)`) that could not fail if the code it is named after were broken, because it (a) has no assertion at all, (b) only asserts a tautology or a value the test itself just created (`expect(true).toBe(true)`, `expect(x).toBe(x)`, `expect(new Foo()).toBeDefined()`), (c) only checks that a mock returns what the test stubbed it to return, or that a function the test called directly was called, or (d) mocks the very module or function it claims to test?",
+      "true": "At least one added test has no assertion that depends on the real behaviour of the code under test: no assertion, a tautology, an assertion on the test's own stub or input, or the unit under test is itself mocked.",
+      "false": "Every added test calls real code and asserts on its output, thrown error, returned value, rendered result, or a side effect it causes (including a mock the unit under test calls, with arguments the unit computed). Weak but real assertions (`toBeTruthy()` on a computed result) do not count. Test helpers, fixtures, factories and setup code without test cases do not count, and neither does code that is not a test.",
+      "fix": "Make the test exercise the real code and assert on a result that would change if that code broke; delete it if it can't.",
+      "when": ["\\b(it|test)(\\.\\w+)?\\s*\\(", "describe\\s*\\("]
     }
   ]
 }

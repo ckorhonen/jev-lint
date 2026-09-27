@@ -234,6 +234,8 @@ fine-tuned Kev-4B is in progress. `local/laya_server.py` and `local/bench_encode
 | Pack | Files | What it checks |
 | --- | --- | --- |
 | `hygiene` | `rules/typescript.json`, `rules/swift.json` | `any`, non-null / force-unwrap, empty catch, debug prints, restating comments, vague names, magic numbers, bare TODOs, hard-coded secrets… |
+| `practices` | `rules/*.practices.json` | React effect misuse (derived state, missing cleanup, fetch races, event logic), overlapping polling / debounced requests, state mutation, index keys, unvalidated external data, sequential awaits, boolean traps; SwiftUI state ownership, expensive `body`, `.onAppear { Task {} }`, retain cycles, main-thread blocking, continuation misuse, continuations without cancellation or that can be overwritten, unprotected shared state, unstable `ForEach` ids, GCD inside async; tests that can't fail (no assertion, tautologies, asserting the test's own stub, mocking the unit under test) |
+| `repo` | `.jev-lint/*.rules.json` in your repo | Whatever the `jev-lint-rules` skill generated from your guidelines |
 
 Two rules were removed because the model is weak at counting and tracing; use a deterministic linter for them:
 
@@ -241,8 +243,6 @@ Two rules were removed because the model is weak at counting and tracing; use a 
 | --- | --- |
 | `ts-no-deep-nesting` | ESLint `max-depth` (and `complexity`); SwiftLint `nesting` / `cyclomatic_complexity` for Swift |
 | `ts-no-floating-promise` | typescript-eslint `@typescript-eslint/no-floating-promises` (needs type-aware linting) |
-| `practices` | `rules/*.practices.json` | React effect misuse (derived state, missing cleanup, fetch races, event logic), overlapping polling / debounced requests, state mutation, index keys, unvalidated external data, sequential awaits, boolean traps; SwiftUI state ownership, expensive `body`, `.onAppear { Task {} }`, retain cycles, main-thread blocking, continuation misuse, continuations without cancellation or that can be overwritten, unprotected shared state, unstable `ForEach` ids, GCD inside async |
-| `repo` | `.jev-lint/*.rules.json` in your repo | Whatever the `jev-lint-rules` skill generated from your guidelines |
 
 ### Options (environment variables on the hook command)
 
