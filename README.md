@@ -186,3 +186,15 @@ python3 report/build.py <DepartureMono-Regular.woff2>   # rebuild the notebook
 ```sh
 bun test && bunx tsc --noEmit && bunx biome check .
 ```
+
+## License and credits
+
+jev-lint is released under the [MIT License](LICENSE).
+
+- The experiment notebook (`report/`) embeds the **Departure Mono** typeface by Helena Zhang
+  ([departuremono.com](https://departuremono.com)), licensed under the
+  [SIL Open Font License 1.1](https://openfontlicense.org). The font remains under its own license.
+- The evaluation compares against and links to other projects without vendoring them:
+  [TypeSafe Jev](https://docs.typesafe.ai) (hosted API), [Kev](https://github.com/jaredpalmer/kev),
+  [Laya](https://github.com/NandhaKishorM/laya) and [JevLike](https://github.com/vinnylarouge/jevlike).
+

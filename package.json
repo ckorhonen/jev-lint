@@ -14,5 +14,6 @@
     "@biomejs/biome": "^2.5.14",
     "bun-types": "^1.4.2",
     "typescript": "^7.0.2"
-  }
+  },
+  "license": "MIT"
 }
