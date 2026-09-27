@@ -108,7 +108,17 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12.5px}
   <div class="eyebrow">Contents</div>
   <ol id="toc-list">
     <li><a href="#answer">Current answer</a></li>
-    <li><a href="#e4">Entry 4 · Local models <span class="tag new">latest</span></a>
+    <li><a href="#e5">Entry 5 · Gate, async, Codex <span class="tag new">latest</span></a>
+      <ol>
+        <li><a href="#e5-gate">Rule gate</a></li>
+        <li><a href="#e5-rules">New rules</a></li>
+        <li><a href="#e5-local">Kev, gated</a></li>
+        <li><a href="#e5-e2e">Claude Code runs</a></li>
+        <li><a href="#e5-codex">Codex runs</a></li>
+        <li><a href="#e5-finetune">Fine-tuning plan</a></li>
+      </ol>
+    </li>
+    <li><a href="#e4">Entry 4 · Local models</a>
       <ol>
         <li><a href="#e4-accuracy">Accuracy</a></li>
         <li><a href="#e4-speed">Speed</a></li>
@@ -153,7 +163,7 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12.5px}
   <section id="answer">
     <h2>Current answer</h2>
     <div class="verdict">
-      <p class="eyebrow">Recommendation as of Entry 4</p>
+      <p class="eyebrow">Recommendation as of Entry 5</p>
       <p><b>Adopt it with both rule packs, as a non-blocking hint.</b> On best-practice rules like "don't mirror a prop into state with an effect", Jev is accurate once each rule is worded narrowly. In real agent runs it cut graded rule violations by about a third. On React tasks, it cut the review comments our rules cover from 1.42 to 0.25 per task. SwiftUI tasks had too few of those comments to show an effect. It does not replace an AI code reviewer. About three quarters of what the reviewer raised was logic and design problems that no snippet-level rule can see.</p>
     </div>
     <div class="facts">
@@ -178,8 +188,91 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12.5px}
     <figure><svg viewBox="0 0 680 210" role="img" aria-label="Median seconds per check" class="chart"><line x1="44" x2="670" y1="164.0" y2="164.0" class="grid"/><text x="38" y="168.0" class="tick" text-anchor="end">0.00s</text><line x1="44" x2="670" y1="128.0" y2="128.0" class="grid"/><text x="38" y="132.0" class="tick" text-anchor="end">0.50s</text><line x1="44" x2="670" y1="92.0" y2="92.0" class="grid"/><text x="38" y="96.0" class="tick" text-anchor="end">1.00s</text><line x1="44" x2="670" y1="56.0" y2="56.0" class="grid"/><text x="38" y="60.0" class="tick" text-anchor="end">1.50s</text><line x1="44" x2="670" y1="20.0" y2="20.0" class="grid"/><text x="38" y="24.0" class="tick" text-anchor="end">2.00s</text><rect x="62.0" y="143.8" width="167.7" height="20.2" class="s1"><title>Median time per check · Jev: 0.28s</title></rect><text x="145.8" y="138.8" class="val" text-anchor="middle">0.28s</text><text x="148.3" y="192" class="glabel" text-anchor="middle">Jev</text><rect x="270.7" y="52.0" width="167.7" height="112.0" class="s1"><title>Median time per check · GPT-6-Luna (low): 1.56s</title></rect><text x="354.5" y="47.0" class="val" text-anchor="middle">1.56s</text><text x="357.0" y="192" class="glabel" text-anchor="middle">GPT-6-Luna (low)</text><rect x="479.3" y="87.4" width="167.7" height="76.6" class="s1"><title>Median time per check · GPT-5.4-mini (round 1): 1.06s</title></rect><text x="563.2" y="82.4" class="val" text-anchor="middle">1.06s</text><text x="565.7" y="192" class="glabel" text-anchor="middle">GPT-5.4-mini (round 1)</text></svg><div class="legend"><span class="key"><i class="sw s1"></i>Median time per check</span></div></figure>
   </section>
 
+  <section class="entry" id="e5">
+    <h2>Entry 5 · Rule gate, async hooks, new rules, Codex <span class="date">26 Sep 2026</span> <span class="tag new">latest</span></h2>
+    <p><b>Question.</b> Entry 4 found that the local model's time grows with the number of rules asked, and that hooks block the agent while they run. Four questions follow. Can a cheap pattern gate skip rules that can't apply without losing catches? Does running the check in the background (Claude Code's <code>asyncRewake</code>) still change the agent's code? Does the hook work in Codex? Do the new rules for the reviewer's misses hold up?</p>
+    <p><b>Changes in this entry:</b></p>
+    <ul>
+      <li><b>Gate:</b> every rule got a <code>when</code> pattern, such as <code>useEffect</code> or <code>Continuation</code>, and is only asked when it matches.</li>
+      <li><b>Dropped rules:</b> nesting depth and floating promises moved to ESLint (<code>max-depth</code>, <code>no-floating-promises</code>).</li>
+      <li><b>New rules:</b> three, each with fresh labeled edits from two independent authors:
+        <ul>
+          <li>overlapping polling or debounced requests;</li>
+          <li>continuations without cancellation;</li>
+          <li>stored continuations that a second call can overwrite.</li>
+        </ul>
+      </li>
+      <li><b>Rule boundaries:</b> the new rules overlapped with older ones, so their boundaries were written into the rules using the tuning split only.</li>
+    </ul>
+
+    <h3 id="e5-gate">Rule gate</h3>
+    <figure><svg viewBox="0 0 680 220" role="img" aria-label="Rules asked per edit with the gate" class="chart"><line x1="44" x2="670" y1="174.0" y2="174.0" class="grid"/><text x="38" y="178.0" class="tick" text-anchor="end">0.0</text><line x1="44" x2="670" y1="130.0" y2="130.0" class="grid"/><text x="38" y="134.0" class="tick" text-anchor="end">4.0</text><line x1="44" x2="670" y1="86.0" y2="86.0" class="grid"/><text x="38" y="90.0" class="tick" text-anchor="end">8.0</text><line x1="44" x2="670" y1="42.0" y2="42.0" class="grid"/><text x="38" y="46.0" class="tick" text-anchor="end">12.0</text><rect x="62.0" y="53.0" width="55.2" height="121.0" class="s4"><title>Rules in the pack · Hygiene · TS: 11.0</title></rect><text x="89.6" y="48.0" class="val" text-anchor="middle">11.0</text><rect x="122.2" y="139.8" width="55.2" height="34.2" class="s1"><title>Rules asked per edit after the gate (mean) · Hygiene · TS: 3.1</title></rect><text x="149.9" y="134.8" class="val" text-anchor="middle">3.1</text><text x="122.2" y="202" class="glabel" text-anchor="middle">Hygiene · TS</text><rect x="218.5" y="31.0" width="55.2" height="143.0" class="s4"><title>Rules in the pack · Hygiene · Swift: 13.0</title></rect><text x="246.1" y="26.0" class="val" text-anchor="middle">13.0</text><rect x="278.8" y="136.1" width="55.2" height="37.9" class="s1"><title>Rules asked per edit after the gate (mean) · Hygiene · Swift: 3.4</title></rect><text x="306.4" y="131.1" class="val" text-anchor="middle">3.4</text><text x="278.8" y="202" class="glabel" text-anchor="middle">Hygiene · Swift</text><rect x="375.0" y="53.0" width="55.2" height="121.0" class="s4"><title>Rules in the pack · Practices · TS: 11.0</title></rect><text x="402.6" y="48.0" class="val" text-anchor="middle">11.0</text><rect x="435.2" y="119.3" width="55.2" height="54.7" class="s1"><title>Rules asked per edit after the gate (mean) · Practices · TS: 5.0</title></rect><text x="462.9" y="114.3" class="val" text-anchor="middle">5.0</text><text x="435.2" y="202" class="glabel" text-anchor="middle">Practices · TS</text><rect x="531.5" y="42.0" width="55.2" height="132.0" class="s4"><title>Rules in the pack · Practices · Swift: 12.0</title></rect><text x="559.1" y="37.0" class="val" text-anchor="middle">12.0</text><rect x="591.8" y="140.9" width="55.2" height="33.1" class="s1"><title>Rules asked per edit after the gate (mean) · Practices · Swift: 3.0</title></rect><text x="619.4" y="135.9" class="val" text-anchor="middle">3.0</text><text x="591.8" y="202" class="glabel" text-anchor="middle">Practices · Swift</text></svg><div class="legend"><span class="key"><i class="sw s4"></i>Rules in the pack</span><span class="key"><i class="sw s1"></i>Rules asked per edit after the gate (mean)</span></div></figure>
+    <p>Across all labeled edits, an edit is now judged against 3.0–5.0 rules instead of 11–13, so two thirds of the model's work disappears. On held-out edits, the gate cost no recall for Jev or Luna. One pattern did cost a catch at first: the overlap rule's pattern knew timers and polling but not <code>fetch</code>. We broadened it to "makes a request"; the gated numbers below are after that fix.</p>
+    <details class="more"><summary>Held-out F1, recall and false alarms, all rules vs gated</summary><div class="table "><table><thead><tr><th>Judge</th><th>Pack · lang</th><th>F1 (all → gated)</th><th>Recall</th><th>Clean edits flagged</th></tr></thead><tbody><tr><td>Jev</td><td>Hygiene · TS</td><td>100% → 100%</td><td>100% → 100%</td><td>0% → 0%</td></tr><tr><td>GPT-6-Luna</td><td>Hygiene · TS</td><td>100% → 100%</td><td>100% → 100%</td><td>0% → 0%</td></tr><tr><td>Jev</td><td>Hygiene · Swift</td><td>99% → 100%</td><td>100% → 100%</td><td>0% → 0%</td></tr><tr><td>GPT-6-Luna</td><td>Hygiene · Swift</td><td>98% → 98%</td><td>98% → 98%</td><td>0% → 0%</td></tr><tr><td>Jev</td><td>Practices · TS</td><td>97% → 97%</td><td>99% → 99%</td><td>2% → 2%</td></tr><tr><td>GPT-6-Luna</td><td>Practices · TS</td><td>97% → 98%</td><td>100% → 100%</td><td>2% → 2%</td></tr><tr><td>Jev</td><td>Practices · Swift</td><td>93% → 94%</td><td>96% → 96%</td><td>8% → 8%</td></tr><tr><td>GPT-6-Luna</td><td>Practices · Swift</td><td>94% → 94%</td><td>100% → 100%</td><td>13% → 13%</td></tr></tbody></table></div></details>
+    <p class="note">The gate is a regex prefilter, so it can only remove flags, never add them. Its patterns are deliberately broad ("the code mentions <code>useEffect</code>"). They don't try to detect the violation itself, which stays the model's job.</p>
+
+    <h3 id="e5-rules">Rules for the reviewer's misses</h3>
+    <div class="table "><table><thead><tr><th>Rule (held-out, gated)</th><th>Jev</th><th>GPT-6-Luna</th></tr></thead><tbody><tr><td><code>react-async-overlap</code></td><td>10/10 found · 0 false</td><td>10/10 found · 2 false</td></tr><tr><td><code>react-effect-fetch-race</code></td><td>13/13 found · 4 false</td><td>13/13 found · 1 false</td></tr><tr><td><code>swift-continuation-cancellation</code></td><td>12/12 found · 1 false</td><td>12/12 found · 1 false</td></tr><tr><td><code>swift-continuation-stored-overwrite</code></td><td>9/9 found · 1 false</td><td>9/9 found · 1 false</td></tr><tr><td><code>swift-continuation-misuse</code></td><td>11/13 found · 5 false</td><td>13/13 found · 6 false</td></tr></tbody></table></div>
+    <ul>
+      <li><b>The new rules work.</b> On held-out edits, overlap caught 10 of 10, cancellation 12 of 12, and stored-overwrite 9 of 9, with 0–1 false flags each.</li>
+      <li><b>The older neighbours needed boundaries.</b> <code>swift-continuation-misuse</code> started firing on the new cases (13 false flags on the tuning split). After its exceptions named the new rules, it made 5 false flags on held-out edits. Fetch race still has 4. Both are worth another wording pass, and Swift practice rules are now at 93–94% F1, against 96% before the harder cases arrived.</li>
+    </ul>
+
+    <h3 id="e5-local">Kev-4B with the gate</h3>
+    <figure><svg viewBox="0 0 680 240" role="img" aria-label="Kev-4B held-out F1, before and after the gate" class="chart"><line x1="44" x2="670" y1="194.0" y2="194.0" class="grid"/><text x="38" y="198.0" class="tick" text-anchor="end">0%</text><line x1="44" x2="670" y1="150.5" y2="150.5" class="grid"/><text x="38" y="154.5" class="tick" text-anchor="end">25%</text><line x1="44" x2="670" y1="107.0" y2="107.0" class="grid"/><text x="38" y="111.0" class="tick" text-anchor="end">50%</text><line x1="44" x2="670" y1="63.5" y2="63.5" class="grid"/><text x="38" y="67.5" class="tick" text-anchor="end">75%</text><line x1="44" x2="670" y1="20.0" y2="20.0" class="grid"/><text x="38" y="24.0" class="tick" text-anchor="end">100%</text><rect x="62.0" y="77.0" width="55.2" height="117.0" class="s3"><title>Kev-4B, all rules (Entry 4) · Hygiene · TS: 67%</title></rect><text x="89.6" y="72.0" class="val" text-anchor="middle">67%</text><rect x="122.2" y="63.1" width="55.2" height="130.9" class="s1"><title>Kev-4B, gated (Entry 5) · Hygiene · TS: 75%</title></rect><text x="149.9" y="58.1" class="val" text-anchor="middle">75%</text><text x="122.2" y="222" class="glabel" text-anchor="middle">Hygiene · TS</text><rect x="218.5" y="78.0" width="55.2" height="116.0" class="s3"><title>Kev-4B, all rules (Entry 4) · Hygiene · Swift: 67%</title></rect><text x="246.1" y="73.0" class="val" text-anchor="middle">67%</text><rect x="278.8" y="69.1" width="55.2" height="124.9" class="s1"><title>Kev-4B, gated (Entry 5) · Hygiene · Swift: 72%</title></rect><text x="306.4" y="64.1" class="val" text-anchor="middle">72%</text><text x="278.8" y="222" class="glabel" text-anchor="middle">Hygiene · Swift</text><rect x="375.0" y="81.3" width="55.2" height="112.7" class="s3"><title>Kev-4B, all rules (Entry 4) · Practices · TS: 65%</title></rect><text x="402.6" y="76.3" class="val" text-anchor="middle">65%</text><rect x="435.2" y="65.1" width="55.2" height="128.9" class="s1"><title>Kev-4B, gated (Entry 5) · Practices · TS: 74%</title></rect><text x="462.9" y="60.1" class="val" text-anchor="middle">74%</text><text x="435.2" y="222" class="glabel" text-anchor="middle">Practices · TS</text><rect x="531.5" y="99.7" width="55.2" height="94.3" class="s3"><title>Kev-4B, all rules (Entry 4) · Practices · Swift: 54%</title></rect><text x="559.1" y="94.7" class="val" text-anchor="middle">54%</text><rect x="591.8" y="71.5" width="55.2" height="122.5" class="s1"><title>Kev-4B, gated (Entry 5) · Practices · Swift: 70%</title></rect><text x="619.4" y="66.5" class="val" text-anchor="middle">70%</text><text x="591.8" y="222" class="glabel" text-anchor="middle">Practices · Swift</text></svg><div class="legend"><span class="key"><i class="sw s3"></i>Kev-4B, all rules (Entry 4)</span><span class="key"><i class="sw s1"></i>Kev-4B, gated (Entry 5)</span></div></figure>
+    <p>Gating helped Kev on both fronts. F1 rose to 70–75%, because it stopped answering rules that couldn't apply, and median time fell from 3.4 s to 1.4 s per edit. It is still well behind Jev's 94–100%.</p>
+    <p><b>Batching on Metal was already done.</b> Kev's MLX path runs all of a request's rule rows in one batched pass, with up to 57 rules per pass for a short edit. Forcing one rule per pass made it 10–34% slower. The remaining cost is plain compute, about 114 tokens per rule through a 4B model, so fewer rules (the gate) or a smaller model are the levers.</p>
+    <div class="table "><table><thead><tr><th>Edit</th><th>Code tokens</th><th>Rules</th><th>Rules per pass (default)</th><th>Batched</th><th>One rule per pass</th></tr></thead><tbody><tr><td>short</td><td>103</td><td>22</td><td>57</td><td>12.1 s</td><td>13.4 s</td></tr><tr><td>long</td><td>384</td><td>22</td><td>28</td><td>29.2 s</td><td>39.1 s</td></tr></tbody></table></div>
+
+    <h3 id="e5-e2e">Claude Code runs: sync vs async, Jev vs local</h3>
+    <p><b>Setup.</b> Entry 3's 12 React/SwiftUI tasks ran twice under four conditions, 96 runs in all:</p>
+    <ul>
+      <li>no hook;</li>
+      <li>Jev, synchronous;</li>
+      <li>Jev in the background with <code>asyncRewake</code>: findings arrive as a system message when ready, and the agent never waits;</li>
+      <li>local Kev-4B in the background.</li>
+    </ul>
+    <p>Both rule packs were on, gated. Luna graded the final code and reviewed it blind.</p>
+    <figure><svg viewBox="0 0 680 230" role="img" aria-label="Entry 5 end-to-end: violations and time per task" class="chart"><line x1="44" x2="670" y1="184.0" y2="184.0" class="grid"/><text x="38" y="188.0" class="tick" text-anchor="end">0.00</text><line x1="44" x2="670" y1="129.3" y2="129.3" class="grid"/><text x="38" y="133.3" class="tick" text-anchor="end">1.00</text><line x1="44" x2="670" y1="74.7" y2="74.7" class="grid"/><text x="38" y="78.7" class="tick" text-anchor="end">2.00</text><line x1="44" x2="670" y1="20.0" y2="20.0" class="grid"/><text x="38" y="24.0" class="tick" text-anchor="end">3.00</text><rect x="62.0" y="54.2" width="64.2" height="129.8" class="s4"><title>none: 2.38 violations</title></rect><text x="94.1" y="49.2" class="val" text-anchor="middle">2.38</text><rect x="131.2" y="111.1" width="64.2" height="72.9" class="s2"><title>jev: 1.33 violations</title></rect><text x="163.4" y="106.1" class="val" text-anchor="middle">1.33</text><rect x="200.5" y="117.9" width="64.2" height="66.1" class="s1"><title>jev-rewake: 1.21 violations</title></rect><text x="232.6" y="112.9" class="val" text-anchor="middle">1.21</text><rect x="269.8" y="115.7" width="64.2" height="68.3" class="s3"><title>kev-rewake: 1.25 violations</title></rect><text x="301.9" y="110.7" class="val" text-anchor="middle">1.25</text><text x="200.5" y="212" class="glabel" text-anchor="middle">Graded violations / task</text><rect x="375.0" y="94.1" width="64.2" height="89.9" class="s4"><title>none: 49 s per task</title></rect><text x="407.1" y="89.1" class="val" text-anchor="middle">1.65</text><rect x="444.2" y="65.3" width="64.2" height="118.7" class="s2"><title>jev: 65 s per task</title></rect><text x="476.4" y="60.3" class="val" text-anchor="middle">2.17</text><rect x="513.5" y="76.3" width="64.2" height="107.7" class="s1"><title>jev-rewake: 59 s per task</title></rect><text x="545.6" y="71.3" class="val" text-anchor="middle">1.97</text><rect x="582.8" y="20.0" width="64.2" height="164.0" class="s3"><title>kev-rewake: 101 s per task</title></rect><text x="614.9" y="15.0" class="val" text-anchor="middle">3.38</text><text x="513.5" y="212" class="glabel" text-anchor="middle">Minutes / task (x2)</text></svg><div class="legend"><span class="key"><i class="sw s4"></i>No hook</span><span class="key"><i class="sw s2"></i>Jev, sync</span><span class="key"><i class="sw s1"></i>Jev, async rewake</span><span class="key"><i class="sw s3"></i>Kev-4B local, async rewake</span></div></figure>
+    <p class="caption">Right-hand group: minutes per task, doubled so it shares the scale.</p>
+    <div class="table "><table><thead><tr><th>Condition</th><th>Violations / task</th><th>Change vs none (95% CI)</th><th>Time / task</th><th>Cost / task</th><th>Findings shown (high / medium)</th><th>Mean hook time</th><th>Rule-covered review findings / task</th><th>Builds</th></tr></thead><tbody><tr><td>No hook</td><td>2.38</td><td>—</td><td>49 s</td><td>$0.123</td><td>—</td><td>—</td><td>0.96</td><td>24/24</td></tr><tr><td>Jev, sync</td><td>1.33</td><td>-1.04 (-1.92 to -0.21)</td><td>65 s</td><td>$0.162</td><td>19 / 16</td><td>0.3 s</td><td>0.50</td><td>24/24</td></tr><tr><td>Jev, async rewake</td><td>1.21</td><td>-1.17 (-2.00 to -0.38)</td><td>59 s</td><td>$0.156</td><td>15 / 22</td><td>0.3 s</td><td>1.00</td><td>24/24</td></tr><tr><td>Kev-4B local, async rewake</td><td>1.25</td><td>-1.12 (-1.96 to -0.29)</td><td>101 s</td><td>$0.197</td><td>9 / 71</td><td>9.4 s</td><td>0.79</td><td>24/24</td></tr></tbody></table></div>
+    <ul>
+      <li><b>Every hook condition cut violations significantly,</b> by about 1 per task out of 2.4. The 95% intervals exclude zero, and 13–15 of 24 tasks improved while 3–5 got worse.</li>
+      <li><b>Async is as effective as sync and costs less time.</b> It added +10 s per task against +16 s. In headless runs the background findings still arrived: in the pilot, the agent added type guards right after an async "unvalidated JSON" finding.</li>
+      <li><b>One signal disagrees.</b> The AI reviewer's comments that our rules cover fell with sync Jev (0.96 → 0.50 per task) but not with async (1.00). Those counts are small, about 24 comments per condition, so this needs a bigger run before it means anything.</li>
+      <li><b>Local Kev in the background worked, expensively.</b>
+        <ul>
+          <li>It matched Jev on violations (1.25 per task).</li>
+          <li>It showed 71 double-check findings, many of them noise, which the agent spent edits on.</li>
+          <li>Its checks averaged 9.4 s with four agents sharing one server.</li>
+          <li>Net: +52 s and +60% cost per task. So it's usable as a background judge, but not better than Jev until it's more precise.</li>
+        </ul>
+      </li>
+    </ul>
+
+    <h3 id="e5-codex">Codex runs</h3>
+    <p>The broken Codex install turned out to be a stale npm shim; a working Homebrew Codex (0.157.1) was already installed. Codex supports synchronous hooks: <code>apply_patch</code> events are parsed from their <code>+</code> lines, and findings go back as context. It has no rewake, so the Codex runs are synchronous. Setup: the same 12 tasks, twice each, with the user's default Codex model (gpt-6-astra, medium) and an isolated Codex home per run.</p>
+    <div class="table "><table><thead><tr><th>Codex condition</th><th>Violations / task</th><th>Change vs none (95% CI)</th><th>Time / task</th><th>Edits / task</th><th>Findings shown</th><th>Builds</th></tr></thead><tbody><tr><td>No hook</td><td>1.67</td><td>—</td><td>91 s</td><td>1.0</td><td>0</td><td>24/24</td></tr><tr><td>Jev hook (sync)</td><td>0.92</td><td>-0.75 (-1.29 to -0.17); 15 better, 4 worse</td><td>97 s</td><td>1.5</td><td>26</td><td>24/24</td></tr></tbody></table></div>
+    <p>The hook cut Codex's graded violations by 45% (1.67 → 0.92 per task), with an interval that excludes zero, for about 6 s more per task. In the smoke test, Codex had been told to cast the JSON; after the hook's finding, it replaced the cast with runtime validation.</p>
+
+    <h3 id="e5-finetune">Fine-tuning plan</h3>
+    <ul>
+      <li><b>Jev's outputs can't be training data.</b> TypeSafe's Master Customer Agreement prohibits using "the Services or any Output to perform model distillation, train a model to imitate the output of the Services, or develop… a similar or competing product". So the teacher can't be Jev.</li>
+      <li><b>What we can use:</b> our labeled edits. That's about 950 cases, roughly 10,000 rule judgments, labeled by Claude subagents and not by Jev. Train only on the tuning split, and keep every held-out file untouched for evaluation. The model providers' terms on using generated data for training should be checked before any release.</li>
+      <li><b>Recipe:</b> Kev's own fine-tuning path, starting from the released checkpoint (<code>--init_from jaredpalmer/kev-4b</code>). Kev-4B first, then Kev-0.8B. Its authors report about $1 per Kev-4B run on an H100, or it can run locally on MLX with one job at a time.</li>
+      <li><b>Bar to beat:</b>
+        <ul>
+          <li>held-out F1 of at least 90%;</li>
+          <li>clean-edit false alarms of at most 5%;</li>
+          <li>a gated median of at most 1 s on this Mac (0.8B).</li>
+        </ul>
+        Then re-run the Entry 5 E2E with the fine-tuned model in the background.
+      </li>
+    </ul>
+  </section>
+
   <section class="entry" id="e4">
-    <h2>Entry 4 · Local models on the Mac <span class="date">26 Sep 2026</span> <span class="tag new">latest</span></h2>
+    <h2>Entry 4 · Local models on the Mac <span class="date">26 Sep 2026</span></h2>
     <p><b>Question.</b> Can a Jev-like model running on this machine (M3 Max, 64 GB) replace the API call? The goal is zero cost per edit and lower latency, ideally using the Apple Neural Engine.</p>
     <p><b>Setup.</b> Three open models all speak the same <code>/v1/systemone</code> protocol, so the hook and harness only needed a base-URL switch (<code>TYPESAFE_BASE_URL</code>):</p>
     <ul>
@@ -356,6 +449,8 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12.5px}
     <h2>Recommendation</h2>
     <ol>
       <li><b>Install the hook with both packs</b> in Claude Code (and Codex once its CLI is fixed on this machine). Run it as a non-blocking hint with thresholds 0.8 / 0.5, and pin <code>JEV_LINT_MODEL=jev-1.13.0</code>.</li>
+      <li><b>Keep the gate on</b> (the default). It skips about two thirds of rule checks per edit at no measured recall cost.</li>
+      <li><b>In Claude Code, run it async:</b> <code>asyncRewake: true</code> with <code>JEV_LINT_MODE=rewake</code>. It's as effective as synchronous and saves about 6 s per task, though a larger run should confirm it before relying on it. In Codex, keep it synchronous, since Codex has no rewake.</li>
       <li><b>Let each repo learn from the hook.</b> The findings log records what fired and whether the agent fixed or kept it. Run the <code>jev-lint-learn</code> skill weekly on active repos: it turns recurring fixes into AGENTS.md guidance, and repeatedly ignored flags into rule rewrites. In its first real use, it narrowed this repo's own stdout rule after a false positive.</li>
       <li><b>Keep the AI code reviewer.</b> The hook handles the pattern-level issues cheaply before review, so review time goes to logic and design, which is where about 75% of review findings were.</li>
       <li><b>Treat rule wording like code.</b> Before adding a rule, add labeled examples and hard negatives, tune on the dev split, and accept it only if the held-out split holds up. The harness does this in one command.</li>
@@ -367,12 +462,13 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12.5px}
   <section id="next">
     <h2>Next experiments</h2>
     <ul>
-      <li><b>Fine-tune Kev-4B (then Kev-0.8B) on our labeled edits,</b> and re-run Entry 4. The bar to beat is Jev's 96% held-out F1 at about 0.3 s. Check TypeSafe's terms before training on Jev outputs.</li>
-      <li><b>Try an async hook</b> (<code>asyncRewake</code>) so a slower local judge doesn't block the agent, and measure whether late feedback still gets acted on.</li>
+      <li><b>Fine-tune Kev-4B, then Kev-0.8B,</b> on our tuning-split labels, following the Entry 5 plan. Never use Jev outputs: TypeSafe's terms forbid it.</li>
+      <li><b>A second wording pass</b> on <code>swift-continuation-misuse</code> and <code>react-effect-fetch-race</code>, the two rules the new ones crowd.</li>
+      <li><b>A bigger async run</b> to settle whether async feedback reduces review comments as much as sync.</li>
       <li><b>Neural Engine, only with a model built for it.</b> A shared-state encoder in Apple's Neural Engine layout, if a fine-tuned small model turns out accurate enough.</li>
       <li><b>More coverage of the reviewer's categories.</b> Try rules for the misses (debounce and poll races, continuation cancellation), and check whether they stay precise.</li>
       <li><b>Bigger end-to-end runs.</b> More repeats, a weaker and a stronger agent model, and real repositories instead of scaffolds.</li>
-      <li><b>Codex end to end.</b> Blocked for now: the Codex CLI's platform binary is missing on this machine.</li>
+
     </ul>
   </section>
 
@@ -381,6 +477,7 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12.5px}
     <ul>
       <li><b>Jev:</b> <code>jev-latest</code> (jev-1.13.0), one call per edit, one yes/no question (a Noul) per rule. $0.042 per million input tokens; output tokens are free.</li>
       <li><b>LLM judge, grader, reviewer and mapper:</b> GPT-6-Luna at <code>reasoning_effort: low</code>. $0.10 per million input tokens and $0.50 per million output, standard tier, checked 26 Sep 2026. Entry 1 originally used GPT-5.4-mini and GPT-5.5.</li>
+      <li><b>Codex (Entry 5):</b> codex-cli 0.157.1 (Homebrew), gpt-6-astra at medium reasoning (the user's default), <code>codex exec</code> with an isolated <code>CODEX_HOME</code> per run and <code>--dangerously-bypass-hook-trust</code>.</li>
       <li><b>Local models (Entry 4):</b> Kev-0.8B and Kev-4B (<code>jaredpalmer/kev-*</code>, MLX, bf16); Laya 0.3.20 English checkpoint (PyTorch Metal backend; ONNX Runtime 1.30 with the Core ML provider). Held-out split only, one request at a time, on an M3 Max with 64 GB.</li>
       <li><b>Agent:</b> Claude Code headless (Sonnet). User hooks, plugins and MCP servers were off. Hook conditions were interleaved.</li>
       <li><b>Labels:</b> written by Claude subagents, one labeler per edit. Tuning and held-out sets come from different authors. Thresholds were fixed at 0.8 / 0.5 before any data came in.</li>
@@ -403,6 +500,15 @@ python3 report/build.py path/to/DepartureMono-Regular.woff2 # rebuild this page<
   <section id="log">
     <h2>Changelog</h2>
     <ul>
+      <li><b>26 Sep 2026, Entry 5.</b>
+        <ul>
+          <li>Rule gate (<code>when</code> patterns), and the async <code>rewake</code> hook mode.</li>
+          <li>Three new rules; two rules dropped to ESLint.</li>
+          <li>Label <code>scope</code> per case.</li>
+          <li>Codex runner, and 96 Claude Code plus 48 Codex runs.</li>
+          <li>Removed the dead <code>claude-code-notch</code> hooks from the user's Claude Code and Codex configs (unrelated cleanup, requested).</li>
+        </ul>
+      </li>
       <li><b>26 Sep 2026, feedback loop.</b> The hook now keeps a local findings log. <code>src/findings.ts</code> classifies each finding as fixed, kept or unknown, and the <code>jev-lint-learn</code> skill feeds recurring ones back into a repo's AGENTS.md and <code>.jev-lint/</code> rules. The <code>jev-lint-rules</code> skill and <code>src/validate.ts</code> generate and validate repo rules from its guidelines.</li>
       <li><b>26 Sep 2026, Entry 4.</b> Local models: Kev-0.8B, Kev-4B and Laya on this Mac, plus Laya's encoder through Core ML. The hook and harness gained <code>TYPESAFE_BASE_URL</code> / <code>LOCAL_BASE_URL</code> for any <code>/v1/systemone</code> server. Repo pushed to GitHub, and the hook installed in Claude Code and Codex.</li>
       <li><b>26 Sep 2026, Entry 3.</b> Added 20 best-practice rules, a v1→v2 wording pass for TypeScript, the pre-review catch analysis, and hook on/off runs on 12 React/SwiftUI tasks. The page became a notebook.</li>

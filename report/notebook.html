@@ -108,7 +108,17 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12.5px}
   <div class="eyebrow">Contents</div>
   <ol id="toc-list">
     <li><a href="#answer">Current answer</a></li>
-    <li><a href="#e4">Entry 4 · Local models <span class="tag new">latest</span></a>
+    <li><a href="#e5">Entry 5 · Gate, async, Codex <span class="tag new">latest</span></a>
+      <ol>
+        <li><a href="#e5-gate">Rule gate</a></li>
+        <li><a href="#e5-rules">New rules</a></li>
+        <li><a href="#e5-local">Kev, gated</a></li>
+        <li><a href="#e5-e2e">Claude Code runs</a></li>
+        <li><a href="#e5-codex">Codex runs</a></li>
+        <li><a href="#e5-finetune">Fine-tuning plan</a></li>
+      </ol>
+    </li>
+    <li><a href="#e4">Entry 4 · Local models</a>
       <ol>
         <li><a href="#e4-accuracy">Accuracy</a></li>
         <li><a href="#e4-speed">Speed</a></li>
@@ -153,7 +163,7 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12.5px}
   <section id="answer">
     <h2>Current answer</h2>
     <div class="verdict">
-      <p class="eyebrow">Recommendation as of Entry 4</p>
+      <p class="eyebrow">Recommendation as of Entry 5</p>
       <p><b>Adopt it with both rule packs, as a non-blocking hint.</b> On best-practice rules like "don't mirror a prop into state with an effect", Jev is accurate once each rule is worded narrowly. In real agent runs it cut graded rule violations by about a third. On React tasks, it cut the review comments our rules cover from 1.42 to 0.25 per task. SwiftUI tasks had too few of those comments to show an effect. It does not replace an AI code reviewer. About three quarters of what the reviewer raised was logic and design problems that no snippet-level rule can see.</p>
     </div>
     <div class="facts">
@@ -178,8 +188,91 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12.5px}
     {{CHART_LATENCY}}
   </section>
 
+  <section class="entry" id="e5">
+    <h2>Entry 5 · Rule gate, async hooks, new rules, Codex <span class="date">26 Sep 2026</span> <span class="tag new">latest</span></h2>
+    <p><b>Question.</b> Entry 4 found that the local model's time grows with the number of rules asked, and that hooks block the agent while they run. Four questions follow. Can a cheap pattern gate skip rules that can't apply without losing catches? Does running the check in the background (Claude Code's <code>asyncRewake</code>) still change the agent's code? Does the hook work in Codex? Do the new rules for the reviewer's misses hold up?</p>
+    <p><b>Changes in this entry:</b></p>
+    <ul>
+      <li><b>Gate:</b> every rule got a <code>when</code> pattern, such as <code>useEffect</code> or <code>Continuation</code>, and is only asked when it matches.</li>
+      <li><b>Dropped rules:</b> nesting depth and floating promises moved to ESLint (<code>max-depth</code>, <code>no-floating-promises</code>).</li>
+      <li><b>New rules:</b> three, each with fresh labeled edits from two independent authors:
+        <ul>
+          <li>overlapping polling or debounced requests;</li>
+          <li>continuations without cancellation;</li>
+          <li>stored continuations that a second call can overwrite.</li>
+        </ul>
+      </li>
+      <li><b>Rule boundaries:</b> the new rules overlapped with older ones, so their boundaries were written into the rules using the tuning split only.</li>
+    </ul>
+
+    <h3 id="e5-gate">Rule gate</h3>
+    {{CHART_GATE}}
+    <p>Across all labeled edits, an edit is now judged against 3.0–5.0 rules instead of 11–13, so two thirds of the model's work disappears. On held-out edits, the gate cost no recall for Jev or Luna. One pattern did cost a catch at first: the overlap rule's pattern knew timers and polling but not <code>fetch</code>. We broadened it to "makes a request"; the gated numbers below are after that fix.</p>
+    <details class="more"><summary>Held-out F1, recall and false alarms, all rules vs gated</summary>{{GATE_TABLE}}</details>
+    <p class="note">The gate is a regex prefilter, so it can only remove flags, never add them. Its patterns are deliberately broad ("the code mentions <code>useEffect</code>"). They don't try to detect the violation itself, which stays the model's job.</p>
+
+    <h3 id="e5-rules">Rules for the reviewer's misses</h3>
+    {{NEW_RULE_TABLE}}
+    <ul>
+      <li><b>The new rules work.</b> On held-out edits, overlap caught 10 of 10, cancellation 12 of 12, and stored-overwrite 9 of 9, with 0–1 false flags each.</li>
+      <li><b>The older neighbours needed boundaries.</b> <code>swift-continuation-misuse</code> started firing on the new cases (13 false flags on the tuning split). After its exceptions named the new rules, it made 5 false flags on held-out edits. Fetch race still has 4. Both are worth another wording pass, and Swift practice rules are now at 93–94% F1, against 96% before the harder cases arrived.</li>
+    </ul>
+
+    <h3 id="e5-local">Kev-4B with the gate</h3>
+    {{CHART_KEV_GATE}}
+    <p>Gating helped Kev on both fronts. F1 rose to 70–75%, because it stopped answering rules that couldn't apply, and median time fell from {{KEV_LAT_BEFORE}} s to {{KEV_LAT_AFTER}} s per edit. It is still well behind Jev's 94–100%.</p>
+    <p><b>Batching on Metal was already done.</b> Kev's MLX path runs all of a request's rule rows in one batched pass, with up to 57 rules per pass for a short edit. Forcing one rule per pass made it 10–34% slower. The remaining cost is plain compute, about 114 tokens per rule through a 4B model, so fewer rules (the gate) or a smaller model are the levers.</p>
+    {{BATCH_TABLE}}
+
+    <h3 id="e5-e2e">Claude Code runs: sync vs async, Jev vs local</h3>
+    <p><b>Setup.</b> Entry 3's 12 React/SwiftUI tasks ran twice under four conditions, 96 runs in all:</p>
+    <ul>
+      <li>no hook;</li>
+      <li>Jev, synchronous;</li>
+      <li>Jev in the background with <code>asyncRewake</code>: findings arrive as a system message when ready, and the agent never waits;</li>
+      <li>local Kev-4B in the background.</li>
+    </ul>
+    <p>Both rule packs were on, gated. Luna graded the final code and reviewed it blind.</p>
+    {{CHART_E5}}
+    <p class="caption">Right-hand group: minutes per task, doubled so it shares the scale.</p>
+    {{E5_TABLE}}
+    <ul>
+      <li><b>Every hook condition cut violations significantly,</b> by about 1 per task out of 2.4. The 95% intervals exclude zero, and 13–15 of 24 tasks improved while 3–5 got worse.</li>
+      <li><b>Async is as effective as sync and costs less time.</b> It added +10 s per task against +16 s. In headless runs the background findings still arrived: in the pilot, the agent added type guards right after an async "unvalidated JSON" finding.</li>
+      <li><b>One signal disagrees.</b> The AI reviewer's comments that our rules cover fell with sync Jev (0.96 → 0.50 per task) but not with async (1.00). Those counts are small, about 24 comments per condition, so this needs a bigger run before it means anything.</li>
+      <li><b>Local Kev in the background worked, expensively.</b>
+        <ul>
+          <li>It matched Jev on violations (1.25 per task).</li>
+          <li>It showed 71 double-check findings, many of them noise, which the agent spent edits on.</li>
+          <li>Its checks averaged 9.4 s with four agents sharing one server.</li>
+          <li>Net: +52 s and +60% cost per task. So it's usable as a background judge, but not better than Jev until it's more precise.</li>
+        </ul>
+      </li>
+    </ul>
+
+    <h3 id="e5-codex">Codex runs</h3>
+    <p>The broken Codex install turned out to be a stale npm shim; a working Homebrew Codex (0.157.1) was already installed. Codex supports synchronous hooks: <code>apply_patch</code> events are parsed from their <code>+</code> lines, and findings go back as context. It has no rewake, so the Codex runs are synchronous. Setup: the same 12 tasks, twice each, with the user's default Codex model (gpt-6-astra, medium) and an isolated Codex home per run.</p>
+    {{CODEX_TABLE}}
+    <p>The hook cut Codex's graded violations by 45% (1.67 → 0.92 per task), with an interval that excludes zero, for about 6 s more per task. In the smoke test, Codex had been told to cast the JSON; after the hook's finding, it replaced the cast with runtime validation.</p>
+
+    <h3 id="e5-finetune">Fine-tuning plan</h3>
+    <ul>
+      <li><b>Jev's outputs can't be training data.</b> TypeSafe's Master Customer Agreement prohibits using "the Services or any Output to perform model distillation, train a model to imitate the output of the Services, or develop… a similar or competing product". So the teacher can't be Jev.</li>
+      <li><b>What we can use:</b> our labeled edits. That's about 950 cases, roughly 10,000 rule judgments, labeled by Claude subagents and not by Jev. Train only on the tuning split, and keep every held-out file untouched for evaluation. The model providers' terms on using generated data for training should be checked before any release.</li>
+      <li><b>Recipe:</b> Kev's own fine-tuning path, starting from the released checkpoint (<code>--init_from jaredpalmer/kev-4b</code>). Kev-4B first, then Kev-0.8B. Its authors report about $1 per Kev-4B run on an H100, or it can run locally on MLX with one job at a time.</li>
+      <li><b>Bar to beat:</b>
+        <ul>
+          <li>held-out F1 of at least 90%;</li>
+          <li>clean-edit false alarms of at most 5%;</li>
+          <li>a gated median of at most 1 s on this Mac (0.8B).</li>
+        </ul>
+        Then re-run the Entry 5 E2E with the fine-tuned model in the background.
+      </li>
+    </ul>
+  </section>
+
   <section class="entry" id="e4">
-    <h2>Entry 4 · Local models on the Mac <span class="date">26 Sep 2026</span> <span class="tag new">latest</span></h2>
+    <h2>Entry 4 · Local models on the Mac <span class="date">26 Sep 2026</span></h2>
     <p><b>Question.</b> Can a Jev-like model running on this machine (M3 Max, 64 GB) replace the API call? The goal is zero cost per edit and lower latency, ideally using the Apple Neural Engine.</p>
     <p><b>Setup.</b> Three open models all speak the same <code>/v1/systemone</code> protocol, so the hook and harness only needed a base-URL switch (<code>TYPESAFE_BASE_URL</code>):</p>
     <ul>
@@ -356,6 +449,8 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12.5px}
     <h2>Recommendation</h2>
     <ol>
       <li><b>Install the hook with both packs</b> in Claude Code (and Codex once its CLI is fixed on this machine). Run it as a non-blocking hint with thresholds 0.8 / 0.5, and pin <code>JEV_LINT_MODEL=jev-1.13.0</code>.</li>
+      <li><b>Keep the gate on</b> (the default). It skips about two thirds of rule checks per edit at no measured recall cost.</li>
+      <li><b>In Claude Code, run it async:</b> <code>asyncRewake: true</code> with <code>JEV_LINT_MODE=rewake</code>. It's as effective as synchronous and saves about 6 s per task, though a larger run should confirm it before relying on it. In Codex, keep it synchronous, since Codex has no rewake.</li>
       <li><b>Let each repo learn from the hook.</b> The findings log records what fired and whether the agent fixed or kept it. Run the <code>jev-lint-learn</code> skill weekly on active repos: it turns recurring fixes into AGENTS.md guidance, and repeatedly ignored flags into rule rewrites. In its first real use, it narrowed this repo's own stdout rule after a false positive.</li>
       <li><b>Keep the AI code reviewer.</b> The hook handles the pattern-level issues cheaply before review, so review time goes to logic and design, which is where about 75% of review findings were.</li>
       <li><b>Treat rule wording like code.</b> Before adding a rule, add labeled examples and hard negatives, tune on the dev split, and accept it only if the held-out split holds up. The harness does this in one command.</li>
@@ -367,12 +462,13 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12.5px}
   <section id="next">
     <h2>Next experiments</h2>
     <ul>
-      <li><b>Fine-tune Kev-4B (then Kev-0.8B) on our labeled edits,</b> and re-run Entry 4. The bar to beat is Jev's 96% held-out F1 at about 0.3 s. Check TypeSafe's terms before training on Jev outputs.</li>
-      <li><b>Try an async hook</b> (<code>asyncRewake</code>) so a slower local judge doesn't block the agent, and measure whether late feedback still gets acted on.</li>
+      <li><b>Fine-tune Kev-4B, then Kev-0.8B,</b> on our tuning-split labels, following the Entry 5 plan. Never use Jev outputs: TypeSafe's terms forbid it.</li>
+      <li><b>A second wording pass</b> on <code>swift-continuation-misuse</code> and <code>react-effect-fetch-race</code>, the two rules the new ones crowd.</li>
+      <li><b>A bigger async run</b> to settle whether async feedback reduces review comments as much as sync.</li>
       <li><b>Neural Engine, only with a model built for it.</b> A shared-state encoder in Apple's Neural Engine layout, if a fine-tuned small model turns out accurate enough.</li>
       <li><b>More coverage of the reviewer's categories.</b> Try rules for the misses (debounce and poll races, continuation cancellation), and check whether they stay precise.</li>
       <li><b>Bigger end-to-end runs.</b> More repeats, a weaker and a stronger agent model, and real repositories instead of scaffolds.</li>
-      <li><b>Codex end to end.</b> Blocked for now: the Codex CLI's platform binary is missing on this machine.</li>
+
     </ul>
   </section>
 
@@ -381,6 +477,7 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12.5px}
     <ul>
       <li><b>Jev:</b> <code>jev-latest</code> (jev-1.13.0), one call per edit, one yes/no question (a Noul) per rule. $0.042 per million input tokens; output tokens are free.</li>
       <li><b>LLM judge, grader, reviewer and mapper:</b> GPT-6-Luna at <code>reasoning_effort: low</code>. $0.10 per million input tokens and $0.50 per million output, standard tier, checked 26 Sep 2026. Entry 1 originally used GPT-5.4-mini and GPT-5.5.</li>
+      <li><b>Codex (Entry 5):</b> codex-cli 0.157.1 (Homebrew), gpt-6-astra at medium reasoning (the user's default), <code>codex exec</code> with an isolated <code>CODEX_HOME</code> per run and <code>--dangerously-bypass-hook-trust</code>.</li>
       <li><b>Local models (Entry 4):</b> Kev-0.8B and Kev-4B (<code>jaredpalmer/kev-*</code>, MLX, bf16); Laya 0.3.20 English checkpoint (PyTorch Metal backend; ONNX Runtime 1.30 with the Core ML provider). Held-out split only, one request at a time, on an M3 Max with 64 GB.</li>
       <li><b>Agent:</b> Claude Code headless (Sonnet). User hooks, plugins and MCP servers were off. Hook conditions were interleaved.</li>
       <li><b>Labels:</b> written by Claude subagents, one labeler per edit. Tuning and held-out sets come from different authors. Thresholds were fixed at 0.8 / 0.5 before any data came in.</li>
@@ -403,6 +500,15 @@ python3 report/build.py path/to/DepartureMono-Regular.woff2 # rebuild this page<
   <section id="log">
     <h2>Changelog</h2>
     <ul>
+      <li><b>26 Sep 2026, Entry 5.</b>
+        <ul>
+          <li>Rule gate (<code>when</code> patterns), and the async <code>rewake</code> hook mode.</li>
+          <li>Three new rules; two rules dropped to ESLint.</li>
+          <li>Label <code>scope</code> per case.</li>
+          <li>Codex runner, and 96 Claude Code plus 48 Codex runs.</li>
+          <li>Removed the dead <code>claude-code-notch</code> hooks from the user's Claude Code and Codex configs (unrelated cleanup, requested).</li>
+        </ul>
+      </li>
       <li><b>26 Sep 2026, feedback loop.</b> The hook now keeps a local findings log. <code>src/findings.ts</code> classifies each finding as fixed, kept or unknown, and the <code>jev-lint-learn</code> skill feeds recurring ones back into a repo's AGENTS.md and <code>.jev-lint/</code> rules. The <code>jev-lint-rules</code> skill and <code>src/validate.ts</code> generate and validate repo rules from its guidelines.</li>
       <li><b>26 Sep 2026, Entry 4.</b> Local models: Kev-0.8B, Kev-4B and Laya on this Mac, plus Laya's encoder through Core ML. The hook and harness gained <code>TYPESAFE_BASE_URL</code> / <code>LOCAL_BASE_URL</code> for any <code>/v1/systemone</code> server. Repo pushed to GitHub, and the hook installed in Claude Code and Codex.</li>
       <li><b>26 Sep 2026, Entry 3.</b> Added 20 best-practice rules, a v1→v2 wording pass for TypeScript, the pre-review catch analysis, and hook on/off runs on 12 React/SwiftUI tasks. The page became a notebook.</li>

@@ -1,0 +1,13 @@
+{
+  "date": "2026-09-26",
+  "machine": "Apple M3 Max, 64 GB",
+  "model": "jaredpalmer/kev-4b served by kev.serve (MLX bf16), warm; cold start 22.8 s",
+  "rows": [
+    {"rules": 1, "short_new_ms": 561, "short_repeat_ms": 234, "long_new_ms": 2516, "long_repeat_ms": 289},
+    {"rules": 5, "short_new_ms": 1457, "short_repeat_ms": 1188, "long_new_ms": 3614, "long_repeat_ms": 1226},
+    {"rules": 13, "short_new_ms": 3977, "short_repeat_ms": 3440, "long_new_ms": 3591, "long_repeat_ms": 2020},
+    {"rules": 23, "short_new_ms": 8493, "short_repeat_ms": 7897, "long_new_ms": 5950, "long_repeat_ms": 5103}
+  ],
+  "no_criteria_23_rules_ms": {"short": 6053, "long": 7795},
+  "edits": "short = 6-line held-out TS edit, long = 138-line held-out TS edit"
+}

@@ -1,0 +1,1393 @@
+[
+  {
+    "task": "react-metrics-poller",
+    "lang": "typescript",
+    "condition": "jev",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "src/MetricsPanel.tsx",
+        "line": 27,
+        "severity": "medium",
+        "title": "Effect assumes browser globals",
+        "explanation": "This effect accesses `document` without a browser guard, so rendering or mounting in SSR, tests, or other non-DOM environments throws instead of rendering the panel.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/MetricsPanel.tsx",
+        "line": 50,
+        "severity": "medium",
+        "title": "Duplicate metric names produce duplicate React keys",
+        "explanation": "The response validator allows duplicate names, but the component uses each name as a key, leading to duplicate-key reconciliation bugs and ambiguous change tracking for those metrics.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/MetricsPanel.tsx",
+        "line": 61,
+        "severity": "low",
+        "title": "Error responses expose arbitrary server messages",
+        "explanation": "The caught fetch or parsing error is rendered directly to users, which can disclose implementation details from server-provided messages; consider displaying a stable generic message and logging details separately.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "src/MetricsPanel.tsx",
+        "rule": "ts-no-magic-numbers",
+        "jevProbability": 0.51,
+        "graderConfirms": false
+      }
+    ]
+  },
+  {
+    "task": "react-signup-form",
+    "lang": "typescript",
+    "condition": "none",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "src/SignupForm.tsx",
+        "line": 97,
+        "severity": "medium",
+        "title": "Sends the untrimmed password confirmation",
+        "explanation": "The request spreads all form values, so `confirmPassword` is sent to the API (and password-like data is unnecessarily duplicated); send only the fields the signup endpoint requires, typically excluding the confirmation.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/SignupForm.tsx",
+        "line": 103,
+        "severity": "medium",
+        "title": "Treats error payloads as failures even on successful responses",
+        "explanation": "The presence of `data.errors` returns before checking `response.ok`, so a successful response containing an unrelated or stale `errors` property is displayed as a signup failure.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/SignupForm.tsx",
+        "line": 132,
+        "severity": "medium",
+        "title": "Allows a successful response with an invalid ID to leave the form in an ambiguous state",
+        "explanation": "The account may already have been created, but the form retains the password and shows an error rather than a success state, leaving users likely to retry and potentially create duplicate accounts.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "src/SignupForm.tsx",
+        "rule": "ts-no-vague-names",
+        "jevProbability": 0.61,
+        "graderConfirms": false
+      }
+    ]
+  },
+  {
+    "task": "react-chat-room",
+    "lang": "typescript",
+    "condition": "jev",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "src/ChatRoom.tsx",
+        "line": 83,
+        "severity": "medium",
+        "title": "Messages are never bounded",
+        "explanation": "Every distinct message remains in component state and the DOM indefinitely, so a long-lived or busy chat room can consume unbounded memory and degrade rendering performance.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/ChatRoom.tsx",
+        "line": 160,
+        "severity": "medium",
+        "title": "Untrusted timestamps are used as datetime values",
+        "explanation": "The validator accepts any string for `sentAt`, but `<time dateTime>` expects a valid machine-readable date, so malformed server data can produce misleading or invalid time metadata.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "react-metrics-poller",
+    "lang": "typescript",
+    "condition": "none",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "src/MetricsPanel.tsx",
+        "line": 99,
+        "severity": "medium",
+        "title": "Starts a request while the document is hidden",
+        "explanation": "The initial `refresh()` runs even when `document.hidden` is true, so when the page becomes visible the immediate refresh is skipped if that request is still pending, delaying fresh data until it finishes or the next polling interval.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/MetricsPanel.tsx",
+        "line": 13,
+        "severity": "medium",
+        "title": "Does not reject duplicate metric names",
+        "explanation": "Duplicate names pass validation even though names are used as React keys and as the identity in `previousValues` and `changed`, causing duplicate-key warnings and ambiguous change tracking.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "react-user-search",
+    "lang": "typescript",
+    "condition": "none",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "src/UserSearch.tsx",
+        "line": 103,
+        "severity": "medium",
+        "title": "User IDs may produce colliding React keys",
+        "explanation": "Because IDs may be strings or numbers, values such as `1` and `\"1\"` are coerced to the same React key, and duplicate IDs from the API also collide, which can cause incorrect list reconciliation.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "src/UserSearch.tsx",
+        "rule": "ts-no-vague-names",
+        "jevProbability": 0.58,
+        "graderConfirms": false
+      },
+      {
+        "file": "src/UserSearch.tsx",
+        "rule": "ts-no-magic-numbers",
+        "jevProbability": 0.65,
+        "graderConfirms": true
+      }
+    ]
+  },
+  {
+    "task": "react-user-search",
+    "lang": "typescript",
+    "condition": "jev",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "src/UserSearch.tsx",
+        "line": 31,
+        "severity": "medium",
+        "title": "Previous results briefly remain visible for a new query",
+        "explanation": "Because the results are cleared in a passive effect, a render after `term` changes can still show the prior query’s results and status before the effect updates state.",
+        "rule": "react-derived-state-effect",
+        "jevProbability": 0.06
+      },
+      {
+        "file": "src/UserSearch.tsx",
+        "line": 98,
+        "severity": "medium",
+        "title": "Allowed IDs can collide as React keys",
+        "explanation": "The `User` type permits both numeric and string IDs, so values such as `1` and `\"1\"` can produce the same React key and cause reconciliation errors when both appear in a result list.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "src/UserSearch.tsx",
+        "rule": "ts-no-vague-names",
+        "jevProbability": 0.59,
+        "graderConfirms": true
+      },
+      {
+        "file": "src/UserSearch.tsx",
+        "rule": "ts-no-magic-numbers",
+        "jevProbability": 0.66,
+        "graderConfirms": true
+      }
+    ]
+  },
+  {
+    "task": "react-signup-form",
+    "lang": "typescript",
+    "condition": "jev",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "src/SignupForm.tsx",
+        "line": 90,
+        "severity": "medium",
+        "title": "Assumes every response has a JSON body",
+        "explanation": "Calling `response.json()` unconditionally turns empty or non-JSON error responses (such as a 500 page or 204 response) into the generic connection-error path instead of handling the HTTP status appropriately.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/SignupForm.tsx",
+        "line": 88,
+        "severity": "low",
+        "title": "Sends the confirmation password to the API",
+        "explanation": "The request includes `confirmPassword`, which is only needed for client-side validation and unnecessarily transmits a second copy of the password to the server.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/SignupForm.tsx",
+        "line": 133,
+        "severity": "low",
+        "title": "Success message remains while the user edits a new form",
+        "explanation": "After a successful signup the form resets, but subsequent edits do not clear `accountId`, so the success message can misleadingly describe a newly edited, unsubmitted form.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "src/SignupForm.tsx",
+        "rule": "ts-no-vague-names",
+        "jevProbability": 0.55,
+        "graderConfirms": true
+      }
+    ]
+  },
+  {
+    "task": "react-chat-room",
+    "lang": "typescript",
+    "condition": "none",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "src/ChatRoom.tsx",
+        "line": 77,
+        "severity": "medium",
+        "title": "Reconnect backoff resets on every open",
+        "explanation": "If the server repeatedly accepts a connection and then quickly drops it, resetting `retryCount` on each `open` makes every retry use a one-second delay and can create a persistent reconnect loop.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/ChatRoom.tsx",
+        "line": 87,
+        "severity": "medium",
+        "title": "Messages grow without bound",
+        "explanation": "Every unique message is retained for the lifetime of the room session, so a long-running or high-volume chat can consume increasing memory and make rendering increasingly expensive.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/ChatRoom.tsx",
+        "line": 131,
+        "severity": "medium",
+        "title": "Incoming messages always force-scroll the reader",
+        "explanation": "Setting `scrollTop` to `scrollHeight` on every update prevents users from reading earlier messages whenever a new message arrives; only auto-scroll when the reader was already near the bottom.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "src/ChatRoom.tsx",
+        "rule": "ts-no-empty-catch",
+        "jevProbability": 0.97,
+        "graderConfirms": true
+      },
+      {
+        "file": "src/ChatRoom.tsx",
+        "rule": "ts-no-magic-numbers",
+        "jevProbability": 0.78,
+        "graderConfirms": true
+      }
+    ]
+  },
+  {
+    "task": "react-profile-editor",
+    "lang": "typescript",
+    "condition": "jev",
+    "rep": 1,
+    "findings": [],
+    "jevOnly": []
+  },
+  {
+    "task": "react-todo-board",
+    "lang": "typescript",
+    "condition": "none",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "src/TodoBoard.tsx",
+        "line": 29,
+        "severity": "medium",
+        "title": "Storage-backed state can break server hydration",
+        "explanation": "When rendered on the server, `readTodos` falls back to an empty list, while the browser initializer may load saved todos, producing different server and client markup; the subsequent persistence effect can then overwrite the saved list with the client’s initial state.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "react-todo-board",
+    "lang": "typescript",
+    "condition": "jev",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "src/TodoBoard.tsx",
+        "line": 33,
+        "severity": "medium",
+        "title": "Local-storage initialization can cause hydration mismatches",
+        "explanation": "When rendered on the server, this initializer returns an empty list because `window` is unavailable, but the client may initialize from saved todos, so the server and first client renders differ during hydration.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/TodoBoard.tsx",
+        "line": 58,
+        "severity": "medium",
+        "title": "Adding a task can throw when `crypto.randomUUID` is unavailable",
+        "explanation": "In browsers or contexts without `crypto.randomUUID` (including some insecure contexts), submitting a task throws instead of adding it, so provide a supported ID-generation fallback or handle the failure.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "react-profile-editor",
+    "lang": "typescript",
+    "condition": "none",
+    "rep": 1,
+    "findings": [],
+    "jevOnly": []
+  },
+  {
+    "task": "swiftui-stopwatch",
+    "lang": "swift",
+    "condition": "none",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "Sources/App/Stopwatch.swift",
+        "line": 21,
+        "severity": "medium",
+        "title": "Elapsed time may stop advancing during device sleep",
+        "explanation": "`systemUptime` measures awake time on Apple platforms, so locking the device or otherwise sleeping can make the stopwatch undercount elapsed time; use a monotonic clock that includes sleep if the stopwatch should continue through it.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/Stopwatch.swift",
+        "line": 129,
+        "severity": "medium",
+        "title": "Disappearing the view stops the stopwatch",
+        "explanation": "`onDisappear` also runs for temporary navigation, tab, or presentation changes, so leaving the screen unexpectedly stops timing instead of allowing the stopwatch to continue.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "swiftui-settings",
+    "lang": "swift",
+    "condition": "jev",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "Sources/App/SettingsScreen.swift",
+        "line": 73,
+        "severity": "medium",
+        "title": "UserDefaults observer reloads for unrelated suites",
+        "explanation": "`UserDefaults.didChangeNotification` is observed globally, but the handler never checks which defaults instance or suite changed, so unrelated preference writes can trigger redundant reloads and interfere with this store's state.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/SettingsScreen.swift",
+        "line": 85,
+        "severity": "medium",
+        "title": "External writes can be overwritten during reload",
+        "explanation": "The defaults notification schedules an asynchronous main-actor reload, leaving a window where a user edit can write an older value back to `UserDefaults` before the external change is loaded.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/SettingsScreen.swift",
+        "line": 95,
+        "severity": "medium",
+        "title": "Invalid persisted refresh intervals reach the Stepper",
+        "explanation": "Values loaded from `UserDefaults` are not validated or clamped to the Stepper's 60–3,600 second range, so stale, negative, infinite, or out-of-range stored values can make the control show invalid state and persist unusable intervals.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/SettingsScreen.swift",
+        "line": 53,
+        "severity": "low",
+        "title": "Refresh interval persistence compares floating-point values exactly",
+        "explanation": "Exact `Double` inequality can cause needless writes for numerically equivalent interval values, so consider representing this minute-based setting as an integer or comparing normalized values.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "swiftui-search",
+    "lang": "swift",
+    "condition": "jev",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "Sources/App/SearchScreen.swift",
+        "line": 59,
+        "severity": "medium",
+        "title": "Decode results off the main actor",
+        "explanation": "`search(for:)` is main-actor isolated, so decoding a large response runs synchronously on the UI thread and can cause visible hangs; move decoding to a non-main-actor context.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/SearchScreen.swift",
+        "line": 93,
+        "severity": "medium",
+        "title": "Ensure result IDs are unique",
+        "explanation": "`List` uses each result's `id` as its row identity, so duplicate IDs in the API response can produce incorrect row updates or SwiftUI identity warnings.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "swiftui-settings",
+    "lang": "swift",
+    "condition": "none",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "Sources/App/SettingsScreen.swift",
+        "line": 59,
+        "severity": "medium",
+        "title": "Observe changes from the injected defaults suite",
+        "explanation": "This publisher uses the process-wide `UserDefaults.didChangeNotification`, which is posted for changes to the standard defaults rather than reliably identifying changes to the injected `defaults` instance, so stores backed by a custom suite can miss external updates.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/SettingsScreen.swift",
+        "line": 62,
+        "severity": "medium",
+        "title": "Queued reloads can overwrite newer local edits",
+        "explanation": "Each defaults notification schedules an uncoalesced main-actor task, so a delayed reload can read and apply stale defaults after the user has made a newer in-memory edit.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/SettingsScreen.swift",
+        "line": 82,
+        "severity": "medium",
+        "title": "Out-of-range stored refresh intervals break the Stepper",
+        "explanation": "The persisted `Double` is accepted without validation, so a value outside `1...3600` can put the bound Stepper outside its supported range and leave the UI displaying or editing an invalid interval.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "swift-legacy-bridge",
+    "lang": "swift",
+    "condition": "none",
+    "rep": 1,
+    "findings": [],
+    "jevOnly": [
+      {
+        "file": "Sources/App/LegacyBridge.swift",
+        "rule": "swift-continuation-cancellation",
+        "jevProbability": 0.78,
+        "graderConfirms": true
+      }
+    ]
+  },
+  {
+    "task": "swiftui-search",
+    "lang": "swift",
+    "condition": "none",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "Sources/App/SearchScreen.swift",
+        "line": 47,
+        "severity": "medium",
+        "title": "Decode results off the main actor",
+        "explanation": "`SearchViewModel` is main-actor isolated, so decoding the response array runs on the UI actor and can block rendering for a large payload; perform decoding in a nonisolated/background context.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/SearchScreen.swift",
+        "line": 53,
+        "severity": "medium",
+        "title": "Cancellation can leave loading state set",
+        "explanation": "When the view’s `.task` is cancelled without a replacement search (for example, when the view disappears), this early return skips resetting `isLoading`, so the retained view model can remain stuck in its loading state.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "Sources/App/SearchScreen.swift",
+        "rule": "swift-no-magic-numbers",
+        "jevProbability": 0.74,
+        "graderConfirms": false
+      }
+    ]
+  },
+  {
+    "task": "swiftui-stopwatch",
+    "lang": "swift",
+    "condition": "jev",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "Sources/App/Stopwatch.swift",
+        "line": 25,
+        "severity": "medium",
+        "title": "Creates an unstructured task for every timer tick",
+        "explanation": "At 100 ticks per second, each fire enqueues a MainActor task that cannot be cancelled, so if the actor is busy these tasks can accumulate and later perform redundant updates.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "swiftui-thumbnail-grid",
+    "lang": "swift",
+    "condition": "none",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "Sources/App/ThumbnailGrid.swift",
+        "line": 114,
+        "severity": "medium",
+        "title": "Unbounded image downloads can exhaust memory",
+        "explanation": "`data(from:)` buffers the entire response without a size limit, so a large or malicious response can consume substantial memory before decoding or caching it.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/ThumbnailGrid.swift",
+        "line": 119,
+        "severity": "medium",
+        "title": "Full-size image decoding runs on the main actor",
+        "explanation": "The cache and its download task are main-actor isolated, so constructing `NSImage` from downloaded data can block UI updates, especially for large images.",
+        "rule": "swift-ui-off-main",
+        "jevProbability": 0.09
+      },
+      {
+        "file": "Sources/App/ThumbnailGrid.swift",
+        "line": 100,
+        "severity": "medium",
+        "title": "Cache limit does not bound image memory usage",
+        "explanation": "`countLimit` caps the number of cached objects rather than their memory cost, and caching full-resolution images can still retain a large amount of memory.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "Sources/App/ThumbnailGrid.swift",
+        "rule": "swiftui-foreach-unstable-id",
+        "jevProbability": 0.79,
+        "graderConfirms": true
+      }
+    ]
+  },
+  {
+    "task": "swiftui-chat",
+    "lang": "swift",
+    "condition": "none",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "Sources/App/ChatScreen.swift",
+        "line": 67,
+        "severity": "medium",
+        "title": "Backoff is not reset when a connection succeeds",
+        "explanation": "`retryDelay` resets only after receiving a frame, so a connection that repeatedly completes its handshake but drops before the first message can keep escalating to the 30-second delay despite each successful connection.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/ChatScreen.swift",
+        "line": 75,
+        "severity": "medium",
+        "title": "Unbounded inbound messages can exhaust memory",
+        "explanation": "Every decoded server message is retained indefinitely, and neither individual payload size nor the message history is bounded, allowing a busy or hostile server to grow memory usage without limit.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "Sources/App/ChatScreen.swift",
+        "rule": "swift-no-empty-catch",
+        "jevProbability": 0.57,
+        "graderConfirms": false
+      },
+      {
+        "file": "Sources/App/ChatScreen.swift",
+        "rule": "swift-no-vague-names",
+        "jevProbability": 0.52,
+        "graderConfirms": false
+      },
+      {
+        "file": "Sources/App/ChatScreen.swift",
+        "rule": "swift-no-magic-numbers",
+        "jevProbability": 0.65,
+        "graderConfirms": true
+      }
+    ]
+  },
+  {
+    "task": "swiftui-thumbnail-grid",
+    "lang": "swift",
+    "condition": "jev",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "Sources/App/ThumbnailGrid.swift",
+        "line": 87,
+        "severity": "medium",
+        "title": "Cache retains every decoded image indefinitely",
+        "explanation": "The shared cache has no eviction or size limit, so scrolling through many distinct URLs keeps all decoded `NSImage` instances alive and can cause substantial memory growth.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/ThumbnailGrid.swift",
+        "line": 96,
+        "severity": "medium",
+        "title": "Downloads have no response-size limit or downsampling",
+        "explanation": "The code buffers the entire response and decodes it at full resolution, allowing unexpectedly large images or responses to consume excessive memory before they are displayed as small thumbnails.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "Sources/App/ThumbnailGrid.swift",
+        "rule": "swiftui-foreach-unstable-id",
+        "jevProbability": 0.79,
+        "graderConfirms": false
+      }
+    ]
+  },
+  {
+    "task": "swift-legacy-bridge",
+    "lang": "swift",
+    "condition": "jev",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "Sources/App/LegacyBridge.swift",
+        "line": 54,
+        "severity": "medium",
+        "title": "Progress stream uses unbounded buffering",
+        "explanation": "`AsyncStream` defaults to an unbounded buffer, so a fast or long-running SDK can accumulate progress events indefinitely when the consumer is slower, causing unnecessary memory growth; consider a bounded or newest-value buffering policy.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "Sources/App/LegacyBridge.swift",
+        "rule": "swift-continuation-cancellation",
+        "jevProbability": 0.78,
+        "graderConfirms": false
+      }
+    ]
+  },
+  {
+    "task": "react-user-search",
+    "lang": "typescript",
+    "condition": "none",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "src/UserSearch.tsx",
+        "line": 109,
+        "severity": "medium",
+        "title": "User IDs can collide as React keys",
+        "explanation": "The validator accepts both numeric and string IDs, but React coerces keys to strings, so distinct users with IDs `1` and `\"1\"` (or duplicate IDs) can share a key and be reconciled incorrectly.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "src/UserSearch.tsx",
+        "rule": "ts-no-vague-names",
+        "jevProbability": 0.57,
+        "graderConfirms": true
+      },
+      {
+        "file": "src/UserSearch.tsx",
+        "rule": "ts-no-magic-numbers",
+        "jevProbability": 0.67,
+        "graderConfirms": true
+      }
+    ]
+  },
+  {
+    "task": "react-user-search",
+    "lang": "typescript",
+    "condition": "jev",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "src/UserSearch.tsx",
+        "line": 122,
+        "severity": "medium",
+        "title": "User IDs may produce colliding React keys",
+        "explanation": "The response validator permits duplicate IDs and both numeric and string IDs, which can stringify to the same React key (for example, `1` and `\"1\"`), causing incorrect row reconciliation and React warnings.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "react-signup-form",
+    "lang": "typescript",
+    "condition": "none",
+    "rep": 2,
+    "findings": [],
+    "jevOnly": [
+      {
+        "file": "src/SignupForm.tsx",
+        "rule": "ts-no-vague-names",
+        "jevProbability": 0.57,
+        "graderConfirms": true
+      }
+    ]
+  },
+  {
+    "task": "react-metrics-poller",
+    "lang": "typescript",
+    "condition": "none",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "src/MetricsPanel.tsx",
+        "line": 14,
+        "severity": "medium",
+        "title": "Duplicate metric names are accepted",
+        "explanation": "The validator allows repeated names, which produces duplicate React keys and makes the name-keyed change tracking ambiguous or incorrect.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "swiftui-chat",
+    "lang": "swift",
+    "condition": "jev",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "Sources/App/ChatScreen.swift",
+        "line": 38,
+        "severity": "medium",
+        "title": "Auto-scroll overrides the reader’s scroll position",
+        "explanation": "Every content-height preference change scrolls to the bottom, so incoming messages or layout changes pull users away from older messages even when they have intentionally scrolled up.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/ChatScreen.swift",
+        "line": 116,
+        "severity": "high",
+        "title": "WebSocket URL points to a placeholder host",
+        "explanation": "`chat.example.com` is a reserved example domain, so the connection cannot reach a real chat service unless this value is replaced with the configured endpoint.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/ChatScreen.swift",
+        "line": 196,
+        "severity": "low",
+        "title": "Connection status can remain stale after send failure",
+        "explanation": "This branch marks the connection disconnected but leaves `status` as “Connected” until the receive loop observes cancellation and updates it.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "react-signup-form",
+    "lang": "typescript",
+    "condition": "jev",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "src/SignupForm.tsx",
+        "line": 78,
+        "severity": "medium",
+        "title": "Treat non-2xx responses before parsing errors",
+        "explanation": "The code parses JSON before checking `response.ok`, so an error response with an empty or non-JSON body throws and is reported as an ambiguous connection failure instead of the intended request failure.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/SignupForm.tsx",
+        "line": 87,
+        "severity": "medium",
+        "title": "Handle malformed or empty JSON responses",
+        "explanation": "Calling `response.json()` unconditionally rejects for successful responses with empty or invalid JSON, leaving the user with an uncertain-creation message even when the server response should be handled as a protocol error.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/SignupForm.tsx",
+        "line": 88,
+        "severity": "medium",
+        "title": "Do not discard unrecognized server validation errors",
+        "explanation": "If the server returns a nonempty `errors` object containing only unknown fields or non-string messages, the form ignores those details and reports a generic error without displaying actionable feedback.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/SignupForm.tsx",
+        "line": 112,
+        "severity": "low",
+        "title": "Avoid rendering an untrusted account ID as text",
+        "explanation": "The ID is interpolated without trimming a string value, so a valid but whitespace-padded server ID is shown verbatim and may create confusing success feedback.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "src/SignupForm.tsx",
+        "rule": "ts-no-vague-names",
+        "jevProbability": 0.57,
+        "graderConfirms": true
+      }
+    ]
+  },
+  {
+    "task": "react-metrics-poller",
+    "lang": "typescript",
+    "condition": "jev",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "src/MetricsPanel.tsx",
+        "line": 115,
+        "severity": "medium",
+        "title": "Metric names are not guaranteed to be unique keys",
+        "explanation": "If the API returns multiple metrics with the same name, React receives duplicate keys and the name-based change tracking becomes ambiguous, so validate uniqueness or use a stable unique identifier.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/MetricsPanel.tsx",
+        "line": 126,
+        "severity": "low",
+        "title": "Invalid content inside the description list",
+        "explanation": "The `dl` grouping `div` contains a `span` in addition to its `dt`/`dd` pair, which is not valid description-list grouping markup and can confuse assistive technology.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "react-chat-room",
+    "lang": "typescript",
+    "condition": "jev",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "src/ChatRoom.tsx",
+        "line": 94,
+        "severity": "medium",
+        "title": "Message history grows without bound",
+        "explanation": "Every unique message remains in component state and the DOM for the lifetime of the room, so a long-lived or busy chat can consume unbounded memory and degrade rendering performance.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "react-profile-editor",
+    "lang": "typescript",
+    "condition": "none",
+    "rep": 2,
+    "findings": [],
+    "jevOnly": [
+      {
+        "file": "src/useUserProfiles.ts",
+        "rule": "ts-no-non-null-assertion",
+        "jevProbability": 0.98,
+        "graderConfirms": true
+      }
+    ]
+  },
+  {
+    "task": "react-chat-room",
+    "lang": "typescript",
+    "condition": "none",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "src/ChatRoom.tsx",
+        "line": 91,
+        "severity": "medium",
+        "title": "Guard queued messages against room changes",
+        "explanation": "A message update queued just before the room effect is cleaned up can run after the new room has been selected and append an old-room message to the new room's state, so the updater should verify `current.id === roomId` before adding it.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "src/ChatRoom.tsx",
+        "rule": "ts-no-empty-catch",
+        "jevProbability": 0.57,
+        "graderConfirms": false
+      },
+      {
+        "file": "src/ChatRoom.tsx",
+        "rule": "ts-no-magic-numbers",
+        "jevProbability": 0.76,
+        "graderConfirms": true
+      },
+      {
+        "file": "src/ChatRoom.tsx",
+        "rule": "react-props-mirrored-in-state",
+        "jevProbability": 0.73,
+        "graderConfirms": true
+      }
+    ]
+  },
+  {
+    "task": "react-todo-board",
+    "lang": "typescript",
+    "condition": "jev",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "src/TodoBoard.tsx",
+        "line": 30,
+        "severity": "medium",
+        "title": "Local-storage initialization can cause an SSR hydration mismatch",
+        "explanation": "When rendered on the server, `restoreTodos()` returns an empty list, while the browser may initialize from saved todos, so the initial client markup can differ from the server markup and trigger hydration errors.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "react-todo-board",
+    "lang": "typescript",
+    "condition": "none",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "src/TodoBoard.tsx",
+        "line": 29,
+        "severity": "medium",
+        "title": "Server rendering can hydrate with different todos",
+        "explanation": "The lazy initializer reads browser storage during render, so an SSR render starts with an empty list while the client may render stored todos immediately, causing a hydration mismatch and potentially replacing server-rendered content.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/TodoBoard.tsx",
+        "line": 24,
+        "severity": "medium",
+        "title": "Malformed stored data is overwritten on mount",
+        "explanation": "When parsing fails, the loader returns an empty list and the mount effect then persists that empty list, discarding the original stored value rather than preserving it or surfacing a load error.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/TodoBoard.tsx",
+        "line": 74,
+        "severity": "low",
+        "title": "Todo creation assumes randomUUID is available",
+        "explanation": "Calling `crypto.randomUUID()` directly can throw in browsers or contexts that do not support it, preventing the add action from completing.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "swiftui-search",
+    "lang": "swift",
+    "condition": "none",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "Sources/App/SearchScreen.swift",
+        "line": 47,
+        "severity": "medium",
+        "title": "Search uses a placeholder API host",
+        "explanation": "Requests are sent to `api.example.com`, so this screen cannot retrieve real search results unless the placeholder is replaced with the intended service endpoint.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "Sources/App/SearchScreen.swift",
+        "rule": "swift-no-magic-numbers",
+        "jevProbability": 0.75,
+        "graderConfirms": true
+      }
+    ]
+  },
+  {
+    "task": "react-profile-editor",
+    "lang": "typescript",
+    "condition": "jev",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "src/useUserProfiles.ts",
+        "line": 21,
+        "severity": "medium",
+        "title": "Serialization can throw or collapse distinct inputs",
+        "explanation": "`JSON.stringify(ids)` can throw for malformed runtime inputs such as circular arrays and may yield `undefined` for unsupported values, which can break the effect's `JSON.parse` or cause distinct ID lists to share a request key.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/ProfileEditor.tsx",
+        "line": 14,
+        "severity": "medium",
+        "title": "Resetting the editor on server updates can discard drafts",
+        "explanation": "Including `displayName` and `bio` in the React key remounts the form whenever those props change, so a background refresh can silently erase a user's unsaved edits.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/ProfileEditor.tsx",
+        "line": 35,
+        "severity": "medium",
+        "title": "Successful save can mark a stale draft as saved",
+        "explanation": "The submit handler closes over the submitted `draft` and calls `setSaved(draft)` after awaiting `onSave`; if the draft changes while the request is in flight, the newer edits are incorrectly treated as saved and the dirty indicator is lost.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "swiftui-stopwatch",
+    "lang": "swift",
+    "condition": "jev",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "Sources/App/Stopwatch.swift",
+        "line": 121,
+        "severity": "medium",
+        "title": "Disappearing view silently pauses the stopwatch",
+        "explanation": "Calling `stop()` on every disappearance changes stopwatch state when the view is merely covered or temporarily removed, so returning to the stopwatch does not resume elapsed time despite the view documenting pause/resume controls.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/Stopwatch.swift",
+        "line": 53,
+        "severity": "low",
+        "title": "Lap identifiers can be reused after clearing laps",
+        "explanation": "Using the current array count for IDs means removing laps through `reset()` causes later laps to reuse identifiers, which can confuse SwiftUI identity if updates overlap or the model is extended to preserve displayed rows.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "swiftui-search",
+    "lang": "swift",
+    "condition": "jev",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "Sources/App/SearchScreen.swift",
+        "line": 54,
+        "severity": "medium",
+        "title": "Decode search results off the main actor",
+        "explanation": "`search(for:)` is main-actor isolated, so decoding the response here runs synchronously on the UI thread and can make the interface unresponsive if the response is large.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "Sources/App/SearchScreen.swift",
+        "rule": "swift-no-magic-numbers",
+        "jevProbability": 0.75,
+        "graderConfirms": false
+      }
+    ]
+  },
+  {
+    "task": "swiftui-stopwatch",
+    "lang": "swift",
+    "condition": "none",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "Sources/App/Stopwatch.swift",
+        "line": 12,
+        "severity": "medium",
+        "title": "Truncation can display hundredths incorrectly",
+        "explanation": "Converting the binary floating-point product directly to `Int` truncates values, so an elapsed time intended to show a hundredth such as `0.29` can display one hundredth too low; round before converting.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/Stopwatch.swift",
+        "line": 37,
+        "severity": "low",
+        "title": "Timer publishes more often than the display can use",
+        "explanation": "A 10 ms timer drives SwiftUI updates at 100 Hz even though the UI displays hundredths and most screens refresh less frequently, causing avoidable main-thread and battery work.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "Sources/App/Stopwatch.swift",
+        "rule": "swift-no-magic-numbers",
+        "jevProbability": 0.57,
+        "graderConfirms": true
+      }
+    ]
+  },
+  {
+    "task": "swiftui-settings",
+    "lang": "swift",
+    "condition": "jev",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "Sources/App/SettingsScreen.swift",
+        "line": 89,
+        "severity": "medium",
+        "title": "Validate persisted refresh intervals",
+        "explanation": "The stored interval is accepted without checking the Stepper’s 15...3,600 range, so an out-of-range value can be loaded and displayed even though the control is supposed to constrain it.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "swiftui-settings",
+    "lang": "swift",
+    "condition": "none",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "Sources/App/SettingsScreen.swift",
+        "line": 86,
+        "severity": "medium",
+        "title": "Validate persisted refresh intervals",
+        "explanation": "The stored integer is loaded without checking the Stepper’s `1...1_440` range, so stale or malformed preferences can leave the setting outside the range the UI promises.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "swiftui-thumbnail-grid",
+    "lang": "swift",
+    "condition": "none",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "Sources/App/ThumbnailGrid.swift",
+        "line": 117,
+        "severity": "medium",
+        "title": "Decode images off the main actor",
+        "explanation": "The task is explicitly main-actor-isolated, so constructing and validating an `NSImage` happens on the UI actor and can cause visible hangs for large or complex images.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/ThumbnailGrid.swift",
+        "line": 112,
+        "severity": "medium",
+        "title": "Bound downloaded image data and dimensions",
+        "explanation": "The code buffers the entire response and accepts arbitrarily large image dimensions, so a URL serving oversized content can cause excessive memory use or a process termination.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/ThumbnailGrid.swift",
+        "line": 99,
+        "severity": "medium",
+        "title": "Use a memory-cost limit for the image cache",
+        "explanation": "`countLimit = 200` limits only the number of entries, not their memory cost, so caching 200 full-resolution images can still consume an unbounded amount of memory.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "Sources/App/ThumbnailGrid.swift",
+        "rule": "swiftui-foreach-unstable-id",
+        "jevProbability": 0.84,
+        "graderConfirms": false
+      }
+    ]
+  },
+  {
+    "task": "swiftui-thumbnail-grid",
+    "lang": "swift",
+    "condition": "jev",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "Sources/App/ThumbnailGrid.swift",
+        "line": 22,
+        "severity": "medium",
+        "title": "Duplicate URLs receive duplicate view identities",
+        "explanation": "The outer `ForEach` uses unique indices, but `.id(imageURLs[index])` overrides that identity with the URL, so repeated URLs have duplicate identities and SwiftUI may reuse or reconcile their cell state and tasks incorrectly.",
+        "rule": "swiftui-foreach-unstable-id",
+        "jevProbability": 0.75
+      },
+      {
+        "file": "Sources/App/ThumbnailGrid.swift",
+        "line": 116,
+        "severity": "medium",
+        "title": "Image decoding runs on the main actor",
+        "explanation": "`ThumbnailCache` and its download task are main-actor isolated, so constructing `NSImage` from downloaded data happens on the UI actor and can stall scrolling when images are large or numerous.",
+        "rule": "swift-blocking-main-thread",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "swift-legacy-bridge",
+    "lang": "swift",
+    "condition": "jev",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "Sources/App/LegacyBridge.swift",
+        "line": 53,
+        "severity": "medium",
+        "title": "Geocoding cancellation can remain suspended indefinitely",
+        "explanation": "Cancellation is only checked after the callback resumes the continuation, so a canceled task still waits forever if the geocoder never calls back; use a cancellation-aware bridge if callers need prompt cancellation.",
+        "rule": "swift-continuation-cancellation",
+        "jevProbability": 0.75
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "swiftui-chat",
+    "lang": "swift",
+    "condition": "jev",
+    "rep": 2,
+    "findings": [],
+    "jevOnly": [
+      {
+        "file": "Sources/App/ChatScreen.swift",
+        "rule": "swift-continuation-cancellation",
+        "jevProbability": 0.63,
+        "graderConfirms": true
+      }
+    ]
+  },
+  {
+    "task": "swift-legacy-bridge",
+    "lang": "swift",
+    "condition": "none",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "Sources/App/LegacyBridge.swift",
+        "line": 28,
+        "severity": "medium",
+        "title": "Geocoding cancellation cannot unblock the task",
+        "explanation": "If the task is cancelled while the legacy geocoder is pending, it remains suspended until the callback arrives, so the cancellation check after the continuation does not provide prompt cancellation.",
+        "rule": "swift-continuation-cancellation",
+        "jevProbability": 0.86
+      },
+      {
+        "file": "Sources/App/LegacyBridge.swift",
+        "line": 70,
+        "severity": "medium",
+        "title": "Upload cancellation still waits for completion",
+        "explanation": "Cancelling the task while it awaits the continuation does not make `upload(file:)` return until the SDK invokes `onFinish`, leaving callers and any structured-concurrency scope blocked despite cancellation.",
+        "rule": "swift-continuation-cancellation",
+        "jevProbability": 0.86
+      },
+      {
+        "file": "Sources/App/LegacyBridge.swift",
+        "line": 53,
+        "severity": "low",
+        "title": "Progress stream uses unbounded buffering",
+        "explanation": "`makeStream()` defaults to unbounded buffering, so a fast or unusually chatty SDK can accumulate progress events without limit when the consumer is slower.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "swiftui-chat",
+    "lang": "swift",
+    "condition": "none",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "Sources/App/ChatScreen.swift",
+        "line": 142,
+        "severity": "medium",
+        "title": "Reconnect backoff resets on any received message",
+        "explanation": "A connection that repeatedly delivers one message and then drops resets `retryDelay` to one second each time, allowing a flapping server to trigger rapid reconnects instead of backing off.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "Sources/App/ChatScreen.swift",
+        "line": 202,
+        "severity": "medium",
+        "title": "Received messages accumulate without a bound",
+        "explanation": "The WebSocket stream appends every incoming message indefinitely, so a long-lived or high-volume chat session can grow memory usage without limit.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "Sources/App/ChatScreen.swift",
+        "rule": "swift-no-magic-numbers",
+        "jevProbability": 0.55,
+        "graderConfirms": true
+      }
+    ]
+  }
+]

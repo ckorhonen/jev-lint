@@ -1,0 +1,11 @@
+{
+  "date": "2026-09-26",
+  "machine": "Apple M3 Max, 64 GB",
+  "model": "jaredpalmer/kev-4b, MLX bf16",
+  "method": "In-process kev.checkpoint.load + model.probs on one request with 22 TypeScript rules (hygiene + practices); median of 3 warm runs. 'one_row_per_pass' patches kev.mlx_model.rows_per_pass to return 1.",
+  "results": [
+    {"edit": "short", "state_tokens": 103, "rules": 22, "row_tokens_mean": 114, "rows_per_pass_default": 57, "batched_s": 12.08, "one_row_per_pass_s": 13.38},
+    {"edit": "long", "state_tokens": 384, "rules": 22, "row_tokens_mean": 114, "rows_per_pass_default": 28, "batched_s": 29.23, "one_row_per_pass_s": 39.06}
+  ],
+  "note": "Kev's MLX path already batches all question rows of a request in one pass (budget 16,384 tokens). Absolute times are higher than the served numbers because other processes were running; the ratio is what matters."
+}

@@ -25,7 +25,10 @@ def load(path):
     return json.loads(Path(path).read_text())
 
 
-summary = load(RES / "summary.json")  # hygiene (Jev, Luna, regex) + practices v2 (Jev, Luna)
+# Entries 1-4 read the results as they stood at the end of Entry 4; Entry 5 reads the latest
+# (rule gate, new rules, two rules dropped), so earlier charts keep matching their prose.
+summary = load(SNAP / "summary-2026-09-26-entry4-final.json")
+summary5 = load(RES / "summary.json")
 practices_v1 = load(SNAP / "summary-2026-09-26-practices-v1.json")
 mini = load(SNAP / "summary-round1-gpt-5.4-mini-hygiene.json")
 r1_graded_gpt55 = load(SNAP / "e2e-graded-round1-grader-gpt-5.5.json")
@@ -40,8 +43,16 @@ RULES = {
     for lang in ["typescript", "swift"]
     for pack in ["hygiene", "practices"]
 }
-HYGIENE_IDS = {r["id"] for (l, p), rs in RULES.items() if p == "hygiene" for r in rs}
-PRACTICE_IDS = {r["id"] for (l, p), rs in RULES.items() if p == "practices" for r in rs}
+# Entries 1-4 use the rule sets as they were at the end of Entry 4 (snapshotted before Entry 5
+# dropped two hygiene rules and added three practice rules).
+RULES_E4 = {
+    ("typescript", "hygiene"): load(SNAP / "typescript.hygiene-v1.json")["rules"],
+    ("typescript", "practices"): load(SNAP / "typescript.practices-v2b.json")["rules"],
+    ("swift", "hygiene"): [r for r in RULES[("swift", "hygiene")]],
+    ("swift", "practices"): load(SNAP / "swift.practices-v1.json")["rules"],
+}
+HYGIENE_IDS = {r["id"] for (l, p), rs in RULES_E4.items() if p == "hygiene" for r in rs}
+PRACTICE_IDS = {r["id"] for (l, p), rs in RULES_E4.items() if p == "practices" for r in rs}
 
 font_css = ""
 if len(sys.argv) > 1 and Path(sys.argv[1]).exists():
@@ -266,7 +277,7 @@ def per_rule_rows(lang):
     j = res(summary, "jev", "practices", lang, "holdout", "high+medium")["perRule"]
     l = res(summary, "llm", "practices", lang, "holdout", "high")["perRule"]
     rows = []
-    for rule in RULES[(lang, "practices")]:
+    for rule in RULES_E4[(lang, "practices")]:
         a, b = j[rule["id"]], l[rule["id"]]
         cell = lambda x: f"{x['tp']}/{x['tp'] + x['fn']} found · {x['fp']} false"
         rows.append([f"<code>{rule['id']}</code>", cell(a), cell(b)])
@@ -407,7 +418,7 @@ DETERMINISTIC = {
     "swift-dispatch-in-async": "No",
 }
 for lname, lang in LANGS:
-    for rule in RULES[(lang, "practices")]:
+    for rule in RULES_E4[(lang, "practices")]:
         practice_rule_table.append([f"<code>{rule['id']}</code>", esc(rule["fix"]), DETERMINISTIC.get(rule["id"], "—")])
 
 # ---------------------------------------------------------------- Entry 4: local models
@@ -482,6 +493,87 @@ for key, label in LABELS.items():
     bench_rows.append([label, f"{r.get('median_ms', 0) / 1000:.1f} s",
                        f"{cov['coreml_nodes']} of {cov['nodes']} nodes, {cov['partitions']} pieces" if cov else "—"])
 
+# ---------------------------------------------------------------- Entry 5: gate, async, new rules, Codex
+
+gate_groups = [("Hygiene · TS", "hygiene.typescript"), ("Hygiene · Swift", "hygiene.swift"),
+               ("Practices · TS", "practices.typescript"), ("Practices · Swift", "practices.swift")]
+GS = summary5["gateStats"]
+chart_gate = grouped_bars(
+    gate_groups, [("Rules in the pack", "rules", "s4"), ("Rules asked per edit after the gate (mean)", "asked", "s1")],
+    lambda g, k: GS[g]["rules"] if k == "rules" else GS[g]["asked"] / GS[g]["cases"],
+    "Rules asked per edit with the gate", fmt=lambda v: f"{v:.1f}", max_v=14, ticks=(0, 4, 8, 12), height=220,
+)
+gate_rows = []
+for gl, key in gate_groups:
+    pack, lang = key.split(".")
+    for judge, sysname in [("Jev", "jev"), ("GPT-6-Luna", "llm")]:
+        a = res(summary5, sysname, pack, lang, "holdout", "high+medium")
+        b = res(summary5, sysname, pack, lang, "holdout", "gated high+medium")
+        gate_rows.append([judge, gl, f"{pct(a['f1'])} → {pct(b['f1'])}", f"{pct(a['recall'])} → {pct(b['recall'])}",
+                          f"{pct(a['cleanFalseAlarmRate'])} → {pct(b['cleanFalseAlarmRate'])}"])
+
+NEW_RULES = ["react-async-overlap", "react-effect-fetch-race", "swift-continuation-cancellation", "swift-continuation-stored-overwrite", "swift-continuation-misuse"]
+new_rule_rows = []
+for rid in NEW_RULES:
+    lang = "typescript" if rid.startswith(("react", "ts")) else "swift"
+    cells = [f"<code>{rid}</code>"]
+    for sysname, pol in [("jev", "gated high+medium"), ("llm", "gated high+medium")]:
+        v = res(summary5, sysname, "practices", lang, "holdout", pol)["perRule"].get(rid)
+        cells.append(f"{v['tp']}/{v['tp'] + v['fn']} found · {v['fp']} false" if v else "—")
+    new_rule_rows.append(cells)
+
+kev_before = LOCAL["Kev-4B (MLX)"]
+kev_after = load(RES / "summary-local-kev-4b-gated.json")
+chart_kev_gate = grouped_bars(
+    headline_groups, [("Kev-4B, all rules (Entry 4)", "before", "s3"), ("Kev-4B, gated (Entry 5)", "after", "s1")],
+    lambda g, k: res(kev_before if k == "before" else kev_after, "local", g[0], g[1], "holdout", "high+medium")["f1"],
+    "Kev-4B held-out F1, before and after the gate",
+)
+kev_lat = [mean_p50(kev_before, "local"), mean_p50(kev_after, "local")]
+BATCH = load(RES / "local/kev-4b-row-batching.json")
+batch_rows = [[r["edit"], r["state_tokens"], r["rules"], r["rows_per_pass_default"], f"{r['batched_s']:.1f} s", f"{r['one_row_per_pass_s']:.1f} s"] for r in BATCH["results"]]
+
+G5 = load(RES / "e2e-graded-entry5.json")
+R5 = load(RES / "e2e-review-entry5.json")
+conds5 = [("No hook", "none", "s4"), ("Jev, sync", "jev", "s2"), ("Jev, async rewake", "jev-rewake", "s1"), ("Kev-4B local, async rewake", "kev-rewake", "s3")]
+
+
+def e5(cond):
+    rows = [r for r in G5 if r["condition"] == cond]
+    rs = [r for r in R5 if r["condition"] == cond]
+    f = [x for r in rs for x in r["findings"]]
+    return {
+        "viol": st.mean(r["totalViolations"] for r in rows), "n": len(rows), "build": sum(r["build"]["ok"] for r in rows),
+        "cost": st.mean(r["transcript"]["costUsd"] for r in rows), "dur": st.mean(r["transcript"]["durationMs"] for r in rows) / 1000,
+        "high": sum(r["hook"]["highShown"] for r in rows), "med": sum(r["hook"]["mediumShown"] for r in rows),
+        "lat": st.mean([r["hook"]["meanLatencyMs"] for r in rows if r["hook"]["calls"]] or [0]) / 1000,
+        "errs": sum(r["hook"]["errors"] for r in rows), "calls": sum(r["hook"]["calls"] for r in rows),
+        "inscope": sum(x["rule"] != "none" for x in f) / len(rs), "review": len(f) / len(rs),
+    }
+
+
+E5 = {c: e5(c) for _, c, _ in conds5}
+chart_e5_viol = grouped_bars(
+    [("Graded violations / task", "viol"), ("Minutes / task (x2)", "dur")], [(l, c, k) for l, c, k in conds5],
+    lambda g, c: E5[c]["viol"] if g == "viol" else E5[c]["dur"] / 30,
+    "Entry 5 end-to-end: violations and time per task", fmt=lambda v: f"{v:.2f}", max_v=3, ticks=(0, 1, 2, 3), height=230,
+    tip_fn=lambda g, c, v: f"{c}: {E5[c]['viol']:.2f} violations" if g == "viol" else f"{c}: {E5[c]['dur']:.0f} s per task",
+)
+e5_rows = []
+for label, c, _ in conds5:
+    a = E5[c]
+    diff = "—" if c == "none" else "{:+.2f} ({:+.2f} to {:+.2f})".format(*paired_diff(G5, c, lambda r: r["totalViolations"])[:3])
+    e5_rows.append([label, f"{a['viol']:.2f}", diff, f"{a['dur']:.0f} s", f"${a['cost']:.3f}", f"{a['high']} / {a['med']}" if c != "none" else "—",
+                    f"{a['lat']:.1f} s" if c != "none" else "—", f"{a['inscope']:.2f}", f"{a['build']}/{a['n']}"])
+
+GC = load(RES / "e2e-graded-codex5.json")
+codex_rows = []
+for label, c in [("No hook", "none"), ("Jev hook (sync)", "jev")]:
+    rows = [r for r in GC if r["condition"] == c]
+    diff = "—" if c == "none" else "{:+.2f} ({:+.2f} to {:+.2f}); {} better, {} worse".format(*paired_diff(GC, c, lambda r: r["totalViolations"]))
+    codex_rows.append([label, f"{st.mean(r['totalViolations'] for r in rows):.2f}", diff, f"{st.mean(r['wallMs'] for r in rows) / 1000:.0f} s",
+                       f"{st.mean(r['transcript']['edits'] for r in rows):.1f}", str(sum(r['hook']['findingsShown'] for r in rows)), f"{sum(r['build']['ok'] for r in rows)}/{len(rows)}"])
+
 # ---------------------------------------------------------------- page
 
 N = lambda x: f"{x:.2f}"
@@ -492,6 +584,13 @@ ctx = dict(
     CHART_FUNNEL=chart_funnel, CHART_EXTRA=chart_extra, CHART_HOOK_REVIEW=chart_hook_review, CHART_HOOK_OUT=chart_hook_out,
     CHART_R1=chart_r1,
     CHART_LOCAL_F1=chart_local_f1, CHART_LOCAL_LAT=chart_local_lat,
+    CHART_GATE=chart_gate, GATE_TABLE=table(["Judge", "Pack · lang", "F1 (all → gated)", "Recall", "Clean edits flagged"], gate_rows),
+    NEW_RULE_TABLE=table(["Rule (held-out, gated)", "Jev", "GPT-6-Luna"], new_rule_rows),
+    CHART_KEV_GATE=chart_kev_gate, KEV_LAT_BEFORE=f"{kev_lat[0]:.1f}", KEV_LAT_AFTER=f"{kev_lat[1]:.1f}",
+    BATCH_TABLE=table(["Edit", "Code tokens", "Rules", "Rules per pass (default)", "Batched", "One rule per pass"], batch_rows),
+    CHART_E5=chart_e5_viol,
+    E5_TABLE=table(["Condition", "Violations / task", "Change vs none (95% CI)", "Time / task", "Cost / task", "Findings shown (high / medium)", "Mean hook time", "Rule-covered review findings / task", "Builds"], e5_rows),
+    CODEX_TABLE=table(["Codex condition", "Violations / task", "Change vs none (95% CI)", "Time / task", "Edits / task", "Findings shown", "Builds"], codex_rows),
     LOCAL_TABLE=table(["Model", "Pack · lang", "F1 (p ≥ 0.5)", "Clean edits flagged", "High tier P / R", "Best F1 (threshold)", "Median time"], local_rows),
     BENCH_TABLE=table(["Encoder backend", "Time for 21 rules × 512 tokens", "Core ML coverage"], bench_rows),
     KEV4_HIGH=f"{kev4_high_real} of {kev4_high_total}",
