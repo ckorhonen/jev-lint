@@ -1,6 +1,6 @@
 // Turns a Claude Code / Codex PostToolUse hook event into the code the edit added.
 
-export type ChangedFile = { filePath: string; addedCode: string; changeKind: "write" | "edit" | "patch" };
+export type ChangedFile = { filePath: string; addedCode: string; changeKind: "write" | "edit" | "patch" | "recheck" };
 
 type HookEvent = {
   hook_event_name?: string;

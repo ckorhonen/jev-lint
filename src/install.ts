@@ -2,7 +2,7 @@
 // Install or update the jev-lint hook for Claude Code and Codex, idempotently.
 //   bun ~/Repos/jev-lint/src/install.ts                 # check only: key, configs, skills (no writes)
 //   bun ~/Repos/jev-lint/src/install.ts --apply         # write hooks (backs up each file first)
-//   options: --claude-only | --codex-only, --project <repo> (Claude hook in <repo>/.claude/settings.json),
+//   options: --no-recheck (skip the end-of-turn re-check on Stop/SubagentStop), --claude-only | --codex-only, --project <repo> (Claude hook in <repo>/.claude/settings.json),
 //            --async (Claude: background check that wakes the agent), --skills (link skills), --smoke
 //
 // An existing jev-lint entry (any command running jev-lint's src/hook.ts) is replaced in place,
@@ -34,7 +34,7 @@ const ASYNC_TIMEOUT_S = 180; // a background check can take longer (slow local j
 const SMOKE_TIMEOUT_MS = 30_000;
 
 type HookCommand = { type: "command"; command: string; timeout: number; statusMessage?: string; asyncRewake?: boolean };
-type HookGroup = { matcher: string; hooks: HookCommand[] };
+type HookGroup = { matcher?: string; hooks: HookCommand[] };
 type HookConfig = { hooks?: Record<string, HookGroup[] | undefined> } & Record<string, unknown>;
 
 export function hookGroup(agent: "claude" | "codex", opts: { async?: boolean; bun?: string } = {}): HookGroup {
@@ -56,6 +56,16 @@ export function hookGroup(agent: "claude" | "codex", opts: { async?: boolean; bu
 }
 
 const isJevLint = (h: HookCommand) => /jev-lint\/src\/hook\.ts/.test(h.command);
+const isJevLintRecheck = (h: HookCommand) => /jev-lint\/src\/recheck\.ts/.test(h.command);
+const RECHECK = join(REPO, "src/recheck.ts");
+const RECHECK_TIMEOUT_S = 20;
+export const RECHECK_EVENTS = ["Stop", "SubagentStop"] as const;
+
+// End-of-turn re-check for the learning loop (see src/recheck.ts): no matcher, since Stop events have no tool.
+export function recheckGroup(opts: { bun?: string } = {}): HookGroup {
+  const bun = opts.bun ?? Bun.which("bun") ?? process.execPath;
+  return { hooks: [{ type: "command", command: `JEV_LINT_MODEL=${MODEL} ${bun} ${RECHECK}`, timeout: RECHECK_TIMEOUT_S }] };
+}
 
 // Which bun binary runs the hook doesn't matter (Homebrew vs ~/.bun), so it isn't a change.
 const sameHook = (a: HookGroup, b: HookGroup) => {
@@ -64,9 +74,14 @@ const sameHook = (a: HookGroup, b: HookGroup) => {
 };
 
 // Returns the merged config and what happened. Pure, so it is unit-tested.
-export function mergeHook(config: HookConfig, group: HookGroup): { config: HookConfig; action: "added" | "updated" | "unchanged" } {
-  const post = [...(config.hooks?.PostToolUse ?? [])];
-  const index = post.findIndex((g) => g.hooks?.some(isJevLint));
+export function mergeHook(
+  config: HookConfig,
+  group: HookGroup,
+  event = "PostToolUse",
+  ours: (h: HookCommand) => boolean = isJevLint,
+): { config: HookConfig; action: "added" | "updated" | "unchanged" } {
+  const post = [...(config.hooks?.[event] ?? [])];
+  const index = post.findIndex((g) => g.hooks?.some(ours));
   let action: "added" | "updated" | "unchanged" = "added";
   if (index === -1) post.push(group);
   else if (sameHook(post[index], group)) action = "unchanged";
@@ -74,14 +89,14 @@ export function mergeHook(config: HookConfig, group: HookGroup): { config: HookC
     // Keep any unrelated hooks that share the group; swap only the jev-lint command.
     // A group's matcher is shared by all its hooks, so never change it under other hooks:
     // leave them in their group and give jev-lint its own.
-    const others = post[index].hooks.filter((h) => !isJevLint(h));
+    const others = post[index].hooks.filter((h) => !ours(h));
     if (others.length) {
       post[index] = { ...post[index], hooks: others };
       post.push(group);
     } else post[index] = group;
     action = "updated";
   }
-  return { config: { ...config, hooks: { ...config.hooks, PostToolUse: post } }, action };
+  return { config: { ...config, hooks: { ...config.hooks, [event]: post } }, action };
 }
 
 function keyStatus(): string {
@@ -96,17 +111,29 @@ function keyStatus(): string {
   return found.status === 0 ? "present (Keychain: typesafe-api-key)" : "MISSING";
 }
 
-function writeConfig(path: string, group: HookGroup, apply: boolean): string {
+// Main hook on PostToolUse, plus (unless disabled) the end-of-turn re-check on Stop/SubagentStop.
+function writeConfig(path: string, group: HookGroup, apply: boolean, recheck: boolean): string {
   const parsed: unknown = existsSync(path) ? JSON.parse(readFileSync(path, "utf8")) : {};
   if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) throw new Error(`${path} is not a JSON object; not touching it`);
-  const current = parsed as HookConfig;
-  const { config, action } = mergeHook(current, group);
-  if (apply && action !== "unchanged") {
+  let config = parsed as HookConfig;
+  const actions: string[] = [];
+  const main = mergeHook(config, group);
+  config = main.config;
+  actions.push(`hook ${main.action}`);
+  if (recheck) {
+    for (const event of RECHECK_EVENTS) {
+      const merged = mergeHook(config, recheckGroup(), event, isJevLintRecheck);
+      config = merged.config;
+      actions.push(`${event} re-check ${merged.action}`);
+    }
+  }
+  const changed = actions.some((a) => !a.endsWith("unchanged"));
+  if (apply && changed) {
     mkdirSync(dirname(path), { recursive: true });
     if (existsSync(path)) copyFileSync(path, `${path}.bak-jev-lint-${new Date().toISOString().replace(/[:.]/g, "-")}`);
     writeFileSync(path, `${JSON.stringify(config, null, 2)}\n`);
   }
-  return `${path}: ${action}${apply || action === "unchanged" ? "" : " (dry run; pass --apply)"}`;
+  return `${path}: ${actions.join(", ")}${apply || !changed ? "" : " (dry run; pass --apply)"}`;
 }
 
 function codexFeatureStatus(): string {
@@ -166,6 +193,7 @@ if (import.meta.main) {
       async: { type: "boolean", default: false },
       skills: { type: "boolean", default: false },
       smoke: { type: "boolean", default: false },
+      "no-recheck": { type: "boolean", default: false },
     },
   });
   if (values["codex-only"] && values.project) {
@@ -177,10 +205,10 @@ if (import.meta.main) {
   console.log(`TypeSafe key: ${keyStatus()}`);
   if (!values["codex-only"]) {
     const path = values.project ? join(resolve(values.project), ".claude/settings.json") : join(homedir(), ".claude/settings.json");
-    console.log(`Claude Code: ${writeConfig(path, hookGroup("claude", { async: values.async }), values.apply)}`);
+    console.log(`Claude Code: ${writeConfig(path, hookGroup("claude", { async: values.async }), values.apply, !values["no-recheck"])}`);
   }
   if (!values["claude-only"] && !values.project) {
-    console.log(`Codex: ${writeConfig(join(homedir(), ".codex/hooks.json"), hookGroup("codex"), values.apply)}`);
+    console.log(`Codex: ${writeConfig(join(homedir(), ".codex/hooks.json"), hookGroup("codex"), values.apply, !values["no-recheck"])}`);
     console.log(`Codex: ${codexFeatureStatus()}; the first run asks you to trust the hook`);
   }
   if (values.skills) for (const line of linkSkills(values.apply)) console.log(`skill ${line}`);

@@ -1,0 +1,4047 @@
+[
+  {
+    "task": "py-order-refund",
+    "lang": "python",
+    "condition": "none",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "app/main.py",
+        "line": 8,
+        "severity": "medium",
+        "title": "Database schema creation runs during import",
+        "explanation": "Calling `create_all` at module import blocks imports and test collection, requires the database to be reachable before the app can start, and bypasses the normal migration/startup lifecycle.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/routes/orders.py",
+        "line": 54,
+        "severity": "medium",
+        "title": "Synchronous database calls block async handlers",
+        "explanation": "These `async` endpoints use a synchronous SQLAlchemy `Session` for queries and commits, so database I/O can block the event loop and reduce request concurrency.",
+        "rule": "py-sync-client-in-async",
+        "jevProbability": 0.69
+      },
+      {
+        "file": "app/routes/orders.py",
+        "line": 77,
+        "severity": "medium",
+        "title": "Converting refund amounts to float risks monetary inaccuracies",
+        "explanation": "Converting a `Decimal` amount to binary floating point can change the amount sent to the payment provider, so use the provider's exact decimal or integer-minor-unit representation.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/routes/orders.py",
+        "line": 77,
+        "severity": "high",
+        "title": "Concurrent refund requests can charge twice",
+        "explanation": "Two requests can both pass the status check before either records the refund, then both call the provider; serialize or atomically claim the refund before making the external call, with an idempotency key.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/routes/orders.py",
+        "line": 71,
+        "severity": "medium",
+        "title": "Refund eligibility is not checked",
+        "explanation": "The endpoint rejects only already-refunded orders, so orders in other ineligible states can still be sent to the payment provider for a refund.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/routes/orders.py",
+        "line": 83,
+        "severity": "medium",
+        "title": "Email failure turns a completed refund into a failed response",
+        "explanation": "The refund is committed before sending email, so an email exception returns an error even though the refund succeeded, and retrying then receives 409 without delivering the receipt.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "py-trial-reminders",
+    "lang": "python",
+    "condition": "none",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "app/trials.py",
+        "line": 29,
+        "severity": "medium",
+        "title": "Naive-only tzinfo check accepts invalid datetime states",
+        "explanation": "Checking only `tzinfo is None` treats datetimes with a non-None `tzinfo` whose `utcoffset()` is `None` as aware, which can still cause naive/aware comparison errors.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/trials.py",
+        "line": 87,
+        "severity": "low",
+        "title": "Discount code generation ignores its user argument",
+        "explanation": "`generate_discount_code` never uses `user`, making codes unrelated to their recipient and leaving the parameter misleading; remove it or incorporate the intended identity semantics.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/trials.py",
+        "line": 102,
+        "severity": "medium",
+        "title": "Duplicate email addresses silently overwrite generated codes",
+        "explanation": "`generate_discount_codes` promises a code per user but keys by email, so repeated emails replace earlier entries and discard generated codes.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/trials.py",
+        "line": 133,
+        "severity": "medium",
+        "title": "Notification deduplication is only in-memory and keyed by email",
+        "explanation": "A worker restart loses `_notified`, and an email change can trigger a repeat, so the documented once-only behavior is not durable or reliably tied to a user identity.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/trials.py",
+        "line": 151,
+        "severity": "medium",
+        "title": "Concurrent iterations can send duplicate reminders",
+        "explanation": "`run_once` checks `_notified` before awaiting email delivery and records the email afterward, allowing overlapping calls to both send before either records success.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/trials.py",
+        "line": 154,
+        "severity": "medium",
+        "title": "Failed email delivery generates a different code on retry",
+        "explanation": "The discount code is generated per attempt and not persisted, so a send that partially succeeds but raises may be retried with a different code, potentially invalidating the delivered offer.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/trials.py",
+        "line": 177,
+        "severity": "medium",
+        "title": "Starting the worker outside a running event loop raises",
+        "explanation": "`asyncio.create_task` requires a running loop, so calling the synchronous `start()` from ordinary synchronous application startup raises `RuntimeError` instead of starting the worker.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/trials.py",
+        "line": 183,
+        "severity": "medium",
+        "title": "Stop can wait indefinitely for a stuck iteration",
+        "explanation": "Setting the event does not cancel an in-progress `get_users` or email call, so `stop()` can hang forever if a dependency blocks or never completes.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/trials.py",
+        "line": 129,
+        "severity": "low",
+        "title": "Worker configuration accepts invalid interval and window values",
+        "explanation": "Negative intervals can cause a tight retry loop and negative reminder windows produce surprising behavior; validate configuration at construction.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "app/trials.py",
+        "rule": "py-perf-sequential-awaits",
+        "jevProbability": 0.63,
+        "graderConfirms": false
+      },
+      {
+        "file": "tests/test_trials.py",
+        "rule": "py-test-fixed-sleep",
+        "jevProbability": 0.9,
+        "graderConfirms": true
+      }
+    ]
+  },
+  {
+    "task": "rb-projects-api",
+    "lang": "ruby",
+    "condition": "none",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "spec/controllers/projects_controller_spec.rb",
+        "line": 6,
+        "severity": "high",
+        "title": "Controller is instantiated outside the Rails request lifecycle",
+        "explanation": "`ActionController` controllers do not accept `params:` or `current_user:` as constructor keywords, so this helper raises before the actions can be tested, and directly invoking actions also bypasses request/response setup.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "spec/controllers/projects_controller_spec.rb",
+        "line": 17,
+        "severity": "high",
+        "title": "Specs read response using a nonexistent JSON accessor",
+        "explanation": "Rails responses expose status through `response.status` and rendered JSON through the response body, not `response[:status]` or `response[:json]`, so these assertions cannot work with a standard Rails controller response.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "py-inventory-reports",
+    "lang": "python",
+    "condition": "jev-rewake",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "app/db.py",
+        "line": 14,
+        "severity": "high",
+        "title": "Passes SQLite-only connect option to every database",
+        "explanation": "`check_same_thread` is a SQLite-specific driver argument, so configuring a PostgreSQL or other non-SQLite `DATABASE_URL` can make engine connections fail.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/main.py",
+        "line": 8,
+        "severity": "medium",
+        "title": "Creates tables during module import",
+        "explanation": "Import-time schema creation couples application startup to database availability and bypasses migration-based schema management, making deployments and process startup less predictable.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/routes/inventory.py",
+        "line": 31,
+        "severity": "medium",
+        "title": "Inventory mutations have no authentication or authorization",
+        "explanation": "The reserve and restock endpoints are public even though the application has a current-user dependency, allowing unauthenticated callers to change inventory.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/routes/inventory.py",
+        "line": 67,
+        "severity": "medium",
+        "title": "Sales report converts monetary totals to binary floats",
+        "explanation": "Converting a monetary database value to `float` can lose decimal precision and return inaccurate totals; preserve decimal values or serialize money in a fixed-point representation.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/routes/inventory.py",
+        "line": 69,
+        "severity": "low",
+        "title": "Sales report loads every matching order into memory",
+        "explanation": "The unpaginated 30-day query can grow without bound and cause high memory use and slow responses as order volume increases.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "app/routes/inventory.py",
+        "rule": "py-perf-orm-write-in-loop",
+        "jevProbability": 0.52,
+        "graderConfirms": true
+      },
+      {
+        "file": "tests/test_inventory.py",
+        "rule": "py-test-real-clock",
+        "jevProbability": 0.62,
+        "graderConfirms": true
+      }
+    ]
+  },
+  {
+    "task": "py-integrations",
+    "lang": "python",
+    "condition": "none",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "app/routes/integrations.py",
+        "line": 109,
+        "severity": "high",
+        "title": "DNS validation is vulnerable to rebinding",
+        "explanation": "The hostname is resolved and checked here, but `requests.get` resolves it again, allowing DNS rebinding to make the actual connection reach a private or metadata address.",
+        "rule": "py-sec-ssrf",
+        "jevProbability": 0.06
+      },
+      {
+        "file": "app/routes/integrations.py",
+        "line": 142,
+        "severity": "medium",
+        "title": "HTTP responses are never closed",
+        "explanation": "The streamed response is not used as a context manager or explicitly closed, so error paths and completed reads can leak connections from the requests connection pool.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/routes/integrations.py",
+        "line": 35,
+        "severity": "medium",
+        "title": "Webhook request bodies are unbounded",
+        "explanation": "Reading the entire body before checking its size lets an unauthenticated caller send an arbitrarily large request and consume substantial memory.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/routes/integrations.py",
+        "line": 45,
+        "severity": "medium",
+        "title": "Malformed JSON shapes can produce server errors",
+        "explanation": "Valid JSON such as a list or scalar has no `.get` method, and list-valued `event` data can also fail set membership, resulting in 500 responses instead of a 400 validation error.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/routes/integrations.py",
+        "line": 56,
+        "severity": "medium",
+        "title": "Webhook events can regress order status",
+        "explanation": "Every accepted event overwrites the current status, so a delayed or replayed failure event can change an already-paid order to failed (or vice versa) without a transition check or idempotency handling.",
+        "rule": "py-read-modify-write-race",
+        "jevProbability": 0.1
+      },
+      {
+        "file": "app/main.py",
+        "line": 10,
+        "severity": "medium",
+        "title": "Tables are created during module import",
+        "explanation": "Running DDL as an import side effect couples application startup and test imports to database availability and bypasses a controlled migration/startup lifecycle.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/main.py",
+        "line": 16,
+        "severity": "medium",
+        "title": "Profile fields accept null despite database constraints",
+        "explanation": "Both update fields allow explicit `null`, which can assign `None` to non-nullable user columns and cause a database integrity error and 500 response on commit.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/main.py",
+        "line": 18,
+        "severity": "low",
+        "title": "Email updates are not validated as email addresses",
+        "explanation": "The API accepts arbitrary strings for `email`, allowing invalid email values to be persisted despite this being a user email field.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "tests/conftest.py",
+        "line": 3,
+        "severity": "high",
+        "title": "Tests can target and erase a configured database",
+        "explanation": "`setdefault` preserves an externally supplied `DATABASE_URL`, while the autouse fixture deletes every table's rows, so running tests with a configured non-test database can destroy real data.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "app/routes/integrations.py",
+        "rule": "py-sync-client-in-async",
+        "jevProbability": 0.88,
+        "graderConfirms": true
+      },
+      {
+        "file": "tests/test_webhooks.py",
+        "rule": "py-test-shared-mutable-state",
+        "jevProbability": 0.52,
+        "graderConfirms": false
+      }
+    ]
+  },
+  {
+    "task": "py-inventory-reports",
+    "lang": "python",
+    "condition": "none",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "app/main.py",
+        "line": 8,
+        "severity": "high",
+        "title": "Create tables during module import",
+        "explanation": "Importing the application performs DDL against the configured database, which can unexpectedly modify a production database during startup, worker reloads, or test collection and bypasses migration management.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/routes/inventory.py",
+        "line": 50,
+        "severity": "high",
+        "title": "Reservation can oversell under concurrent requests",
+        "explanation": "The stock check and read-modify-write are not atomic, so concurrent requests can both observe sufficient stock and commit reservations that exceed inventory.",
+        "rule": "py-read-modify-write-race",
+        "jevProbability": 0.98
+      },
+      {
+        "file": "app/routes/inventory.py",
+        "line": 87,
+        "severity": "medium",
+        "title": "Sales report loads every matching order into memory",
+        "explanation": "The report has no pagination or result limit, so a busy account can make this endpoint consume excessive memory and database resources despite the 30-day cutoff.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "tests/conftest.py",
+        "line": 25,
+        "severity": "medium",
+        "title": "Share one SQLAlchemy session across threads",
+        "explanation": "The fixture passes a single Session from the test thread into TestClient's request-handling thread, but SQLAlchemy sessions are not thread-safe and should be created and used within each request's thread.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "tests/conftest.py",
+        "line": 38,
+        "severity": "medium",
+        "title": "Dependency overrides are unsafe across concurrent tests",
+        "explanation": "Mutating the application-wide override dictionary can cause parallel tests or overlapping clients to use the wrong database session or remove another test's override.",
+        "rule": "py-test-shared-mutable-state",
+        "jevProbability": 0.13
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "py-order-refund",
+    "lang": "python",
+    "condition": "jev-rewake",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "app/db.py",
+        "line": 12,
+        "severity": "high",
+        "title": "SQLite-only connection option is passed to every database",
+        "explanation": "`check_same_thread` is a SQLite driver option, so non-SQLite `DATABASE_URL` values can fail during engine creation or connection setup.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/main.py",
+        "line": 8,
+        "severity": "medium",
+        "title": "Create tables during module import",
+        "explanation": "Importing the application now requires a live database and performs schema changes outside migrations or application startup, which can break workers, tests, and deployments.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/routes/orders.py",
+        "line": 63,
+        "severity": "high",
+        "title": "Concurrent requests can refund the same order twice",
+        "explanation": "The status check and provider refund are not protected by an atomic state transition or idempotency key, so simultaneous requests can both issue refunds.",
+        "rule": "py-read-modify-write-race",
+        "jevProbability": 0.18
+      },
+      {
+        "file": "app/routes/orders.py",
+        "line": 72,
+        "severity": "high",
+        "title": "Provider refund can succeed while the order remains unpaid in the database",
+        "explanation": "The external refund happens before the database commit, so a commit failure leaves the order eligible for another refund despite the provider having already processed one.",
+        "rule": "py-side-effect-in-transaction",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/routes/orders.py",
+        "line": 72,
+        "severity": "medium",
+        "title": "Synchronous database work runs on the event loop",
+        "explanation": "This async handler performs synchronous ORM queries, mutations, and commits directly, which can block the event loop under database latency.",
+        "rule": "py-sync-client-in-async",
+        "jevProbability": 0.61
+      },
+      {
+        "file": "app/routes/orders.py",
+        "line": 76,
+        "severity": "high",
+        "title": "Order is marked refunded regardless of provider result",
+        "explanation": "The returned `refund.status` is ignored, so pending or failed provider refunds are recorded as completed.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/routes/orders.py",
+        "line": 81,
+        "severity": "medium",
+        "title": "Email failure turns a completed refund into an HTTP error",
+        "explanation": "If sending the receipt fails after the refund is committed, the client receives an error even though the refund succeeded, encouraging confusing retries.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/clients/payments.py",
+        "line": 19,
+        "severity": "medium",
+        "title": "Payments session is never closed",
+        "explanation": "A new `requests.Session` is created by the dependency for each request, but no cleanup closes its connections.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/clients/payments.py",
+        "line": 29,
+        "severity": "medium",
+        "title": "Payment ID is interpolated directly into a URL path",
+        "explanation": "An unescaped provider ID can alter the path or query sent to the payment service; encode it as a path segment before constructing the URL.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/routes/orders.py",
+        "line": 72,
+        "severity": "medium",
+        "title": "Refund amount uses binary floating-point",
+        "explanation": "Converting a monetary total to `float` can introduce rounding errors in the amount sent to the provider; use decimal or integer minor units instead.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "tests/test_orders.py",
+        "line": 21,
+        "severity": "high",
+        "title": "Tests drop tables in the configured application database",
+        "explanation": "The suite calls `drop_all` on the production-configurable global engine, so running tests with a non-test `DATABASE_URL` can destroy real data.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "py-integrations",
+    "lang": "python",
+    "condition": "jev-rewake",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "app/routes/integrations.py",
+        "line": 66,
+        "severity": "high",
+        "title": "SQLAlchemy session is used across threads",
+        "explanation": "The request-scoped `Session` is created by FastAPI's synchronous dependency machinery, then passed to `asyncio.to_thread`; SQLAlchemy sessions are not thread-safe, and SQLite connections may also reject this cross-thread use.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/routes/integrations.py",
+        "line": 100,
+        "severity": "high",
+        "title": "DNS validation is vulnerable to rebinding",
+        "explanation": "The code validates one DNS resolution but lets HTTPX resolve the hostname again for the actual connection, so a rebinding hostname can pass the public-address check and then reach a private service.",
+        "rule": "py-sec-ssrf",
+        "jevProbability": 0.07
+      },
+      {
+        "file": "app/routes/integrations.py",
+        "line": 53,
+        "severity": "medium",
+        "title": "Valid JSON with a non-object body crashes the webhook",
+        "explanation": "`json.loads` can return a list, scalar, or null, and the subsequent `.get()` calls raise an unhandled exception instead of returning a 400 response.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/routes/integrations.py",
+        "line": 47,
+        "severity": "medium",
+        "title": "Webhook request body has no size limit",
+        "explanation": "The endpoint buffers the entire request body before verifying its signature, allowing an unauthenticated client to consume excessive memory with a large payload.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/routes/integrations.py",
+        "line": 77,
+        "severity": "medium",
+        "title": "Webhook events can downgrade an order's status",
+        "explanation": "Every accepted event overwrites the current status, so a delayed or repeated failure event can change an already-paid order to failed.",
+        "rule": "py-read-modify-write-race",
+        "jevProbability": 0.15
+      },
+      {
+        "file": "app/routes/integrations.py",
+        "line": 177,
+        "severity": "medium",
+        "title": "Profile fields accept null values",
+        "explanation": "Both optional fields also permit explicit JSON `null`, which can write null into required user columns or leave the user with an invalid profile.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/routes/integrations.py",
+        "line": 178,
+        "severity": "medium",
+        "title": "Email field is not validated as an email address",
+        "explanation": "A minimum length check accepts arbitrary strings, so the endpoint can persist malformed email addresses despite exposing this field as a user email.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/main.py",
+        "line": 8,
+        "severity": "medium",
+        "title": "Database schema is created during module import",
+        "explanation": "Running `create_all` at import time couples application startup to database availability and bypasses controlled schema migrations, and can also run unexpectedly in workers and tests.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "tests/test_integrations.py",
+        "line": 42,
+        "severity": "low",
+        "title": "Fixture clears all dependency overrides globally",
+        "explanation": "Calling `clear()` removes overrides installed by other fixtures or application setup, making tests order-dependent and potentially breaking parallel or composed test suites.",
+        "rule": "py-test-shared-mutable-state",
+        "jevProbability": 0.21
+      },
+      {
+        "file": "tests/test_integrations.py",
+        "line": 40,
+        "severity": "low",
+        "title": "Test database engine is not disposed",
+        "explanation": "The fixture leaves its per-test engine undisposed, which can retain connections and resources across repeated test runs.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "kt-feed-viewmodel",
+    "lang": "kotlin",
+    "condition": "none",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "src/main/kotlin/com/acme/app/feed/FeedViewModel.kt",
+        "line": 37,
+        "severity": "medium",
+        "title": "Draft file is read synchronously during ViewModel construction",
+        "explanation": "`loadDraft()` performs filesystem I/O on the caller thread, which is commonly the Android main thread and can block UI startup for a slow or large cache file.",
+        "rule": "kt-blocking-call-not-main-safe",
+        "jevProbability": 0.66
+      },
+      {
+        "file": "src/main/kotlin/com/acme/app/feed/FeedViewModel.kt",
+        "line": 83,
+        "severity": "medium",
+        "title": "Concurrent draft saves can persist stale text",
+        "explanation": "Each edit launches an independent write on the I/O dispatcher, so an earlier, slower write can finish after a later one and leave the older draft on disk.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/main/kotlin/com/acme/app/feed/FeedViewModel.kt",
+        "line": 55,
+        "severity": "medium",
+        "title": "Cancellation is handled as an ordinary refresh failure",
+        "explanation": "Catching `Exception` also catches `CancellationException`, so cancelling the ViewModel coroutine can incorrectly set an error instead of propagating cancellation (the same issue occurs in the like handler at line 73).",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/main/kotlin/com/acme/app/feed/FeedViewModel.kt",
+        "line": 64,
+        "severity": "medium",
+        "title": "Overlapping like requests can roll back newer state",
+        "explanation": "Each request captures a post snapshot and restores it on failure, so if the user toggles the same post again before an earlier request fails, that stale rollback can discard the newer optimistic change.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "py-trial-reminders",
+    "lang": "python",
+    "condition": "jev-rewake",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "app/trials.py",
+        "line": 103,
+        "severity": "medium",
+        "title": "Default email sender is bound at import time",
+        "explanation": "Using the imported function as a default captures it when this module loads, so later monkeypatching or configuring `app.notifications.send_email` will not affect worker instances that omit `send_email`.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/trials.py",
+        "line": 121,
+        "severity": "high",
+        "title": "Awaitable detection can misclassify supported providers",
+        "explanation": "`isinstance(value, Awaitable)` does not reliably recognize every awaitable object, so a custom awaitable returned by `get_users` can be treated as an iterable and fail instead of being awaited; use `inspect.isawaitable`.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/trials.py",
+        "line": 127,
+        "severity": "medium",
+        "title": "One mail failure prevents remaining reminders",
+        "explanation": "A synchronous sender exception aborts the loop at the first failed recipient, so later users in the same iteration receive no reminder and are retried only on the next poll.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/trials.py",
+        "line": 129,
+        "severity": "high",
+        "title": "Synchronous email sending blocks the event loop",
+        "explanation": "The sender is invoked directly from the async worker, so a blocking SMTP or network implementation stalls the event loop and delays shutdown and other async work.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/trials.py",
+        "line": 137,
+        "severity": "medium",
+        "title": "Concurrent start can create multiple worker tasks",
+        "explanation": "`start()` checks `running` and assigns `_task` without synchronization or yielding, but concurrent callers can still race across task scheduling boundaries and create duplicate polling loops.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/trials.py",
+        "line": 145,
+        "severity": "medium",
+        "title": "Stop can hang indefinitely on an in-flight iteration",
+        "explanation": "`stop()` only sets the event and awaits the task, while `_run_loop` cannot observe that event until `run_once()` finishes, so a hung provider or email sender makes shutdown hang indefinitely.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/trials.py",
+        "line": 140,
+        "severity": "medium",
+        "title": "Worker cannot be safely restarted after cancellation",
+        "explanation": "If the worker task is cancelled externally, `_task` remains a completed task and `start()` can overwrite it without retrieving its exception, potentially producing an unhandled-task warning.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "rb-checkout",
+    "lang": "ruby",
+    "condition": "jev-rewake",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "app/services/checkout.rb",
+        "line": 33,
+        "severity": "high",
+        "title": "External charge runs inside a rollbackable transaction",
+        "explanation": "If charging succeeds but a later database or delivery step fails, the database rolls back while the customer remains charged, so payment must be coordinated with durable state and compensation/idempotency rather than performed inside this transaction.",
+        "rule": "rb-side-effect-before-commit",
+        "jevProbability": 0.98
+      },
+      {
+        "file": "app/services/checkout.rb",
+        "line": 36,
+        "severity": "medium",
+        "title": "Sends email before the transaction commits",
+        "explanation": "A later failure rolls back the order but cannot retract the delivered confirmation, so send it after commit (typically via an after-commit job).",
+        "rule": "rb-side-effect-before-commit",
+        "jevProbability": 0.98
+      },
+      {
+        "file": "app/services/checkout.rb",
+        "line": 37,
+        "severity": "medium",
+        "title": "Enqueues fulfillment before the transaction commits",
+        "explanation": "With queue adapters that publish immediately, the worker can run before the order is committed or the transaction can subsequently roll back, so enqueue through an after-commit mechanism.",
+        "rule": "rb-side-effect-before-commit",
+        "jevProbability": 0.98
+      },
+      {
+        "file": "app/services/checkout.rb",
+        "line": 24,
+        "severity": "high",
+        "title": "Does not validate cart quantities",
+        "explanation": "Zero or negative quantities pass the stock check and can create invalid line items, increase inventory, or reduce the charged total; require a positive integer quantity before changing stock.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/services/checkout.rb",
+        "line": 20,
+        "severity": "medium",
+        "title": "Duplicate product entries can deadlock concurrent checkouts",
+        "explanation": "Locking products in caller-provided order allows two carts containing the same products in opposite orders to hold one row lock each while waiting for the other; aggregate duplicate items and lock products in a stable order.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/services/sales_report.rb",
+        "line": 13,
+        "severity": "medium",
+        "title": "Ordering is nondeterministic for equal timestamps",
+        "explanation": "Orders sharing `created_at` have no secondary sort key, so their relative report order can vary; add a stable tie-breaker such as `id`.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/services/sales_report.rb",
+        "line": 11,
+        "severity": "medium",
+        "title": "Date-only end bounds exclude most of the final day",
+        "explanation": "When callers pass a date or midnight timestamp as `ends_at`, the inclusive range only includes records at that instant and omits later orders that day; normalize to an exclusive next-day bound or define the timestamp contract.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "spec/spec_helper.rb",
+        "line": 5,
+        "severity": "high",
+        "title": "Example-wide transaction masks after-commit behavior",
+        "explanation": "Wrapping every example in an outer transaction prevents real commits, so after-commit callbacks and transaction-dependent job behavior are not exercised and can behave differently in production.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "app/services/checkout.rb",
+        "rule": "rb-perf-n-plus-one",
+        "jevProbability": 0.6,
+        "graderConfirms": false
+      }
+    ]
+  },
+  {
+    "task": "py-dashboard-aggregator",
+    "lang": "python",
+    "condition": "none",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "app/db.py",
+        "line": 10,
+        "severity": "high",
+        "title": "SQLite-only connection option breaks non-SQLite databases",
+        "explanation": "`check_same_thread` is a SQLite driver option, so passing it for a PostgreSQL or other non-SQLite `DATABASE_URL` can make engine connections fail at runtime.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/db.py",
+        "line": 11,
+        "severity": "medium",
+        "title": "In-memory SQLite detection misses valid URL forms",
+        "explanation": "Only the exact `sqlite:///:memory:` URL gets `StaticPool`, so equivalent in-memory SQLite URLs can create separate databases across connections and lose tables or data.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/main.py",
+        "line": 8,
+        "severity": "medium",
+        "title": "Schema creation runs during module import",
+        "explanation": "Calling `create_all` at import time performs database I/O during application import and worker startup, creating deployment and test side effects rather than using an explicit lifespan hook or migrations.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/routes/dashboard.py",
+        "line": 70,
+        "severity": "medium",
+        "title": "Synchronous database work blocks the async event loop",
+        "explanation": "The synchronous SQLAlchemy query runs directly inside an `async def` endpoint, blocking the event loop while database work executes and reducing concurrency under load.",
+        "rule": "py-sync-client-in-async",
+        "jevProbability": 0.91
+      },
+      {
+        "file": "app/routes/dashboard.py",
+        "line": 46,
+        "severity": "medium",
+        "title": "Unbounded fan-out from the profile watchlist",
+        "explanation": "Every watchlist entry starts a concurrent HTTP request with no size limit or concurrency bound, allowing an oversized or malformed upstream watchlist to exhaust connections and resources.",
+        "rule": "py-perf-unbounded-gather",
+        "jevProbability": 0.94
+      },
+      {
+        "file": "app/routes/dashboard.py",
+        "line": 31,
+        "severity": "medium",
+        "title": "Malformed upstream JSON can fail the whole dashboard request",
+        "explanation": "`response.json()` may raise a JSON decoding exception that is not an `httpx.HTTPError`, so invalid JSON from profile, notifications, or prices escapes the graceful fallback and produces a 500 response.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/routes/dashboard.py",
+        "line": 23,
+        "severity": "low",
+        "title": "A new HTTP client is created for every request",
+        "explanation": "Creating and closing an `AsyncClient` per dashboard request prevents connection pooling across requests and adds avoidable connection setup overhead.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "tests/test_dashboard.py",
+        "line": 35,
+        "severity": "low",
+        "title": "Test users and orders are left in the database",
+        "explanation": "The fixture closes its session but never removes its inserted rows, so repeated test runs accumulate data and can contaminate a shared or persistent test database.",
+        "rule": "py-test-shared-mutable-state",
+        "jevProbability": 0.22
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "py-dashboard-aggregator",
+    "lang": "python",
+    "condition": "jev-rewake",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "app/main.py",
+        "line": 8,
+        "severity": "medium",
+        "title": "Create database tables during module import",
+        "explanation": "Import-time DDL can block or fail application startup and runs independently in every worker, so schema creation should be managed through migrations or an explicit lifespan/startup operation.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/routes/dashboard.py",
+        "line": 27,
+        "severity": "medium",
+        "title": "Malformed upstream JSON is not handled",
+        "explanation": "`resp.json()` can raise a JSON decoding error that is not an `httpx.HTTPError`, causing a malformed upstream response to fail the entire dashboard request instead of returning the documented `None` fallback.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/routes/dashboard.py",
+        "line": 36,
+        "severity": "medium",
+        "title": "Malformed notification JSON is not handled",
+        "explanation": "A successful notification response with invalid JSON raises outside the caught `httpx.HTTPError` path and turns an upstream failure into a 500 dashboard response.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/routes/dashboard.py",
+        "line": 47,
+        "severity": "medium",
+        "title": "Ticker is interpolated into the upstream URL without encoding",
+        "explanation": "A watchlist ticker containing path or query delimiters can alter the requested URL, so pass it as an encoded path segment or validate it against the expected ticker format.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/routes/dashboard.py",
+        "line": 50,
+        "severity": "medium",
+        "title": "All quote tasks are created before the semaphore limits requests",
+        "explanation": "The semaphore bounds active network calls but `gather` still eagerly creates one task per watchlist entry, allowing an untrusted or unexpectedly large profile watchlist to consume excessive memory and scheduler resources.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/routes/dashboard.py",
+        "line": 53,
+        "severity": "medium",
+        "title": "Malformed quote JSON is not handled",
+        "explanation": "`resp.json()` decoding failures are not caught as `httpx.HTTPError`, so one invalid quote response causes the dashboard endpoint to return 500 rather than reporting prices as unavailable.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/routes/dashboard.py",
+        "line": 83,
+        "severity": "medium",
+        "title": "Upstream watchlist shape is trusted",
+        "explanation": "If `watchlist` is not a list of strings, `_fetch_prices` can raise during iteration or URL construction and cause a 500 instead of safely rejecting invalid upstream data.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/routes/dashboard.py",
+        "line": 90,
+        "severity": "high",
+        "title": "Synchronous database work runs in the async endpoint",
+        "explanation": "`_recent_orders` performs blocking SQLAlchemy `Session` I/O directly on the event loop, which can stall other requests and should be moved to a synchronous route/dependency threadpool or an async database session.",
+        "rule": "py-sync-client-in-async",
+        "jevProbability": 0.54
+      },
+      {
+        "file": "tests/conftest.py",
+        "line": 7,
+        "severity": "low",
+        "title": "Temporary SQLite database is never cleaned up",
+        "explanation": "The fixture module creates a file-backed database but does not remove it after the test process, leaving temporary files behind on repeated runs.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "tests/test_dashboard.py",
+        "line": 15,
+        "severity": "medium",
+        "title": "Tests share one database without isolating state",
+        "explanation": "The module-scoped application engine points at a persistent test database and fixtures only delete their own user, so parallel runs or stale rows can cause uniqueness conflicts and cross-test interference.",
+        "rule": "py-test-shared-mutable-state",
+        "jevProbability": 0.14
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "rb-projects-api",
+    "lang": "ruby",
+    "condition": "jev-rewake",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "app/controllers/projects_controller.rb",
+        "line": 6,
+        "severity": "medium",
+        "title": "Search matching is database-dependent",
+        "explanation": "`LIKE` is case-sensitive on databases such as PostgreSQL, so the lowercase `web` query in the spec will not match `Website Redesign` there; use a deliberate case-insensitive strategy if that is the intended behavior.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/controllers/projects_controller.rb",
+        "line": 6,
+        "severity": "low",
+        "title": "Search input treats SQL wildcards as operators",
+        "explanation": "A query containing `%` or `_` matches arbitrary text rather than those literal characters, which can make search results surprising; escape wildcard characters if the API is intended to perform literal substring matching.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/controllers/projects_controller.rb",
+        "line": 50,
+        "severity": "medium",
+        "title": "Destroy reports success when destruction is aborted",
+        "explanation": "If a callback or association restriction makes `destroy` fail, the action still returns 204 even though the project remains; check the destroy result and return an appropriate error response.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "spec/controllers/projects_controller_spec.rb",
+        "line": 6,
+        "severity": "high",
+        "title": "Controller specs instantiate the controller with an unsupported API",
+        "explanation": "Rails controllers are not initialized with `params:` and `current_user:` keyword arguments, and the instance lacks the request/response context needed by `render`, so these examples will fail before exercising the actions.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "rb-checkout",
+    "lang": "ruby",
+    "condition": "none",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "app/jobs/fulfillment_job.rb",
+        "line": 3,
+        "severity": "high",
+        "title": "Fulfillment job performs no fulfillment",
+        "explanation": "The job only loads the order and then exits, so successfully enqueued orders never trigger any fulfillment work.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/services/checkout.rb",
+        "line": 30,
+        "severity": "high",
+        "title": "Stock check is vulnerable to concurrent checkouts",
+        "explanation": "Two transactions can both read sufficient stock and then overwrite each other's decrement, allowing overselling; lock the product row or use an atomic conditional decrement.",
+        "rule": "rb-read-modify-write-race",
+        "jevProbability": 0.96
+      },
+      {
+        "file": "app/services/checkout.rb",
+        "line": 30,
+        "severity": "high",
+        "title": "Quantity is not validated as positive",
+        "explanation": "A zero or negative quantity passes the stock check, and a negative quantity increases stock while reducing the charged total.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/services/checkout.rb",
+        "line": 43,
+        "severity": "high",
+        "title": "Payment can succeed while the database transaction rolls back",
+        "explanation": "Charging the external gateway inside the transaction means a later database failure can roll back the order and stock changes without reversing the successful charge.",
+        "rule": "rb-side-effect-before-commit",
+        "jevProbability": 0.98
+      },
+      {
+        "file": "app/services/checkout.rb",
+        "line": 46,
+        "severity": "medium",
+        "title": "Confirmation email is sent before commit",
+        "explanation": "If a later operation or commit fails, the customer may receive confirmation for an order that was rolled back; deliver it only after commit.",
+        "rule": "rb-side-effect-before-commit",
+        "jevProbability": 0.98
+      },
+      {
+        "file": "app/services/checkout.rb",
+        "line": 47,
+        "severity": "medium",
+        "title": "Fulfillment is enqueued before the order commits",
+        "explanation": "A worker can run before the transaction commits and fail to find the order, or process work for an order that is subsequently rolled back; enqueue after commit.",
+        "rule": "rb-side-effect-before-commit",
+        "jevProbability": 0.98
+      },
+      {
+        "file": "app/services/sales_report.rb",
+        "line": 14,
+        "severity": "medium",
+        "title": "Date ranges can exclude most of the final day",
+        "explanation": "When callers pass a Date range for a datetime column, the upper bound may be cast to midnight at the start of that date, excluding orders later that day.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "app/services/checkout.rb",
+        "rule": "rb-perf-n-plus-one",
+        "jevProbability": 0.8,
+        "graderConfirms": false
+      }
+    ]
+  },
+  {
+    "task": "rs-profile-cache",
+    "lang": "rust",
+    "condition": "none",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "src/profiles.rs",
+        "line": 96,
+        "severity": "medium",
+        "title": "Debug output exposes credentials",
+        "explanation": "Deriving `Debug` prints `client_secret` and `access_token`, so logging or panic diagnostics that format this value can leak credentials.",
+        "rule": "rs-debug-derive-secret",
+        "jevProbability": 0.97
+      },
+      {
+        "file": "src/profiles.rs",
+        "line": 61,
+        "severity": "medium",
+        "title": "Concurrent cache misses duplicate backend requests",
+        "explanation": "The cache lock is released before fetching, so simultaneous misses for the same ID all call the backend instead of sharing one in-flight result.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/profiles.rs",
+        "line": 74,
+        "severity": "medium",
+        "title": "Batch loads run serially",
+        "explanation": "Awaiting each ID in sequence makes `load_many` latency the sum of backend request times even when requests could run concurrently.",
+        "rule": "rs-perf-sequential-awaits",
+        "jevProbability": 0.77
+      },
+      {
+        "file": "src/profiles.rs",
+        "line": 83,
+        "severity": "medium",
+        "title": "Expired cache entries are never removed",
+        "explanation": "Expired entries are treated as misses but remain in the map indefinitely, causing memory usage to grow without bound as distinct IDs are requested.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/profiles.rs",
+        "line": 112,
+        "severity": "medium",
+        "title": "Expiry subtraction can overflow",
+        "explanation": "Subtracting the current timestamp from an arbitrary `i64` expiry can overflow for extreme values and panic in debug builds.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/profiles.rs",
+        "line": 133,
+        "severity": "medium",
+        "title": "LIKE metacharacters are not escaped",
+        "explanation": "Although values are bound safely against SQL injection, `%` and `_` in `name_prefix` remain SQL wildcards, so the query does not enforce literal prefix matching.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "rb-invitations",
+    "lang": "ruby",
+    "condition": "none",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "app/controllers/invitations_controller.rb",
+        "line": 13,
+        "severity": "high",
+        "title": "Use a recognized HTTP status symbol",
+        "explanation": "`:unprocessable_content` is not a portable Rails status symbol and may raise `ArgumentError` while handling invalid invitations; use `:unprocessable_entity`.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/controllers/invitations_controller.rb",
+        "line": 10,
+        "severity": "medium",
+        "title": "Synchronous mail delivery can fail after persisting the invitation",
+        "explanation": "If delivery raises, the request returns an error even though the invitation has already been saved, so retries can create duplicate invitations; enqueue delivery or otherwise handle this partial-success case.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/models/invitation.rb",
+        "line": 11,
+        "severity": "medium",
+        "title": "Token uniqueness is not enforced at the database level",
+        "explanation": "The model validation can be bypassed by concurrent inserts, and the schema has no unique index on `invitations.token`, allowing duplicate tokens that make token lookup ambiguous.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/models/invitation.rb",
+        "line": 21,
+        "severity": "medium",
+        "title": "The model permits accepting expired invitations",
+        "explanation": "`accept!` updates `accepted_at` without checking expiration, so callers outside this controller—or a request racing the controller's expiry check—can accept an expired invitation.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "spec/controllers/invitations_controller_spec.rb",
+        "line": 8,
+        "severity": "high",
+        "title": "Controller specs instantiate the controller with unsupported arguments",
+        "explanation": "Rails controllers are not initialized with `params:` and `current_user:` keyword arguments, so these examples will fail before exercising the actions; use request specs or set up the controller through Rails' test harness.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "spec/controllers/invitations_controller_spec.rb",
+        "line": 15,
+        "severity": "medium",
+        "title": "Controller response assertions use the wrong interface",
+        "explanation": "An ActionController response is not a hash with `:status`, `:json`, or `:location` keys, so these assertions will fail even after fixing controller setup; assert against the Rails response API and parsed response body.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "rs-chat-server",
+    "lang": "rust",
+    "condition": "none",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "src/chat.rs",
+        "line": 62,
+        "severity": "medium",
+        "title": "Client tasks outlive server shutdown",
+        "explanation": "Breaking the accept loop returns from `serve` without waiting for or cancelling spawned client tasks, so they can continue serving clients and writing to the log after shutdown has ostensibly completed.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/chat.rs",
+        "line": 129,
+        "severity": "medium",
+        "title": "Unbounded client line allocation",
+        "explanation": "`Lines::next_line` can accumulate an arbitrarily large line before returning, allowing a client to consume unbounded memory with a message that never ends in a newline.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/chat.rs",
+        "line": 55,
+        "severity": "medium",
+        "title": "Persistent accept errors can cause a busy loop",
+        "explanation": "Continuing immediately after an accept error can spin at full CPU when the error is persistent, such as file-descriptor exhaustion.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/chat.rs",
+        "line": 160,
+        "severity": "medium",
+        "title": "Lagged clients silently lose chat messages",
+        "explanation": "When a receiver falls behind the bounded broadcast channel, `Lagged` is ignored and the client continues without any indication that messages were dropped.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/main.rs",
+        "line": 7,
+        "severity": "medium",
+        "title": "Startup address does not match the bound address",
+        "explanation": "The program prints `config.listen_addr` but starts the chat server using `CHAT_LISTEN` or a hard-coded default, so the reported address can be misleading and the configured address is ignored.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "rs-profile-cache",
+    "lang": "rust",
+    "condition": "jev-rewake",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "src/profiles.rs",
+        "line": 77,
+        "severity": "medium",
+        "title": "Concurrent misses can overwrite newer cache values",
+        "explanation": "The cache lock is released before fetching, so simultaneous misses may complete out of order and let an older backend result replace a newer one; use per-key request coalescing or validate cache state before insertion.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/profiles.rs",
+        "line": 92,
+        "severity": "medium",
+        "title": "Batch loading spawns an unbounded number of tasks",
+        "explanation": "A large `ids` slice creates one Tokio task per ID, which can exhaust memory or overwhelm the backend; bound concurrency with a stream or semaphore.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/profiles.rs",
+        "line": 105,
+        "severity": "medium",
+        "title": "A task panic crashes the entire batch operation",
+        "explanation": "Calling `expect` on each `JoinError` turns one cancelled or panicking load task into a panic in `load_many` instead of returning per-ID results or handling the failure.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/profiles.rs",
+        "line": 140,
+        "severity": "medium",
+        "title": "Expiry arithmetic can overflow",
+        "explanation": "Casting the epoch duration to `i64` and subtracting `now` can overflow for extreme timestamps, potentially panicking in debug builds or producing an invalid remaining lifetime.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/profiles.rs",
+        "line": 154,
+        "severity": "low",
+        "title": "Prefix search treats SQL LIKE wildcards as user patterns",
+        "explanation": "Bound parameters prevent SQL injection, but `%` and `_` in `name_prefix` still act as wildcards, so this does not reliably implement literal prefix matching.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "bzl-bundle-rule",
+    "lang": "bazel",
+    "condition": "none",
+    "rep": 1,
+    "findings": [],
+    "jevOnly": [
+      {
+        "file": "tools/defs.bzl",
+        "rule": "bzl-depset-flatten-in-impl",
+        "jevProbability": 0.92,
+        "graderConfirms": true
+      }
+    ]
+  },
+  {
+    "task": "kt-account-sync",
+    "lang": "kotlin",
+    "condition": "none",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "src/main/kotlin/com/acme/app/sync/SyncManager.kt",
+        "line": 102,
+        "severity": "high",
+        "title": "Change items are discarded",
+        "explanation": "Each page’s `items` are never consumed or persisted, so a successful sync advances cursors while losing the actual changes.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/main/kotlin/com/acme/app/sync/SyncManager.kt",
+        "line": 105,
+        "severity": "high",
+        "title": "Cursor is saved before page changes are applied",
+        "explanation": "The cursor advances immediately after fetching a page, so a crash or failure before its changes are handled makes those changes unrecoverable on the next run.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/main/kotlin/com/acme/app/sync/SyncManager.kt",
+        "line": 93,
+        "severity": "medium",
+        "title": "Cancellation is recorded as a sync error",
+        "explanation": "`CancellationException` is caught as an ordinary `Exception`, which can publish a misleading error when a caller cancels the sync or its lifecycle ends.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/main/kotlin/com/acme/app/sync/SyncManager.kt",
+        "line": 114,
+        "severity": "medium",
+        "title": "Periodic sync suppresses failures",
+        "explanation": "`runCatching` discards every sync failure, leaving periodic runs with no logging or failure signal and making persistent operational errors difficult to diagnose.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/main/kotlin/com/acme/app/sync/SyncManager.kt",
+        "line": 61,
+        "severity": "medium",
+        "title": "Corrupt cursor data silently resets progress",
+        "explanation": "Returning an empty cursor map for any read or decode failure hides corruption and can cause all previously synced changes to be replayed.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/main/kotlin/com/acme/app/sync/SyncManager.kt",
+        "line": 66,
+        "severity": "medium",
+        "title": "Cursor writes are not atomic",
+        "explanation": "Writing directly to the cursor file can leave truncated JSON if the process stops during the write, after which `load()` silently resets all cursors.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/main/kotlin/com/acme/app/sync/SyncManager.kt",
+        "line": 83,
+        "severity": "medium",
+        "title": "Concurrent sync collections can race on cursor state",
+        "explanation": "Because `sync()` is a cold flow, concurrent collectors can load independent cursor maps and overwrite one another’s file updates, leading to duplicate work or lost cursor progress.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "src/main/kotlin/com/acme/app/sync/SyncManager.kt",
+        "rule": "kt-blocking-call-not-main-safe",
+        "jevProbability": 0.87,
+        "graderConfirms": true
+      }
+    ]
+  },
+  {
+    "task": "kt-account-sync",
+    "lang": "kotlin",
+    "condition": "jev-rewake",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "src/main/kotlin/com/acme/app/sync/SyncManager.kt",
+        "line": 80,
+        "severity": "high",
+        "title": "Fetched changes are discarded",
+        "explanation": "Each `ChangePage`'s `changes` are never processed or exposed, so the sync can advance its cursor and report success without applying any account changes.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/main/kotlin/com/acme/app/sync/SyncManager.kt",
+        "line": 83,
+        "severity": "medium",
+        "title": "Cursor is checkpointed before page changes are committed",
+        "explanation": "The next cursor is persisted immediately after fetching the page, so a crash or failure while applying that page can cause the next sync to skip its changes.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/main/kotlin/com/acme/app/sync/SyncManager.kt",
+        "line": 47,
+        "severity": "medium",
+        "title": "Concurrent syncs can overwrite cursor state",
+        "explanation": "Multiple calls to `sync()` can load and mutate independent cursor maps and write the same file concurrently, allowing an older cursor snapshot to overwrite a newer one.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/main/kotlin/com/acme/app/sync/SyncManager.kt",
+        "line": 99,
+        "severity": "medium",
+        "title": "Cursor writes are not atomic",
+        "explanation": "Writing directly to the cursor file can leave truncated or invalid JSON if the process is interrupted, causing `loadCursors()` to discard all saved progress.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/main/kotlin/com/acme/app/sync/SyncManager.kt",
+        "line": 72,
+        "severity": "medium",
+        "title": "Periodic sync stops permanently on top-level failures",
+        "explanation": "An exception from loading cursors, fetching the account list, or recording status escapes the loop and completes the returned job, so later scheduled sync attempts never run.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "src/main/kotlin/com/acme/app/sync/SyncManager.kt",
+        "rule": "kt-perf-sequential-suspend-calls",
+        "jevProbability": 0.56,
+        "graderConfirms": true
+      }
+    ]
+  },
+  {
+    "task": "rb-invitations",
+    "lang": "ruby",
+    "condition": "jev-rewake",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "spec/controllers/invitations_controller_spec.rb",
+        "line": 8,
+        "severity": "high",
+        "title": "Controller specs instantiate the controller with unsupported arguments",
+        "explanation": "`ActionController` controllers are not constructed with `params:` and `current_user:` keyword arguments, so these examples will raise before exercising the actions instead of setting up a real request and authenticated user.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/mailers/invitation_mailer.rb",
+        "line": 6,
+        "severity": "medium",
+        "title": "Invitation email contains a relative acceptance URL",
+        "explanation": "Email clients cannot reliably resolve `/invitations/.../accept` because the link has no host, so recipients may be unable to open the invitation.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/controllers/invitations_controller.rb",
+        "line": 22,
+        "severity": "medium",
+        "title": "Already accepted invitations can be accepted repeatedly",
+        "explanation": "The action unconditionally overwrites `accepted_at` and redirects even when the invitation was previously accepted, allowing a supposedly single-use invitation to be replayed.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/controllers/invitations_controller.rb",
+        "line": 10,
+        "severity": "medium",
+        "title": "Synchronous email delivery can leave a saved invitation after a failed request",
+        "explanation": "If `deliver_now` raises after the invitation is saved, the client sees a failed request despite the persisted invitation and may retry, creating duplicate invitations; enqueueing delivery after commit avoids coupling persistence to mail transport.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "rs-chat-server",
+    "lang": "rust",
+    "condition": "jev-rewake",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "src/chat.rs",
+        "line": 89,
+        "severity": "medium",
+        "title": "Accept errors can cause a busy loop",
+        "explanation": "Every accept error is discarded and the loop immediately retries, so persistent errors can spin at full CPU instead of being surfaced or handled with backoff.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/chat.rs",
+        "line": 108,
+        "severity": "medium",
+        "title": "Logging failures are silently ignored",
+        "explanation": "Ignoring write and flush errors makes the server report success even when messages are not recorded, contrary to the documented guarantee that every chat message is logged.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/chat.rs",
+        "line": 122,
+        "severity": "medium",
+        "title": "Client input has no line-length limit",
+        "explanation": "`Lines` can buffer an arbitrarily large line before yielding it, allowing a client to consume unbounded server memory by sending data without a newline.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/chat.rs",
+        "line": 167,
+        "severity": "medium",
+        "title": "Lagged clients silently miss messages",
+        "explanation": "Discarding `RecvError::Lagged` lets a slow client continue as though its stream were complete even though one or more broadcasts were dropped; the server should make this loss explicit or disconnect the client.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/main.rs",
+        "line": 9,
+        "severity": "medium",
+        "title": "Configured listen address is not used",
+        "explanation": "The program prints `config.listen_addr` but starts the chat server using a separate `CHAT_LISTEN` lookup, so the displayed/configured address can differ from the actual bind address.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "tests/chat.rs",
+        "line": 75,
+        "severity": "low",
+        "title": "Test line reader drops a buffered reader",
+        "explanation": "Constructing and dropping a new `BufReader` for each read can discard bytes it read ahead, making this helper unreliable if a test later reads multiple lines from the same stream.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "ts-notes-api-security",
+    "lang": "typescript",
+    "condition": "none",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "src/notesApi.ts",
+        "line": 190,
+        "severity": "medium",
+        "title": "Open redirect via backslash path",
+        "explanation": "`sanitizeNextPath` only rejects a backslash immediately after the leading slash, but browsers and intermediaries can normalize paths such as `/\\evil.example`-style variants or encoded separators into network-path URLs, so validate the resolved URL's origin before redirecting.",
+        "rule": "ts-open-redirect",
+        "jevProbability": 0.05
+      },
+      {
+        "file": "src/notesApi.ts",
+        "line": 199,
+        "severity": "high",
+        "title": "SSRF protection misses noncanonical private addresses",
+        "explanation": "Hostname string patterns do not reliably catch IPv4-mapped IPv6, alternate IPv4 representations, or DNS names resolving to private addresses, allowing imports to reach internal services; resolve and validate destination IPs and revalidate redirects/DNS as appropriate.",
+        "rule": "ts-sec-ssrf",
+        "jevProbability": 0.05
+      },
+      {
+        "file": "src/notesApi.ts",
+        "line": 215,
+        "severity": "medium",
+        "title": "Signup has a username race",
+        "explanation": "Checking for an existing username and inserting in separate operations permits concurrent signups to create duplicates unless the database enforces a unique constraint, and an insert conflict currently becomes an unhandled server error.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/notesApi.ts",
+        "line": 251,
+        "severity": "medium",
+        "title": "Login session cookie has no expiry",
+        "explanation": "The database session expires after 24 hours, but the cookie is a browser-session cookie with no `Max-Age` or `Expires`, so its lifetime does not match the intended session TTL and can persist in restored browser sessions.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/notesApi.ts",
+        "line": 285,
+        "severity": "low",
+        "title": "Malformed PATCH JSON gets an incorrect validation response",
+        "explanation": "`readJsonBody` returns null for malformed JSON, but PATCH treats that as an invalid JSON body while signup/login/import silently reinterpret the same parse failure as missing fields, making request parsing behavior inconsistent.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/notesApi.ts",
+        "line": 298,
+        "severity": "medium",
+        "title": "PATCH accepts an empty update",
+        "explanation": "An empty object or an object containing only unrelated fields produces an empty patch and still calls `update`, which can cause unnecessary writes or unintended `updatedAt` changes instead of rejecting a no-op.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/notesApi.ts",
+        "line": 358,
+        "severity": "high",
+        "title": "Import reads the full remote response into memory",
+        "explanation": "The byte limit is applied only after `response.text()` buffers and decodes the entire body, so an attacker-controlled large response can exhaust memory and the character-based truncation does not enforce the advertised byte limit.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/notesApi.ts",
+        "line": 358,
+        "severity": "medium",
+        "title": "Remote fetch has no timeout or cancellation",
+        "explanation": "A remote server can hold an import request open indefinitely because `fetch` has no timeout/abort signal, tying up request resources.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/notesApi.ts",
+        "line": 383,
+        "severity": "medium",
+        "title": "Malformed note path encoding throws",
+        "explanation": "`decodeURIComponent` throws for a path containing invalid percent escapes, which escapes the handler and can turn a malformed client request into an unhandled server error instead of a controlled 400 response.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "src/notesApi.ts",
+        "rule": "ts-perf-unbounded-list-query",
+        "jevProbability": 0.73,
+        "graderConfirms": true
+      }
+    ]
+  },
+  {
+    "task": "bzl-tax-module",
+    "lang": "bazel",
+    "condition": "none",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "pricing/BUILD.bazel",
+        "line": 8,
+        "severity": "high",
+        "title": "Genrule reads an undeclared status file",
+        "explanation": "The command reaches into `bazel-out/stable-status.txt` instead of using Bazel's stamped make variables, so the file may be absent or inaccessible in a sandbox and the action has no declared dependency on its contents.",
+        "rule": "bzl-nonhermetic-action",
+        "jevProbability": 0.19
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "pricing/tax_rates_integration_test.py",
+        "rule": "py-test-real-network",
+        "jevProbability": 0.83,
+        "graderConfirms": false
+      }
+    ]
+  },
+  {
+    "task": "bzl-tax-module",
+    "lang": "bazel",
+    "condition": "jev-rewake",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "pricing/tax.py",
+        "line": 15,
+        "severity": "high",
+        "title": "Resource is resolved outside the Bazel runfiles tree",
+        "explanation": "`Path(__file__).parent / \"tax_rates.csv\"` assumes the data file is adjacent to the imported source, but Bazel puts declared `data` in runfiles separately, so importing this module can fail with `FileNotFoundError` under Bazel.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "pricing/tax.py",
+        "line": 17,
+        "severity": "medium",
+        "title": "Malformed CSV data fails without useful validation",
+        "explanation": "The loader assumes every row has `state` and a valid `rate` and silently overwrites duplicate state codes, causing malformed or duplicated data to produce import-time exceptions or incorrect rates.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "pricing/tax.py",
+        "line": 26,
+        "severity": "medium",
+        "title": "Non-string state codes raise an unexpected exception",
+        "explanation": "The public function calls `.upper()` without validating `state`, so values such as `None` raise `AttributeError` rather than the documented `ValueError` for an unknown code.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "pricing/tax.py",
+        "line": 33,
+        "severity": "medium",
+        "title": "Invalid monetary inputs are not validated",
+        "explanation": "Negative amounts, non-finite Decimals, or values outside the active Decimal context can produce nonsensical tax results or Decimal exceptions instead of a clear input error.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "pricing/tax_rates_integration_test.py",
+        "line": 26,
+        "severity": "medium",
+        "title": "Integration test points to a reserved, nonexistent domain",
+        "explanation": "The configured endpoint is explicitly an IANA documentation domain, so explicitly running this test will fail before it can compare rates.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "pricing/tax_rates_integration_test.py",
+        "line": 35,
+        "severity": "medium",
+        "title": "Live response shape and values are trusted without validation",
+        "explanation": "A malformed response, non-dictionary `rates`, or invalid rate value causes incidental `KeyError`, `TypeError`, or `Decimal` errors rather than a clear test failure describing the service contract violation.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "pricing/tax_rates_integration_test.py",
+        "line": 37,
+        "severity": "medium",
+        "title": "Additional live states are not checked",
+        "explanation": "The comparison only iterates local states, so the test passes when the service returns unexpected extra state codes despite claiming to verify the full rate set.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "tools/defs.bzl",
+        "line": 21,
+        "severity": "high",
+        "title": "Generated version is vulnerable to shell injection",
+        "explanation": "The status-file value is interpolated directly into a shell `printf` format argument, so a crafted SCM revision containing shell metacharacters can execute commands during the build.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "tools/defs.bzl",
+        "line": 16,
+        "severity": "medium",
+        "title": "Output path is not constrained to the package",
+        "explanation": "`ctx.attr.out` is passed to `declare_file` without rejecting absolute paths or parent traversal, allowing invalid or unintended output paths and build failures.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "tools/defs.bzl",
+        "line": 17,
+        "severity": "medium",
+        "title": "Shell tool dependencies are undeclared",
+        "explanation": "The action invokes `grep`, `cut`, and shell utilities by ambient PATH, which makes it non-hermetic and can fail or vary across execution platforms.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "tools/defs.bzl",
+        "line": 21,
+        "severity": "medium",
+        "title": "Missing SCM revision silently becomes unknown",
+        "explanation": "The rule claims to generate the current commit but turns absent workspace status data into a successful `unknown` output, masking a misconfigured workspace-status command or missing status key.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "pricing/tax_rates_integration_test.py",
+        "rule": "py-test-real-network",
+        "jevProbability": 0.79,
+        "graderConfirms": false
+      }
+    ]
+  },
+  {
+    "task": "bzl-bundle-rule",
+    "lang": "bazel",
+    "condition": "jev-rewake",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "tools/defs.bzl",
+        "line": 17,
+        "severity": "high",
+        "title": "`actions.write` cannot write an `Args` object",
+        "explanation": "`ctx.actions.write` requires `content` to be a string, but `args` is a `ctx.actions.args()` object, so this rule fails when Bazel analyzes or evaluates the action; use an action that consumes the `Args` object or construct a string.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "tools/defs.bzl",
+        "line": 26,
+        "severity": "low",
+        "title": "Manifest paths are not always repository-relative",
+        "explanation": "`File.short_path` for files from external repositories can include a `../` repository prefix, so the documented claim that every entry is a repo-relative path is inaccurate.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "kt-feed-viewmodel",
+    "lang": "kotlin",
+    "condition": "jev-rewake",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "src/test/kotlin/com/acme/app/feed/FeedViewModelTest.kt",
+        "line": 71,
+        "severity": "high",
+        "title": "Startup refresh assertion runs before the coroutine",
+        "explanation": "With `StandardTestDispatcher`, the `viewModelScope.launch` in the constructor is queued rather than run inline, so `refreshCount` is still zero here and this test fails before advancing the scheduler.",
+        "rule": "kt-test-launch-without-advance",
+        "jevProbability": 0.57
+      },
+      {
+        "file": "src/main/kotlin/com/acme/app/feed/FeedViewModel.kt",
+        "line": 45,
+        "severity": "medium",
+        "title": "Draft file is read synchronously during ViewModel construction",
+        "explanation": "`readDraft()` performs filesystem access before the ViewModel is constructed, which can block the Android main thread and delay UI startup.",
+        "rule": "kt-blocking-call-not-main-safe",
+        "jevProbability": 0.44
+      },
+      {
+        "file": "src/main/kotlin/com/acme/app/feed/FeedViewModel.kt",
+        "line": 90,
+        "severity": "medium",
+        "title": "Concurrent draft writes can persist an older value last",
+        "explanation": "Each edit launches an independent write, so a slower write for older text can complete after a newer one and leave stale draft data on disk.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/main/kotlin/com/acme/app/feed/FeedViewModel.kt",
+        "line": 57,
+        "severity": "medium",
+        "title": "Overlapping refreshes can report loading complete too early",
+        "explanation": "Each refresh independently sets `isLoading` to false when it finishes, so an earlier request can clear the indicator while a later refresh is still in progress.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/main/kotlin/com/acme/app/feed/FeedViewModel.kt",
+        "line": 82,
+        "severity": "medium",
+        "title": "A failed like request can roll back a newer toggle",
+        "explanation": "If multiple toggles are in flight, an older request's failure unconditionally restores its original value and can overwrite the newer optimistic state or a later successful update.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "py-order-refund",
+    "lang": "python",
+    "condition": "none",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "app/db.py",
+        "line": 10,
+        "severity": "high",
+        "title": "SQLite-only connection option is applied to every database",
+        "explanation": "`check_same_thread` is a SQLite driver option, so configuring a PostgreSQL or other non-SQLite `DATABASE_URL` can make engine connection attempts fail.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/routes/orders.py",
+        "line": 58,
+        "severity": "medium",
+        "title": "Synchronous database work blocks the async event loop",
+        "explanation": "The async handlers perform synchronous ORM queries and lazy relationship loading (and the refund handler also commits and refreshes), which can block the event loop under load.",
+        "rule": "py-sync-client-in-async",
+        "jevProbability": 0.56
+      },
+      {
+        "file": "app/routes/orders.py",
+        "line": 72,
+        "severity": "high",
+        "title": "Concurrent refund requests can issue duplicate refunds",
+        "explanation": "The status check and later status update are not atomic, so concurrent requests can both see a payable order and call the provider before either commits the refunded status.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/routes/orders.py",
+        "line": 79,
+        "severity": "high",
+        "title": "Provider success followed by database failure can cause duplicate refunds",
+        "explanation": "If the provider processes the refund but the subsequent database commit fails, the order remains eligible for another refund attempt, and no idempotency key or reconciliation mechanism is used here.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/main.py",
+        "line": 8,
+        "severity": "medium",
+        "title": "Schema creation runs as an import-time side effect",
+        "explanation": "Calling `create_all` during module import couples application startup and tests to database availability and bypasses controlled schema migrations.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "tests/test_orders.py",
+        "line": 39,
+        "severity": "medium",
+        "title": "Test teardown clears all application dependency overrides",
+        "explanation": "Calling `clear()` removes overrides installed by other fixtures or tests, which can cause order-dependent failures; restore only the overrides this fixture changes.",
+        "rule": "py-test-shared-mutable-state",
+        "jevProbability": 0.35
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "py-inventory-reports",
+    "lang": "python",
+    "condition": "none",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "app/db.py",
+        "line": 17,
+        "severity": "high",
+        "title": "SQLite-only connection argument is passed to every database",
+        "explanation": "When `DATABASE_URL` points to PostgreSQL or another non-SQLite backend, `check_same_thread` is forwarded to that driver and can cause connection creation to fail.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/routes/inventory.py",
+        "line": 35,
+        "severity": "high",
+        "title": "Stock reservation is vulnerable to concurrent overselling",
+        "explanation": "The stock check and decrement are separate read-modify-write operations, so concurrent requests can both pass the check and reserve more units than are available.",
+        "rule": "py-read-modify-write-race",
+        "jevProbability": 0.97
+      },
+      {
+        "file": "app/routes/inventory.py",
+        "line": 54,
+        "severity": "medium",
+        "title": "Sales report exposes customer names without authentication",
+        "explanation": "This endpoint returns customer-identifying information but has no authentication or authorization dependency, making the report publicly accessible.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/routes/inventory.py",
+        "line": 57,
+        "severity": "medium",
+        "title": "Sales report triggers N+1 database queries",
+        "explanation": "Accessing each order's user and items, then each item's product, can issue additional queries per order and item; eager-load these relationships for the report.",
+        "rule": "py-perf-orm-query-in-loop",
+        "jevProbability": 0.91
+      },
+      {
+        "file": "app/main.py",
+        "line": 8,
+        "severity": "medium",
+        "title": "Schema creation runs as an import-time side effect",
+        "explanation": "Calling `create_all` during module import couples application startup and tests to schema mutation, can race across workers, and bypasses a controlled migration process.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "ts-notes-api-security",
+    "lang": "typescript",
+    "condition": "jev-rewake",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "src/notesApi.ts",
+        "line": 206,
+        "severity": "medium",
+        "title": "Malformed cookies turn requests into 500s",
+        "explanation": "`decodeURIComponent` throws on an invalid percent escape, so a client-supplied malformed cookie causes the handler to return an internal-server error instead of treating the request as unauthenticated.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/notesApi.ts",
+        "line": 241,
+        "severity": "low",
+        "title": "Malformed encoded note IDs become 500s",
+        "explanation": "`decodeURIComponent` can throw for malformed percent-encoding, which sends an invalid path through the generic 500 handler rather than returning a client error.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/notesApi.ts",
+        "line": 289,
+        "severity": "medium",
+        "title": "Login accepts unbounded passwords",
+        "explanation": "Unlike signup, login does not cap password length, allowing unauthenticated callers to make the server encode and PBKDF2-hash arbitrarily large input.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/notesApi.ts",
+        "line": 274,
+        "severity": "medium",
+        "title": "Signup has a check-then-create race",
+        "explanation": "Concurrent signups for the same email can both pass `findByEmail` and create duplicate accounts unless the database enforces a unique email constraint, which this interface does not guarantee.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/notesApi.ts",
+        "line": 174,
+        "severity": "medium",
+        "title": "Loopback hostnames can bypass the import URL guard",
+        "explanation": "Hosts such as `localhost.` and names ending in `.localhost` are not rejected even though they can resolve to loopback, allowing imports to reach local services.",
+        "rule": "ts-sec-ssrf",
+        "jevProbability": 0.05
+      },
+      {
+        "file": "src/notesApi.ts",
+        "line": 371,
+        "severity": "medium",
+        "title": "JSON request bodies are unbounded",
+        "explanation": "`req.json()` buffers and parses the entire request without a size limit, so large bodies can consume substantial memory before the endpoint validates their fields.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/notesApi.ts",
+        "line": 390,
+        "severity": "low",
+        "title": "Rejected import responses are not drained or canceled",
+        "explanation": "On redirects, non-OK responses, or an oversized `Content-Length`, the handler returns without canceling or consuming the response body, potentially tying up connection resources.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/notesApi.ts",
+        "line": 424,
+        "severity": "medium",
+        "title": "Oversized imports are reported as upstream failures",
+        "explanation": "`readLimitedText` throws when the streamed body exceeds the limit, but the surrounding catch maps that expected client-size rejection to 502 instead of a size-related 4xx response.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/notesApi.ts",
+        "line": 429,
+        "severity": "medium",
+        "title": "Oversized streams are not canceled",
+        "explanation": "When the byte limit is exceeded, `finally` only releases the reader lock and leaves the response stream uncanceled, allowing the upstream transfer to continue unnecessarily.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "src/notesApi.ts",
+        "rule": "ts-no-vague-names",
+        "jevProbability": 0.56,
+        "graderConfirms": true
+      }
+    ]
+  },
+  {
+    "task": "py-order-refund",
+    "lang": "python",
+    "condition": "jev-rewake",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "app/db.py",
+        "line": 12,
+        "severity": "high",
+        "title": "SQLite-only connection option is applied to every database",
+        "explanation": "When `DATABASE_URL` uses PostgreSQL or another non-SQLite driver, passing `check_same_thread` through `connect_args` can make engine creation fail because that driver does not accept the option.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/routes/orders.py",
+        "line": 41,
+        "severity": "medium",
+        "title": "Synchronous database work blocks the async event loop",
+        "explanation": "The query, commit, and refresh operations in these `async` handlers use synchronous SQLAlchemy sessions directly, so they can block the event loop under database latency or load.",
+        "rule": "py-sync-client-in-async",
+        "jevProbability": 0.79
+      },
+      {
+        "file": "app/routes/orders.py",
+        "line": 57,
+        "severity": "high",
+        "title": "Concurrent refund requests can refund the same order twice",
+        "explanation": "The status check and update are not atomic and the external refund happens before any claim or lock, so simultaneous requests can both pass the check and issue separate provider refunds.",
+        "rule": "py-read-modify-write-race",
+        "jevProbability": 0.22
+      },
+      {
+        "file": "app/routes/orders.py",
+        "line": 57,
+        "severity": "high",
+        "title": "Provider refund can succeed while the local order remains paid",
+        "explanation": "If the database commit fails after the provider call succeeds, the request leaves the order marked paid and a retry can issue another refund unless the provider call uses an idempotency key or the workflow reconciles the result.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/routes/orders.py",
+        "line": 54,
+        "severity": "medium",
+        "title": "Refund is not restricted to eligible order states",
+        "explanation": "Only an already-refunded order is rejected, so orders in states such as pending or cancelled are sent to the payment provider for a refund.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/routes/orders.py",
+        "line": 64,
+        "severity": "medium",
+        "title": "Email failure makes a completed refund look like a failed request",
+        "explanation": "The order is committed as refunded before sending email, so an email exception returns an error even though the refund is complete and subsequent retries are rejected without retrying the notification.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/clients/payments.py",
+        "line": 30,
+        "severity": "medium",
+        "title": "Payment ID is interpolated into a URL without encoding",
+        "explanation": "A payment ID containing path separators or URL control characters can alter the requested path, so it should be URL-encoded or supplied through a safely constructed URL.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/clients/payments.py",
+        "line": 35,
+        "severity": "low",
+        "title": "Cached client session has no lifecycle cleanup",
+        "explanation": "The cached `requests.Session` is never closed, which can retain pooled sockets for the process lifetime and makes clean shutdown or client replacement difficult.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/main.py",
+        "line": 8,
+        "severity": "medium",
+        "title": "Schema creation runs during module import",
+        "explanation": "Calling `create_all` at import time makes importing the app perform blocking database I/O and can prevent worker startup when the database is unavailable; schema setup belongs in an explicit startup or migration workflow.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "py-inventory-reports",
+    "lang": "python",
+    "condition": "jev-rewake",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "app/main.py",
+        "line": 8,
+        "severity": "medium",
+        "title": "Create tables during module import",
+        "explanation": "Importing the application performs database DDL, which can fail before startup and introduces deployment races; schema creation should be handled by migrations or an explicit startup/lifespan step.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/routes/inventory.py",
+        "line": 84,
+        "severity": "medium",
+        "title": "Sales report triggers N+1 queries",
+        "explanation": "Accessing each order's user, items, and each item's product lazily can issue several extra queries per order, making this endpoint increasingly slow as the report grows.",
+        "rule": "py-perf-orm-query-in-loop",
+        "jevProbability": 0.88
+      },
+      {
+        "file": "tests/conftest.py",
+        "line": 30,
+        "severity": "medium",
+        "title": "Share one SQLAlchemy Session across threads",
+        "explanation": "The fixture creates the session in the test thread but uses it in FastAPI's worker thread, despite SQLAlchemy sessions not being thread-safe; provide a session per request or run the endpoint with a thread-safe test setup.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "tests/conftest.py",
+        "line": 35,
+        "severity": "low",
+        "title": "Dependency override can clobber existing overrides",
+        "explanation": "The fixture unconditionally removes the `get_db` override afterward rather than restoring any override that was present before the fixture ran.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "py-trial-reminders",
+    "lang": "python",
+    "condition": "none",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "app/trials.py",
+        "line": 126,
+        "severity": "medium",
+        "title": "Users receive repeated reminder emails",
+        "explanation": "Every loop calls `run_once` without recording that a reminder was already sent, so each still-expiring user receives another email with a fresh code on every interval.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/trials.py",
+        "line": 120,
+        "severity": "medium",
+        "title": "An exception permanently stops the reminder loop",
+        "explanation": "An exception from fetching users or sending an email escapes `_loop`, terminating the background task so later reminder cycles never run unless the worker is manually restarted.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/trials.py",
+        "line": 129,
+        "severity": "medium",
+        "title": "Synchronous user fetching blocks the event loop",
+        "explanation": "`get_users()` is invoked directly inside the async worker, so a blocking database query or other slow synchronous fetch stalls the event loop and can delay shutdown and unrelated async work.",
+        "rule": "py-sync-client-in-async",
+        "jevProbability": 0.1
+      },
+      {
+        "file": "app/trials.py",
+        "line": 81,
+        "severity": "low",
+        "title": "The interval is not validated",
+        "explanation": "A zero or negative interval can make the worker loop run continuously, consuming CPU and potentially flooding the email sender.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/models.py",
+        "line": 25,
+        "severity": "low",
+        "title": "Numeric columns are annotated as floats",
+        "explanation": "SQLAlchemy `Numeric` values are normally returned as `Decimal`, so the `float` annotations for product price and order total misrepresent runtime values and can mislead callers.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "app/trials.py",
+        "rule": "py-perf-sequential-awaits",
+        "jevProbability": 0.81,
+        "graderConfirms": true
+      },
+      {
+        "file": "tests/test_trials.py",
+        "rule": "py-test-fixed-sleep",
+        "jevProbability": 0.92,
+        "graderConfirms": true
+      }
+    ]
+  },
+  {
+    "task": "rb-projects-api",
+    "lang": "ruby",
+    "condition": "none",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "spec/controllers/projects_controller_spec.rb",
+        "line": 6,
+        "severity": "high",
+        "title": "Controller is not instantiated through Rails",
+        "explanation": "`ProjectsController.new(params:, current_user:)` does not use ActionController's supported request/dispatch lifecycle, so the controller actions and `response` assertions will not behave like real Rails requests and the specs are likely to fail before testing the endpoint.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/controllers/projects_controller.rb",
+        "line": 4,
+        "severity": "medium",
+        "title": "Search treats user input as LIKE wildcards",
+        "explanation": "The query is SQL-parameterized, but `%` and `_` in `q` remain wildcard characters, so searches can match far more than the requested literal substring.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/controllers/projects_controller.rb",
+        "line": 40,
+        "severity": "medium",
+        "title": "Destroy reports success when callbacks abort deletion",
+        "explanation": "`destroy` can return `false` when a callback halts the operation, but the action unconditionally sends `204 No Content`, hiding that the project was not deleted.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "py-trial-reminders",
+    "lang": "python",
+    "condition": "jev-rewake",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "app/trials.py",
+        "line": 34,
+        "severity": "medium",
+        "title": "Naive clock breaks with timezone-aware signup timestamps",
+        "explanation": "The default clock returns a naive `datetime`, so subtracting or comparing it with an aware `signup_at` raises `TypeError`; use a consistent timezone convention, preferably UTC.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/trials.py",
+        "line": 108,
+        "severity": "medium",
+        "title": "Synchronous email sending blocks the event loop",
+        "explanation": "`run_once()` calls the synchronous sender directly, so a slow SMTP operation stalls every other coroutine on the worker's event loop; make sending async or offload it to a thread.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/trials.py",
+        "line": 117,
+        "severity": "medium",
+        "title": "An unexpected tick failure permanently stops the reminder loop",
+        "explanation": "Exceptions from `get_users()` or other uncaught work escape `_loop()` and finish its task, leaving the worker silently inactive until explicitly restarted.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/trials.py",
+        "line": 89,
+        "severity": "medium",
+        "title": "Notification deduplication is lost on restart and across workers",
+        "explanation": "The in-memory `notified` set allows the same user to receive duplicate reminders after a process restart or when multiple worker instances run; persist notification state or coordinate it in shared storage.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/trials.py",
+        "line": 61,
+        "severity": "medium",
+        "title": "Discount codes have only four bits of entropy per requested character",
+        "explanation": "`token_hex(token_length)[:token_length]` produces only `token_length` hexadecimal characters, making the default code a guessable 32-bit token that may be inadequate for redeemable discounts.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "py-integrations",
+    "lang": "python",
+    "condition": "jev-rewake",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "app/routes/integrations.py",
+        "line": 55,
+        "severity": "high",
+        "title": "Session is used from a different thread",
+        "explanation": "The request-scoped `Session` is created and finalized by FastAPI's sync dependency machinery but is passed to `asyncio.to_thread`, violating SQLAlchemy's thread-safety contract and risking connection/session corruption; run the database work in the same thread or create and close the session inside the worker.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/routes/integrations.py",
+        "line": 73,
+        "severity": "high",
+        "title": "DNS validation is vulnerable to rebinding",
+        "explanation": "The hostname is checked here but resolved again independently by the HTTP client, so a rebinding hostname can pass the public-IP check and resolve to an internal address when fetched.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/routes/integrations.py",
+        "line": 147,
+        "severity": "medium",
+        "title": "Preview byte limit is applied after buffering",
+        "explanation": "`response.text` materializes the entire upstream response before slicing, so an attacker-controlled large page can exhaust memory despite `MAX_PREVIEW_BYTES`.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/routes/integrations.py",
+        "line": 39,
+        "severity": "medium",
+        "title": "Webhook request body has no size limit",
+        "explanation": "`request.body()` buffers the complete unauthenticated request before signature verification, allowing oversized webhook requests to consume excessive memory.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/routes/integrations.py",
+        "line": 49,
+        "severity": "medium",
+        "title": "Valid non-object JSON causes a server error",
+        "explanation": "A JSON array, scalar, or `null` parses successfully but has no `.get()` method, producing a 500 instead of rejecting the malformed payload with a 4xx response.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/routes/integrations.py",
+        "line": 51,
+        "severity": "medium",
+        "title": "Payment identifier is not validated",
+        "explanation": "Any truthy JSON value is accepted as `payment_id`, so arrays or objects can reach the SQL filter and trigger database binding errors instead of a controlled 4xx response.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/routes/integrations.py",
+        "line": 66,
+        "severity": "medium",
+        "title": "Webhook events can regress order state",
+        "explanation": "The handler unconditionally overwrites status, so a delayed or replayed failure event can change an already-paid order to failed (or vice versa) without an explicit transition policy.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "py-dashboard-aggregator",
+    "lang": "python",
+    "condition": "none",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "app/main.py",
+        "line": 8,
+        "severity": "medium",
+        "title": "Create tables during module import",
+        "explanation": "Import-time schema creation can block or fail application startup, race across multiple workers, and bypasses controlled migrations; move database initialization to migrations or an explicit lifecycle step.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/routes/dashboard.py",
+        "line": 76,
+        "severity": "medium",
+        "title": "Create a new HTTP client for every request",
+        "explanation": "Constructing an `AsyncClient` per dashboard call forfeits connection pooling and repeatedly incurs connection setup; manage a shared client in the application lifespan and close it on shutdown.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/routes/dashboard.py",
+        "line": 88,
+        "severity": "high",
+        "title": "Run synchronous database work inside the async endpoint",
+        "explanation": "`_recent_orders` performs blocking synchronous SQLAlchemy I/O on the event loop, and the injected synchronous session may also be used from a different thread than the one that created it.",
+        "rule": "py-sync-client-in-async",
+        "jevProbability": 0.64
+      },
+      {
+        "file": "app/routes/dashboard.py",
+        "line": 24,
+        "severity": "medium",
+        "title": "Malformed upstream JSON is not handled",
+        "explanation": "`resp.json()` can raise a JSON-decoding error that is not an `httpx.HTTPError`, so a successful but invalid upstream response turns the dashboard request into a 500 instead of the documented fallback.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/routes/dashboard.py",
+        "line": 42,
+        "severity": "medium",
+        "title": "Upstream request failures can leave sibling requests running",
+        "explanation": "If one `client.get` in `gather` raises an `HTTPError`, the exception is caught while other gathered requests may still be running as the client context exits; collect per-request failures or cancel and await the remaining tasks.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/routes/dashboard.py",
+        "line": 44,
+        "severity": "medium",
+        "title": "External profile data is trusted as a ticker list",
+        "explanation": "A malformed or unexpectedly large `watchlist` can cause runtime errors or an unbounded burst of upstream requests; validate the response shape and constrain ticker values and list size before fetching prices.",
+        "rule": "py-perf-unbounded-gather",
+        "jevProbability": 0.94
+      },
+      {
+        "file": "app/routes/dashboard.py",
+        "line": 64,
+        "severity": "low",
+        "title": "Convert monetary totals to binary floats",
+        "explanation": "Converting a decimal order total to `float` can lose monetary precision, so serialize it as a decimal-safe representation instead.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "py-integrations",
+    "lang": "python",
+    "condition": "none",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "app/main.py",
+        "line": 11,
+        "severity": "medium",
+        "title": "Run schema creation as an import side effect",
+        "explanation": "Calling `create_all` while importing the application can unexpectedly connect to or modify the production database during tests, CLI use, or worker startup, and bypasses controlled schema migrations.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/routes/integrations.py",
+        "line": 48,
+        "severity": "medium",
+        "title": "Malformed webhook payloads can become 500 errors",
+        "explanation": "`model_validate_json` raises Pydantic validation exceptions directly inside the endpoint, which are not FastAPI request-validation errors and can therefore surface malformed JSON or invalid fields as server errors instead of client errors.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/routes/integrations.py",
+        "line": 54,
+        "severity": "medium",
+        "title": "Webhook events can overwrite a completed payment state",
+        "explanation": "The handler unconditionally replaces the order status, so a replayed or out-of-order `failed` event can change an already-paid order back to failed (or vice versa) without event deduplication or transition checks.",
+        "rule": "py-read-modify-write-race",
+        "jevProbability": 0.13
+      },
+      {
+        "file": "app/routes/integrations.py",
+        "line": 56,
+        "severity": "medium",
+        "title": "Synchronous database work blocks the async webhook handler",
+        "explanation": "This `async` endpoint performs synchronous SQLAlchemy operations, including commit, on the event-loop thread, reducing throughput and potentially stalling unrelated requests under load.",
+        "rule": "py-sync-client-in-async",
+        "jevProbability": 0.85
+      },
+      {
+        "file": "app/routes/integrations.py",
+        "line": 69,
+        "severity": "high",
+        "title": "DNS validation is vulnerable to rebinding",
+        "explanation": "The code validates the hostname's current DNS answers but then lets HTTPX resolve the hostname again for the connection, allowing DNS rebinding to redirect the request to a private or otherwise disallowed address.",
+        "rule": "py-sec-ssrf",
+        "jevProbability": 0.07
+      },
+      {
+        "file": "app/routes/integrations.py",
+        "line": 69,
+        "severity": "medium",
+        "title": "Malformed URL ports can cause an unhandled exception",
+        "explanation": "Accessing `parsed.port` raises `ValueError` for invalid or out-of-range ports, and this exception is not converted into a client error.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/routes/integrations.py",
+        "line": 79,
+        "severity": "low",
+        "title": "Redirect limit rejects a destination after the final allowed redirect",
+        "explanation": "The loop makes at most five requests, so if the fifth response is a redirect the code rejects it without making a request to the resulting destination, even though that is the target reached after five redirects.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "tests/conftest.py",
+        "line": 19,
+        "severity": "low",
+        "title": "Test database engine is not disposed",
+        "explanation": "The fixture drops tables but never disposes its per-test engine, leaving pooled connections and engine resources to be reclaimed nondeterministically.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "py-dashboard-aggregator",
+    "lang": "python",
+    "condition": "jev-rewake",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "app/db.py",
+        "line": 10,
+        "severity": "medium",
+        "title": "SQLite connection arguments are applied to every database",
+        "explanation": "`check_same_thread` is a SQLite-only option, so a PostgreSQL or other non-SQLite `DATABASE_URL` can fail during engine connection setup.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/db.py",
+        "line": 11,
+        "severity": "medium",
+        "title": "In-memory SQLite detection misses equivalent URLs",
+        "explanation": "The StaticPool workaround only applies to the exact `sqlite:///:memory:` spelling, so other valid in-memory SQLite URLs can create separate per-thread databases and appear empty.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/main.py",
+        "line": 8,
+        "severity": "medium",
+        "title": "Tables are created during module import",
+        "explanation": "Import-time `create_all` performs blocking database I/O and bypasses a controlled application lifecycle, which can break startup when the database is unavailable and is not a substitute for migrations.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/routes/dashboard.py",
+        "line": 29,
+        "severity": "medium",
+        "title": "Outbound profile URL embeds an untrusted identifier without encoding",
+        "explanation": "A user-controlled path component should be safely encoded or passed as a URL parameter to avoid malformed requests or path manipulation if identifiers cease to be strictly numeric.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/routes/dashboard.py",
+        "line": 38,
+        "severity": "medium",
+        "title": "Outbound notification URL embeds an untrusted identifier without encoding",
+        "explanation": "The interpolated identifier is inserted directly into a downstream URL path, allowing malformed paths or path manipulation if its type or source changes.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/routes/dashboard.py",
+        "line": 53,
+        "severity": "medium",
+        "title": "Ticker symbols are interpolated into downstream URLs unescaped",
+        "explanation": "A watchlist value containing reserved path characters can alter the quote request path, and the profile response is external data that should be validated and encoded.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/routes/dashboard.py",
+        "line": 56,
+        "severity": "high",
+        "title": "Unbounded task creation defeats the concurrency limit",
+        "explanation": "The semaphore limits only active requests, while `gather` still creates one task per watchlist ticker, so a large upstream watchlist can exhaust memory and overload the service.",
+        "rule": "py-perf-unbounded-gather",
+        "jevProbability": 0.92
+      },
+      {
+        "file": "app/routes/dashboard.py",
+        "line": 60,
+        "severity": "medium",
+        "title": "Malformed price JSON escapes the intended failure handling",
+        "explanation": "`resp.json()` can raise a decoding exception not caught by the `httpx.HTTPError` handler, turning an upstream bad response into a 500 instead of returning `None`.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/routes/dashboard.py",
+        "line": 93,
+        "severity": "high",
+        "title": "A synchronous SQLAlchemy session is used from a worker thread",
+        "explanation": "The request-scoped session is created in the request thread but queried by `asyncio.to_thread`, which violates SQLAlchemy session thread-safety and can cause concurrent use or SQLite thread-affinity failures.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/routes/dashboard.py",
+        "line": 95,
+        "severity": "high",
+        "title": "Sequential profile await delays independent dashboard work",
+        "explanation": "The handler waits for the profile request before gathering notifications and orders, so slow profile latency unnecessarily delays those independent results and can leave already-running tasks pending if the request is cancelled.",
+        "rule": "py-perf-sequential-awaits",
+        "jevProbability": 0.71
+      },
+      {
+        "file": "tests/test_dashboard.py",
+        "line": 25,
+        "severity": "medium",
+        "title": "Fixture yields a detached user after closing its session",
+        "explanation": "The yielded ORM object is detached, and relying on its attributes after closing the session can fail if those attributes become expired or unloaded.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "tests/test_dashboard.py",
+        "line": 29,
+        "severity": "medium",
+        "title": "Autouse user fixture makes every test depend on database writes",
+        "explanation": "The override fixture implicitly inserts a user and orders for every test, coupling tests to a persistent database and leaving committed rows behind, which can cause pollution and nondeterministic failures.",
+        "rule": "py-test-shared-mutable-state",
+        "jevProbability": 0.33
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "rb-invitations",
+    "lang": "ruby",
+    "condition": "jev-rewake",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "app/controllers/invitations_controller.rb",
+        "line": 22,
+        "severity": "high",
+        "title": "Acceptance is not atomic with expiry check",
+        "explanation": "An invitation can expire after `expired?` is checked but before `accept!` writes, allowing an expired invitation to be accepted under concurrent requests.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/controllers/invitations_controller.rb",
+        "line": 22,
+        "severity": "high",
+        "title": "Invitation acceptance is unauthenticated",
+        "explanation": "Anyone possessing the token can accept the invitation without verifying the intended invitee's identity or email, which can grant project access if acceptance is later used as authorization.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/controllers/invitations_controller.rb",
+        "line": 24,
+        "severity": "medium",
+        "title": "Return path can bypass the local host",
+        "explanation": "A path such as `/%2f%2fevil.example` passes the checks but may be decoded and interpreted as an external redirect by browsers or downstream routing, so the redirect target should be normalized and validated.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/controllers/invitations_controller.rb",
+        "line": 10,
+        "severity": "medium",
+        "title": "Synchronous mail delivery can fail after persistence",
+        "explanation": "`deliver_now` can raise after the invitation has been saved, returning an error despite a persisted invitation and inviting duplicate records on retry; enqueueing delivery or handling failures avoids this inconsistent outcome.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/models/invitation.rb",
+        "line": 10,
+        "severity": "medium",
+        "title": "Uniqueness validation can race",
+        "explanation": "The model-level token uniqueness check is not concurrency-safe, and although the database index prevents duplicate tokens, a collision can raise `ActiveRecord::RecordNotUnique` instead of retrying token generation.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/models/invitation.rb",
+        "line": 20,
+        "severity": "medium",
+        "title": "Acceptance can overwrite an existing timestamp",
+        "explanation": "Calling `accept!` on an already accepted invitation resets `accepted_at`, so concurrent accepts or other callers can change the recorded acceptance time.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "spec/controllers/invitations_controller_spec.rb",
+        "line": 8,
+        "severity": "high",
+        "title": "Specs instantiate controllers with a non-Rails API",
+        "explanation": "Rails controller constructors do not accept `params` or `current_user` keyword arguments, so these examples will raise instead of exercising controller actions.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "spec/controllers/invitations_controller_spec.rb",
+        "line": 18,
+        "severity": "high",
+        "title": "Mailer assertion uses the wrong delivery collection",
+        "explanation": "Rails mail deliveries are stored as `ActionMailer::Base.deliveries` (or the configured delivery array), and `ApplicationMailer.deliveries` is not a standard API, so this expectation will fail.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "db/schema.rb",
+        "line": 2,
+        "severity": "high",
+        "title": "Schema forcibly drops existing tables",
+        "explanation": "Using `force: true` in the checked-in schema causes schema loading to drop and recreate tables, destroying data when this schema is loaded against a database that already contains them.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "rb-projects-api",
+    "lang": "ruby",
+    "condition": "jev-rewake",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "spec/controllers/projects_controller_spec.rb",
+        "line": 6,
+        "severity": "high",
+        "title": "Controller cannot be initialized this way",
+        "explanation": "A standard Rails controller's `new` does not accept `params` or `current_user` keyword arguments, so `build_controller` raises before these examples can exercise the actions.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "spec/controllers/projects_controller_spec.rb",
+        "line": 18,
+        "severity": "high",
+        "title": "Specs use a nonexistent response interface",
+        "explanation": "Rails controllers expose an `ActionDispatch::Response`, not a hash with `:status` and `:json` keys, so the response assertions will fail even after fixing controller construction.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/controllers/projects_controller.rb",
+        "line": 4,
+        "severity": "medium",
+        "title": "Search treats user input as LIKE syntax",
+        "explanation": "The bound parameter prevents SQL injection, but `%` and `_` in `q` remain wildcards, so ordinary input can unexpectedly match far more names than the requested substring.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/controllers/projects_controller.rb",
+        "line": 4,
+        "severity": "medium",
+        "title": "Search case sensitivity varies by database",
+        "explanation": "The implementation uses `LIKE`, which is case-insensitive on some supported databases and case-sensitive on others, while the spec expects lowercase `web` to match `Website Redesign`.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/controllers/projects_controller.rb",
+        "line": 45,
+        "severity": "medium",
+        "title": "Destroy reports success when callbacks prevent deletion",
+        "explanation": "If a destroy callback aborts the operation, the record remains but the action still returns `204 No Content`; check the destroy result and respond with an error when deletion fails.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "rb-checkout",
+    "lang": "ruby",
+    "condition": "none",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "app/jobs/fulfillment_job.rb",
+        "line": 3,
+        "severity": "high",
+        "title": "Fulfillment job performs no fulfillment",
+        "explanation": "The job only loads the order and then returns, so enqueuing it never actually fulfills the order.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/services/checkout.rb",
+        "line": 17,
+        "severity": "medium",
+        "title": "String product IDs fail lookup",
+        "explanation": "When cart items come from Rails request parameters, `product_id` is commonly a string while `index_by(&:id)` keys are integers, so `fetch` raises even for an existing product.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/services/checkout.rb",
+        "line": 27,
+        "severity": "high",
+        "title": "Cart quantities are not validated",
+        "explanation": "A negative quantity passes the stock check and increases inventory while producing a negative line-item quantity and potentially a negative charge, and string quantities can raise a comparison error.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/services/checkout.rb",
+        "line": 29,
+        "severity": "high",
+        "title": "Stock updates are vulnerable to concurrent checkouts",
+        "explanation": "The product rows are neither locked nor updated atomically, so concurrent checkouts can both pass the stock check and oversell inventory.",
+        "rule": "rb-read-modify-write-race",
+        "jevProbability": 0.96
+      },
+      {
+        "file": "app/services/checkout.rb",
+        "line": 35,
+        "severity": "high",
+        "title": "External charge occurs inside the database transaction",
+        "explanation": "If a later database operation or transaction commit fails, the database rolls back but the already-completed card charge is not reversed, leaving the customer charged without a recorded order.",
+        "rule": "rb-side-effect-before-commit",
+        "jevProbability": 0.9
+      },
+      {
+        "file": "app/services/checkout.rb",
+        "line": 40,
+        "severity": "medium",
+        "title": "Mailer failure prevents fulfillment enqueueing",
+        "explanation": "Because the synchronous email is sent before the job is enqueued, a mail delivery exception leaves a paid order without fulfillment being scheduled.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/services/sales_report.rb",
+        "line": 7,
+        "severity": "medium",
+        "title": "Date bounds use system rather than Rails time zone",
+        "explanation": "`Date#to_time` uses the process-local time zone, which can make the report's calendar-day range disagree with the application's configured time zone and omit or include orders near midnight.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "rb-invitations",
+    "lang": "ruby",
+    "condition": "none",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "spec/controllers/invitations_controller_spec.rb",
+        "line": 8,
+        "severity": "high",
+        "title": "Controller specs instantiate controllers with unsupported arguments",
+        "explanation": "Rails controllers are initialized without `params:` or `current_user:` keyword arguments, so these examples raise `ArgumentError` before exercising the actions and should use Rails request/controller-test helpers instead.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/mailers/invitation_mailer.rb",
+        "line": 6,
+        "severity": "medium",
+        "title": "Invitation email contains a relative link",
+        "explanation": "A recipient opening this email has no site context for `/invitations/#{invitation.token}`, so the link will not reliably navigate to the application; generate an absolute URL using the configured host and route helper.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/controllers/invitations_controller.rb",
+        "line": 12,
+        "severity": "medium",
+        "title": "Synchronous mail delivery can leave a saved invitation after request failure",
+        "explanation": "If `deliver_now` raises after `invitation.save`, the client receives an error even though the invitation persists, and retries can create duplicate invitations; enqueue delivery or handle delivery failure explicitly.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/models/invitation.rb",
+        "line": 32,
+        "severity": "medium",
+        "title": "Token generation does not guarantee an unguessable token",
+        "explanation": "Using `||=` preserves any token supplied by callers, allowing an invitation to be created with a predictable value despite token-based acceptance; ensure tokens are generated securely and cannot be overridden with arbitrary values.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "rb-checkout",
+    "lang": "ruby",
+    "condition": "jev-rewake",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "app/jobs/fulfillment_job.rb",
+        "line": 3,
+        "severity": "high",
+        "title": "Fulfillment job performs no fulfillment",
+        "explanation": "The job only loads the order and then returns, so successfully enqueued orders never actually trigger fulfillment.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/services/checkout.rb",
+        "line": 21,
+        "severity": "high",
+        "title": "Unvalidated quantities can increase stock and produce invalid charges",
+        "explanation": "A zero or negative cart quantity passes the stock check, and a negative quantity increases inventory while contributing a negative amount to the charge.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/services/checkout.rb",
+        "line": 35,
+        "severity": "high",
+        "title": "External charge occurs before the database transaction commits",
+        "explanation": "If a later update or commit fails, the database rolls back but the customer may already have been charged, leaving no paid order for that charge.",
+        "rule": "rb-side-effect-before-commit",
+        "jevProbability": 0.98
+      },
+      {
+        "file": "app/services/checkout.rb",
+        "line": 38,
+        "severity": "medium",
+        "title": "Confirmation email is sent before the order commits",
+        "explanation": "If the transaction later rolls back, the customer can receive confirmation for an order that does not exist.",
+        "rule": "rb-side-effect-before-commit",
+        "jevProbability": 0.98
+      },
+      {
+        "file": "app/services/checkout.rb",
+        "line": 39,
+        "severity": "medium",
+        "title": "Fulfillment can be enqueued before the order commits",
+        "explanation": "When the job is visible to a worker before the surrounding transaction commits, it can run against an uncommitted or subsequently rolled-back order; enqueue after commit or use an after-commit mechanism.",
+        "rule": "rb-side-effect-before-commit",
+        "jevProbability": 0.98
+      },
+      {
+        "file": "app/services/checkout.rb",
+        "line": 35,
+        "severity": "medium",
+        "title": "Retries can charge the same checkout more than once",
+        "explanation": "The gateway call has no idempotency key, so retrying the service after an ambiguous gateway response can create multiple charges for one order.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/services/sales_report.rb",
+        "line": 11,
+        "severity": "medium",
+        "title": "Date ranges exclude most of the final day",
+        "explanation": "The documented `Date` range is converted to a timestamp range ending at midnight on the last date, so orders later that day are omitted.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "spec/services/checkout_spec.rb",
+        "line": 6,
+        "severity": "medium",
+        "title": "Mailer deliveries are not reset between examples",
+        "explanation": "The out-of-stock example expects an empty deliveries collection, but a preceding successful example leaves a message behind, making the spec order-dependent and potentially flaky.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "app/services/checkout.rb",
+        "rule": "rb-perf-n-plus-one",
+        "jevProbability": 0.7,
+        "graderConfirms": false
+      }
+    ]
+  },
+  {
+    "task": "kt-account-sync",
+    "lang": "kotlin",
+    "condition": "none",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "src/main/kotlin/com/acme/app/sync/SyncManager.kt",
+        "line": 92,
+        "severity": "high",
+        "title": "Fetched changes are discarded",
+        "explanation": "Each `ChangePage.items` is ignored, so the sync fetches pages and advances cursors without applying or exposing any of the actual changes.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/main/kotlin/com/acme/app/sync/SyncManager.kt",
+        "line": 95,
+        "severity": "high",
+        "title": "Cursor is persisted before changes are safely handled",
+        "explanation": "The cursor is advanced on disk before the page's changes are processed, so a failure after this save can cause the next run to skip changes that were never applied.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/main/kotlin/com/acme/app/sync/SyncManager.kt",
+        "line": 83,
+        "severity": "medium",
+        "title": "Concurrent sync collections can race on cursor storage",
+        "explanation": "Because `sync()` is a cold flow and there is no mutual exclusion, simultaneous collectors can read and overwrite the same cursor file and issue conflicting requests for an account.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/main/kotlin/com/acme/app/sync/SyncManager.kt",
+        "line": 84,
+        "severity": "medium",
+        "title": "Account-fetch failures bypass sync error status",
+        "explanation": "`accounts()` runs before the `try` block, so its failures propagate without updating `SyncStatusStore.lastError`, unlike failures during paging.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/main/kotlin/com/acme/app/sync/SyncManager.kt",
+        "line": 61,
+        "severity": "medium",
+        "title": "Cursor file I/O runs on the collector's dispatcher",
+        "explanation": "Synchronous `readText` and `writeText` execute in the flow context and can block the main thread when a UI collector collects `sync()`.",
+        "rule": "kt-blocking-call-not-main-safe",
+        "jevProbability": 0.87
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "src/test/kotlin/com/acme/app/sync/SyncManagerTest.kt",
+        "rule": "kt-test-error-path-passes-silently",
+        "jevProbability": 0.76,
+        "graderConfirms": false
+      }
+    ]
+  },
+  {
+    "task": "kt-feed-viewmodel",
+    "lang": "kotlin",
+    "condition": "jev-rewake",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "src/main/kotlin/com/acme/app/feed/FeedViewModel.kt",
+        "line": 46,
+        "severity": "medium",
+        "title": "Feed collection failures are unhandled",
+        "explanation": "If `repository.feed()` throws or its flow completes with an error, the collector terminates without surfacing an error or restarting, leaving the UI with stale posts.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/main/kotlin/com/acme/app/feed/FeedViewModel.kt",
+        "line": 63,
+        "severity": "medium",
+        "title": "Overlapping refreshes clear the loading state too early",
+        "explanation": "Each refresh independently sets `isRefreshing` to false in `finally`, so an earlier request can hide the loading indicator while a later refresh is still in flight.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/main/kotlin/com/acme/app/feed/FeedViewModel.kt",
+        "line": 69,
+        "severity": "medium",
+        "title": "Concurrent like requests can roll back newer user intent",
+        "explanation": "Each request captures its own previous value, so a delayed failure from an earlier toggle can overwrite a more recent toggle's state and produce an incorrect like count.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/main/kotlin/com/acme/app/feed/FeedViewModel.kt",
+        "line": 123,
+        "severity": "medium",
+        "title": "Loading a saved draft can overwrite a newer edit",
+        "explanation": "Because draft loading is asynchronous, a user edit made before the file read completes can be replaced by the older persisted text.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/main/kotlin/com/acme/app/feed/FeedViewModel.kt",
+        "line": 129,
+        "severity": "medium",
+        "title": "Draft writes can finish out of order",
+        "explanation": "Each edit launches an independent IO coroutine that writes the same file, so a slower write for an older value can finish last and persist stale text.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "kt-feed-viewmodel",
+    "lang": "kotlin",
+    "condition": "none",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "src/main/kotlin/com/acme/app/feed/FeedViewModel.kt",
+        "line": 53,
+        "severity": "high",
+        "title": "Feed flow failures can crash the app",
+        "explanation": "The `launchIn(viewModelScope)` collector has no exception handling, so an exception from `repository.feed()` is uncaught in the ViewModel scope and can reach the app's coroutine exception handler rather than being represented in UI state.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/main/kotlin/com/acme/app/feed/FeedViewModel.kt",
+        "line": 110,
+        "severity": "medium",
+        "title": "Draft restoration can overwrite newer edits",
+        "explanation": "If the user calls `updateDraft` before the asynchronous read completes, this unconditional state update replaces the new draft with the stale persisted value.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/main/kotlin/com/acme/app/feed/FeedViewModel.kt",
+        "line": 97,
+        "severity": "medium",
+        "title": "Cancelling a save does not reliably prevent a stale write",
+        "explanation": "`writeText` is blocking and non-cancellable, so a cancelled save may continue writing concurrently with its replacement and leave an older or corrupted draft on disk.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/main/kotlin/com/acme/app/feed/FeedViewModel.kt",
+        "line": 88,
+        "severity": "medium",
+        "title": "A failed like can roll back a newer toggle",
+        "explanation": "Each request captures its own previous post and rolls back unconditionally, so an earlier request that fails can overwrite the optimistic state of a later toggle.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/main/kotlin/com/acme/app/feed/FeedViewModel.kt",
+        "line": 65,
+        "severity": "medium",
+        "title": "Overlapping refreshes report loading incorrectly",
+        "explanation": "Each refresh independently sets `isLoading` false on completion, so the first of multiple overlapping refreshes can hide the loading indicator while another refresh is still running.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/main/kotlin/com/acme/app/feed/FeedViewModel.kt",
+        "line": 116,
+        "severity": "medium",
+        "title": "Unexpected draft JSON shapes can escape restoration",
+        "explanation": "The parser only catches I/O and serialization exceptions, while accessing `jsonObject` on a valid non-object JSON value can throw an unchecked exception and fail the launched coroutine.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "rs-profile-cache",
+    "lang": "rust",
+    "condition": "none",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "src/profiles.rs",
+        "line": 75,
+        "severity": "medium",
+        "title": "Concurrent cache misses are not coalesced",
+        "explanation": "Two callers missing the same key can both fetch from the backend before either populates the cache, causing avoidable duplicate requests and potentially overwhelming a slow or rate-limited backend.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/profiles.rs",
+        "line": 78,
+        "severity": "medium",
+        "title": "A slower fetch can overwrite a newer cached profile",
+        "explanation": "Concurrent misses for the same ID insert results in completion order, so an older, slower backend response can replace a newer result that was already cached.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/profiles.rs",
+        "line": 151,
+        "severity": "medium",
+        "title": "LIKE wildcards in the prefix are treated as patterns",
+        "explanation": "Appending `%` does not implement a literal name prefix when `name_prefix` contains `%` or `_`; those characters broaden the search unless they are escaped and the query declares the escape character.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/profiles.rs",
+        "line": 117,
+        "severity": "low",
+        "title": "Expiry arithmetic can overflow",
+        "explanation": "The unchecked cast and subtraction can wrap or panic for extreme timestamps (including `i64::MIN`), so compute the difference with checked or saturating arithmetic.",
+        "rule": "rs-unsigned-subtraction-underflow",
+        "jevProbability": 0.09
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "src/profiles.rs",
+        "rule": "rs-perf-sequential-awaits",
+        "jevProbability": 0.86,
+        "graderConfirms": false
+      },
+      {
+        "file": "tests/profiles.rs",
+        "rule": "rs-perf-sequential-awaits",
+        "jevProbability": 0.86,
+        "graderConfirms": false
+      }
+    ]
+  },
+  {
+    "task": "rs-chat-server",
+    "lang": "rust",
+    "condition": "none",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "src/chat.rs",
+        "line": 81,
+        "severity": "high",
+        "title": "Shutdown leaves connection tasks running",
+        "explanation": "`run_until` returns without tracking or aborting the spawned handlers, so connected clients remain serviced and keep the log file open after the server is supposedly stopped.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/chat.rs",
+        "line": 145,
+        "severity": "medium",
+        "title": "`read_line` is not cancellation-safe in this select",
+        "explanation": "When a broadcast or idle timer wins, the pending `read_line` future is dropped and may lose already-read partial input, corrupting or discarding a client's next line.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/chat.rs",
+        "line": 126,
+        "severity": "medium",
+        "title": "Unbounded line reads allow memory exhaustion",
+        "explanation": "A client can send an arbitrarily long nickname or message without a newline, causing `read_line` to grow its buffer without limit.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/chat.rs",
+        "line": 123,
+        "severity": "medium",
+        "title": "Clients can receive broadcasts from before they joined",
+        "explanation": "The receiver is subscribed before nickname validation and user-count registration, so messages sent while the client is logging in remain queued and may be delivered after it joins.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/chat.rs",
+        "line": 88,
+        "severity": "medium",
+        "title": "Accept errors are silently retried",
+        "explanation": "Continuing on every accept error can create a tight retry loop during persistent failures, consuming CPU while hiding the underlying server error.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/chat.rs",
+        "line": 9,
+        "severity": "medium",
+        "title": "Configured listen address is not used",
+        "explanation": "`main` prints `config.listen_addr` but binds the chat server to `CHAT_LISTEN` or a hard-coded default, so the configured address is ignored and the startup message can be misleading.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/chat.rs",
+        "line": 178,
+        "severity": "low",
+        "title": "Lagged receivers silently lose messages",
+        "explanation": "When a client falls behind the bounded broadcast channel, messages are dropped without any notification, making message loss invisible to the client.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/chat.rs",
+        "line": 152,
+        "severity": "low",
+        "title": "Message formatting strips trailing whitespace",
+        "explanation": "`trim_end()` removes all trailing whitespace from message text rather than only the line terminator, unexpectedly changing messages.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "src/chat.rs",
+        "rule": "rs-select-cancel-unsafe",
+        "jevProbability": 0.68,
+        "graderConfirms": false
+      },
+      {
+        "file": "src/chat.rs",
+        "rule": "rs-spawned-task-error-lost",
+        "jevProbability": 0.87,
+        "graderConfirms": true
+      },
+      {
+        "file": "tests/chat.rs",
+        "rule": "rs-select-cancel-unsafe",
+        "jevProbability": 0.68,
+        "graderConfirms": false
+      },
+      {
+        "file": "tests/chat.rs",
+        "rule": "rs-spawned-task-error-lost",
+        "jevProbability": 0.87,
+        "graderConfirms": false
+      }
+    ]
+  },
+  {
+    "task": "kt-account-sync",
+    "lang": "kotlin",
+    "condition": "jev-rewake",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "src/main/kotlin/com/acme/app/sync/SyncManager.kt",
+        "line": 68,
+        "severity": "high",
+        "title": "Changes are discarded while advancing the cursor",
+        "explanation": "Each page’s `items` are never consumed, yet its cursor is persisted, so changes are permanently skipped instead of being applied.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/main/kotlin/com/acme/app/sync/SyncManager.kt",
+        "line": 58,
+        "severity": "medium",
+        "title": "Cancellation is recorded as a sync failure",
+        "explanation": "Catching `Throwable` includes `CancellationException`, so normal coroutine cancellation updates the error status and can misreport an interrupted sync as a failure.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/main/kotlin/com/acme/app/sync/SyncManager.kt",
+        "line": 48,
+        "severity": "medium",
+        "title": "Some sync failures bypass status reporting",
+        "explanation": "`accounts()` and `loadCursors()` run before the `try`, so failures there propagate without calling `statusStore.reportError`.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/main/kotlin/com/acme/app/sync/SyncManager.kt",
+        "line": 70,
+        "severity": "medium",
+        "title": "Repeated cursors can make paging loop forever",
+        "explanation": "If the API returns the same non-null `nextCursor` repeatedly, the loop keeps requesting the same page with no progress or termination check.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/main/kotlin/com/acme/app/sync/SyncManager.kt",
+        "line": 93,
+        "severity": "medium",
+        "title": "A failed run permanently stops periodic syncing",
+        "explanation": "An exception from `sync().collect()` escapes the launched coroutine and terminates the periodic loop, so later scheduled attempts never run.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/main/kotlin/com/acme/app/sync/SyncManager.kt",
+        "line": 86,
+        "severity": "medium",
+        "title": "Cursor writes can leave the store corrupted",
+        "explanation": "Writing directly to the destination file is not atomic, so a crash or overlapping sync can leave truncated JSON that `loadCursors()` silently treats as an empty cursor map.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/main/kotlin/com/acme/app/sync/SyncManager.kt",
+        "line": 47,
+        "severity": "medium",
+        "title": "Concurrent sync runs can race on cursor state",
+        "explanation": "Multiple collectors or periodic/manual runs can load and write the same cursor file concurrently, allowing one run to overwrite another run’s newer cursors.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "rs-chat-server",
+    "lang": "rust",
+    "condition": "jev-rewake",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "src/chat.rs",
+        "line": 107,
+        "severity": "medium",
+        "title": "Shutdown leaves client tasks running",
+        "explanation": "Returning from `run` drops the listener but does not signal or await the detached client tasks, so existing connections remain open and continue using shared state after the server has ostensibly shut down.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/chat.rs",
+        "line": 139,
+        "severity": "medium",
+        "title": "Broadcast traffic can indefinitely reset the idle timeout",
+        "explanation": "The timeout is recreated each time this `select!` loop iterates, so a client receiving frequent broadcasts can avoid the idle timeout even if it sends no data.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/chat.rs",
+        "line": 172,
+        "severity": "medium",
+        "title": "Lagged clients silently miss messages",
+        "explanation": "When a client falls behind the bounded broadcast channel, `Lagged` is ignored and the skipped messages are permanently lost without notifying the client or otherwise handling the gap.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/chat.rs",
+        "line": 46,
+        "severity": "medium",
+        "title": "Logging failures are silently discarded",
+        "explanation": "All file write and flush errors are ignored, so the server can continue claiming to log every message while silently losing log entries, including after disk or filesystem failures.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/chat.rs",
+        "line": 120,
+        "severity": "medium",
+        "title": "Unbounded input lines allow memory exhaustion",
+        "explanation": "`Lines::next_line()` buffers until a newline with no length limit, allowing a client to send an arbitrarily large line and consume unbounded server memory.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/chat.rs",
+        "line": 143,
+        "severity": "low",
+        "title": "Message text loses trailing whitespace",
+        "explanation": "`trim_end()` removes all trailing whitespace from chat content rather than only the line terminator, changing messages that intentionally end in spaces or tabs.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "rs-profile-cache",
+    "lang": "rust",
+    "condition": "jev-rewake",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "src/profiles.rs",
+        "line": 70,
+        "severity": "medium",
+        "title": "Concurrent cache misses duplicate backend requests",
+        "explanation": "The cache lock is released before fetching, so simultaneous loads for the same uncached ID all call the backend and race to insert, defeating the cache's request-coalescing purpose under concurrency.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/profiles.rs",
+        "line": 46,
+        "severity": "medium",
+        "title": "Cache grows without bound",
+        "explanation": "Entries are only checked for expiration on lookup and never removed, so a long-running service seeing many distinct IDs retains expired profiles indefinitely.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/profiles.rs",
+        "line": 31,
+        "severity": "medium",
+        "title": "Backend async method does not require Send futures",
+        "explanation": "Because the trait's async method has no `Send` bound, `ProfileService::load` may produce a non-`Send` future and therefore cannot be used with common Tokio APIs such as `tokio::spawn` for some backend implementations.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/profiles.rs",
+        "line": 149,
+        "severity": "low",
+        "title": "LIKE wildcards are not escaped",
+        "explanation": "Parameter binding prevents SQL injection, but `%` and `_` in `name_prefix` retain wildcard meaning, so inputs are not treated as literal prefixes and can match unintended names.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/profiles.rs",
+        "line": 128,
+        "severity": "medium",
+        "title": "Expiry arithmetic can wrap for large timestamps",
+        "explanation": "Casting the public `u64` expiry timestamp to `i64` can wrap values above `i64::MAX`, producing an incorrect remaining lifetime or overflowing the subtraction.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/profiles.rs",
+        "line": 126,
+        "severity": "low",
+        "title": "System clock adjustment can panic expiry checks",
+        "explanation": "A system clock before the Unix epoch triggers `expect` and panics, despite this being a recoverable clock condition for a helper that otherwise returns a duration.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "src/profiles.rs",
+        "rule": "rs-perf-sequential-awaits",
+        "jevProbability": 0.78,
+        "graderConfirms": true
+      },
+      {
+        "file": "tests/profiles.rs",
+        "rule": "rs-perf-sequential-awaits",
+        "jevProbability": 0.78,
+        "graderConfirms": false
+      }
+    ]
+  },
+  {
+    "task": "bzl-tax-module",
+    "lang": "bazel",
+    "condition": "none",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "pricing/BUILD.bazel",
+        "line": 50,
+        "severity": "high",
+        "title": "`INFO_FILE` may not be a supported genrule variable",
+        "explanation": "If Bazel does not recognize `$(INFO_FILE)` as a genrule Make variable, analysis fails with an undefined-variable error, so the generated `version.py` target cannot build; use a supported status-file mechanism, such as a stamping rule that declares the status file as an input.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "pricing/tax_rates_integration_test.py",
+        "line": 23,
+        "severity": "medium",
+        "title": "Integration test does not detect extra local rates",
+        "explanation": "The loop only checks states returned by the service, so stale entries present only in `RATES` pass unnoticed; compare the complete state sets before checking rate values.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "pricing/BUILD.bazel",
+        "rule": "bzl-sandbox-opt-out-unexplained",
+        "jevProbability": 0.54,
+        "graderConfirms": true
+      },
+      {
+        "file": "pricing/tax_rates_integration_test.py",
+        "rule": "py-test-real-network",
+        "jevProbability": 0.84,
+        "graderConfirms": false
+      }
+    ]
+  },
+  {
+    "task": "bzl-bundle-rule",
+    "lang": "bazel",
+    "condition": "none",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "tools/defs.bzl",
+        "line": 12,
+        "severity": "medium",
+        "title": "Manifest paths are not repo-relative",
+        "explanation": "`File.path` is an execroot-relative artifact path and can include configuration-specific `bazel-out` prefixes or external-repository paths, so the manifest does not reliably contain the repo-relative paths promised by the rule's documentation.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "tools/defs.bzl",
+        "line": 50,
+        "severity": "low",
+        "title": "Genrule arguments are not shell-quoted",
+        "explanation": "The expanded tool and source paths are inserted unquoted into a shell command, so valid workspace or artifact paths containing spaces or shell metacharacters can cause the command to fail or interpret unintended arguments.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "tools/defs.bzl",
+        "rule": "bzl-depset-flatten-in-impl",
+        "jevProbability": 0.95,
+        "graderConfirms": true
+      }
+    ]
+  },
+  {
+    "task": "bzl-bundle-rule",
+    "lang": "bazel",
+    "condition": "jev-rewake",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "tools/defs.bzl",
+        "line": 21,
+        "severity": "high",
+        "title": "`ctx.actions.write` cannot accept an Args object",
+        "explanation": "`ctx.actions.write` requires `content` to be a string, so passing `args` causes analysis to fail for every `py_bundle` target.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "pricing/BUILD.bazel",
+        "line": 16,
+        "severity": "medium",
+        "title": "Flaky setting can conceal the timing failure",
+        "explanation": "Marking the test flaky allows Bazel to retry and accept intermittent failures, leaving the known timing bug unresolved and potentially hiding regressions.",
+        "rule": "bzl-test-disabled-silently",
+        "jevProbability": 0.07
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "bzl-tax-module",
+    "lang": "bazel",
+    "condition": "jev-rewake",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "pricing/tax.py",
+        "line": 12,
+        "severity": "high",
+        "title": "Resolving `__file__` can escape the Bazel runfiles tree",
+        "explanation": "`Path.resolve()` follows Bazel’s runfiles symlink for `tax.py` back to the source tree, so the adjacent CSV lookup can fail when the deployed runtime has runfiles but not the original checkout.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "pricing/tax_live_rates_test.py",
+        "line": 19,
+        "severity": "high",
+        "title": "The live-service URL is a reserved example domain",
+        "explanation": "`rates.example.com` is a placeholder domain rather than a usable rates service, so this integration test cannot reliably reach the service it claims to validate.",
+        "rule": "py-test-real-network",
+        "jevProbability": 0.97
+      },
+      {
+        "file": "pricing/tax_live_rates_test.py",
+        "line": 9,
+        "severity": "medium",
+        "title": "The documented command filters out the test",
+        "explanation": "`--test_tag_filters=-manual` excludes this test because it is tagged `manual`, so the stated command will not execute it.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "pricing/tax_live_rates_test.py",
+        "line": 29,
+        "severity": "medium",
+        "title": "The comparison does not detect missing live states",
+        "explanation": "The loop only checks states returned by the service, so the test passes if the service omits states that are present in the bundled rates.",
+        "rule": "py-test-cannot-fail",
+        "jevProbability": 0.05
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "pricing/BUILD.bazel",
+        "rule": "bzl-nonhermetic-action",
+        "jevProbability": 0.92,
+        "graderConfirms": true
+      }
+    ]
+  },
+  {
+    "task": "ts-notes-api-security",
+    "lang": "typescript",
+    "condition": "none",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "src/notesApi.ts",
+        "line": 159,
+        "severity": "high",
+        "title": "SSRF check can be bypassed by DNS resolution",
+        "explanation": "The check only examines the URL hostname, so a public-looking hostname that resolves (or is rebound) to a private or metadata IP can make `fetch` access internal services; validate resolved addresses and constrain the actual connection, including redirects.",
+        "rule": "ts-sec-ssrf",
+        "jevProbability": 0.05
+      },
+      {
+        "file": "src/notesApi.ts",
+        "line": 173,
+        "severity": "medium",
+        "title": "Remote imports have no timeout or response-size limit",
+        "explanation": "An authenticated caller can make the service wait indefinitely or buffer an arbitrarily large response with `res.text()`, consuming connections and memory; apply a timeout and enforce a maximum response size.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/notesApi.ts",
+        "line": 235,
+        "severity": "medium",
+        "title": "Malformed note IDs become internal errors",
+        "explanation": "`decodeURIComponent` throws for malformed percent escapes, causing the outer handler to return a 500 instead of treating the path as an invalid ID and returning a client error or 404.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/notesApi.ts",
+        "line": 242,
+        "severity": "medium",
+        "title": "Internal exception details are returned to clients",
+        "explanation": "Returning arbitrary exception messages in the 500 response can expose database, infrastructure, or other sensitive implementation details; log the error server-side and return a generic response.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/notesApi.ts",
+        "line": 253,
+        "severity": "medium",
+        "title": "Signup uniqueness check is vulnerable to races",
+        "explanation": "Two concurrent signups can both pass `findByEmail` and attempt creation, so the database must enforce email uniqueness and the conflict must be handled as a 409 rather than surfacing as a 500.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/notesApi.ts",
+        "line": 380,
+        "severity": "low",
+        "title": "Import failures expose upstream error details",
+        "explanation": "The response includes raw fetch exception messages, which may disclose internal network or URL details; return a generic import error and keep diagnostics in server-side logs.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "src/notesApi.ts",
+        "rule": "ts-no-magic-numbers",
+        "jevProbability": 0.51,
+        "graderConfirms": false
+      }
+    ]
+  },
+  {
+    "task": "ts-notes-api-security",
+    "lang": "typescript",
+    "condition": "jev-rewake",
+    "rep": 2,
+    "findings": [
+      {
+        "file": "src/notesApi.ts",
+        "line": 143,
+        "severity": "medium",
+        "title": "Malformed cookie encoding can turn requests into 500s",
+        "explanation": "`decodeURIComponent` throws for malformed percent escapes, and this exception propagates through authentication into the router’s generic 500 response instead of treating the cookie as invalid.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/notesApi.ts",
+        "line": 205,
+        "severity": "high",
+        "title": "IPv6 private-address checks can be bypassed",
+        "explanation": "The prefix checks miss equivalent IPv6 spellings and other non-public ranges such as IPv4-mapped addresses written in hexadecimal or expanded form, allowing imports to reach private or loopback destinations.",
+        "rule": "ts-sec-ssrf",
+        "jevProbability": 0.05
+      },
+      {
+        "file": "src/notesApi.ts",
+        "line": 214,
+        "severity": "high",
+        "title": "DNS resolution leaves import vulnerable to SSRF",
+        "explanation": "The URL is checked by hostname string only, so a public-looking hostname resolving to a private address can access internal services, and the comment’s suggested network-layer mitigation is not enforced here.",
+        "rule": "ts-sec-ssrf",
+        "jevProbability": 0.05
+      },
+      {
+        "file": "src/notesApi.ts",
+        "line": 235,
+        "severity": "medium",
+        "title": "Import timeout does not cover response-body reads",
+        "explanation": "The abort timeout is attached to `fetch`, but the fetch promise resolves once headers arrive, so a server can stall the body indefinitely and hold the request open while `readLimited` waits.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/notesApi.ts",
+        "line": 250,
+        "severity": "medium",
+        "title": "Body reader is cancelled even after normal completion",
+        "explanation": "The `finally` block calls `reader.cancel()` even when the stream is already complete, which can reject or interfere with stream implementations and can mask an earlier read/size error if cancellation itself throws.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/notesApi.ts",
+        "line": 314,
+        "severity": "medium",
+        "title": "Signup has a username-creation race",
+        "explanation": "The separate lookup and create are not atomic, so concurrent signups for the same username can both pass the check unless the database enforces a unique constraint and the conflict is handled.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/notesApi.ts",
+        "line": 383,
+        "severity": "medium",
+        "title": "PATCH can update a note after ownership changes",
+        "explanation": "Ownership is checked with an initial read and the subsequent update is keyed only by note ID, allowing a concurrent ownership change or deletion/recreation to cause an unauthorized update unless the database operation also enforces the user ID.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/notesApi.ts",
+        "line": 397,
+        "severity": "medium",
+        "title": "Search assumes a specific SQL dialect and row shape",
+        "explanation": "The `?` placeholders and `ESCAPE` literal are dialect-specific, while `Db.query` promises only `unknown[]`, so the endpoint may fail or return an invalid/untyped response for otherwise conforming database adapters.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/notesApi.ts",
+        "line": 424,
+        "severity": "low",
+        "title": "Non-success imports leave the response body unconsumed",
+        "explanation": "Returning immediately for a non-OK response does not cancel or drain its body, which can waste network resources or prevent connection reuse in runtimes that require explicit body cleanup.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/notesApi.ts",
+        "line": 427,
+        "severity": "medium",
+        "title": "Invalid or misleading Content-Length is not handled safely",
+        "explanation": "The size check trusts a parseable declared length only when it exceeds the cap; malformed, negative, or inaccurate values bypass it, and the subsequent stream limit remains the only reliable enforcement.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/notesApi.ts",
+        "line": 484,
+        "severity": "medium",
+        "title": "Malformed percent-encoding in note IDs becomes a 500",
+        "explanation": "`decodeURIComponent` can throw for an invalid escape sequence and is evaluated inside the route-level catch, so a malformed path returns an internal-server-error response rather than a client error.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/notesApi.ts",
+        "line": 130,
+        "severity": "low",
+        "title": "Caller headers can override the JSON content type",
+        "explanation": "Spreading caller-supplied headers after the default permits an inconsistent content type for JSON responses, making the helper’s response contract easy to violate.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": [
+      {
+        "file": "src/notesApi.ts",
+        "rule": "ts-no-vague-names",
+        "jevProbability": 0.51,
+        "graderConfirms": true
+      }
+    ]
+  }
+]

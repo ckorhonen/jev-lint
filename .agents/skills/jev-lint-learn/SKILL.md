@@ -32,6 +32,13 @@ What an outcome means, for each first flag of a rule in a (thread, file) pair (a
 | kept | still flagged at the file's last check | noise, or a real issue the agent ignored |
 | unknown | the file was never checked again | nothing learned |
 
+The end-of-turn **re-check hook** (`src/recheck.ts`, installed on `Stop` and `SubagentStop`)
+re-asks each still-flagged rule about the file as it is now, so outcomes should rarely be
+unknown. If more than about 30% are unknown, check the hook is installed
+(`bun $JEV/src/install.ts`) before drawing conclusions. A re-check looks at the whole file, so a
+"kept" can occasionally mean the rule found the same problem elsewhere in that file; read the
+excerpts before acting on a "kept" cluster.
+
 ## 2. Cluster
 
 ```sh

@@ -12,7 +12,10 @@ that teaches the wrong pattern, or a rule that nags about code that's actually f
 2. **Each finding gets an outcome.** If the agent's next edit to that file clears the flag, it
    counts as **fixed**: the agent made the mistake and corrected it. If the flag is still
    there at the end, it counts as **kept**: the agent disagreed or ignored it, so the rule may
-   be wrong for your code.
+   be wrong for your code. At the end of every turn, a small **re-check hook** looks again at
+   any file that still had findings, asking only those rules about the file as it is now, so
+   every finding gets an outcome even if the agent never touched the file again. (Subagents
+   are tracked separately, so one subagent's fix doesn't count for another's file.)
 3. **Every week or two, an agent reviews the log.** It groups findings into clusters (rule ×
    part of the repo × test or not). It only acts on clusters with real evidence: at least
    5 outcomes across at least 3 sessions. Then it proposes up to three changes:
@@ -32,6 +35,13 @@ You stay in control. The scheduled agent writes a report and a branch; you revie
 
 Do these steps in the repo you're setting up. Ask the user before creating the scheduled job,
 and show them the exact command it will run.
+
+### 0. Make sure the re-check hook is installed
+
+`bun ~/Repos/jev-lint/src/install.ts` (a dry run) should report the re-check on `Stop` and
+`SubagentStop` for each agent. If it says "added (dry run)", run it again with `--apply`.
+Without it, most findings end up "unknown" and the loop has little evidence to work with.
+Turn it off with `--no-recheck` at install time or `JEV_LINT_RECHECK=off`.
 
 ### 1. Make sure there's something to learn from
 

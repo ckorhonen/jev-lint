@@ -55,7 +55,22 @@
       "true": "A bare number with non-obvious meaning appears in logic.",
       "false": "Numbers are named constants, trivial values, or self-explanatory in context (array index 0, HTTP status 404, percent 100).",
       "fix": "Extract the number into a well-named constant.",
-      "when": ["\\d"]
+      "when": ["\\d"],
+      "thresholds": {
+        "medium": null
+      },
+      "excludePaths": [
+        "**/*.test.*",
+        "**/*.spec.*",
+        "**/*_test.*",
+        "**/__tests__/**",
+        "**/test/**",
+        "**/tests/**",
+        "**/Tests/**",
+        "**/*Tests.swift",
+        "**/*Test.swift",
+        "**/e2e/**"
+      ]
     },
     {
       "id": "ts-no-commented-out-code",

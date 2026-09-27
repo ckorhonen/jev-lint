@@ -63,7 +63,22 @@
       "true": "A bare number with non-obvious meaning appears in logic.",
       "false": "Numbers are named constants, trivial values, layout padding in SwiftUI modifiers, or self-explanatory in context.",
       "fix": "Extract the number into a well-named constant.",
-      "when": ["\\d"]
+      "when": ["\\d"],
+      "thresholds": {
+        "medium": null
+      },
+      "excludePaths": [
+        "**/*.test.*",
+        "**/*.spec.*",
+        "**/*_test.*",
+        "**/__tests__/**",
+        "**/test/**",
+        "**/tests/**",
+        "**/Tests/**",
+        "**/*Tests.swift",
+        "**/*Test.swift",
+        "**/e2e/**"
+      ]
     },
     {
       "id": "swift-no-commented-out-code",

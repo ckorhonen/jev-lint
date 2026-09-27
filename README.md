@@ -283,6 +283,8 @@ controls which rules apply in that repo:
 - `disable` turns off single rules, e.g. `["ts-no-magic-numbers"]`;
 - `skipPaths` skips a rule for some paths, as globs relative to the repo root, e.g.
   `{"ts-unvalidated-external-data": ["src/providers/**"]}`.
+- `thresholds` sets a rule's own confidence cutoffs, e.g. `{"ts-no-magic-numbers": {"medium": null}}`
+  to show only its high-confidence findings.
 
 A repo rule can also carry `paths` globs (e.g. `["src/routes/**"]` or `["**/*.tsx"]`) so it's
 only asked where its convention holds. That's useful in multi-language repos, and for
@@ -297,6 +299,9 @@ repo dogfoods it: see [`.jev-lint/`](.jev-lint/).
 The hook keeps a local findings log: one line per checked file, with the rules that fired,
 a short excerpt, latency and tokens. For each finding it records whether the agent **fixed**
 it on a later edit, **kept** it (disagreed or ignored it), or never touched the file again.
+At the end of each turn, a re-check hook (`src/recheck.ts`, installed on `Stop` and
+`SubagentStop` by `install.ts`) looks again at files that still had findings, so almost every
+finding gets a fixed-or-kept outcome. Subagents are tracked separately.
 
 ```sh
 bun ~/Repos/jev-lint/src/findings.ts --repo . --days 30              # per rule, plus failed checks and judge cost
@@ -377,6 +382,7 @@ Two rules were removed because the model is weak at counting and tracing; use a 
 | `JEV_LINT_LOG` | unset | Debug: append every raw judgment to a JSONL file |
 | `JEV_LINT_FINDINGS_LOG` | `~/.local/state/jev-lint/findings.jsonl` | Findings log used by `jev-lint-learn`; `off` disables it |
 | `TYPESAFE_BASE_URL` | `https://api.typesafe.ai` | Any `/v1/systemone` server, e.g. a local Kev or Laya (no key needed) |
+| `JEV_LINT_RECHECK` | `on` | `off` disables the end-of-turn re-check (`src/recheck.ts`) that gives each finding a fixed/kept outcome |
 | `JEV_LINT_DAEMON` | `on` | `off` checks in the hook process every time. When `on`, the first check starts a small background process that keeps the API connection open and reads the key once; later checks go through it (about 100 ms faster each). It is local only (a user-only Unix socket), exits after 30 idle minutes (`JEV_LINT_DAEMON_IDLE_MS`) or when jev-lint's code changes, and the hook falls back to checking in process if it is unavailable. |
 | `JEV_LINT_DEBUG` | unset | Print errors to stderr |
 

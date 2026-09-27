@@ -14,6 +14,7 @@ reword a single rule, use `jev-lint-write-rule`. All five skills are symlinked i
 ## Layout
 
 - `src/hook.ts` — hook entry (Claude Code `Write|Edit|MultiEdit`, Codex `apply_patch`). Must fail open: never throw, never block, always exit 0.
+- `src/recheck.ts` — end-of-turn re-check (Stop/SubagentStop hook): re-asks still-flagged rules about the current file so findings get fixed/kept outcomes; fail-open, prints nothing.
 - `src/checks.ts` — runs the checks for one event (file cap, parallelism); used in process and by the daemon.
 - `src/daemon.ts` / `src/daemonClient.ts` — optional warm daemon: one API connection and one Keychain read shared across hook calls, over a user-only Unix socket. The hook must keep working when it is absent, stale or slow (it falls back to in-process checks; a timeout counts as a failed check, not a retry).
 - `src/extract.ts` — hook payload → code the edit added (Codex: `+` lines only).

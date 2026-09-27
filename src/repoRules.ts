@@ -13,9 +13,16 @@
 
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { dirname, join, parse } from "node:path";
-import type { Rule, RuleSet } from "./lint";
+import type { Rule, RuleSet, RuleThresholds } from "./lint";
 
-export type RepoConfig = { dir: string; packs?: string[]; disable?: string[]; skipPaths?: Record<string, string[]>; ruleSets: RuleSet[] };
+export type RepoConfig = {
+  dir: string;
+  packs?: string[];
+  disable?: string[];
+  skipPaths?: Record<string, string[]>;
+  thresholds?: Record<string, RuleThresholds>;
+  ruleSets: RuleSet[];
+};
 
 const cache = new Map<string, RepoConfig | null>();
 
@@ -51,12 +58,14 @@ export function loadRepoDir(dir: string): RepoConfig {
   let packs: string[] | undefined;
   let disable: string[] | undefined;
   let skipPaths: Record<string, string[]> | undefined;
+  let thresholds: Record<string, RuleThresholds> | undefined;
   const strings = (v: unknown) => (Array.isArray(v) ? v.filter((x): x is string => typeof x === "string") : undefined);
   try {
     const config = JSON.parse(readFileSync(join(dir, "config.json"), "utf8")) as {
       packs?: unknown;
       disable?: unknown;
       skipPaths?: unknown;
+      thresholds?: unknown;
     };
     packs = strings(config.packs);
     disable = strings(config.disable);
@@ -64,10 +73,20 @@ export function loadRepoDir(dir: string): RepoConfig {
       skipPaths = {};
       for (const [rule, globs] of Object.entries(config.skipPaths)) skipPaths[rule] = strings(globs) ?? [];
     }
+    if (config.thresholds && typeof config.thresholds === "object") {
+      const cutoff = (x: unknown) => (typeof x === "number" && x >= 0 && x <= 1 ? x : undefined);
+      thresholds = {};
+      for (const [rule, t] of Object.entries(config.thresholds as Record<string, { high?: unknown; medium?: unknown }>)) {
+        // Only keys the repo actually set, so they don't wipe out a rule's own cutoffs when merged.
+        const high = cutoff(t?.high);
+        const medium = t?.medium === null ? null : cutoff(t?.medium);
+        thresholds[rule] = { ...(high !== undefined && { high }), ...(medium !== undefined && { medium }) };
+      }
+    }
   } catch {
     // config.json is optional
   }
-  return { dir, packs, disable, skipPaths, ruleSets };
+  return { dir, packs, disable, skipPaths, thresholds, ruleSets };
 }
 
 // Walks up from the file's directory to the filesystem root.

@@ -58,3 +58,33 @@ describe("file matching", () => {
     delete process.env.JEV_LINT_CANDIDATES;
   });
 });
+
+describe("per-rule thresholds and excludePaths", () => {
+  test("tierFor honours a rule's own cutoffs, and medium: null turns the double-check tier off", async () => {
+    const { tierFor } = await import("../src/lint");
+    expect(tierFor(0.6)).toBe("medium");
+    expect(tierFor(0.6, undefined, { medium: null })).toBeUndefined();
+    expect(tierFor(0.85, undefined, { medium: null })).toBe("high");
+    expect(tierFor(0.85, undefined, { high: 0.9 })).toBe("medium");
+  });
+
+  test("excludePaths skips a rule for matching files; repo config thresholds merge per key", () => {
+    const dir = mkdtempSync(join(tmpdir(), "jev-lint-thr-"));
+    mkdirSync(join(dir, ".jev-lint"));
+    const rule = {
+      id: "repo-thr",
+      question: "Does `added_code` do X?",
+      true: "y",
+      false: "n",
+      fix: "f",
+      excludePaths: ["**/*.test.ts"],
+      thresholds: { high: 0.9 },
+    };
+    writeFileSync(join(dir, ".jev-lint/ts.rules.json"), JSON.stringify({ language: "typescript", extensions: [".ts"], rules: [rule] }));
+    writeFileSync(join(dir, ".jev-lint/config.json"), JSON.stringify({ packs: ["repo"], thresholds: { "repo-thr": { medium: null } } }));
+    expect(ruleSetFor(join(dir, "src/a.test.ts"))).toBeUndefined();
+    const merged = ruleSetFor(join(dir, "src/a.ts"))?.rules[0];
+    expect(merged?.thresholds).toEqual({ high: 0.9, medium: null });
+    rmSync(dir, { recursive: true, force: true });
+  });
+});

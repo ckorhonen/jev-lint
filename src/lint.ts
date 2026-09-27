@@ -19,8 +19,15 @@ export type Rule = {
   fix: string;
   when?: string[];
   paths?: string[];
+  // Glob patterns (matched against the file's full path) where the rule is never asked,
+  // e.g. test files for a rule that only makes sense in production code.
+  excludePaths?: string[];
+  // Per-rule confidence cutoffs, overriding the global THRESHOLDS. `medium: null` turns off
+  // the "double-check" tier for this rule, so only high-confidence findings are shown.
+  thresholds?: RuleThresholds;
   status?: "candidate";
 };
+export type RuleThresholds = { high?: number; medium?: number | null };
 // `filenames`: exact file names that belong to the set when the extension alone can't say
 // (Bazel's BUILD, BUILD.bazel, WORKSPACE, MODULE.bazel).
 export type RuleSet = { language: string; extensions: string[]; filenames?: string[]; rules: Rule[] };
@@ -98,11 +105,18 @@ export function ruleSetFor(filePath: string, packs?: Pack[], cwd = process.cwd()
   const seen = new Set<string>();
   const merged = mergeRuleSets(sets);
   const relPath = repo ? relative(dirname(repo.dir), absolute) : filePath;
+  const excluded = (r: Rule) => r.excludePaths?.some((glob) => matchesGlob(glob, absolute)) ?? false;
   const off = (r: Rule) =>
-    repo?.disable?.includes(r.id) || repo?.skipPaths?.[r.id]?.some((glob) => matchesGlob(glob, relPath)) || !rulePathsMatch(r, relPath);
+    excluded(r) ||
+    repo?.disable?.includes(r.id) ||
+    repo?.skipPaths?.[r.id]?.some((glob) => matchesGlob(glob, relPath)) ||
+    !rulePathsMatch(r, relPath);
   const candidates = process.env.JEV_LINT_CANDIDATES === "on";
   if (merged)
-    merged.rules = merged.rules.filter((r) => (candidates || r.status !== "candidate") && !off(r) && !seen.has(r.id) && seen.add(r.id));
+    merged.rules = merged.rules
+      .filter((r) => (candidates || r.status !== "candidate") && !off(r) && !seen.has(r.id) && seen.add(r.id))
+      // A repo's config.json can tune any rule's cutoffs (built-in or its own).
+      .map((r) => (repo?.thresholds?.[r.id] ? { ...r, thresholds: { ...r.thresholds, ...repo.thresholds[r.id] } } : r));
   return merged?.rules.length ? merged : undefined;
 }
 
@@ -154,9 +168,11 @@ export function buildQuestions(ruleSet: RuleSet): Record<string, NoulQuestion> {
   );
 }
 
-export function tierFor(probability: number, thresholds = THRESHOLDS): Tier | undefined {
-  if (probability >= thresholds.high) return "high";
-  if (probability >= thresholds.medium) return "medium";
+export function tierFor(probability: number, thresholds = THRESHOLDS, rule?: RuleThresholds): Tier | undefined {
+  const high = rule?.high ?? thresholds.high;
+  const medium = rule?.medium === null ? undefined : (rule?.medium ?? thresholds.medium);
+  if (probability >= high) return "high";
+  if (medium !== undefined && probability >= medium) return "medium";
   return undefined;
 }
 
@@ -183,9 +199,12 @@ export async function lintChange(
     cwd?: string;
     baseUrl?: string;
     gate?: boolean;
+    onlyRules?: string[]; // ask just these rules (the end-of-session re-check)
   } = {},
 ): Promise<LintResult | undefined> {
-  const ruleSet = ruleSetFor(change.filePath, opts.packs, opts.cwd);
+  const full = ruleSetFor(change.filePath, opts.packs, opts.cwd);
+  const ruleSet = full && opts.onlyRules ? { ...full, rules: full.rules.filter((r) => opts.onlyRules?.includes(r.id)) } : full;
+  if (ruleSet && !ruleSet.rules.length) return undefined;
   if (!ruleSet || !change.addedCode.trim() || change.addedCode.length > MAX_ADDED_CHARS) return undefined;
 
   const gate = opts.gate ?? process.env.JEV_LINT_GATE !== "off";
@@ -202,7 +221,7 @@ export async function lintChange(
   for (const rule of ruleSet.rules) {
     const probability = (response.answers as Record<string, { noul: number }>)[rule.id]?.noul ?? 0;
     probabilities[rule.id] = probability;
-    const tier = tierFor(probability, opts.thresholds);
+    const tier = tierFor(probability, opts.thresholds, rule.thresholds);
     if (tier) findings.push({ ruleId: rule.id, probability, tier, fix: rule.fix });
   }
   findings.sort((a, b) => b.probability - a.probability);

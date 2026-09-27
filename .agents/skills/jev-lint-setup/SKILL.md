@@ -54,7 +54,9 @@ Then run:
 bun "$JEV/src/install.ts" --apply [--claude-only|--codex-only] [--project <repo>] [--async] --skills --smoke
 ```
 
-`--apply` backs up each file it changes (`*.bak-jev-lint-<time>`) and only replaces the
+Besides the main hook, the installer adds the end-of-turn **re-check** on `Stop` and
+`SubagentStop`, which gives the learning loop an outcome for every finding (`--no-recheck` skips
+it). `--apply` backs up each file it changes (`*.bak-jev-lint-<time>`) and only replaces the
 jev-lint entry, never other hooks. Running it again changes nothing.
 
 **Codex:**

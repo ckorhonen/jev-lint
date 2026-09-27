@@ -37,6 +37,17 @@ Optional `.jev-lint/config.json`:
   repo root (the directory holding `.jev-lint/`). The rule isn't asked for matching files.
   Use it to exempt an area from a rule, including a built-in one, such as tests.
 
+## Tuning a noisy rule: `thresholds` and `excludePaths`
+
+- **`thresholds`:** gives a rule its own confidence cutoffs, e.g. `"thresholds": { "medium": null }`
+  to show only high-confidence ("fix") findings, or `{ "high": 0.9 }`. Use it when the
+  double-check tier of a useful rule is mostly noise, as the findings log showed for magic numbers.
+- **`excludePaths`:** globs matched against the file's full path, where the rule is never asked
+  (e.g. `["**/*.test.*", "**/__tests__/**", "**/Tests/**"]`). Use it for rules that only make sense
+  in production code.
+- **For one repo:** the same cutoffs can be set in `.jev-lint/config.json` as
+  `"thresholds": { "<rule id>": { "medium": null } }`, for any rule, built-in or repo.
+
 ## Scoping a rule to files: `paths`
 
 A rule may list `paths` globs, relative to the repo root. It is then asked only for files

@@ -36,4 +36,17 @@ describe("install mergeHook", () => {
     expect(action).toBe("updated");
     expect(config.hooks?.PostToolUse).toEqual([{ matcher: "*", hooks: [other] }, group]);
   });
+
+  test("the re-check goes on Stop without a matcher, idempotently, next to other Stop hooks", async () => {
+    const { recheckGroup } = await import("../src/install");
+    const other = { hooks: [{ type: "command" as const, command: "notify", timeout: 5 }] };
+    const recheck = recheckGroup({ bun: "/usr/bin/bun" });
+    const isRecheck = (h: { command: string }) => /jev-lint\/src\/recheck\.ts/.test(h.command);
+    const once = mergeHook({ hooks: { Stop: [other] } }, recheck, "Stop", isRecheck);
+    expect(once.action).toBe("added");
+    expect(once.config.hooks?.Stop).toEqual([other, recheck]);
+    expect(recheck.matcher).toBeUndefined();
+    expect(mergeHook(once.config, recheck, "Stop", isRecheck).action).toBe("unchanged");
+    expect(once.config.hooks?.PostToolUse).toBeUndefined();
+  });
 });
