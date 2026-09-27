@@ -354,6 +354,18 @@ bun eval/bench-rules.ts                   # rules per request vs accuracy, laten
 python3 report/build.py <DepartureMono-Regular.woff2>   # rebuild the notebook
 ```
 
+**Rule-pack languages (E2E):** `eval/e2e/tasks.packs.json` has 15 tasks for Python (FastAPI),
+Ruby (ActiveRecord, no full Rails), Kotlin, Rust (Tokio), Bazel (rules_python) and one
+TypeScript security task, on scaffolds in `eval/e2e/scaffold/<lang>/`. Only files the agent
+added or changed are graded, each with every non-candidate pack for its language. The build
+check is compile-only and is skipped (`build.ok: null`) when the toolchain is missing
+(Kotlin needs gradle and a JDK, Bazel needs bazel or bazelisk):
+
+```sh
+bun eval/e2e/run.ts --tasks-file eval/e2e/tasks.packs.json --tag langs --conditions none,jev --reps 2
+E2E_TAG=langs bun eval/e2e/grade.ts && E2E_TAG=langs bun eval/e2e/review.ts
+```
+
 **Cases:**
 - `eval/cases/<lang>[.practices].dev.jsonl` is the tuning split. Rule wording is only tuned here.
 - `eval/cases/<lang>[.practices].holdout.jsonl` is the held-out split, written by a separate author in a different style.

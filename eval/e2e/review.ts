@@ -17,6 +17,7 @@ import { basename, join } from "node:path";
 import { extractChanges } from "../../src/extract";
 import { lintChange, ruleSetForLanguage } from "../../src/lint";
 import { gradeFile } from "./grade";
+import { fileLanguage, isLegacy, type Lang, type PackLang, REVIEW_STACK } from "./languages";
 
 const REPO = join(import.meta.dir, "../..");
 const MODEL = process.env.REVIEW_MODEL ?? "gpt-6-luna";
@@ -27,7 +28,7 @@ const CACHE = join(REPO, "eval/results/cache", `review-${MODEL}-${EFFORT}`);
 
 type Run = {
   task: string;
-  lang: "typescript" | "swift";
+  lang: Lang;
   condition: string;
   rep: number;
   files: { path: string; content: string }[];
@@ -87,7 +88,11 @@ const REVIEW_SCHEMA = {
 };
 
 async function review(run: Run): Promise<Finding[]> {
-  const stack = run.lang === "typescript" ? "TypeScript and React" : "Swift, SwiftUI, and Swift concurrency";
+  const stack = isLegacy(run.lang)
+    ? run.lang === "typescript"
+      ? "TypeScript and React"
+      : "Swift, SwiftUI, and Swift concurrency"
+    : REVIEW_STACK[run.lang as PackLang];
   const files = run.files
     .map(
       (f) =>
@@ -108,7 +113,9 @@ async function review(run: Run): Promise<Finding[]> {
 
 async function mapFindings(run: Run, findings: Finding[]): Promise<string[]> {
   if (!findings.length) return [];
-  const rules = ruleSetForLanguage(run.lang)?.rules ?? [];
+  // Rules of every language in the run (legacy runs: just run.lang; Bazel runs: bazel + python).
+  const langs = [...new Set([run.lang, ...run.files.map((f) => fileLanguage(f.path, run.lang))])];
+  const rules = langs.flatMap((l) => ruleSetForLanguage(l)?.rules ?? []);
   const ids = [...rules.map((r) => r.id), "none"];
   const schema = {
     type: "object",
@@ -183,7 +190,7 @@ async function main() {
         const probs = jev.final[basename(file.path)] ?? {};
         const flagged = Object.entries(probs).filter(([id, p]) => p >= 0.5 && !reviewed.has(`${basename(file.path)}|${id}`));
         if (!flagged.length) continue;
-        const verdict = await gradeFile(run.lang, file.path, file.content);
+        const verdict = await gradeFile(fileLanguage(file.path, run.lang), file.path, file.content);
         for (const [id, p] of flagged)
           extras.push({ file: file.path, rule: id, jevProbability: p, graderConfirms: (verdict[id]?.instances ?? 0) > 0 });
       }

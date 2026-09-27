@@ -59,6 +59,11 @@ Each line is `{id, lang, split, payload, labels, notes}`. The payload is a real 
 - **Don't change rules while grading or review is running.** Mixed rule versions invalidate the round. Regrade after any rule change (the caches make it cheap).
 - **Report paired differences** per task and rep, with a bootstrap 95% CI and better/worse/tie counts. With about 24 runs per condition, say plainly when the CI crosses zero.
 - **Break results down by language/stack.** An overall improvement can hide one stack getting nothing.
+- **Rule-pack languages:** `eval/e2e/tasks.packs.json` has 15 tasks: 5 Python, 3 Ruby, 2 each for Kotlin, Rust and Bazel, and 1 TypeScript security task. Run it with `--tasks-file eval/e2e/tasks.packs.json --tag langs` (`packs` is already used by a rerun of the practices tasks).
+  - Per-language settings live in `eval/e2e/languages.ts`: source globs, a compile-only build check, and the reviewer persona. TypeScript and Swift keep their original code paths.
+  - Only files that differ from the scaffold are recorded. Each file is graded with its own language's rules, so Bazel runs grade BUILD/.bzl files with the Bazel rules and .py files with the Python rules.
+  - A missing toolchain gives `build: {ok: null, skipped}`. On this machine that is Kotlin (no gradle or JDK) and Bazel. Report build pass rates only for languages that were actually checked.
+  - `remediate.ts` still handles TypeScript and Swift only.
 
 ## 5. Notebook (`report/`)
 

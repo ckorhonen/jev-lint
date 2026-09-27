@@ -7,6 +7,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { ruleSetForLanguage } from "../../src/lint";
 import { REGEX_RULES } from "../systems";
+import { fileLanguage, type Lang } from "./languages";
 
 const REPO = join(import.meta.dir, "../..");
 export const GRADER_MODEL = process.env.GRADER_MODEL ?? "gpt-6-luna";
@@ -15,10 +16,10 @@ const CACHE = join(REPO, "eval/results/cache", `grader-${GRADER_MODEL}-${process
 
 type Run = {
   task: string;
-  lang: "typescript" | "swift";
+  lang: Lang;
   condition: string;
   rep: number;
-  build: { ok: boolean };
+  build: { ok: boolean | null; skipped?: string };
   transcript: Record<string, number | boolean>;
   hook: Record<string, number>;
   files: { path: string; content: string }[];
@@ -103,10 +104,14 @@ async function main() {
       for (const file of run.files) {
         if (SCAFFOLD_STUBS.has(file.content.trim())) continue; // untouched scaffold
         lines += file.content.split("\n").length;
-        const verdict = await gradeFile(run.lang, file.path, file.content);
+        // Legacy (TypeScript/Swift) runs: always run.lang. Bazel runs grade .py files with Python rules.
+        const lang = fileLanguage(file.path, run.lang);
+        const verdict = await gradeFile(lang, file.path, file.content);
         for (const [id, v] of Object.entries(verdict)) perRule[id] = (perRule[id] ?? 0) + v.instances;
+        // The regex baseline only exists for TypeScript and Swift.
+        if (lang !== "typescript" && lang !== "swift") continue;
         for (const [id, re] of Object.entries(REGEX_RULES)) {
-          if (!id.startsWith(run.lang === "typescript" ? "ts-" : "swift-")) continue;
+          if (!id.startsWith(lang === "typescript" ? "ts-" : "swift-")) continue;
           regexPerRule[id] = (regexPerRule[id] ?? 0) + (re.test(file.content) ? 1 : 0);
         }
       }

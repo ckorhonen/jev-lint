@@ -1,0 +1,232 @@
+[
+  {
+    "agent": "claude",
+    "task": "bzl-bundle-rule",
+    "lang": "bazel",
+    "condition": "none",
+    "rep": 1,
+    "exitCode": 0,
+    "wallMs": 92445,
+    "build": {
+      "ok": null,
+      "skipped": "bazel/bazelisk not installed; Bazel build check skipped",
+      "output": ""
+    },
+    "transcript": {
+      "edits": 4,
+      "rewakes": 0,
+      "costUsd": 0.24047999999999997,
+      "durationMs": 91511,
+      "numTurns": 20,
+      "isError": false
+    },
+    "hook": {
+      "calls": 0,
+      "findingsShown": 0,
+      "highShown": 0,
+      "mediumShown": 0,
+      "errors": 0,
+      "meanLatencyMs": 0,
+      "editsAfterFeedback": 0
+    },
+    "files": [
+      {
+        "path": "pricing/BUILD.bazel",
+        "content": "load(\"@rules_python//python:defs.bzl\", \"py_library\", \"py_test\")\nload(\"//tools:defs.bzl\", \"py_bundle_stamped\")\n\npy_library(\n    name = \"pricing\",\n    srcs = [\"pricing.py\"],\n)\n\npy_test(\n    name = \"pricing_test\",\n    size = \"small\",\n    srcs = [\"pricing_test.py\"],\n    deps = [\":pricing\"],\n)\n\npy_bundle_stamped(\n    name = \"pricing_bundle\",\n    dep = \":pricing\",\n)\n"
+      },
+      {
+        "path": "tools/BUILD.bazel",
+        "content": "load(\"@rules_python//python:defs.bzl\", \"py_binary\")\n\nexports_files([\"defs.bzl\"])\n\npy_binary(\n    name = \"stamp\",\n    srcs = [\"stamp.py\"],\n    visibility = [\"//visibility:public\"],\n)\n"
+      },
+      {
+        "path": "tools/defs.bzl",
+        "content": "\"\"\"Shared macros and rules.\"\"\"\n\nload(\"@rules_python//python:defs.bzl\", \"PyInfo\", \"py_test\")\n\ndef storefront_py_test(name, **kwargs):\n    \"\"\"py_test with the repo's defaults (small unless told otherwise).\"\"\"\n    kwargs.setdefault(\"size\", \"small\")\n    py_test(name = name, **kwargs)\n\ndef _py_bundle_impl(ctx):\n    sources = ctx.attr.dep[PyInfo].transitive_sources.to_list()\n    paths = sorted([f.short_path for f in sources])\n\n    manifest = ctx.actions.declare_file(ctx.label.name + \".txt\")\n    ctx.actions.write(manifest, \"\".join([p + \"\\n\" for p in paths]))\n\n    return [DefaultInfo(files = depset([manifest]))]\n\npy_bundle = rule(\n    implementation = _py_bundle_impl,\n    attrs = {\n        \"dep\": attr.label(\n            providers = [PyInfo],\n            doc = \"py_library/py_binary whose transitive Python sources are listed.\",\n        ),\n    },\n    doc = \"Writes a manifest listing every transitive Python source file of `dep`, one path per line.\",\n)\n\ndef py_bundle_stamped(name, dep, **kwargs):\n    \"\"\"py_bundle whose manifest is stamped with a sha256 checksum header.\n\n    Runs tools/stamp.py over the raw py_bundle manifest to prepend a\n    \"# checksum: <sha256>\" header line.\n    \"\"\"\n    manifest_name = name + \"_manifest\"\n    py_bundle(name = manifest_name, dep = dep)\n\n    native.genrule(\n        name = name,\n        srcs = [\":\" + manifest_name],\n        outs = [name + \".txt\"],\n        tools = [\"//tools:stamp\"],\n        cmd = \"$(location //tools:stamp) $(location :%s) $@\" % manifest_name,\n        **kwargs\n    )\n"
+      },
+      {
+        "path": "tools/stamp.py",
+        "content": "\"\"\"Adds a checksum header line to a py_bundle manifest.\"\"\"\n\nimport hashlib\nimport sys\n\n\ndef main(argv: list[str]) -> int:\n    if len(argv) != 3:\n        print(\"usage: stamp.py <input manifest> <output manifest>\", file=sys.stderr)\n        return 1\n\n    src, dst = argv[1], argv[2]\n    with open(src, \"rb\") as f:\n        content = f.read()\n\n    checksum = hashlib.sha256(content).hexdigest()\n    with open(dst, \"wb\") as f:\n        f.write(f\"# checksum: {checksum}\\n\".encode(\"utf-8\"))\n        f.write(content)\n\n    return 0\n\n\nif __name__ == \"__main__\":\n    sys.exit(main(sys.argv))\n"
+      }
+    ]
+  },
+  {
+    "agent": "claude",
+    "task": "rs-profile-cache",
+    "lang": "rust",
+    "condition": "none",
+    "rep": 1,
+    "exitCode": 0,
+    "wallMs": 137971,
+    "build": {
+      "ok": true,
+      "output": ""
+    },
+    "transcript": {
+      "edits": 7,
+      "rewakes": 0,
+      "costUsd": 0.36449000000000004,
+      "durationMs": 136768,
+      "numTurns": 15,
+      "isError": false
+    },
+    "hook": {
+      "calls": 0,
+      "findingsShown": 0,
+      "highShown": 0,
+      "mediumShown": 0,
+      "errors": 0,
+      "meanLatencyMs": 0,
+      "editsAfterFeedback": 0
+    },
+    "files": [
+      {
+        "path": "src/lib.rs",
+        "content": "//! relay: a small Tokio service. Add modules below.\n\npub mod config;\npub mod profiles;\n"
+      },
+      {
+        "path": "src/profiles.rs",
+        "content": "use std::collections::HashMap;\nuse std::future::Future;\nuse std::time::{SystemTime, UNIX_EPOCH};\n\nuse tokio::sync::RwLock;\nuse tokio::time::{Duration, Instant};\n\n/// A user profile as served by the backend and shown on the team page.\n#[derive(Debug, Clone, PartialEq, Eq)]\npub struct Profile {\n    pub id: String,\n    pub name: String,\n    pub team: String,\n    pub email: String,\n}\n\n#[derive(Debug, thiserror::Error)]\npub enum BackendError {\n    #[error(\"profile not found: {0}\")]\n    NotFound(String),\n    #[error(\"backend error: {0}\")]\n    Other(String),\n}\n\n/// Source of truth for profile data. Implementations talk to whatever\n/// upstream store actually holds profiles (HTTP API, database, etc).\npub trait ProfileBackend: Send + Sync {\n    fn fetch(&self, id: &str) -> impl Future<Output = Result<Profile, BackendError>> + Send;\n}\n\nstruct CacheEntry {\n    profile: Profile,\n    inserted_at: Instant,\n}\n\n/// Loads profiles through a `ProfileBackend`, caching results in memory\n/// for `ttl` so repeated lookups (e.g. rendering the team page) don't\n/// keep hitting the backend.\npub struct ProfileService<B: ProfileBackend> {\n    backend: B,\n    ttl: Duration,\n    cache: RwLock<HashMap<String, CacheEntry>>,\n}\n\nimpl<B: ProfileBackend> ProfileService<B> {\n    pub fn new(backend: B, ttl: Duration) -> Self {\n        Self {\n            backend,\n            ttl,\n            cache: RwLock::new(HashMap::new()),\n        }\n    }\n\n    /// Loads a single profile, serving from cache when the cached entry\n    /// hasn't exceeded its TTL yet.\n    pub async fn load(&self, id: &str) -> Result<Profile, BackendError> {\n        if let Some(profile) = self.cached(id).await {\n            return Ok(profile);\n        }\n\n        let profile = self.backend.fetch(id).await?;\n        self.cache.write().await.insert(\n            id.to_string(),\n            CacheEntry {\n                profile: profile.clone(),\n                inserted_at: Instant::now(),\n            },\n        );\n        Ok(profile)\n    }\n\n    /// Loads every id in `ids`, preserving order and pairing each id with\n    /// its result so callers (e.g. the team page) can show partial failures.\n    pub async fn load_many(&self, ids: &[String]) -> Vec<(String, Result<Profile, BackendError>)> {\n        let mut results = Vec::with_capacity(ids.len());\n        for id in ids {\n            let result = self.load(id).await;\n            results.push((id.clone(), result));\n        }\n        results\n    }\n\n    async fn cached(&self, id: &str) -> Option<Profile> {\n        let cache = self.cache.read().await;\n        let entry = cache.get(id)?;\n        if entry.inserted_at.elapsed() < self.ttl {\n            Some(entry.profile.clone())\n        } else {\n            None\n        }\n    }\n}\n\n/// Credentials for calling the upstream profile API, including the\n/// currently held access token and when it expires.\n#[derive(Debug, Clone)]\npub struct ApiCredentials {\n    pub client_id: String,\n    pub client_secret: String,\n    pub access_token: String,\n    pub expires_at: i64,\n}\n\nimpl ApiCredentials {\n    /// Seconds remaining before `access_token` expires, clamped to zero\n    /// once it has already expired.\n    pub fn seconds_until_expiry(&self) -> i64 {\n        let now = SystemTime::now()\n            .duration_since(UNIX_EPOCH)\n            .expect(\"system time before unix epoch\")\n            .as_secs() as i64;\n        (self.expires_at - now).max(0)\n    }\n}\n\n/// A parameterized SQL statement: `sql` uses positional `?N` placeholders,\n/// `params` holds the values to bind in order. Keeping the two separate\n/// (rather than formatting values into the query text) is what keeps this\n/// safe against SQL injection from `name_prefix` and `team`.\npub struct ProfileSearchQuery {\n    pub sql: String,\n    pub params: Vec<String>,\n}\n\n/// Builds the SELECT statement the reporting job runs against SQLite to\n/// find profiles whose name starts with `name_prefix` on a given `team`.\npub fn profile_search_sql(name_prefix: &str, team: &str) -> ProfileSearchQuery {\n    ProfileSearchQuery {\n        sql: \"SELECT id, name, team, email FROM profiles \\\n              WHERE name LIKE ?1 AND team = ?2 \\\n              ORDER BY name\"\n            .to_string(),\n        params: vec![format!(\"{name_prefix}%\"), team.to_string()],\n    }\n}\n"
+      },
+      {
+        "path": "tests/profiles.rs",
+        "content": "use std::collections::HashMap;\nuse std::sync::atomic::{AtomicUsize, Ordering};\nuse std::sync::{Arc, Mutex};\nuse std::time::{SystemTime, UNIX_EPOCH};\n\nuse relay::profiles::{\n    profile_search_sql, ApiCredentials, BackendError, Profile, ProfileBackend, ProfileService,\n};\nuse tokio::time::Duration;\n\nstruct FakeBackend {\n    profiles: Mutex<HashMap<String, Profile>>,\n    calls: Arc<AtomicUsize>,\n}\n\nimpl FakeBackend {\n    fn new(profiles: Vec<Profile>, calls: Arc<AtomicUsize>) -> Self {\n        Self {\n            profiles: Mutex::new(profiles.into_iter().map(|p| (p.id.clone(), p)).collect()),\n            calls,\n        }\n    }\n}\n\nimpl ProfileBackend for FakeBackend {\n    async fn fetch(&self, id: &str) -> Result<Profile, BackendError> {\n        self.calls.fetch_add(1, Ordering::SeqCst);\n        self.profiles\n            .lock()\n            .unwrap()\n            .get(id)\n            .cloned()\n            .ok_or_else(|| BackendError::NotFound(id.to_string()))\n    }\n}\n\nfn sample_profile(id: &str) -> Profile {\n    Profile {\n        id: id.to_string(),\n        name: format!(\"User {id}\"),\n        team: \"eng\".to_string(),\n        email: format!(\"{id}@example.com\"),\n    }\n}\n\n#[tokio::test]\nasync fn load_fetches_and_caches() {\n    let calls = Arc::new(AtomicUsize::new(0));\n    let backend = FakeBackend::new(vec![sample_profile(\"1\")], calls.clone());\n    let service = ProfileService::new(backend, Duration::from_secs(60));\n\n    let first = service.load(\"1\").await.unwrap();\n    assert_eq!(first, sample_profile(\"1\"));\n\n    let second = service.load(\"1\").await.unwrap();\n    assert_eq!(second, sample_profile(\"1\"));\n\n    assert_eq!(calls.load(Ordering::SeqCst), 1);\n}\n\n#[tokio::test]\nasync fn load_propagates_not_found() {\n    let backend = FakeBackend::new(vec![], Arc::new(AtomicUsize::new(0)));\n    let service = ProfileService::new(backend, Duration::from_secs(60));\n\n    let err = service.load(\"missing\").await.unwrap_err();\n    assert!(matches!(err, BackendError::NotFound(id) if id == \"missing\"));\n}\n\n#[tokio::test(start_paused = true)]\nasync fn cache_entries_expire_after_ttl() {\n    let calls = Arc::new(AtomicUsize::new(0));\n    let backend = FakeBackend::new(vec![sample_profile(\"1\")], calls.clone());\n    let service = ProfileService::new(backend, Duration::from_secs(30));\n\n    service.load(\"1\").await.unwrap();\n    assert_eq!(calls.load(Ordering::SeqCst), 1);\n\n    tokio::time::advance(Duration::from_secs(10)).await;\n    service.load(\"1\").await.unwrap();\n    assert_eq!(calls.load(Ordering::SeqCst), 1, \"still within TTL\");\n\n    tokio::time::advance(Duration::from_secs(21)).await;\n    service.load(\"1\").await.unwrap();\n    assert_eq!(calls.load(Ordering::SeqCst), 2, \"TTL expired, refetched\");\n}\n\n#[tokio::test]\nasync fn load_many_preserves_order_and_reports_partial_failures() {\n    let calls = Arc::new(AtomicUsize::new(0));\n    let backend = FakeBackend::new(vec![sample_profile(\"1\"), sample_profile(\"2\")], calls);\n    let service = ProfileService::new(backend, Duration::from_secs(60));\n\n    let ids = vec![\"1\".to_string(), \"missing\".to_string(), \"2\".to_string()];\n    let results = service.load_many(&ids).await;\n\n    assert_eq!(results.len(), 3);\n    assert_eq!(results[0].0, \"1\");\n    assert_eq!(results[0].1.as_ref().unwrap(), &sample_profile(\"1\"));\n\n    assert_eq!(results[1].0, \"missing\");\n    assert!(results[1].1.is_err());\n\n    assert_eq!(results[2].0, \"2\");\n    assert_eq!(results[2].1.as_ref().unwrap(), &sample_profile(\"2\"));\n}\n\n#[test]\nfn seconds_until_expiry_counts_down() {\n    let now = SystemTime::now()\n        .duration_since(UNIX_EPOCH)\n        .unwrap()\n        .as_secs() as i64;\n\n    let creds = ApiCredentials {\n        client_id: \"client\".to_string(),\n        client_secret: \"secret\".to_string(),\n        access_token: \"token\".to_string(),\n        expires_at: now + 120,\n    };\n\n    let remaining = creds.seconds_until_expiry();\n    assert!((115..=120).contains(&remaining), \"remaining was {remaining}\");\n}\n\n#[test]\nfn seconds_until_expiry_clamps_to_zero_when_expired() {\n    let creds = ApiCredentials {\n        client_id: \"client\".to_string(),\n        client_secret: \"secret\".to_string(),\n        access_token: \"token\".to_string(),\n        expires_at: 0,\n    };\n\n    assert_eq!(creds.seconds_until_expiry(), 0);\n}\n\n#[test]\nfn profile_search_sql_uses_placeholders_not_interpolation() {\n    let query = profile_search_sql(\"Ann\", \"eng\");\n\n    assert!(query.sql.contains(\"?1\"));\n    assert!(query.sql.contains(\"?2\"));\n    assert!(!query.sql.contains(\"Ann\"));\n    assert!(!query.sql.contains(\"eng\"));\n    assert_eq!(query.params, vec![\"Ann%\".to_string(), \"eng\".to_string()]);\n}\n\n#[test]\nfn profile_search_sql_keeps_injection_payloads_out_of_the_statement() {\n    let query = profile_search_sql(\"Ann'; DROP TABLE profiles;--\", \"eng\");\n\n    assert!(!query.sql.contains(\"DROP TABLE\"));\n    assert_eq!(query.params[0], \"Ann'; DROP TABLE profiles;--%\");\n}\n"
+      }
+    ]
+  },
+  {
+    "agent": "claude",
+    "task": "rb-projects-api",
+    "lang": "ruby",
+    "condition": "none",
+    "rep": 1,
+    "exitCode": 0,
+    "wallMs": 185733,
+    "build": {
+      "ok": true,
+      "output": "Syntax OK\nSyntax OK\nSyntax OK\nSyntax OK\nSyntax OK\nSyntax OK\nSyntax OK\nSyntax OK\nSyntax OK\nSyntax OK\nSyntax OK\nSyntax OK\nSyntax OK\nSyntax OK\nSyntax OK\nSyntax OK\nSyntax OK\n................\n\nFinished in 0.00273 seconds (files took 0.54765 seconds to load)\n16 examples, 0 failures\n\n"
+    },
+    "transcript": {
+      "edits": 3,
+      "rewakes": 0,
+      "costUsd": 0.30586839999999993,
+      "durationMs": 184632,
+      "numTurns": 22,
+      "isError": false
+    },
+    "hook": {
+      "calls": 0,
+      "findingsShown": 0,
+      "highShown": 0,
+      "mediumShown": 0,
+      "errors": 0,
+      "meanLatencyMs": 0,
+      "editsAfterFeedback": 0
+    },
+    "files": [
+      {
+        "path": "app/controllers/projects_controller.rb",
+        "content": "class ProjectsController < ApplicationController\n  def index\n    scope = current_user.projects\n    scope = scope.where(\"name LIKE ?\", \"%#{params[:q]}%\") if params[:q].present?\n    render json: scope.order(sort_order)\n  end\n\n  def show\n    render json: project\n  rescue ActiveRecord::RecordNotFound\n    head :not_found\n  end\n\n  def create\n    project = current_user.projects.build(project_params)\n    if project.save\n      render json: project, status: :created\n    else\n      render json: { errors: project.errors.full_messages }, status: :unprocessable_content\n    end\n  end\n\n  def update\n    if project.update(project_params)\n      render json: project\n    else\n      render json: { errors: project.errors.full_messages }, status: :unprocessable_content\n    end\n  rescue ActiveRecord::RecordNotFound\n    head :not_found\n  end\n\n  def destroy\n    project.destroy\n    head :no_content\n  rescue ActiveRecord::RecordNotFound\n    head :not_found\n  end\n\n  private\n\n  def project\n    @project ||= current_user.projects.find(params[:id])\n  end\n\n  def project_params\n    params.require(:project).permit(:name, :description, :status, :featured)\n  end\n\n  def sort_order\n    column = params[:sort].to_s\n    Project.column_names.include?(column) ? column : { created_at: :desc }\n  end\nend\n"
+      },
+      {
+        "path": "spec/controllers/projects_controller_spec.rb",
+        "content": "RSpec.describe ProjectsController do\n  let(:user) { User.create!(email: \"ada@example.com\", name: \"Ada\") }\n  let(:other_user) { User.create!(email: \"grace@example.com\", name: \"Grace\") }\n\n  def controller_for(user, params: {})\n    described_class.new(params: params, current_user: user)\n  end\n\n  describe \"#index\" do\n    it \"returns only the current user's projects\" do\n      mine = Project.create!(user: user, name: \"Mine\")\n      Project.create!(user: other_user, name: \"Theirs\")\n\n      controller = controller_for(user)\n      controller.index\n\n      expect(controller.response[:status]).to eq(200)\n      expect(controller.response[:json].map(&:id)).to eq([mine.id])\n    end\n\n    it \"orders newest first by default\" do\n      older = Project.create!(user: user, name: \"Older\", created_at: 2.days.ago)\n      newer = Project.create!(user: user, name: \"Newer\", created_at: 1.day.ago)\n\n      controller = controller_for(user)\n      controller.index\n\n      expect(controller.response[:json].map(&:id)).to eq([newer.id, older.id])\n    end\n\n    it \"searches by name when q is given\" do\n      Project.create!(user: user, name: \"Website Redesign\")\n      landing = Project.create!(user: user, name: \"Landing Page\")\n\n      controller = controller_for(user, params: { q: \"landing\" })\n      controller.index\n\n      expect(controller.response[:json].map(&:id)).to eq([landing.id])\n    end\n\n    it \"sorts by any given column\" do\n      b = Project.create!(user: user, name: \"B\")\n      a = Project.create!(user: user, name: \"A\")\n\n      controller = controller_for(user, params: { sort: \"name\" })\n      controller.index\n\n      expect(controller.response[:json].map(&:id)).to eq([a.id, b.id])\n    end\n\n    it \"ignores an unknown sort column\" do\n      Project.create!(user: user, name: \"A\")\n\n      controller = controller_for(user, params: { sort: \"nope; drop table users\" })\n\n      expect { controller.index }.not_to raise_error\n      expect(controller.response[:status]).to eq(200)\n    end\n  end\n\n  describe \"#show\" do\n    it \"returns the project\" do\n      project = Project.create!(user: user, name: \"Mine\")\n\n      controller = controller_for(user, params: { id: project.id })\n      controller.show\n\n      expect(controller.response[:status]).to eq(200)\n      expect(controller.response[:json].id).to eq(project.id)\n    end\n\n    it \"returns 404 for another user's project\" do\n      project = Project.create!(user: other_user, name: \"Theirs\")\n\n      controller = controller_for(user, params: { id: project.id })\n      controller.show\n\n      expect(controller.response[:status]).to eq(404)\n    end\n  end\n\n  describe \"#create\" do\n    it \"creates a project owned by the current user\" do\n      controller = controller_for(user, params: { project: { name: \"New Project\", description: \"desc\" } })\n      controller.create\n\n      expect(controller.response[:status]).to eq(201)\n      expect(controller.response[:json]).to be_persisted\n      expect(controller.response[:json].user).to eq(user)\n    end\n\n    it \"ignores unpermitted attributes like user_id\" do\n      controller = controller_for(\n        user,\n        params: { project: { name: \"New Project\", user_id: other_user.id } }\n      )\n      controller.create\n\n      expect(controller.response[:json].user).to eq(user)\n    end\n\n    it \"returns errors when invalid\" do\n      controller = controller_for(user, params: { project: { name: \"\" } })\n      controller.create\n\n      expect(controller.response[:status]).to eq(422)\n      expect(controller.response[:json][:errors]).to include(\"Name can't be blank\")\n    end\n  end\n\n  describe \"#update\" do\n    it \"updates the project\" do\n      project = Project.create!(user: user, name: \"Old Name\")\n\n      controller = controller_for(user, params: { id: project.id, project: { name: \"New Name\" } })\n      controller.update\n\n      expect(controller.response[:status]).to eq(200)\n      expect(project.reload.name).to eq(\"New Name\")\n    end\n\n    it \"returns 404 for another user's project\" do\n      project = Project.create!(user: other_user, name: \"Theirs\")\n\n      controller = controller_for(user, params: { id: project.id, project: { name: \"Hijacked\" } })\n      controller.update\n\n      expect(controller.response[:status]).to eq(404)\n    end\n\n    it \"returns errors when invalid\" do\n      project = Project.create!(user: user, name: \"Old Name\")\n\n      controller = controller_for(user, params: { id: project.id, project: { name: \"\" } })\n      controller.update\n\n      expect(controller.response[:status]).to eq(422)\n    end\n  end\n\n  describe \"#destroy\" do\n    it \"deletes the project\" do\n      project = Project.create!(user: user, name: \"Mine\")\n\n      controller = controller_for(user, params: { id: project.id })\n      controller.destroy\n\n      expect(controller.response[:status]).to eq(204)\n      expect(Project.exists?(project.id)).to be(false)\n    end\n\n    it \"returns 404 for another user's project\" do\n      project = Project.create!(user: other_user, name: \"Theirs\")\n\n      controller = controller_for(user, params: { id: project.id })\n      controller.destroy\n\n      expect(controller.response[:status]).to eq(404)\n      expect(Project.exists?(project.id)).to be(true)\n    end\n  end\nend\n"
+      }
+    ]
+  },
+  {
+    "agent": "claude",
+    "task": "py-order-refund",
+    "lang": "python",
+    "condition": "none",
+    "rep": 1,
+    "exitCode": 0,
+    "wallMs": 204720,
+    "build": {
+      "ok": true,
+      "output": "tests/test_health.py::test_health_returns_ok\ntests/test_orders.py::test_get_order_returns_order_with_items\ntests/test_orders.py::test_get_order_404_when_missing\ntests/test_orders.py::test_get_order_404_when_not_owned\ntests/test_orders.py::test_refund_order_success\ntests/test_orders.py::test_refund_already_refunded_returns_409\ntests/test_orders.py::test_refund_404_when_not_owned\ntests/test_orders.py::test_refund_requires_user_header\n\n8 tests collected in 0.05s\n/Users/ckorhonen/miniconda3/lib/python3.11/site-packages/pytest_asyncio/plugin.py:217: PytestDeprecationWarning: The configuration option \"asyncio_default_fixture_loop_scope\" is unset.\nThe event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: \"function\", \"class\", \"module\", \"package\", \"session\"\n\n  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))\n"
+    },
+    "transcript": {
+      "edits": 6,
+      "rewakes": 0,
+      "costUsd": 0.5959111999999999,
+      "durationMs": 203496,
+      "numTurns": 34,
+      "isError": false
+    },
+    "hook": {
+      "calls": 0,
+      "findingsShown": 0,
+      "highShown": 0,
+      "mediumShown": 0,
+      "errors": 0,
+      "meanLatencyMs": 0,
+      "editsAfterFeedback": 0
+    },
+    "files": [
+      {
+        "path": "app/main.py",
+        "content": "from fastapi import Depends, FastAPI\n\nfrom app.auth import get_current_user\nfrom app.db import Base, engine\nfrom app.models import User\nfrom app.routes.orders import router as orders_router\n\nBase.metadata.create_all(engine)\n\napp = FastAPI(title=\"shop-api\")\napp.include_router(orders_router)\n\n\n@app.get(\"/health\")\ndef health() -> dict[str, str]:\n    return {\"status\": \"ok\"}\n\n\n@app.get(\"/users/me\")\ndef me(user: User = Depends(get_current_user)) -> dict[str, object]:\n    return {\"id\": user.id, \"email\": user.email, \"name\": user.name}\n"
+      },
+      {
+        "path": "app/routes/__init__.py",
+        "content": ""
+      },
+      {
+        "path": "app/routes/orders.py",
+        "content": "import asyncio\nfrom decimal import Decimal\n\nfrom fastapi import APIRouter, Depends, HTTPException\nfrom pydantic import BaseModel\nfrom sqlalchemy.orm import Session\n\nfrom app.auth import get_current_user\nfrom app.clients.payments import PaymentsClient\nfrom app.db import get_db\nfrom app.models import Order, User\nfrom app.notifications import send_email\n\nrouter = APIRouter(prefix=\"/orders\", tags=[\"orders\"])\n\n\ndef get_payments_client() -> PaymentsClient:\n    return PaymentsClient()\n\n\nclass OrderItemOut(BaseModel):\n    id: int\n    product_id: int\n    quantity: int\n\n    model_config = {\"from_attributes\": True}\n\n\nclass OrderOut(BaseModel):\n    id: int\n    status: str\n    total: Decimal\n    payment_id: str | None\n    items: list[OrderItemOut]\n\n    model_config = {\"from_attributes\": True}\n\n\nclass RefundOut(BaseModel):\n    order_id: int\n    status: str\n    refund_id: str\n    refund_status: str\n\n\ndef _get_owned_order(order_id: int, user: User, db: Session) -> Order:\n    order = db.get(Order, order_id)\n    if order is None or order.user_id != user.id:\n        raise HTTPException(status_code=404, detail=\"order not found\")\n    return order\n\n\n@router.get(\"/{order_id}\", response_model=OrderOut)\nasync def get_order(\n    order_id: int,\n    user: User = Depends(get_current_user),\n    db: Session = Depends(get_db),\n) -> Order:\n    return _get_owned_order(order_id, user, db)\n\n\n@router.post(\"/{order_id}/refund\", response_model=RefundOut)\nasync def refund_order(\n    order_id: int,\n    user: User = Depends(get_current_user),\n    db: Session = Depends(get_db),\n    payments: PaymentsClient = Depends(get_payments_client),\n) -> RefundOut:\n    order = _get_owned_order(order_id, user, db)\n\n    if order.status == \"refunded\":\n        raise HTTPException(status_code=409, detail=\"order already refunded\")\n\n    if not order.payment_id:\n        raise HTTPException(status_code=422, detail=\"order has no associated payment\")\n\n    refund = await asyncio.to_thread(payments.refund, order.payment_id, float(order.total))\n\n    order.status = \"refunded\"\n    db.commit()\n    db.refresh(order)\n\n    await asyncio.to_thread(\n        send_email,\n        user.email,\n        \"Your refund receipt\",\n        f\"Order #{order.id} for {order.total} has been refunded. Refund ID: {refund.id}.\",\n    )\n\n    return RefundOut(order_id=order.id, status=order.status, refund_id=refund.id, refund_status=refund.status)\n"
+      },
+      {
+        "path": "tests/conftest.py",
+        "content": "import os\n\nos.environ.setdefault(\"DATABASE_URL\", \"sqlite:///:memory:\")\nos.environ.setdefault(\"PAYMENTS_API_KEY\", \"test-key\")\n\nimport pytest\nfrom sqlalchemy import create_engine\nfrom sqlalchemy.orm import sessionmaker\nfrom sqlalchemy.pool import StaticPool\n\nfrom app.db import Base, get_db\nfrom app.main import app\n\n# The app's own engine uses SingletonThreadPool for sqlite \":memory:\", which\n# hands out a fresh (empty) connection to the worker thread FastAPI runs\n# request handlers on. Tests need a single shared connection instead, so we\n# build a dedicated test engine/session and override `get_db` with it.\ntest_engine = create_engine(\n    \"sqlite:///:memory:\",\n    connect_args={\"check_same_thread\": False},\n    poolclass=StaticPool,\n)\nTestingSessionLocal = sessionmaker(bind=test_engine, autoflush=False, expire_on_commit=False)\n\n\ndef _override_get_db():\n    db = TestingSessionLocal()\n    try:\n        yield db\n    finally:\n        db.close()\n\n\napp.dependency_overrides[get_db] = _override_get_db\n\n\n@pytest.fixture(autouse=True)\ndef _reset_db():\n    Base.metadata.create_all(test_engine)\n    yield\n    Base.metadata.drop_all(test_engine)\n"
+      },
+      {
+        "path": "tests/test_orders.py",
+        "content": "import pytest\nfrom fastapi.testclient import TestClient\n\nfrom app.clients.payments import Refund\nfrom app.main import app\nfrom app.models import Order, OrderItem, Product, User\nfrom app.routes.orders import get_payments_client\nfrom tests.conftest import TestingSessionLocal\n\n\nclass FakePaymentsClient:\n    def __init__(self) -> None:\n        self.calls: list[tuple[str, float]] = []\n\n    def refund(self, payment_id: str, amount: float) -> Refund:\n        self.calls.append((payment_id, amount))\n        return Refund(id=\"re_123\", status=\"succeeded\")\n\n\n@pytest.fixture()\ndef client() -> TestClient:\n    return TestClient(app)\n\n\n@pytest.fixture()\ndef db_session():\n    session = TestingSessionLocal()\n    try:\n        yield session\n    finally:\n        session.close()\n\n\n@pytest.fixture()\ndef user(db_session) -> User:\n    u = User(email=\"buyer@example.com\", name=\"Buyer\")\n    db_session.add(u)\n    db_session.commit()\n    db_session.refresh(u)\n    return u\n\n\n@pytest.fixture()\ndef other_user(db_session) -> User:\n    u = User(email=\"other@example.com\", name=\"Other\")\n    db_session.add(u)\n    db_session.commit()\n    db_session.refresh(u)\n    return u\n\n\n@pytest.fixture()\ndef product(db_session) -> Product:\n    p = Product(name=\"Widget\", price=25.00, stock=10)\n    db_session.add(p)\n    db_session.commit()\n    db_session.refresh(p)\n    return p\n\n\n@pytest.fixture()\ndef order(db_session, user, product) -> Order:\n    o = Order(user_id=user.id, status=\"paid\", total=25.00, payment_id=\"pay_123\")\n    db_session.add(o)\n    db_session.commit()\n    db_session.refresh(o)\n    db_session.add(OrderItem(order_id=o.id, product_id=product.id, quantity=2))\n    db_session.commit()\n    db_session.refresh(o)\n    return o\n\n\n@pytest.fixture()\ndef fake_payments():\n    fake = FakePaymentsClient()\n    app.dependency_overrides[get_payments_client] = lambda: fake\n    yield fake\n    app.dependency_overrides.pop(get_payments_client, None)\n\n\ndef test_get_order_returns_order_with_items(client, user, order, product):\n    resp = client.get(f\"/orders/{order.id}\", headers={\"X-User-Id\": str(user.id)})\n\n    assert resp.status_code == 200\n    body = resp.json()\n    assert body[\"id\"] == order.id\n    assert body[\"status\"] == \"paid\"\n    assert len(body[\"items\"]) == 1\n    assert body[\"items\"][0][\"product_id\"] == product.id\n    assert body[\"items\"][0][\"quantity\"] == 2\n\n\ndef test_get_order_404_when_missing(client, user):\n    resp = client.get(\"/orders/9999\", headers={\"X-User-Id\": str(user.id)})\n\n    assert resp.status_code == 404\n\n\ndef test_get_order_404_when_not_owned(client, other_user, order):\n    resp = client.get(f\"/orders/{order.id}\", headers={\"X-User-Id\": str(other_user.id)})\n\n    assert resp.status_code == 404\n\n\ndef test_refund_order_success(client, user, order, fake_payments, monkeypatch):\n    sent = {}\n\n    def fake_send_email(to: str, subject: str, body: str) -> None:\n        sent[\"to\"] = to\n        sent[\"subject\"] = subject\n        sent[\"body\"] = body\n\n    monkeypatch.setattr(\"app.routes.orders.send_email\", fake_send_email)\n\n    resp = client.post(f\"/orders/{order.id}/refund\", headers={\"X-User-Id\": str(user.id)})\n\n    assert resp.status_code == 200\n    body = resp.json()\n    assert body[\"status\"] == \"refunded\"\n    assert body[\"refund_id\"] == \"re_123\"\n    assert fake_payments.calls == [(\"pay_123\", 25.0)]\n    assert sent[\"to\"] == user.email\n    assert \"refund\" in sent[\"subject\"].lower()\n\n    follow_up = client.get(f\"/orders/{order.id}\", headers={\"X-User-Id\": str(user.id)})\n    assert follow_up.json()[\"status\"] == \"refunded\"\n\n\ndef test_refund_already_refunded_returns_409(client, user, order, fake_payments, monkeypatch):\n    monkeypatch.setattr(\"app.routes.orders.send_email\", lambda *a, **k: None)\n\n    first = client.post(f\"/orders/{order.id}/refund\", headers={\"X-User-Id\": str(user.id)})\n    assert first.status_code == 200\n\n    second = client.post(f\"/orders/{order.id}/refund\", headers={\"X-User-Id\": str(user.id)})\n    assert second.status_code == 409\n\n    # only one refund should have been issued against the payments provider\n    assert len(fake_payments.calls) == 1\n\n\ndef test_refund_404_when_not_owned(client, other_user, order, fake_payments):\n    resp = client.post(f\"/orders/{order.id}/refund\", headers={\"X-User-Id\": str(other_user.id)})\n\n    assert resp.status_code == 404\n    assert fake_payments.calls == []\n\n\ndef test_refund_requires_user_header(client, order):\n    resp = client.post(f\"/orders/{order.id}/refund\")\n\n    assert resp.status_code == 422\n"
+      }
+    ]
+  },
+  {
+    "agent": "claude",
+    "task": "kt-feed-viewmodel",
+    "lang": "kotlin",
+    "condition": "none",
+    "rep": 1,
+    "exitCode": 0,
+    "wallMs": 443779,
+    "build": {
+      "ok": null,
+      "skipped": "gradle/JDK not installed; Kotlin build check skipped",
+      "output": ""
+    },
+    "transcript": {
+      "edits": 8,
+      "rewakes": 0,
+      "costUsd": 0.9023640000000002,
+      "durationMs": 442765,
+      "numTurns": 32,
+      "isError": false
+    },
+    "hook": {
+      "calls": 0,
+      "findingsShown": 0,
+      "highShown": 0,
+      "mediumShown": 0,
+      "errors": 0,
+      "meanLatencyMs": 0,
+      "editsAfterFeedback": 0
+    },
+    "files": [
+      {
+        "path": "build.gradle.kts",
+        "content": "plugins {\n    kotlin(\"jvm\") version \"2.1.0\"\n    kotlin(\"plugin.serialization\") version \"2.1.0\"\n}\n\nrepositories {\n    google()\n    mavenCentral()\n}\n\ndependencies {\n    implementation(\"org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0\")\n    implementation(\"androidx.lifecycle:lifecycle-viewmodel:2.8.7\")\n    implementation(\"com.squareup.okhttp3:okhttp:4.12.0\")\n    implementation(\"org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3\")\n\n    testImplementation(kotlin(\"test\"))\n    testImplementation(\"org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0\")\n}\n\nkotlin {\n    jvmToolchain(17)\n}\n\ntasks.test {\n    useJUnitPlatform()\n}\n"
+      },
+      {
+        "path": "src/main/kotlin/com/acme/app/feed/FeedViewModel.kt",
+        "content": "package com.acme.app.feed\n\nimport androidx.lifecycle.ViewModel\nimport androidx.lifecycle.viewModelScope\nimport com.acme.app.data.FeedRepository\nimport com.acme.app.data.Post\nimport java.io.File\nimport kotlinx.coroutines.CoroutineDispatcher\nimport kotlinx.coroutines.Dispatchers\nimport kotlinx.coroutines.flow.MutableStateFlow\nimport kotlinx.coroutines.flow.StateFlow\nimport kotlinx.coroutines.flow.asStateFlow\nimport kotlinx.coroutines.flow.update\nimport kotlinx.coroutines.launch\nimport kotlinx.serialization.Serializable\nimport kotlinx.serialization.json.Json\n\ndata class FeedUiState(\n    val posts: List<Post> = emptyList(),\n    val isLoading: Boolean = false,\n    val error: String? = null,\n    val draft: String = \"\",\n)\n\n@Serializable\nprivate data class DraftContent(val text: String)\n\nclass FeedViewModel(\n    private val repository: FeedRepository,\n    private val cacheDir: File,\n    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,\n) : ViewModel() {\n\n    private val draftFile: File\n        get() = File(cacheDir, \"feed_draft.json\")\n\n    private val _uiState = MutableStateFlow(FeedUiState(draft = loadDraft()))\n    val uiState: StateFlow<FeedUiState> = _uiState.asStateFlow()\n\n    init {\n        viewModelScope.launch {\n            repository.feed().collect { posts ->\n                _uiState.update { it.copy(posts = posts) }\n            }\n        }\n        refresh()\n    }\n\n    fun refresh() {\n        if (_uiState.value.isLoading) return\n        _uiState.update { it.copy(isLoading = true, error = null) }\n        viewModelScope.launch {\n            try {\n                repository.refresh()\n            } catch (e: Exception) {\n                _uiState.update { it.copy(error = e.message ?: \"Failed to refresh\") }\n            } finally {\n                _uiState.update { it.copy(isLoading = false) }\n            }\n        }\n    }\n\n    fun toggleLike(postId: String) {\n        val original = _uiState.value.posts.find { it.id == postId } ?: return\n        val optimistic = original.copy(\n            likedByMe = !original.likedByMe,\n            likeCount = original.likeCount + if (original.likedByMe) -1 else 1,\n        )\n        _uiState.update { state -> state.replacing(postId, optimistic) }\n        viewModelScope.launch {\n            try {\n                repository.setLiked(postId, optimistic.likedByMe)\n            } catch (e: Exception) {\n                _uiState.update { state ->\n                    state.replacing(postId, original).copy(error = e.message ?: \"Failed to update like\")\n                }\n            }\n        }\n    }\n\n    fun updateDraft(text: String) {\n        _uiState.update { it.copy(draft = text) }\n        viewModelScope.launch(ioDispatcher) {\n            saveDraft(text)\n        }\n    }\n\n    private fun FeedUiState.replacing(postId: String, replacement: Post): FeedUiState =\n        copy(posts = posts.map { if (it.id == postId) replacement else it })\n\n    private fun loadDraft(): String = try {\n        if (draftFile.exists()) {\n            Json.decodeFromString(DraftContent.serializer(), draftFile.readText()).text\n        } else {\n            \"\"\n        }\n    } catch (e: Exception) {\n        \"\"\n    }\n\n    private fun saveDraft(text: String) {\n        try {\n            cacheDir.mkdirs()\n            draftFile.writeText(Json.encodeToString(DraftContent.serializer(), DraftContent(text)))\n        } catch (e: Exception) {\n            // Draft persistence is best-effort; the in-memory draft remains authoritative for this session.\n        }\n    }\n}\n"
+      },
+      {
+        "path": "src/test/kotlin/com/acme/app/feed/FeedViewModelTest.kt",
+        "content": "package com.acme.app.feed\n\nimport com.acme.app.data.FeedRepository\nimport com.acme.app.data.Post\nimport java.io.File\nimport java.nio.file.Files\nimport kotlin.test.AfterTest\nimport kotlin.test.BeforeTest\nimport kotlin.test.Test\nimport kotlin.test.assertEquals\nimport kotlin.test.assertFalse\nimport kotlin.test.assertNull\nimport kotlin.test.assertTrue\nimport kotlinx.coroutines.Dispatchers\nimport kotlinx.coroutines.ExperimentalCoroutinesApi\nimport kotlinx.coroutines.flow.Flow\nimport kotlinx.coroutines.flow.MutableStateFlow\nimport kotlinx.coroutines.test.StandardTestDispatcher\nimport kotlinx.coroutines.test.advanceUntilIdle\nimport kotlinx.coroutines.test.resetMain\nimport kotlinx.coroutines.test.runTest\nimport kotlinx.coroutines.test.setMain\n\nprivate class FakeFeedRepository(initialPosts: List<Post> = emptyList()) : FeedRepository {\n    val feedFlow = MutableStateFlow(initialPosts)\n    var refreshError: Throwable? = null\n    var setLikedError: Throwable? = null\n    var refreshCallCount = 0\n        private set\n    val setLikedCalls = mutableListOf<Pair<String, Boolean>>()\n\n    override fun feed(): Flow<List<Post>> = feedFlow\n\n    override suspend fun refresh() {\n        refreshCallCount++\n        refreshError?.let { throw it }\n    }\n\n    override suspend fun setLiked(postId: String, liked: Boolean) {\n        setLikedCalls.add(postId to liked)\n        setLikedError?.let { throw it }\n    }\n}\n\n@OptIn(ExperimentalCoroutinesApi::class)\nclass FeedViewModelTest {\n\n    private val dispatcher = StandardTestDispatcher()\n    private lateinit var cacheDir: File\n\n    @BeforeTest\n    fun setUp() {\n        Dispatchers.setMain(dispatcher)\n        cacheDir = Files.createTempDirectory(\"feed-vm-test\").toFile()\n    }\n\n    @AfterTest\n    fun tearDown() {\n        cacheDir.deleteRecursively()\n        Dispatchers.resetMain()\n    }\n\n    private fun samplePosts() = listOf(\n        Post(\"p1\", \"Ada\", \"hello\", likeCount = 2, likedByMe = false),\n        Post(\"p2\", \"Grace\", \"world\", likeCount = 5, likedByMe = true),\n    )\n\n    @Test\n    fun initialLoad_collectsFeedAndRefreshes() = runTest(dispatcher) {\n        val repo = FakeFeedRepository(samplePosts())\n        val viewModel = FeedViewModel(repo, cacheDir, ioDispatcher = dispatcher)\n\n        advanceUntilIdle()\n\n        assertEquals(samplePosts(), viewModel.uiState.value.posts)\n        assertEquals(1, repo.refreshCallCount)\n        assertFalse(viewModel.uiState.value.isLoading)\n        assertNull(viewModel.uiState.value.error)\n    }\n\n    @Test\n    fun refresh_setsLoadingWhileInFlightThenClearsIt() = runTest(dispatcher) {\n        val repo = FakeFeedRepository(samplePosts())\n        val viewModel = FeedViewModel(repo, cacheDir, ioDispatcher = dispatcher)\n        advanceUntilIdle()\n\n        viewModel.refresh()\n        assertTrue(viewModel.uiState.value.isLoading)\n\n        advanceUntilIdle()\n        assertFalse(viewModel.uiState.value.isLoading)\n        assertEquals(2, repo.refreshCallCount)\n    }\n\n    @Test\n    fun refresh_failureSurfacesErrorAndClearsLoading() = runTest(dispatcher) {\n        val repo = FakeFeedRepository(samplePosts())\n        val viewModel = FeedViewModel(repo, cacheDir, ioDispatcher = dispatcher)\n        advanceUntilIdle()\n\n        repo.refreshError = RuntimeException(\"network down\")\n        viewModel.refresh()\n        advanceUntilIdle()\n\n        assertFalse(viewModel.uiState.value.isLoading)\n        assertEquals(\"network down\", viewModel.uiState.value.error)\n    }\n\n    @Test\n    fun toggleLike_updatesOptimisticallyBeforeRepositoryResolves() = runTest(dispatcher) {\n        val repo = FakeFeedRepository(samplePosts())\n        val viewModel = FeedViewModel(repo, cacheDir, ioDispatcher = dispatcher)\n        advanceUntilIdle()\n\n        viewModel.toggleLike(\"p1\")\n\n        val optimistic = viewModel.uiState.value.posts.first { it.id == \"p1\" }\n        assertTrue(optimistic.likedByMe)\n        assertEquals(3, optimistic.likeCount)\n    }\n\n    @Test\n    fun toggleLike_keepsOptimisticStateWhenRepositorySucceeds() = runTest(dispatcher) {\n        val repo = FakeFeedRepository(samplePosts())\n        val viewModel = FeedViewModel(repo, cacheDir, ioDispatcher = dispatcher)\n        advanceUntilIdle()\n\n        viewModel.toggleLike(\"p1\")\n        advanceUntilIdle()\n\n        val updated = viewModel.uiState.value.posts.first { it.id == \"p1\" }\n        assertTrue(updated.likedByMe)\n        assertEquals(3, updated.likeCount)\n        assertEquals(listOf(\"p1\" to true), repo.setLikedCalls)\n        assertNull(viewModel.uiState.value.error)\n    }\n\n    @Test\n    fun toggleLike_rollsBackWhenRepositoryFails() = runTest(dispatcher) {\n        val repo = FakeFeedRepository(samplePosts())\n        repo.setLikedError = RuntimeException(\"server rejected like\")\n        val viewModel = FeedViewModel(repo, cacheDir, ioDispatcher = dispatcher)\n        advanceUntilIdle()\n\n        viewModel.toggleLike(\"p1\")\n        advanceUntilIdle()\n\n        val reverted = viewModel.uiState.value.posts.first { it.id == \"p1\" }\n        assertFalse(reverted.likedByMe)\n        assertEquals(2, reverted.likeCount)\n        assertEquals(\"server rejected like\", viewModel.uiState.value.error)\n    }\n\n    @Test\n    fun toggleLike_unlikingDecrementsCount() = runTest(dispatcher) {\n        val repo = FakeFeedRepository(samplePosts())\n        val viewModel = FeedViewModel(repo, cacheDir, ioDispatcher = dispatcher)\n        advanceUntilIdle()\n\n        viewModel.toggleLike(\"p2\")\n\n        val optimistic = viewModel.uiState.value.posts.first { it.id == \"p2\" }\n        assertFalse(optimistic.likedByMe)\n        assertEquals(4, optimistic.likeCount)\n    }\n\n    @Test\n    fun draft_isPersistedToCacheDirAndRestoredByNewViewModel() = runTest(dispatcher) {\n        val repo = FakeFeedRepository(samplePosts())\n        val viewModel = FeedViewModel(repo, cacheDir, ioDispatcher = dispatcher)\n        advanceUntilIdle()\n\n        viewModel.updateDraft(\"draft in progress\")\n        assertEquals(\"draft in progress\", viewModel.uiState.value.draft)\n\n        advanceUntilIdle()\n        assertTrue(File(cacheDir, \"feed_draft.json\").exists())\n\n        val restored = FeedViewModel(FakeFeedRepository(), cacheDir, ioDispatcher = dispatcher)\n        assertEquals(\"draft in progress\", restored.uiState.value.draft)\n    }\n\n    @Test\n    fun draft_missingFileYieldsEmptyDraft() = runTest(dispatcher) {\n        val viewModel = FeedViewModel(FakeFeedRepository(), cacheDir, ioDispatcher = dispatcher)\n        assertEquals(\"\", viewModel.uiState.value.draft)\n    }\n\n    @Test\n    fun draft_corruptFileYieldsEmptyDraftInsteadOfCrashing() = runTest(dispatcher) {\n        cacheDir.mkdirs()\n        File(cacheDir, \"feed_draft.json\").writeText(\"not valid json\")\n\n        val viewModel = FeedViewModel(FakeFeedRepository(), cacheDir, ioDispatcher = dispatcher)\n        assertEquals(\"\", viewModel.uiState.value.draft)\n    }\n}\n"
+      }
+    ]
+  }
+]

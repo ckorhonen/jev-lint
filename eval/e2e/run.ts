@@ -7,6 +7,7 @@ import { spawn, spawnSync } from "node:child_process";
 import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, statSync, symlinkSync, writeFileSync } from "node:fs";
 import { join, relative } from "node:path";
 import { parseArgs } from "node:util";
+import { isLegacy, type Lang, type PackLang, packBuildCheck, packSourceFiles } from "./languages";
 
 const REPO = join(import.meta.dir, "../..");
 const E2E_ROOT = process.env.E2E_ROOT ?? join(process.env.TMPDIR ?? "/tmp", "jev-lint-e2e");
@@ -25,7 +26,8 @@ const { values: args } = parseArgs({
 });
 
 // scaffold defaults to lang; "react" is a TypeScript scaffold with React types installed.
-type Task = { id: string; lang: "typescript" | "swift"; scaffold?: string; prompt: string };
+// python, ruby, kotlin, rust and bazel tasks (tasks.packs.json) use eval/e2e/languages.ts.
+type Task = { id: string; lang: Lang; scaffold?: string; prompt: string };
 // Conditions: which judge, and whether the hook blocks the agent (sync) or runs in the
 // background and wakes it with findings (Claude Code `asyncRewake`; Codex has no rewake).
 type Condition = "none" | "jev" | "jev-high" | "jev-rewake" | "kev-rewake";
@@ -150,7 +152,8 @@ function runClaude(task: Task, condition: Condition, runDir: string, workDir: st
   });
 }
 
-function sourceFiles(workDir: string, lang: Task["lang"]) {
+function sourceFiles(workDir: string, lang: Task["lang"], scaffold: string) {
+  if (!isLegacy(lang)) return packSourceFiles(workDir, scaffold, lang as PackLang);
   const root = join(workDir, lang === "typescript" ? "src" : "Sources/App");
   const ext = lang === "typescript" ? /\.(ts|tsx)$/ : /\.swift$/;
   const files: string[] = [];
@@ -167,6 +170,7 @@ function sourceFiles(workDir: string, lang: Task["lang"]) {
 }
 
 function buildCheck(workDir: string, lang: Task["lang"]) {
+  if (!isLegacy(lang)) return packBuildCheck(workDir, lang as PackLang);
   const result =
     lang === "typescript"
       ? spawnSync(join(REPO, "node_modules/.bin/tsc"), ["--noEmit", "-p", workDir], { encoding: "utf8" })
@@ -250,12 +254,16 @@ async function runOne(task: Task, condition: Condition, rep: number) {
   const workDir = join(runDir, "work");
   mkdirSync(runDir, { recursive: true });
   const scaffold = join(REPO, "eval/e2e/scaffold", task.scaffold ?? task.lang);
-  cpSync(scaffold, workDir, { recursive: true, filter: (src) => !src.includes("node_modules") && !src.includes(".build") });
+  cpSync(scaffold, workDir, {
+    recursive: true,
+    filter: (src) => !src.includes("node_modules") && !src.includes(".build") && !src.includes("__pycache__"),
+  });
   if (existsSync(join(scaffold, "node_modules"))) symlinkSync(join(scaffold, "node_modules"), join(workDir, "node_modules"));
 
   const claude =
     args.agent === "codex" ? await runCodex(task, condition, runDir, workDir) : await runClaude(task, condition, runDir, workDir);
-  const files = sourceFiles(workDir, task.lang).map((f) => ({ path: relative(workDir, f), content: readFileSync(f, "utf8") }));
+  const files = sourceFiles(workDir, task.lang, scaffold).map((f) => ({ path: relative(workDir, f), content: readFileSync(f, "utf8") }));
+  const build = buildCheck(workDir, task.lang);
   const result = {
     agent: args.agent,
     task: task.id,
@@ -264,14 +272,14 @@ async function runOne(task: Task, condition: Condition, rep: number) {
     rep,
     exitCode: claude.exitCode,
     wallMs: claude.wallMs,
-    build: buildCheck(workDir, task.lang),
+    build,
     transcript: transcriptStats(runDir),
     hook: hookStats(runDir),
     files,
   };
   writeFileSync(join(runDir, "result.json"), JSON.stringify(result, null, 2));
   console.error(
-    `done ${task.id} ${condition} r${rep}: build=${result.build.ok} cost=$${result.transcript.costUsd.toFixed(2)} hookFindings=${result.hook.findingsShown}`,
+    `done ${task.id} ${condition} r${rep}: build=${"skipped" in build ? "skipped" : build.ok} files=${files.length} cost=$${result.transcript.costUsd.toFixed(2)} hookFindings=${result.hook.findingsShown}`,
   );
   return result;
 }

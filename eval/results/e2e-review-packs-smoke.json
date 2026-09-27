@@ -1,0 +1,215 @@
+[
+  {
+    "task": "rs-profile-cache",
+    "lang": "rust",
+    "condition": "none",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "src/profiles.rs",
+        "line": 96,
+        "severity": "medium",
+        "title": "Debug output exposes credentials",
+        "explanation": "Deriving `Debug` prints `client_secret` and `access_token`, so logging or panic diagnostics that format this value can leak credentials.",
+        "rule": "rs-debug-derive-secret",
+        "jevProbability": 0.97
+      },
+      {
+        "file": "src/profiles.rs",
+        "line": 61,
+        "severity": "medium",
+        "title": "Concurrent cache misses duplicate backend requests",
+        "explanation": "The cache lock is released before fetching, so simultaneous misses for the same ID all call the backend instead of sharing one in-flight result.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/profiles.rs",
+        "line": 74,
+        "severity": "medium",
+        "title": "Batch loads run serially",
+        "explanation": "Awaiting each ID in sequence makes `load_many` latency the sum of backend request times even when requests could run concurrently.",
+        "rule": "rs-perf-sequential-awaits",
+        "jevProbability": 0.74
+      },
+      {
+        "file": "src/profiles.rs",
+        "line": 83,
+        "severity": "medium",
+        "title": "Expired cache entries are never removed",
+        "explanation": "Expired entries are treated as misses but remain in the map indefinitely, causing memory usage to grow without bound as distinct IDs are requested.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/profiles.rs",
+        "line": 112,
+        "severity": "medium",
+        "title": "Expiry subtraction can overflow",
+        "explanation": "Subtracting the current timestamp from an arbitrary `i64` expiry can overflow for extreme values and panic in debug builds.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/profiles.rs",
+        "line": 133,
+        "severity": "medium",
+        "title": "LIKE metacharacters are not escaped",
+        "explanation": "Although values are bound safely against SQL injection, `%` and `_` in `name_prefix` remain SQL wildcards, so the query does not enforce literal prefix matching.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "rb-projects-api",
+    "lang": "ruby",
+    "condition": "none",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "spec/controllers/projects_controller_spec.rb",
+        "line": 6,
+        "severity": "high",
+        "title": "Controller is instantiated outside the Rails request lifecycle",
+        "explanation": "`ActionController` controllers do not accept `params:` or `current_user:` as constructor keywords, so this helper raises before the actions can be tested, and directly invoking actions also bypasses request/response setup.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "spec/controllers/projects_controller_spec.rb",
+        "line": 17,
+        "severity": "high",
+        "title": "Specs read response using a nonexistent JSON accessor",
+        "explanation": "Rails responses expose status through `response.status` and rendered JSON through the response body, not `response[:status]` or `response[:json]`, so these assertions cannot work with a standard Rails controller response.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "kt-feed-viewmodel",
+    "lang": "kotlin",
+    "condition": "none",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "src/main/kotlin/com/acme/app/feed/FeedViewModel.kt",
+        "line": 37,
+        "severity": "medium",
+        "title": "Draft file is read synchronously during ViewModel construction",
+        "explanation": "`loadDraft()` performs filesystem I/O on the caller thread, which is commonly the Android main thread and can block UI startup for a slow or large cache file.",
+        "rule": "kt-blocking-call-not-main-safe",
+        "jevProbability": 0.59
+      },
+      {
+        "file": "src/main/kotlin/com/acme/app/feed/FeedViewModel.kt",
+        "line": 83,
+        "severity": "medium",
+        "title": "Concurrent draft saves can persist stale text",
+        "explanation": "Each edit launches an independent write on the I/O dispatcher, so an earlier, slower write can finish after a later one and leave the older draft on disk.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/main/kotlin/com/acme/app/feed/FeedViewModel.kt",
+        "line": 55,
+        "severity": "medium",
+        "title": "Cancellation is handled as an ordinary refresh failure",
+        "explanation": "Catching `Exception` also catches `CancellationException`, so cancelling the ViewModel coroutine can incorrectly set an error instead of propagating cancellation (the same issue occurs in the like handler at line 73).",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "src/main/kotlin/com/acme/app/feed/FeedViewModel.kt",
+        "line": 64,
+        "severity": "medium",
+        "title": "Overlapping like requests can roll back newer state",
+        "explanation": "Each request captures a post snapshot and restores it on failure, so if the user toggles the same post again before an earlier request fails, that stale rollback can discard the newer optimistic change.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "py-order-refund",
+    "lang": "python",
+    "condition": "none",
+    "rep": 1,
+    "findings": [
+      {
+        "file": "app/main.py",
+        "line": 8,
+        "severity": "medium",
+        "title": "Database schema creation runs during import",
+        "explanation": "Calling `create_all` at module import blocks imports and test collection, requires the database to be reachable before the app can start, and bypasses the normal migration/startup lifecycle.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/routes/orders.py",
+        "line": 54,
+        "severity": "medium",
+        "title": "Synchronous database calls block async handlers",
+        "explanation": "These `async` endpoints use a synchronous SQLAlchemy `Session` for queries and commits, so database I/O can block the event loop and reduce request concurrency.",
+        "rule": "py-sync-client-in-async",
+        "jevProbability": 0.69
+      },
+      {
+        "file": "app/routes/orders.py",
+        "line": 77,
+        "severity": "medium",
+        "title": "Converting refund amounts to float risks monetary inaccuracies",
+        "explanation": "Converting a `Decimal` amount to binary floating point can change the amount sent to the payment provider, so use the provider's exact decimal or integer-minor-unit representation.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/routes/orders.py",
+        "line": 77,
+        "severity": "high",
+        "title": "Concurrent refund requests can charge twice",
+        "explanation": "Two requests can both pass the status check before either records the refund, then both call the provider; serialize or atomically claim the refund before making the external call, with an idempotency key.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/routes/orders.py",
+        "line": 71,
+        "severity": "medium",
+        "title": "Refund eligibility is not checked",
+        "explanation": "The endpoint rejects only already-refunded orders, so orders in other ineligible states can still be sent to the payment provider for a refund.",
+        "rule": "none",
+        "jevProbability": 0
+      },
+      {
+        "file": "app/routes/orders.py",
+        "line": 83,
+        "severity": "medium",
+        "title": "Email failure turns a completed refund into a failed response",
+        "explanation": "The refund is committed before sending email, so an email exception returns an error even though the refund succeeded, and retrying then receives 409 without delivering the receipt.",
+        "rule": "none",
+        "jevProbability": 0
+      }
+    ],
+    "jevOnly": []
+  },
+  {
+    "task": "bzl-bundle-rule",
+    "lang": "bazel",
+    "condition": "none",
+    "rep": 1,
+    "findings": [],
+    "jevOnly": [
+      {
+        "file": "tools/defs.bzl",
+        "rule": "bzl-depset-flatten-in-impl",
+        "jevProbability": 0.91,
+        "graderConfirms": true
+      }
+    ]
+  }
+]
