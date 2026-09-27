@@ -1,0 +1,14 @@
+{
+  "language": "rust",
+  "extensions": [".rs"],
+  "rules": [
+    {
+      "id": "rs-perf-sequential-awaits",
+      "question": "Does `added_code` `.await` independent futures one after another — a `for` loop that does `client.get(url).send().await` per item, or two or more consecutive `.await`s whose inputs don't depend on each other — where `tokio::join!`, `futures::future::join_all`/`try_join_all` or `FuturesUnordered`/`buffer_unordered` could run them concurrently?",
+      "true": "Independent futures are awaited serially when they could run concurrently.",
+      "false": "Each future needs the previous result; order matters (sequential writes, a rate limit with a comment, a transaction); futures are already joined or buffered; or the loop has a small fixed bound with a comment.",
+      "fix": "Run the independent futures concurrently with `join!`, `try_join_all`, or a bounded `buffer_unordered`.",
+      "when": ["\\.await\\b"]
+    }
+  ]
+}

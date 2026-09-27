@@ -1,0 +1,124 @@
+{
+  "py-test-cannot-fail": {
+    "evidence": [
+      {
+        "grade": "A",
+        "url": "rules/typescript.practices.json ts-test-cannot-fail; rules/swift.practices.json swift-test-cannot-fail",
+        "checked": "2026-09-27",
+        "note": "Same pattern is already validated as a built-in in this repo (holdout 12/12, no false alarms, 2026-09-27 per best-practices/python.md and ruby.md)."
+      },
+      {
+        "grade": "C",
+        "url": "https://arxiv.org/abs/2510.20270",
+        "checked": "2026-09-27",
+        "note": "ImpossibleBench (Zhong, Raghunathan, Carlini, 2025): coding agents delete or edit failing tests instead of fixing code."
+      }
+    ],
+    "whyNotLinter": "PT/pytest-style ruff rules check assertion syntax, not whether the assertion depends on the code under test.",
+    "aiRelevance": "High: agents write tests that assert on their own mocks; the TS/Swift built-ins confirm Jev can judge it.",
+    "expectedNoise": "low (per the TS/Swift built-in holdout).",
+    "languageFile": "python"
+  },
+  "py-test-fixed-sleep": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://mir.cs.illinois.edu/lamyaa/publications/fse14.pdf",
+        "checked": "2026-09-27",
+        "note": "Luo et al., FSE 2014, 161 flaky-test fix commits: Async Wait 45% (34% use a fixed time delay; 54% fixed with waitFor), Concurrency 20%, Test Order Dependency 12% (74% fixed by cleaning shared state)."
+      }
+    ],
+    "whyNotLinter": "Ruff ASYNC251 only flags blocking `time.sleep` inside async functions, not waits in tests; telling a deadline-bounded poll from a bare wait needs judgment.",
+    "aiRelevance": "Same agent failure mode as the TS/Swift variants: lengthen a sleep until the flaky test passes locally.",
+    "expectedNoise": "low",
+    "languageFile": "python",
+    "notes": "Evidence is one B (Luo); add an official pytest/asyncio citation before shipping."
+  },
+  "py-test-error-path-passes-silently": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://docs.pytest.org/en/stable/how-to/assert.html#assertions-about-expected-exceptions",
+        "checked": "2026-09-27 (cited, page not fetched)",
+        "note": "Use pytest.raises to assert that code raises."
+      },
+      {
+        "grade": "C",
+        "url": "https://arxiv.org/abs/2606.18168",
+        "checked": "2026-09-27",
+        "note": "Banik et al. (preprint, Jun 2026), 86,156 agent-authored test-file patches (Codex, Copilot, Devin, Cursor, Claude Code): 80.2% weak/no oracle; W1 no-assertion 24-85% by agent; W2 existence-only 0-0.4%; W4 mock-only 0-4%; W5 snapshot-only 0-4%."
+      }
+    ],
+    "whyNotLinter": "Ruff PT017 (opt-in) flags assertions inside `except` but not `except …: pass` expected-error tests, and needs the test's intent to separate them from cleanup handlers.",
+    "aiRelevance": "Agents write `try: f(); except ValueError: pass` 'tests' that pass whether or not f raises.",
+    "expectedNoise": "low",
+    "languageFile": "python"
+  },
+  "py-test-title-contradicts-assertions": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://arxiv.org/abs/2510.20270",
+        "checked": "2026-09-27",
+        "note": "ImpossibleBench (ICLR 2026): agents pass impossible tests by modifying/deleting tests, special-casing test inputs, operator overloading, state recording; Claude models mostly modify tests; cheating rates up to 92% (GPT-5, one variant)."
+      },
+      {
+        "grade": "B",
+        "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices",
+        "checked": "2026-09-27 (search summary)",
+        "note": "Vendor guidance on agent behavior: models sometimes hard-code values or special-case test inputs; ask for general solutions that 'work for all valid inputs, not just test cases'. Read via search summary, not fetched in full."
+      },
+      {
+        "grade": "C",
+        "url": "https://arxiv.org/abs/2410.21136",
+        "checked": "2026-09-27 (cited, page not fetched)",
+        "note": "Konstantinou et al.: LLM-generated oracles tend to encode actual (possibly buggy) behaviour rather than expected behaviour (cited via Banik et al. ref [9])."
+      }
+    ],
+    "whyNotLinter": "Natural-language intent vs. assertion semantics; no linter can compare them.",
+    "aiRelevance": "As for the TypeScript variant.",
+    "expectedNoise": "low-med",
+    "languageFile": "python"
+  },
+  "py-test-shared-mutable-state": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://mir.cs.illinois.edu/lamyaa/publications/fse14.pdf",
+        "checked": "2026-09-27",
+        "note": "Luo et al., FSE 2014, 161 flaky-test fix commits: Async Wait 45% (34% use a fixed time delay; 54% fixed with waitFor), Concurrency 20%, Test Order Dependency 12% (74% fixed by cleaning shared state)."
+      },
+      {
+        "grade": "B",
+        "url": "https://playwright.dev/docs/best-practices",
+        "checked": "2026-09-27",
+        "note": "Make tests isolated (each test independent, own storage/data); use web-first assertions and auto-waiting locators instead of manual waits."
+      }
+    ],
+    "whyNotLinter": "No Ruff/Pylint rule tracks which tests mutate shared state.",
+    "aiRelevance": "As for the TypeScript variant; agents also widen fixture scope to 'session' to speed up tests without making them read-only.",
+    "expectedNoise": "low-med",
+    "languageFile": "python",
+    "notes": "playwright_bp is a cross-language principle citation; pytest fixture-scope docs would be the better B source (not fetched)."
+  },
+  "py-test-special-case-in-source": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://arxiv.org/abs/2510.20270",
+        "checked": "2026-09-27",
+        "note": "ImpossibleBench (ICLR 2026): agents pass impossible tests by modifying/deleting tests, special-casing test inputs, operator overloading, state recording; Claude models mostly modify tests; cheating rates up to 92% (GPT-5, one variant)."
+      },
+      {
+        "grade": "B",
+        "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices",
+        "checked": "2026-09-27 (search summary)",
+        "note": "Vendor guidance on agent behavior: models sometimes hard-code values or special-case test inputs; ask for general solutions that 'work for all valid inputs, not just test cases'. Read via search summary, not fetched in full."
+      }
+    ],
+    "whyNotLinter": "As for the TypeScript variant.",
+    "aiRelevance": "As for the TypeScript variant.",
+    "expectedNoise": "low-med",
+    "languageFile": "python"
+  }
+}

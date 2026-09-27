@@ -1,0 +1,1515 @@
+{
+  "swiftui-observedobject-owned": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "swiftui-state-not-private": {
+    "precision": 1,
+    "recall": 0.8,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "swiftui-expensive-body": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 6,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "swiftui-task-in-onappear": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "swift-escaping-closure-retain-cycle": {
+    "precision": 1,
+    "recall": 0.8571428571428571,
+    "precisionAtHigh": 1,
+    "positives": 7,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "swift-blocking-main-thread": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "swift-continuation-misuse": {
+    "precision": 0.7857142857142857,
+    "recall": 0.8461538461538461,
+    "precisionAtHigh": 0.8,
+    "positives": 13,
+    "falsePositives": 3,
+    "pass": false,
+    "reasons": [
+      "precision at p\u22650.8 80%"
+    ]
+  },
+  "swift-unprotected-shared-state": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "swiftui-foreach-unstable-id": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "swift-dispatch-in-async": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 6,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "swift-continuation-cancellation": {
+    "precision": 0.9230769230769231,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 12,
+    "falsePositives": 1,
+    "pass": true,
+    "reasons": []
+  },
+  "swift-continuation-stored-overwrite": {
+    "precision": 0.9,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 9,
+    "falsePositives": 1,
+    "pass": true,
+    "reasons": []
+  },
+  "swift-actor-reentrancy-stale-state": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "swift-unchecked-sendable-unsynchronized": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 4,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "swift-cancellation-swallowed-in-loop": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "swift-unstructured-task-in-async-context": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "swift-asyncstream-missing-ontermination": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "swift-observation-tracking-one-shot": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 4,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "swiftui-state-default-heavy-init": {
+    "precision": 0.8,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 4,
+    "falsePositives": 1,
+    "pass": true,
+    "reasons": []
+  },
+  "react-derived-state-effect": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "react-effect-missing-cleanup": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 6,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "react-effect-fetch-race": {
+    "precision": 0.7647058823529411,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 13,
+    "falsePositives": 4,
+    "pass": true,
+    "reasons": []
+  },
+  "react-effect-for-event": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "react-state-mutation": {
+    "precision": 1,
+    "recall": 0.8333333333333334,
+    "precisionAtHigh": 1,
+    "positives": 6,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "react-index-key": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "react-props-mirrored-in-state": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "ts-unvalidated-external-data": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 8,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "ts-sequential-await-loop": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "ts-boolean-trap": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 6,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "react-async-overlap": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 10,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "ts-secret-in-public-env": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "ts-secret-env-fallback": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 4,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "ts-insecure-random-secret": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 4,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "ts-secret-compare-not-constant-time": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 6,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "ts-jwt-decode-without-verify": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 4,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "ts-sql-interpolated-raw-query": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 4,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "ts-shell-command-interpolation": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "ts-regexp-from-input": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 4,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "ts-open-redirect": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 4,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "react-server-action-missing-auth": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "react-server-action-client-identity": {
+    "precision": 1,
+    "recall": 0.8333333333333334,
+    "precisionAtHigh": 1,
+    "positives": 6,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "react-server-action-returns-record": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "react-effect-notifies-parent": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 4,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "react-use-uncached-promise": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 4,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "react-unsanitized-html": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "react-hydration-unsafe-render": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "react-useformstatus-same-component": {
+    "precision": 1,
+    "recall": 0.75,
+    "precisionAtHigh": 1,
+    "positives": 4,
+    "falsePositives": 0,
+    "pass": false,
+    "reasons": [
+      "recall at p\u22650.5 75%"
+    ]
+  },
+  "react-transition-state-after-await": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 4,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "react-lazy-initial-state": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "py-test-cannot-fail": {
+    "precision": 1,
+    "recall": 0.8571428571428571,
+    "precisionAtHigh": 1,
+    "positives": 7,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "py-test-fixed-sleep": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 4,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "py-test-error-path-passes-silently": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 4,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "py-test-title-contradicts-assertions": {
+    "precision": 0.8,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 4,
+    "falsePositives": 1,
+    "pass": true,
+    "reasons": []
+  },
+  "py-test-shared-mutable-state": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 4,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "py-test-special-case-in-source": {
+    "precision": 0.8,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 4,
+    "falsePositives": 1,
+    "pass": true,
+    "reasons": []
+  },
+  "py-test-real-clock": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "py-test-uncontrolled-randomness": {
+    "precision": 1,
+    "recall": 0.8,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "py-test-real-network": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "py-test-unordered-assertion": {
+    "precision": 0.8333333333333334,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 1,
+    "pass": true,
+    "reasons": []
+  },
+  "rb-unscoped-find": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "rb-sql-interpolation": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "rb-side-effect-before-commit": {
+    "precision": 0.8333333333333334,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 1,
+    "pass": true,
+    "reasons": []
+  },
+  "rb-privileged-attrs-permitted": {
+    "precision": 1,
+    "recall": 0.8,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "rb-line-anchor-validation-regex": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 4,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "rb-read-modify-write-race": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "rb-memoize-nil-or-false": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "rb-rescue-swallowed": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "kt-unscoped-coroutine": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 6,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "kt-blocking-call-not-main-safe": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 4,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "kt-runblocking-in-app-code": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "kt-catch-swallows-cancellation": {
+    "precision": 0.8333333333333334,
+    "recall": 1,
+    "precisionAtHigh": 0.8333333333333334,
+    "positives": 5,
+    "falsePositives": 1,
+    "pass": false,
+    "reasons": [
+      "precision at p\u22650.8 83%"
+    ]
+  },
+  "kt-flow-emit-wrong-context": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 4,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "kt-exposed-mutable-state": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "kt-state-mutated-in-place": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 4,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "kt-collect-without-lifecycle": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "kt-viewmodel-holds-context": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "kt-compose-side-effect-in-composition": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "swift-no-force-unwrap": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 4,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "swift-no-force-try": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 4,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "swift-no-force-cast": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 4,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "swift-no-debug-print": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 4,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "swift-no-empty-catch": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 4,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "swift-no-restating-comment": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 4,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "swift-no-vague-names": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "swift-no-magic-numbers": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 4,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "swift-no-commented-out-code": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 4,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "swift-no-bare-todo": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 4,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "swift-no-hardcoded-secret": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 4,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "swift-ui-off-main": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "swift-prefer-guard": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 4,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "bzl-test-disabled-silently": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 6,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "bzl-test-size-mismatch": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "kt-perf-sequential-suspend-calls": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "bzl-public-visibility": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 6,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "bzl-nonhermetic-action": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 7,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "bzl-genrule-tool-in-srcs": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "bzl-sandbox-opt-out-unexplained": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "bzl-macro-fixed-target-names": {
+    "precision": 1,
+    "recall": 0.6,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": false,
+    "reasons": [
+      "recall at p\u22650.5 60%"
+    ]
+  },
+  "bzl-depset-flatten-in-impl": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 4,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "py-perf-orm-query-in-loop": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 6,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "py-perf-orm-write-in-loop": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "py-perf-sequential-awaits": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "py-perf-unbounded-gather": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "rb-test-cannot-fail": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 7,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "rb-test-fixed-sleep": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "swift-test-cannot-fail": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 12,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "swift-test-fixed-sleep": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 6,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "swift-test-error-path-passes-silently": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "swift-test-unawaited-task": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 4,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "swift-test-real-clock": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "swift-test-uncontrolled-randomness": {
+    "precision": 1,
+    "recall": 0.6,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": false,
+    "reasons": [
+      "recall at p\u22650.5 60%"
+    ]
+  },
+  "swift-test-real-network": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "swift-test-unordered-assertion": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "kt-test-cannot-fail": {
+    "precision": 0.6666666666666666,
+    "recall": 1,
+    "precisionAtHigh": 0.8,
+    "positives": 4,
+    "falsePositives": 2,
+    "pass": false,
+    "reasons": [
+      "precision at p\u22650.8 80%",
+      "precision at p\u22650.5 67%"
+    ]
+  },
+  "kt-test-error-path-passes-silently": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "kt-test-launch-without-advance": {
+    "precision": 1,
+    "recall": 0.8,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "kt-test-real-clock": {
+    "precision": 1,
+    "recall": 0.6666666666666666,
+    "precisionAtHigh": 1,
+    "positives": 6,
+    "falsePositives": 0,
+    "pass": false,
+    "reasons": [
+      "recall at p\u22650.5 67%"
+    ]
+  },
+  "kt-test-uncontrolled-randomness": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "kt-test-real-network": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 4,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "kt-test-unordered-assertion": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 4,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "ts-test-cannot-fail": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 12,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "ts-test-fixed-sleep": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "ts-test-title-contradicts-assertions": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 7,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "ts-test-shared-mutable-state": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "ts-test-special-case-in-source": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "ts-test-real-clock": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "ts-test-uncontrolled-randomness": {
+    "precision": 1,
+    "recall": 0.8,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "ts-test-real-network": {
+    "precision": 0.8333333333333334,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 1,
+    "pass": true,
+    "reasons": []
+  },
+  "ts-test-unordered-assertion": {
+    "precision": 0.75,
+    "recall": 0.75,
+    "precisionAtHigh": 1,
+    "positives": 4,
+    "falsePositives": 1,
+    "pass": false,
+    "reasons": [
+      "recall at p\u22650.5 75%"
+    ]
+  },
+  "rs-test-cannot-fail": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "rb-perf-n-plus-one": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "py-sync-client-in-async": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 4,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "py-async-session-shared-concurrently": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 4,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "py-swallowed-cancellation": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 4,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "py-unscoped-object-lookup": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 4,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "py-secret-compare-eq": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 4,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "py-side-effect-in-transaction": {
+    "precision": 0.8,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 4,
+    "falsePositives": 1,
+    "pass": true,
+    "reasons": []
+  },
+  "py-read-modify-write-race": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 4,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "py-pydantic-construct-bypass": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 4,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "swift-perf-formatter-per-call": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "swift-perf-sequential-awaits": {
+    "precision": 0.8333333333333334,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 1,
+    "pass": true,
+    "reasons": []
+  },
+  "ts-no-explicit-any": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 4,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "ts-no-non-null-assertion": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 4,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "ts-no-empty-catch": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 4,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "ts-no-debug-console": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 4,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "ts-no-restating-comment": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 6,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "ts-no-vague-names": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 4,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "ts-no-magic-numbers": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "ts-no-commented-out-code": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 4,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "ts-no-bare-todo": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "ts-no-hardcoded-secret": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 4,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "ts-no-ts-ignore": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 3,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "rs-perf-sequential-awaits": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "ts-perf-query-per-item": {
+    "precision": 0.8333333333333334,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 1,
+    "pass": true,
+    "reasons": []
+  },
+  "ts-perf-sync-io-in-handler": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 4,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "ts-perf-unbounded-list-query": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "ts-perf-linear-lookup-in-loop": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": false,
+    "reasons": [
+      "real-code dry run: p=0.91 false alarm on a Levenshtein loop (SchoolLookup accreditation-matching.ts); C-grade evidence only"
+    ]
+  },
+  "ts-perf-unbounded-fan-out": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "rs-blocking-call-in-async": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "rs-select-cancel-unsafe": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 4,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "rs-spawned-task-error-lost": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "rs-unsigned-subtraction-underflow": {
+    "precision": 1,
+    "recall": 0.8,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "rs-unchecked-unsafe-on-unvalidated": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 4,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "rs-debug-derive-secret": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "rs-sql-built-with-format": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "rs-http-client-per-call": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "language": "swift",
+  "extensions": [".swift"],
+  "rules": [
+    {
+      "id": "swift-perf-formatter-per-call",
+      "question": "Does `added_code` create a `DateFormatter`, `NumberFormatter`, `ISO8601DateFormatter`, `DateComponentsFormatter`, `MeasurementFormatter`, `ByteCountFormatter`, a configured `JSONDecoder`/`JSONEncoder`, or `NSRegularExpression` inside a loop, inside a `map`/`forEach`/`compactMap` closure, or in a function or computed property called per item (`tableView(_:cellForRowAt:)`, `collectionView(_:cellForItemAt:)`, a per-row formatting helper, `description`)?",
+      "true": "An expensive Foundation formatter, decoder or regex is rebuilt for every item.",
+      "false": "The formatter is a `static let` or cached/injected property; `FormatStyle` APIs are used (`date.formatted(...)`, `.formatted(.number)`); it is created once per screen or request outside any loop; or the code is inside a SwiftUI `body` -- that case belongs to `swiftui-expensive-body`.",
+      "fix": "Create the formatter once (a `static let` or cached property) and reuse it, or use `FormatStyle` (Apple Data Formatting Guide).",
+      "when": ["Formatter\\(|JSONDecoder\\(|JSONEncoder\\(|NSRegularExpression\\("]
+    },
+    {
+      "id": "swift-perf-sequential-awaits",
+      "question": "Does `added_code` await independent async calls one after another — a `for` loop that does `try await api.fetch(item)` per item, or two or more consecutive `await`s whose arguments don't depend on each other's results — where `async let` or a `withTaskGroup`/`withThrowingTaskGroup` could run them concurrently?",
+      "true": "Independent awaited calls run serially when they could run concurrently.",
+      "false": "Each call needs the previous result; order matters (sequential writes, a rate limit with a comment, actor state that must update in order); calls already use `async let` or a task group; or the loop has a small fixed bound with a comment.",
+      "fix": "Run the independent calls concurrently with `async let` or a task group.",
+      "when": ["\\bawait\\b"]
+    }
+  ]
+}

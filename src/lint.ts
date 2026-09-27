@@ -1,8 +1,5 @@
-import { dirname, extname, isAbsolute, relative, resolve } from "node:path";
-import swiftRules from "../rules/swift.json";
-import swiftPractices from "../rules/swift.practices.json";
-import typescriptRules from "../rules/typescript.json";
-import typescriptPractices from "../rules/typescript.practices.json";
+import { readdirSync, readFileSync } from "node:fs";
+import { basename, dirname, extname, isAbsolute, join, relative, resolve } from "node:path";
 import type { ChangedFile } from "./extract";
 import { askNouls, type NoulQuestion } from "./jev";
 import { findRepoConfig } from "./repoRules";
@@ -11,31 +8,70 @@ import { findRepoConfig } from "./repoRules";
 // them matches the added code — a cheap, recall-safe gate that cuts model calls.
 // `paths`: optional globs relative to the repo root (the directory holding .jev-lint/). The rule
 // is only asked for files matching one of them, e.g. ["src/routes/**", "**/*.tsx"].
-export type Rule = { id: string; question: string; true: string; false: string; fix: string; when?: string[]; paths?: string[] };
-export type RuleSet = { language: string; extensions: string[]; rules: Rule[] };
+// `status: "candidate"`: a built-in rule still being evaluated. The hook skips it; the eval
+// harness (JEV_LINT_CANDIDATES=on) includes it. Rules ship by dropping the status after they
+// pass on the holdout split.
+export type Rule = {
+  id: string;
+  question: string;
+  true: string;
+  false: string;
+  fix: string;
+  when?: string[];
+  paths?: string[];
+  status?: "candidate";
+};
+// `filenames`: exact file names that belong to the set when the extension alone can't say
+// (Bazel's BUILD, BUILD.bazel, WORKSPACE, MODULE.bazel).
+export type RuleSet = { language: string; extensions: string[]; filenames?: string[]; rules: Rule[] };
 export type Tier = "high" | "medium";
 export type Finding = { ruleId: string; probability: number; tier: Tier; fix: string };
 
-// "hygiene": small code-hygiene rules. "practices": opinionated React/SwiftUI/concurrency
-// best practices that a deterministic linter cannot express. "repo": rules from the
-// nearest `.jev-lint/` directory (see repoRules.ts). One Jev call covers all packs.
-export type Pack = "hygiene" | "practices" | "repo";
-export const RULE_FILES: Record<Exclude<Pack, "repo">, RuleSet[]> = {
-  hygiene: [typescriptRules, swiftRules],
-  practices: [typescriptPractices, swiftPractices],
-};
-export const DEFAULT_PACKS = (process.env.JEV_LINT_PACKS ?? "hygiene,practices,repo").split(",") as Pack[];
+// Built-in packs live in rules/<language>.json ("hygiene") and rules/<language>.<pack>.json.
+// "hygiene": small code-hygiene rules. "practices": opinionated framework and language best
+// practices. "tests": test hygiene (tests that can't fail, and other test smells).
+// "performance": snippet-visible performance problems. "repo": rules from the nearest
+// `.jev-lint/` directory (see repoRules.ts). One Jev call covers all packs.
+export const BUILT_IN_PACKS = ["hygiene", "practices", "tests", "performance"] as const;
+export type BuiltInPack = (typeof BUILT_IN_PACKS)[number];
+export type Pack = BuiltInPack | "repo";
+
+const RULES_DIR = join(import.meta.dir, "../rules");
+
+function loadBuiltIns(): Record<BuiltInPack, RuleSet[]> {
+  const packs = Object.fromEntries(BUILT_IN_PACKS.map((p) => [p, [] as RuleSet[]])) as Record<BuiltInPack, RuleSet[]>;
+  for (const name of readdirSync(RULES_DIR)
+    .filter((n) => n.endsWith(".json"))
+    .sort()) {
+    const parts = name.slice(0, -".json".length).split(".");
+    const pack = (parts.length === 1 ? "hygiene" : parts[1]) as BuiltInPack;
+    if (!packs[pack]) continue;
+    const set = JSON.parse(readFileSync(join(RULES_DIR, name), "utf8")) as RuleSet;
+    packs[pack].push(set);
+  }
+  return packs;
+}
+export const RULE_FILES: Record<BuiltInPack, RuleSet[]> = loadBuiltIns();
+export const LANGUAGES = [...new Set(Object.values(RULE_FILES).flatMap((sets) => sets.map((s) => s.language)))];
+
+export const DEFAULT_PACKS = (process.env.JEV_LINT_PACKS ?? "hygiene,practices,tests,performance,repo").split(",") as Pack[];
 
 function mergeRuleSets(sets: RuleSet[]): RuleSet | undefined {
   if (!sets.length) return undefined;
-  return { language: sets[0].language, extensions: sets[0].extensions, rules: sets.flatMap((s) => s.rules) };
+  return { language: sets[0].language, extensions: sets[0].extensions, filenames: sets[0].filenames, rules: sets.flatMap((s) => s.rules) };
 }
 
-const builtIn = (pack: Pack) => (pack === "repo" ? [] : RULE_FILES[pack]);
+const builtIn = (pack: Pack) => (pack === "repo" ? [] : (RULE_FILES[pack] ?? []));
+
+export function ruleSetMatches(set: RuleSet, filePath: string): boolean {
+  return set.extensions.includes(extname(filePath).toLowerCase()) || Boolean(set.filenames?.includes(basename(filePath)));
+}
 
 // Built-in packs only: used by the eval harness, which works per language.
 export function ruleSetForLanguage(language: string, packs: Pack[] = DEFAULT_PACKS): RuleSet | undefined {
-  return mergeRuleSets(packs.flatMap((pack) => builtIn(pack).filter((s) => s.language === language)));
+  const merged = mergeRuleSets(packs.flatMap((pack) => builtIn(pack).filter((s) => s.language === language)));
+  if (merged && process.env.JEV_LINT_CANDIDATES !== "on") merged.rules = merged.rules.filter((r) => r.status !== "candidate");
+  return merged?.rules.length ? merged : undefined;
 }
 
 // Defaults chosen on the dev split (see report/); override per environment.
@@ -51,21 +87,22 @@ const MAX_ADDED_CHARS = 24_000;
 // Rules for one file. A repo's `.jev-lint/config.json` "packs" list applies when the caller
 // did not pick packs explicitly. Relative paths (Codex patches) resolve against `cwd`.
 export function ruleSetFor(filePath: string, packs?: Pack[], cwd = process.cwd()): RuleSet | undefined {
-  const ext = extname(filePath).toLowerCase();
   const wantsRepo = !packs || packs.includes("repo");
   const absolute = isAbsolute(filePath) ? filePath : resolve(cwd, filePath);
   const repo = wantsRepo ? findRepoConfig(absolute) : undefined;
   const chosen = packs ?? ((repo?.packs as Pack[] | undefined) || DEFAULT_PACKS);
   const sets = chosen
     .flatMap((pack) => (pack === "repo" ? (repo?.ruleSets ?? []) : builtIn(pack)))
-    .filter((s) => s.extensions.includes(ext));
+    .filter((s) => ruleSetMatches(s, filePath));
   // Later packs can't redefine an id already asked; repo rules should use their own prefix.
   const seen = new Set<string>();
   const merged = mergeRuleSets(sets);
   const relPath = repo ? relative(dirname(repo.dir), absolute) : filePath;
   const off = (r: Rule) =>
     repo?.disable?.includes(r.id) || repo?.skipPaths?.[r.id]?.some((glob) => matchesGlob(glob, relPath)) || !rulePathsMatch(r, relPath);
-  if (merged) merged.rules = merged.rules.filter((r) => !off(r) && !seen.has(r.id) && seen.add(r.id));
+  const candidates = process.env.JEV_LINT_CANDIDATES === "on";
+  if (merged)
+    merged.rules = merged.rules.filter((r) => (candidates || r.status !== "candidate") && !off(r) && !seen.has(r.id) && seen.add(r.id));
   return merged?.rules.length ? merged : undefined;
 }
 

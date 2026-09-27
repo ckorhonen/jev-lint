@@ -1,0 +1,37 @@
+{
+  "rb-test-cannot-fail": {
+    "evidence": [
+      {
+        "grade": "A",
+        "url": "rules/typescript.practices.json ts-test-cannot-fail; rules/swift.practices.json swift-test-cannot-fail",
+        "checked": "2026-09-27",
+        "note": "Same pattern is already validated as a built-in in this repo (holdout 12/12, no false alarms, 2026-09-27 per best-practices/python.md and ruby.md)."
+      },
+      {
+        "grade": "C",
+        "url": "https://arxiv.org/abs/2510.20270",
+        "checked": "2026-09-27",
+        "note": "ImpossibleBench (Zhong, Raghunathan, Carlini, 2025): coding agents delete or edit failing tests instead of fixing code."
+      }
+    ],
+    "whyNotLinter": "rubocop-rspec's NoExpectationExample catches (a) only; (b)-(d) need judgment.",
+    "aiRelevance": "High.",
+    "expectedNoise": "low (per the TS/Swift built-in holdout).",
+    "languageFile": "ruby"
+  },
+  "rb-test-fixed-sleep": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://mir.cs.illinois.edu/lamyaa/publications/fse14.pdf",
+        "checked": "2026-09-27",
+        "note": "Luo et al., FSE 2014, 161 flaky-test fix commits: Async Wait 45% (34% use a fixed time delay; 54% fixed with waitFor), Concurrency 20%, Test Order Dependency 12% (74% fixed by cleaning shared state)."
+      }
+    ],
+    "whyNotLinter": "No default RuboCop/rubocop-rspec cop bans `sleep` in specs (a custom cop could, but not distinguish a fake's latency).",
+    "aiRelevance": "Agents stabilise flaky Capybara specs with `sleep 1`.",
+    "expectedNoise": "low",
+    "languageFile": "ruby",
+    "notes": "Evidence is one B (Luo); Capybara README on asynchronous JavaScript would make it 2xB (not fetched)."
+  }
+}

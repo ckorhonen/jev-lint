@@ -1,0 +1,75 @@
+{
+  "swift-test-fixed-sleep": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://mir.cs.illinois.edu/lamyaa/publications/fse14.pdf",
+        "checked": "2026-09-27",
+        "note": "Luo et al., FSE 2014, 161 flaky-test fix commits: Async Wait 45% (34% use a fixed time delay; 54% fixed with waitFor), Concurrency 20%, Test Order Dependency 12% (74% fixed by cleaning shared state)."
+      },
+      {
+        "grade": "B",
+        "url": "https://github.com/swiftlang/swift-testing/blob/main/Sources/Testing/Testing.docc/testing-asynchronous-code.md",
+        "checked": "2026-09-27",
+        "note": "Mark tests async and await asynchronous interactions; use confirmation() for events delivered via handlers."
+      },
+      {
+        "grade": "B",
+        "url": "https://developer.apple.com/documentation/xctest/asynchronous-tests-and-expectations",
+        "checked": "2026-09-27 (cited, page not fetched)",
+        "note": "XCTestExpectation + fulfill/wait or async test methods (page is JS-rendered; body not machine-readable when checked)."
+      }
+    ],
+    "whyNotLinter": "SwiftLint has no test-sleep rule; a `custom_rules` regex could ban `Thread.sleep` in tests but not tell a latency-simulating fake from a wait.",
+    "aiRelevance": "Agents converting completion-handler code to tests reach for `Thread.sleep`/`Task.sleep` to 'let the task finish'.",
+    "expectedNoise": "low",
+    "languageFile": "swift"
+  },
+  "swift-test-error-path-passes-silently": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://github.com/swiftlang/swift-testing/blob/main/Sources/Testing/Testing.docc/testing-asynchronous-code.md",
+        "checked": "2026-09-27",
+        "note": "Mark tests async and await asynchronous interactions; use confirmation() for events delivered via handlers."
+      },
+      {
+        "grade": "C",
+        "url": "https://arxiv.org/abs/2606.18168",
+        "checked": "2026-09-27",
+        "note": "Banik et al. (preprint, Jun 2026), 86,156 agent-authored test-file patches (Codex, Copilot, Devin, Cursor, Claude Code): 80.2% weak/no oracle; W1 no-assertion 24-85% by agent; W2 existence-only 0-0.4%; W4 mock-only 0-4%; W5 snapshot-only 0-4%."
+      }
+    ],
+    "whyNotLinter": "SwiftLint has no rule for this; it needs to know the test's intent (expects an error) and that the success path records no failure.",
+    "aiRelevance": "Agents port try/catch habits from other languages into XCTest; Banik et al. list 'exception-free' and missing-oracle patterns as common in agent tests.",
+    "expectedNoise": "low",
+    "languageFile": "swift",
+    "notes": "swift_testing_async is a weak fit; the Swift Testing 'Testing for errors' article would be the proper B source (not fetched)."
+  },
+  "swift-test-unawaited-task": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://github.com/swiftlang/swift-testing/blob/main/Sources/Testing/Testing.docc/testing-asynchronous-code.md",
+        "checked": "2026-09-27",
+        "note": "Mark tests async and await asynchronous interactions; use confirmation() for events delivered via handlers."
+      },
+      {
+        "grade": "B",
+        "url": "https://developer.apple.com/documentation/xctest/asynchronous-tests-and-expectations",
+        "checked": "2026-09-27 (cited, page not fetched)",
+        "note": "XCTestExpectation + fulfill/wait or async test methods (page is JS-rendered; body not machine-readable when checked)."
+      },
+      {
+        "grade": "B",
+        "url": "https://mir.cs.illinois.edu/lamyaa/publications/fse14.pdf",
+        "checked": "2026-09-27",
+        "note": "Luo et al., FSE 2014, 161 flaky-test fix commits: Async Wait 45% (34% use a fixed time delay; 54% fixed with waitFor), Concurrency 20%, Test Order Dependency 12% (74% fixed by cleaning shared state)."
+      }
+    ],
+    "whyNotLinter": "Swift 6 concurrency checking does not flag an unawaited `Task {}`; whether assertions depend on it needs judgment.",
+    "aiRelevance": "Agents call `viewModel.load()` which spawns a `Task`, then assert immediately; the test passes or fails by timing (Luo: async wait is the top flaky cause).",
+    "expectedNoise": "low-med",
+    "languageFile": "swift"
+  }
+}

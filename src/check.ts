@@ -22,8 +22,8 @@ let checked = 0;
 await Promise.all(
   Array.from({ length: MAX_PARALLEL }, async () => {
     for (let file = queue.shift(); file; file = queue.shift()) {
-      const addedCode = readFileSync(file, "utf8");
       try {
+        const addedCode = readFileSync(file, "utf8");
         const result = await lintChange({ filePath: file, addedCode, changeKind: "write" }, { timeoutMs: 30_000, packs });
         if (!result) continue;
         checked++;

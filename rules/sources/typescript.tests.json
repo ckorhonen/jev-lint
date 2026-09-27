@@ -1,0 +1,88 @@
+{
+  "ts-test-fixed-sleep": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://mir.cs.illinois.edu/lamyaa/publications/fse14.pdf",
+        "checked": "2026-09-27",
+        "note": "Luo et al., FSE 2014, 161 flaky-test fix commits: Async Wait 45% (34% use a fixed time delay; 54% fixed with waitFor), Concurrency 20%, Test Order Dependency 12% (74% fixed by cleaning shared state)."
+      },
+      {
+        "grade": "B",
+        "url": "https://playwright.dev/docs/best-practices",
+        "checked": "2026-09-27",
+        "note": "Make tests isolated (each test independent, own storage/data); use web-first assertions and auto-waiting locators instead of manual waits."
+      }
+    ],
+    "whyNotLinter": "The Promise+setTimeout idiom and custom `sleep`/`delay` helpers have many shapes; telling a wait-for-work sleep from simulated latency inside a mock needs meaning. Existing plugins only ban the Playwright/Cypress APIs by name.",
+    "aiRelevance": "When a test fails intermittently, agents add or lengthen a sleep until it passes locally — the classic flaky-test fix Luo et al. describe.",
+    "expectedNoise": "low",
+    "languageFile": "typescript"
+  },
+  "ts-test-title-contradicts-assertions": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://arxiv.org/abs/2510.20270",
+        "checked": "2026-09-27",
+        "note": "ImpossibleBench (ICLR 2026): agents pass impossible tests by modifying/deleting tests, special-casing test inputs, operator overloading, state recording; Claude models mostly modify tests; cheating rates up to 92% (GPT-5, one variant)."
+      },
+      {
+        "grade": "B",
+        "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices",
+        "checked": "2026-09-27 (search summary)",
+        "note": "Vendor guidance on agent behavior: models sometimes hard-code values or special-case test inputs; ask for general solutions that 'work for all valid inputs, not just test cases'. Read via search summary, not fetched in full."
+      },
+      {
+        "grade": "C",
+        "url": "https://arxiv.org/abs/2410.21136",
+        "checked": "2026-09-27 (cited, page not fetched)",
+        "note": "Konstantinou et al.: LLM-generated oracles tend to encode actual (possibly buggy) behaviour rather than expected behaviour (cited via Banik et al. ref [9])."
+      }
+    ],
+    "whyNotLinter": "Comparing natural-language test titles with assertion semantics is exactly the kind of judgment no linter can make.",
+    "aiRelevance": "ImpossibleBench: when tests conflict with the spec, agents (Claude models especially) edit the test to pass; the visible residue is a title that no longer matches the assertion.",
+    "expectedNoise": "low-med",
+    "languageFile": "typescript"
+  },
+  "ts-test-shared-mutable-state": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://playwright.dev/docs/best-practices",
+        "checked": "2026-09-27",
+        "note": "Make tests isolated (each test independent, own storage/data); use web-first assertions and auto-waiting locators instead of manual waits."
+      },
+      {
+        "grade": "B",
+        "url": "https://mir.cs.illinois.edu/lamyaa/publications/fse14.pdf",
+        "checked": "2026-09-27",
+        "note": "Luo et al., FSE 2014, 161 flaky-test fix commits: Async Wait 45% (34% use a fixed time delay; 54% fixed with waitFor), Concurrency 20%, Test Order Dependency 12% (74% fixed by cleaning shared state)."
+      }
+    ],
+    "whyNotLinter": "jest/vitest `require-hook` (opt-in) only flags setup code outside hooks; whether a later test reads what an earlier test wrote needs data-flow judgment across test bodies in the snippet.",
+    "aiRelevance": "Agents write a sequence of tests as a script ('creates the user', then 'updates the user') that passes only in file order and breaks under sharding, `--shuffle`, or `.only`.",
+    "expectedNoise": "low-med",
+    "languageFile": "typescript"
+  },
+  "ts-test-special-case-in-source": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://arxiv.org/abs/2510.20270",
+        "checked": "2026-09-27",
+        "note": "ImpossibleBench (ICLR 2026): agents pass impossible tests by modifying/deleting tests, special-casing test inputs, operator overloading, state recording; Claude models mostly modify tests; cheating rates up to 92% (GPT-5, one variant)."
+      },
+      {
+        "grade": "B",
+        "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices",
+        "checked": "2026-09-27 (search summary)",
+        "note": "Vendor guidance on agent behavior: models sometimes hard-code values or special-case test inputs; ask for general solutions that 'work for all valid inputs, not just test cases'. Read via search summary, not fetched in full."
+      }
+    ],
+    "whyNotLinter": "`process.env.NODE_ENV === 'test'` is matchable, but most such checks legitimately swap infrastructure; only reading what the branch returns tells special-casing from configuration.",
+    "aiRelevance": "ImpossibleBench documents special-casing test inputs and conditions as a common way agents make failing tests pass; Anthropic's prompting guide warns about it explicitly.",
+    "expectedNoise": "low-med",
+    "languageFile": "typescript"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "swift-perf-formatter-per-call": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/DataFormatting/Articles/dfDateFormatting10_4.html",
+        "checked": "2026-09-27",
+        "note": "'Creating a date formatter is not a cheap operation... it is typically more efficient to cache a single instance'; use a static variable."
+      }
+    ],
+    "whyNotLinter": "SwiftLint has no rule for formatter allocation; per-item context needs judgment.",
+    "aiRelevance": "Medium (inferred): agents write `let f = DateFormatter()` inside helpers used per cell.",
+    "expectedNoise": "low.",
+    "languageFile": "swift"
+  }
+}

@@ -1,0 +1,159 @@
+{
+  "rs-blocking-call-in-async": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://docs.rs/tokio/latest/tokio/#cpu-bound-tasks-and-blocking-code",
+        "checked": "2026-09-27",
+        "note": "'swapping can only happen at .await points, so code that spends a long time without reaching an .await will prevent other tasks from running.'"
+      },
+      {
+        "grade": "B",
+        "url": "https://github.com/rust-lang/rust-clippy/blob/master/clippy_lints/src/declared_lints.rs",
+        "checked": "2026-09-27",
+        "note": "Clippy's lint list has await_holding_lock/refcell/invalid_type but no lint for blocking calls inside async fns."
+      }
+    ],
+    "whyNotLinter": "Clippy has no blocking-in-async lint. `disallowed_methods` could ban `std::thread::sleep` everywhere, including sync code where it is fine; whether code is inside an async context and whether a call blocks takes judgment.",
+    "aiRelevance": "High. Agents use `std::fs::read_to_string` and `std::thread::sleep` in async handlers because that is the std API they know best.",
+    "expectedNoise": "low — the blocking APIs are named, and sync functions are a listed negative.",
+    "languageFile": "rust",
+    "evidenceStatus": "meets bar (1 A or 2 B)",
+    "overlap": "Duplicates rules/rust.performance.json rs-perf-blocking-in-async, which appeared in the working tree during this research (uncommitted). Keep only one; if the perf pack ships, drop this rule."
+  },
+  "rs-select-cancel-unsafe": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://docs.rs/tokio/latest/tokio/macro.select.html",
+        "checked": "2026-09-27",
+        "note": "Lists the cancel-safe methods and the non-cancel-safe ones (read_exact, read_to_end, read_to_string, write_all; Mutex::lock, RwLock::read/write, Semaphore::acquire, Notify::notified)."
+      }
+    ],
+    "whyNotLinter": "Cancellation safety is a documented runtime property of each method, not part of its type. No clippy or rustc lint covers it.",
+    "aiRelevance": "High. `loop { select! { r = stream.read_exact(&mut buf) => …, _ = shutdown.recv() => break } }` is a natural-looking pattern agents write for protocol loops. Data loss only shows under load.",
+    "expectedNoise": "low — the method list is exact, and the pinned-outside-the-loop pattern is a listed negative.",
+    "languageFile": "rust",
+    "evidenceStatus": "single official B source for the exact API; needs a second B (or A from a repo) before shipping as built-in, or accept it on the strength of the vendor doc"
+  },
+  "rs-spawned-task-error-lost": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://docs.rs/tokio/latest/tokio/task/struct.JoinHandle.html",
+        "checked": "2026-09-27",
+        "note": "'A JoinHandle detaches the associated task when it is dropped' (source: tokio/src/runtime/task/join.rs). JoinHandle itself is not #[must_use], so rustc's unused_must_use doesn't fire."
+      }
+    ],
+    "whyNotLinter": "Dropping a JoinHandle is legal and doesn't trigger a warning (not #[must_use]); clippy's `let_underscore_future` is about futures, not handles. Whether the task handles its own errors is a judgment about its body.",
+    "aiRelevance": "Medium-high. Agents spawn background work with `tokio::spawn(async move { do_thing().await? ; Ok::<_, Error>(()) });` and never look at the result.",
+    "expectedNoise": "low — the handle's fate and the body's error handling are both visible.",
+    "languageFile": "rust",
+    "evidenceStatus": "single official B source for the exact API; needs a second B (or A from a repo) before shipping as built-in, or accept it on the strength of the vendor doc"
+  },
+  "rs-unsigned-subtraction-underflow": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://doc.rust-lang.org/reference/behavior-not-considered-unsafe.html#integer-overflow",
+        "checked": "2026-09-27",
+        "note": "Overflow is 'an error'; debug builds panic, other builds may 'panic or silently wrap'."
+      },
+      {
+        "grade": "C",
+        "url": "https://arxiv.org/html/2608.00661v1",
+        "checked": "2026-09-27",
+        "note": "Study of errors in code from 7 LLMs: numeric-overflow runtime errors are 43.9% of Rust runtime errors vs 4–6% in C/C++/Java."
+      }
+    ],
+    "whyNotLinter": "`clippy::arithmetic_side_effects` (restriction) flags every arithmetic operation. `implicit_saturating_sub` only rewrites an already-guarded subtraction. Whether the right side can exceed the left needs judgment about the values.",
+    "aiRelevance": "High. It is the dominant Rust runtime failure in LLM output in the one study found (C-grade), and agents write `len() - 1` reflexively.",
+    "expectedNoise": "med — many subtractions are safe for reasons outside the snippet; the question requires that nothing in the snippet rules underflow out, and it may need wording iteration.",
+    "languageFile": "rust",
+    "evidenceStatus": "single official B source for the exact API; needs a second B (or A from a repo) before shipping as built-in, or accept it on the strength of the vendor doc"
+  },
+  "rs-unchecked-unsafe-on-unvalidated": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://doc.rust-lang.org/std/primitive.slice.html#method.get_unchecked",
+        "checked": "2026-09-27",
+        "note": "'Calling this method with an out-of-bounds index is undefined behavior even if the resulting reference is not used' (library/core/src/slice/mod.rs)."
+      },
+      {
+        "grade": "B",
+        "url": "https://doc.rust-lang.org/nomicon/working-with-unsafe.html",
+        "checked": "2026-09-27",
+        "note": "Rustonomicon: unsafe code's soundness depends on invariants established by surrounding safe code (standard reference, not re-fetched)."
+      },
+      {
+        "grade": "D",
+        "url": "https://medium.com/@krun_dev/rust-llm-generated-code-security-risk-guide-0487c1120591",
+        "checked": "2026-09-27",
+        "note": "Claims unsafe blocks are 3–5x more frequent in LLM Rust than in human code; unsourced. Lead only."
+      }
+    ],
+    "whyNotLinter": "Clippy checks for a SAFETY comment (`undocumented_unsafe_blocks`, restriction) and some transmute shapes, not whether the precondition actually holds. That takes reasoning about where values come from.",
+    "aiRelevance": "Medium-high. Agents reach for `get_unchecked`/`from_utf8_unchecked` when asked to optimize and justify them with confident but wrong SAFETY comments.",
+    "expectedNoise": "low — rare API family; correct uses usually show the bounds check or construction.",
+    "languageFile": "rust",
+    "evidenceStatus": "meets bar (1 A or 2 B)"
+  },
+  "rs-debug-derive-secret": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html",
+        "checked": "2026-09-27",
+        "note": "Lists access tokens, authentication passwords and encryption keys among data that should not be recorded directly in logs."
+      },
+      {
+        "grade": "C",
+        "url": "https://docs.rs/secrecy",
+        "checked": "2026-09-27",
+        "note": "secrecy crate exists to 'prevent accidental leakage of secrets via channels like debug logging'; its SecretBox Debug impl redacts."
+      }
+    ],
+    "whyNotLinter": "Clippy has no secret-aware lint (only `missing_fields_in_debug` for manual impls). Recognizing that a field holds a secret takes judgment about its name and type.",
+    "aiRelevance": "High. Agents add `#[derive(Debug, Clone, Serialize, Deserialize)]` to every struct by reflex, including config and credential structs.",
+    "expectedNoise": "low — both the field names and the derive are visible in the snippet.",
+    "languageFile": "rust",
+    "evidenceStatus": "single official B source for the exact API; needs a second B (or A from a repo) before shipping as built-in, or accept it on the strength of the vendor doc"
+  },
+  "rs-sql-built-with-format": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html",
+        "checked": "2026-09-27",
+        "note": "Primary defense: prepared statements with parameterized queries (standard reference, not re-fetched)."
+      },
+      {
+        "grade": "B",
+        "url": "https://cwe.mitre.org/data/definitions/89.html",
+        "checked": "2026-09-27",
+        "note": "CWE-89 SQL injection."
+      }
+    ],
+    "whyNotLinter": "Clippy has no SQL lint, and the compiler can't tell SQL text from other strings. Telling identifiers from an allowlist apart from user values takes judgment.",
+    "aiRelevance": "Medium-high. Agents use `format!` for dynamic filters and `IN (...)` lists when the bind syntax for the driver is unfamiliar.",
+    "expectedNoise": "low — allowlisted identifiers are the only common look-alike, and they're a listed negative.",
+    "languageFile": "rust",
+    "evidenceStatus": "meets bar (1 A or 2 B)"
+  },
+  "rs-http-client-per-call": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://docs.rs/reqwest/latest/reqwest/struct.Client.html",
+        "checked": "2026-09-27",
+        "note": "'The Client holds a connection pool internally ... so it is advised that you create one and reuse it.'"
+      }
+    ],
+    "whyNotLinter": "Constructing a client is legal; whether the function runs once or per request is a judgment about the call site. Clippy has no lint for it.",
+    "aiRelevance": "Medium-high. Agents write self-contained `async fn fetch_x(url) { let client = Client::new(); … }` helpers.",
+    "expectedNoise": "low — the constructor call and its location are visible.",
+    "languageFile": "rust",
+    "evidenceStatus": "single official B source for the exact API; needs a second B (or A from a repo) before shipping as built-in, or accept it on the strength of the vendor doc"
+  }
+}

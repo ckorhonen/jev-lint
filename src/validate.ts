@@ -10,7 +10,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { extname, join, resolve } from "node:path";
 import { parseArgs } from "node:util";
 import { askNouls } from "./jev";
-import { buildQuestions, type RuleSet, ruleApplies, rulePathsMatch } from "./lint";
+import { buildQuestions, type RuleSet, ruleApplies, rulePathsMatch, ruleSetMatches } from "./lint";
 import { loadRepoDir } from "./repoRules";
 
 const BAR = { minPositives: 3, minNegatives: 2, precisionAtHigh: 0.9, recallAtMedium: 0.8, precisionAtMedium: 0.75 };
@@ -41,7 +41,7 @@ const cases: Case[] = existsSync(casesFile)
       .map((l) => JSON.parse(l))
   : [];
 
-const setFor = (filePath: string): RuleSet | undefined => ruleSets.find((s) => s.extensions.includes(extname(filePath).toLowerCase()));
+const setFor = (filePath: string): RuleSet | undefined => ruleSets.find((s) => ruleSetMatches(s, filePath));
 
 const counts: Record<string, Counts> = {};
 for (const set of ruleSets)

@@ -1,0 +1,8 @@
+# Extends gitleaks' default rules. The generated pack docs (docs/packs/) show the eval set's
+# synthetic "bad" examples, including fake hard-coded secrets for the no-hardcoded-secret rules.
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Synthetic fixtures rendered into the generated pack docs"
+paths = ['''^docs/packs/.*\.md$''']

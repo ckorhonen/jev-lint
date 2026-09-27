@@ -1,0 +1,70 @@
+{
+  "language": "ruby",
+  "extensions": [".rb", ".rake"],
+  "rules": [
+    {
+      "id": "rb-unscoped-find",
+      "question": "Does `added_code` add a Rails controller action (or `before_action` loader) that loads, updates or destroys a user-owned record with a class-level finder on a client-supplied id -- `Invoice.find(params[:id])`, `Invoice.find_by(id: params[:invoice_id])`, `Invoice.where(id: params[:id])` -- instead of scoping it through the current user or tenant (`current_user.invoices.find(params[:id])`, `Current.account.projects.find(...)`) or authorizing the loaded record?",
+      "true": "A record is fetched by a request id with no ownership scope or authorization, so any signed-in user can reach any record.",
+      "false": "The lookup goes through an association of `current_user`, `Current.*` or the tenant; the record is authorized right after loading (Pundit `authorize @invoice`, CanCanCan `load_and_authorize_resource`/`authorize!`, Action Policy `authorize!`, `policy_scope(...)`); the controller is in an admin namespace guarded by an explicit admin check; the model is public by nature (published posts, products); or the code is not a controller.",
+      "fix": "Load the record through the current user's or tenant's association (`current_user.invoices.find(params[:id])`) or authorize it right after loading (Rails Security Guide, 'Privilege Escalation').",
+      "when": ["params"]
+    },
+    {
+      "id": "rb-sql-interpolation",
+      "question": "Does `added_code` put a runtime value into a SQL fragment -- interpolating with `#{...}` into a string passed to `where`, `order`, `reorder`, `joins`, `select`, `group`, `having`, `pluck`, `find_by_sql`, `exec_query`, or `execute`, or passing `params[...]` directly as the argument of `order`/`reorder`/`pluck`/`select` -- instead of placeholders (`where(\"name = ?\", name)`, `where(name: name)`), `sanitize_sql_*`, Arel, or an allow-list?",
+      "true": "A request or other runtime value becomes part of SQL text.",
+      "false": "Values go through hash conditions, `?` or named placeholders, `sanitize_sql_*`, or Arel; only a constant or a value checked against an explicit allow-list (e.g. `SORTABLE.include?(col)` or a `case` mapping) is interpolated; `order(created_at: :desc)` hash form is used; or no SQL string is built.",
+      "fix": "Use hash conditions or `?` placeholders, and map sort columns through an allow-list (Rails Guides, Active Record Query Interface / Security).",
+      "when": ["#\\{|params|order\\("]
+    },
+    {
+      "id": "rb-side-effect-before-commit",
+      "question": "Does `added_code` send email (`deliver_now`), make an HTTP/API call, charge a payment, publish to a queue, or enqueue a job (`perform_async`, `perform_in`, `perform_later`, `deliver_later`) either inside an `ActiveRecord::Base.transaction`/`Model.transaction`/`with_lock` block, or from an `after_save`, `after_create`, `after_update` or `after_destroy` callback -- instead of after commit (`after_commit`, `after_create_commit`, `after_update_commit`, or after the transaction block)?",
+      "true": "A side effect runs inside the transaction: a job can run before its data is committed, and an email or charge can fire even though the transaction later rolls back.",
+      "false": "The side effect is in `after_commit`/`after_*_commit` or after the transaction block; `perform_later`/`deliver_later` is used in a job class or snippet that shows `enqueue_after_transaction_commit` enabled; the transaction or callback only changes database rows or the record's own attributes; or there is no transaction or save callback.",
+      "fix": "Move the side effect to `after_commit` (`after_create_commit`/`after_update_commit`) or after the transaction block.",
+      "when": ["transaction|with_lock|after_(save|create|update|destroy)\\b"]
+    },
+    {
+      "id": "rb-privileged-attrs-permitted",
+      "question": "Does `added_code` add strong-parameter permits in a user-facing (non-admin) controller that let the client set privilege, ownership or billing fields -- `permit(..., :role, :admin, :is_admin, :account_id, :user_id, :owner_id, :organization_id, :tenant_id, :plan, :credits, :balance, :verified, :confirmed_at)` or the same keys in `params.expect(...)` -- or call `permit!`?",
+      "true": "A client can assign privilege, ownership or billing attributes through mass assignment.",
+      "false": "Only ordinary content fields are permitted; ownership is set server-side (`@post.user = current_user`, `current_user.posts.build(...)`); the controller is in an admin namespace or permits these keys only behind an explicit admin or policy check (`permitted_attributes(@user)` from Pundit, `if current_user.admin?`); or the `*_id` keys are references a user may legitimately choose (`category_id`, `country_id`, `assignee_id` validated elsewhere).",
+      "fix": "Remove privileged fields from `permit` and set them server-side, or permit them only behind an explicit admin/policy check.",
+      "when": ["permit|params\\.expect"]
+    },
+    {
+      "id": "rb-line-anchor-validation-regex",
+      "question": "Does `added_code` accept or reject untrusted input (params, a URL, an email, a filename, a header, or a value guarding a redirect, file access or allow-list) with a Ruby regex anchored by `^` and/or `$` -- via `=~`, `match?`, `match`, `!~`, or `validates ... format: { with: /^...$/, multiline: true }` -- instead of `\\A` and `\\z`?",
+      "true": "A validation regex uses line anchors, so input like `\"evil\\nhttps://ok.example\"` passes.",
+      "false": "The regex uses `\\A` and `\\z` (or `\\Z`); it searches or parses multi-line text rather than accepting or rejecting a whole value; it has no anchors; or `^` appears only as a character-class negation (`[^a-z]`).",
+      "fix": "Anchor validation regexes with `\\A` and `\\z` (Rails Security Guide, 'Regular Expressions').",
+      "when": ["\\^|\\$"]
+    },
+    {
+      "id": "rb-read-modify-write-race",
+      "question": "Does `added_code` read a counter, balance, stock, or quota attribute from an ActiveRecord record, change it in Ruby, and save it -- `account.balance -= amount; account.save!`, `product.update(stock: product.stock - qty)` -- without a row lock (`with_lock`, `lock!`, `Model.lock.find`) or an atomic SQL update (`update_counters`, `increment!`/`decrement!`, `update_all(\"stock = stock - ?\", qty)`)?",
+      "true": "A read-modify-write of a shared numeric column can lose concurrent updates.",
+      "false": "The change is done in SQL (`update_counters`, `increment!`/`decrement!`, a conditional `update_all`), the record is locked first (`with_lock`, `lock!`, `lock.find`), optimistic locking (`lock_version`) is shown, or the record is new or not shared (being built, a form object); or no stored numeric field is changed.",
+      "fix": "Do the change in SQL (`update_counters` / conditional `update_all`) or wrap the read-modify-write in `record.with_lock { ... }` (Rails Guides, 'Locking Records for Update').",
+      "when": ["\\+=|-=|\\bsave|update!?\\("]
+    },
+    {
+      "id": "rb-memoize-nil-or-false",
+      "question": "Does `added_code` memoize with `@var ||= ...` where the value can legitimately be `nil` or `false` -- for example `find_by`, `exists?`, `any?`, `present?`, a predicate method, `ENV[...]`, `dig`, `detect`, or an API call that may return nil -- so the expensive work reruns on every call?",
+      "true": "`||=` memoizes a result that can be nil/false, so memoization silently does nothing in that case.",
+      "false": "The memoized value is never nil/false (a relation, a `find` that raises, a new object, a collection, a string built by the code), or the code uses `return @var if defined?(@var)` or a `key?` check; or no `||=` memoization is used.",
+      "fix": "Use `return @x if defined?(@x); @x = ...` when the value can be nil or false.",
+      "when": ["\\|\\|="]
+    },
+    {
+      "id": "rb-rescue-swallowed",
+      "question": "Does `added_code` have a `rescue` (bare `rescue`, `rescue => e`, `rescue StandardError`, or a modifier `rescue nil`) whose body is empty, only a comment, only `nil`, or only returns a default value, without logging the error, reporting it (`Rails.logger.error`, `Rails.error.report`, `Sentry.capture_exception`, `Honeybadger.notify`), or re-raising?",
+      "true": "A broad rescue silently hides the failure.",
+      "false": "The rescue logs, reports, or re-raises the error; or it rescues a specific class (`ActiveRecord::RecordNotFound`, `JSON::ParserError`, `Timeout::Error`, `ArgumentError`) with deliberate handling; or there is no rescue.",
+      "fix": "Rescue the specific error you expect, or report it (`Rails.error.report(e)`) before continuing.",
+      "when": ["rescue"]
+    }
+  ]
+}

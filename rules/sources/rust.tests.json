@@ -1,0 +1,29 @@
+{
+  "rs-test-cannot-fail": {
+    "evidence": [
+      {
+        "grade": "A",
+        "url": "rules/typescript.practices.json, rules/swift.practices.json (commit 9426fda)",
+        "checked": "2026-09-27",
+        "note": "Mirrors jev-lint's validated built-ins ts-test-cannot-fail / swift-test-cannot-fail: holdout 12/12 per language, 0 false positives. Evidence that the wording works, not new evidence for this language."
+      },
+      {
+        "grade": "C",
+        "url": "https://arxiv.org/abs/2606.18168",
+        "checked": "2026-09-27",
+        "note": "Banik et al. (preprint, Jun 2026), 86,156 agent-authored test-file patches (Codex, Copilot, Devin, Cursor, Claude Code): 80.2% weak/no oracle; W1 no-assertion 24-85% by agent; W2 existence-only 0-0.4%; W4 mock-only 0-4%; W5 snapshot-only 0-4%."
+      },
+      {
+        "grade": "B",
+        "url": "https://arxiv.org/abs/2602.00409",
+        "checked": "2026-09-27",
+        "note": "Hora & Robbes, MSR 2026: 1.2M commits/2,168 TS/JS/Python repos; 23% of agent commits touch tests vs 13% human; 36% of agent commits add mocks vs 26% human."
+      }
+    ],
+    "whyNotLinter": "Clippy has no lint requiring a behaviour-dependent assertion in tests.",
+    "aiRelevance": "Banik et al. find 80.2% of agent-authored test-file patches carry weak or no oracle signals (no-assertion is the largest class); Hora & Robbes find agents add mocks in 36% of commits vs 26% for humans.",
+    "expectedNoise": "low-med — Rust tests often rely on unwrap-as-assertion; the false list spells out when that counts.",
+    "languageFile": "rust",
+    "notes": "Refines best-practices/rust.md rs-test-cannot-fail: gate now covers rstest/test_case/proptest and any `path::test` attribute."
+  }
+}

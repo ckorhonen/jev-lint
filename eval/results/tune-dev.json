@@ -1,0 +1,4895 @@
+{
+  "generatedAt": "2026-09-27T17:35:44.844Z",
+  "gateStats": {
+    "performance.kotlin": {
+      "cases": 20,
+      "rules": 1,
+      "asked": 17
+    },
+    "practices.kotlin": {
+      "cases": 95,
+      "rules": 10,
+      "asked": 201
+    },
+    "tests.kotlin": {
+      "cases": 84,
+      "rules": 7,
+      "asked": 407
+    },
+    "performance.python": {
+      "cases": 29,
+      "rules": 4,
+      "asked": 45
+    },
+    "tests.python": {
+      "cases": 112,
+      "rules": 10,
+      "asked": 693
+    },
+    "performance.ruby": {
+      "cases": 18,
+      "rules": 1,
+      "asked": 12
+    },
+    "practices.swift": {
+      "cases": 72,
+      "rules": 19,
+      "asked": 251
+    },
+    "tests.swift": {
+      "cases": 87,
+      "rules": 8,
+      "asked": 416
+    },
+    "practices.typescript": {
+      "cases": 182,
+      "rules": 30,
+      "asked": 729
+    },
+    "tests.typescript": {
+      "cases": 98,
+      "rules": 9,
+      "asked": 630
+    }
+  },
+  "llmModel": "gpt-6-luna",
+  "thresholds": {
+    "HIGH": 0.8,
+    "MEDIUM": 0.5
+  },
+  "caseCounts": {
+    "performance.kotlin.dev": 20,
+    "practices.kotlin.dev": 95,
+    "tests.kotlin.dev": 84,
+    "performance.python.dev": 29,
+    "tests.python.dev": 112,
+    "performance.ruby.dev": 18,
+    "practices.swift.dev": 72,
+    "tests.swift.dev": 87,
+    "practices.typescript.dev": 182,
+    "tests.typescript.dev": 98
+  },
+  "errors": {
+    "jev": 0
+  },
+  "results": [
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "swift",
+      "split": "dev",
+      "policy": "high",
+      "threshold": 0.8,
+      "tp": 28,
+      "fp": 0,
+      "fn": 10,
+      "precision": 1,
+      "recall": 0.7368421052631579,
+      "f1": 0.8484848484848484,
+      "cleanCases": 38,
+      "cleanFalseAlarmRate": 0,
+      "perRule": {
+        "swift-actor-reentrancy-stale-state": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 6,
+          "precision": 1,
+          "recall": 0,
+          "f1": 0
+        },
+        "swift-unchecked-sendable-unsynchronized": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "swift-cancellation-swallowed-in-loop": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "swift-unstructured-task-in-async-context": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 1,
+          "precision": 1,
+          "recall": 0.8333333333333334,
+          "f1": 0.9090909090909091
+        },
+        "swift-asyncstream-missing-ontermination": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 1,
+          "precision": 1,
+          "recall": 0.8333333333333334,
+          "f1": 0.9090909090909091
+        },
+        "swift-observation-tracking-one-shot": {
+          "tp": 2,
+          "fp": 0,
+          "fn": 2,
+          "precision": 1,
+          "recall": 0.5,
+          "f1": 0.6666666666666666
+        },
+        "swiftui-state-default-heavy-init": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        }
+      },
+      "latency": {
+        "p50": 329.22662499999933,
+        "p90": 396.88125000000036,
+        "n": 72,
+        "tokens": {
+          "input": 294016,
+          "output": 0
+        }
+      }
+    },
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "swift",
+      "split": "dev",
+      "policy": "high+medium",
+      "threshold": 0.5,
+      "tp": 38,
+      "fp": 1,
+      "fn": 0,
+      "precision": 0.9743589743589743,
+      "recall": 1,
+      "f1": 0.9870129870129869,
+      "cleanCases": 38,
+      "cleanFalseAlarmRate": 0,
+      "perRule": {
+        "swift-actor-reentrancy-stale-state": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "swift-unchecked-sendable-unsynchronized": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "swift-cancellation-swallowed-in-loop": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "swift-unstructured-task-in-async-context": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "swift-asyncstream-missing-ontermination": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "swift-observation-tracking-one-shot": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "swiftui-state-default-heavy-init": {
+          "tp": 6,
+          "fp": 1,
+          "fn": 0,
+          "precision": 0.8571428571428571,
+          "recall": 1,
+          "f1": 0.923076923076923
+        }
+      },
+      "latency": {
+        "p50": 329.22662499999933,
+        "p90": 396.88125000000036,
+        "n": 72,
+        "tokens": {
+          "input": 294016,
+          "output": 0
+        }
+      }
+    },
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "swift",
+      "split": "dev",
+      "policy": "gated high",
+      "threshold": 0.8,
+      "tp": 28,
+      "fp": 0,
+      "fn": 10,
+      "precision": 1,
+      "recall": 0.7368421052631579,
+      "f1": 0.8484848484848484,
+      "cleanCases": 38,
+      "cleanFalseAlarmRate": 0,
+      "perRule": {
+        "swift-actor-reentrancy-stale-state": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 6,
+          "precision": 1,
+          "recall": 0,
+          "f1": 0
+        },
+        "swift-unchecked-sendable-unsynchronized": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "swift-cancellation-swallowed-in-loop": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "swift-unstructured-task-in-async-context": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 1,
+          "precision": 1,
+          "recall": 0.8333333333333334,
+          "f1": 0.9090909090909091
+        },
+        "swift-asyncstream-missing-ontermination": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 1,
+          "precision": 1,
+          "recall": 0.8333333333333334,
+          "f1": 0.9090909090909091
+        },
+        "swift-observation-tracking-one-shot": {
+          "tp": 2,
+          "fp": 0,
+          "fn": 2,
+          "precision": 1,
+          "recall": 0.5,
+          "f1": 0.6666666666666666
+        },
+        "swiftui-state-default-heavy-init": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        }
+      },
+      "latency": {
+        "p50": 329.22662499999933,
+        "p90": 396.88125000000036,
+        "n": 72,
+        "tokens": {
+          "input": 294016,
+          "output": 0
+        }
+      }
+    },
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "swift",
+      "split": "dev",
+      "policy": "gated high+medium",
+      "threshold": 0.5,
+      "tp": 38,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "cleanCases": 38,
+      "cleanFalseAlarmRate": 0,
+      "perRule": {
+        "swift-actor-reentrancy-stale-state": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "swift-unchecked-sendable-unsynchronized": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "swift-cancellation-swallowed-in-loop": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "swift-unstructured-task-in-async-context": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "swift-asyncstream-missing-ontermination": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "swift-observation-tracking-one-shot": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "swiftui-state-default-heavy-init": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        }
+      },
+      "latency": {
+        "p50": 329.22662499999933,
+        "p90": 396.88125000000036,
+        "n": 72,
+        "tokens": {
+          "input": 294016,
+          "output": 0
+        }
+      }
+    },
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "typescript",
+      "split": "dev",
+      "policy": "high",
+      "threshold": 0.8,
+      "tp": 92,
+      "fp": 0,
+      "fn": 17,
+      "precision": 1,
+      "recall": 0.8440366972477065,
+      "f1": 0.9154228855721394,
+      "cleanCases": 81,
+      "cleanFalseAlarmRate": 0,
+      "perRule": {
+        "ts-secret-in-public-env": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-secret-env-fallback": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-insecure-random-secret": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-secret-compare-not-constant-time": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-jwt-decode-without-verify": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-sql-interpolated-raw-query": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 1,
+          "precision": 1,
+          "recall": 0.8571428571428571,
+          "f1": 0.923076923076923
+        },
+        "ts-shell-command-interpolation": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-regexp-from-input": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-open-redirect": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "react-server-action-missing-auth": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "react-server-action-client-identity": {
+          "tp": 2,
+          "fp": 0,
+          "fn": 4,
+          "precision": 1,
+          "recall": 0.3333333333333333,
+          "f1": 0.5
+        },
+        "react-server-action-returns-record": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 1,
+          "precision": 1,
+          "recall": 0.8333333333333334,
+          "f1": 0.9090909090909091
+        },
+        "react-effect-notifies-parent": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "react-use-uncached-promise": {
+          "tp": 2,
+          "fp": 0,
+          "fn": 3,
+          "precision": 1,
+          "recall": 0.4,
+          "f1": 0.5714285714285715
+        },
+        "react-unsanitized-html": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "react-hydration-unsafe-render": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 2,
+          "precision": 1,
+          "recall": 0.6666666666666666,
+          "f1": 0.8
+        },
+        "react-useformstatus-same-component": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 5,
+          "precision": 1,
+          "recall": 0,
+          "f1": 0
+        },
+        "react-transition-state-after-await": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "react-lazy-initial-state": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 1,
+          "precision": 1,
+          "recall": 0.8333333333333334,
+          "f1": 0.9090909090909091
+        }
+      },
+      "latency": {
+        "p50": 335.53758300000004,
+        "p90": 408.9377080000004,
+        "n": 182,
+        "tokens": {
+          "input": 1165770,
+          "output": 0
+        }
+      }
+    },
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "typescript",
+      "split": "dev",
+      "policy": "high+medium",
+      "threshold": 0.5,
+      "tp": 107,
+      "fp": 5,
+      "fn": 2,
+      "precision": 0.9553571428571429,
+      "recall": 0.981651376146789,
+      "f1": 0.9683257918552036,
+      "cleanCases": 81,
+      "cleanFalseAlarmRate": 0.037037037037037035,
+      "perRule": {
+        "ts-secret-in-public-env": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-secret-env-fallback": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-insecure-random-secret": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-secret-compare-not-constant-time": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-jwt-decode-without-verify": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-sql-interpolated-raw-query": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-shell-command-interpolation": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-regexp-from-input": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-open-redirect": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "react-server-action-missing-auth": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "react-server-action-client-identity": {
+          "tp": 5,
+          "fp": 4,
+          "fn": 1,
+          "precision": 0.5555555555555556,
+          "recall": 0.8333333333333334,
+          "f1": 0.6666666666666667
+        },
+        "react-server-action-returns-record": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "react-effect-notifies-parent": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "react-use-uncached-promise": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 1,
+          "precision": 1,
+          "recall": 0.8,
+          "f1": 0.888888888888889
+        },
+        "react-unsanitized-html": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "react-hydration-unsafe-render": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "react-useformstatus-same-component": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "react-transition-state-after-await": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "react-lazy-initial-state": {
+          "tp": 6,
+          "fp": 1,
+          "fn": 0,
+          "precision": 0.8571428571428571,
+          "recall": 1,
+          "f1": 0.923076923076923
+        }
+      },
+      "latency": {
+        "p50": 335.53758300000004,
+        "p90": 408.9377080000004,
+        "n": 182,
+        "tokens": {
+          "input": 1165770,
+          "output": 0
+        }
+      }
+    },
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "typescript",
+      "split": "dev",
+      "policy": "gated high",
+      "threshold": 0.8,
+      "tp": 92,
+      "fp": 0,
+      "fn": 17,
+      "precision": 1,
+      "recall": 0.8440366972477065,
+      "f1": 0.9154228855721394,
+      "cleanCases": 81,
+      "cleanFalseAlarmRate": 0,
+      "perRule": {
+        "ts-secret-in-public-env": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-secret-env-fallback": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-insecure-random-secret": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-secret-compare-not-constant-time": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-jwt-decode-without-verify": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-sql-interpolated-raw-query": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 1,
+          "precision": 1,
+          "recall": 0.8571428571428571,
+          "f1": 0.923076923076923
+        },
+        "ts-shell-command-interpolation": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-regexp-from-input": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-open-redirect": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "react-server-action-missing-auth": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "react-server-action-client-identity": {
+          "tp": 2,
+          "fp": 0,
+          "fn": 4,
+          "precision": 1,
+          "recall": 0.3333333333333333,
+          "f1": 0.5
+        },
+        "react-server-action-returns-record": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 1,
+          "precision": 1,
+          "recall": 0.8333333333333334,
+          "f1": 0.9090909090909091
+        },
+        "react-effect-notifies-parent": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "react-use-uncached-promise": {
+          "tp": 2,
+          "fp": 0,
+          "fn": 3,
+          "precision": 1,
+          "recall": 0.4,
+          "f1": 0.5714285714285715
+        },
+        "react-unsanitized-html": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "react-hydration-unsafe-render": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 2,
+          "precision": 1,
+          "recall": 0.6666666666666666,
+          "f1": 0.8
+        },
+        "react-useformstatus-same-component": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 5,
+          "precision": 1,
+          "recall": 0,
+          "f1": 0
+        },
+        "react-transition-state-after-await": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "react-lazy-initial-state": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 1,
+          "precision": 1,
+          "recall": 0.8333333333333334,
+          "f1": 0.9090909090909091
+        }
+      },
+      "latency": {
+        "p50": 335.53758300000004,
+        "p90": 408.9377080000004,
+        "n": 182,
+        "tokens": {
+          "input": 1165770,
+          "output": 0
+        }
+      }
+    },
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "typescript",
+      "split": "dev",
+      "policy": "gated high+medium",
+      "threshold": 0.5,
+      "tp": 107,
+      "fp": 1,
+      "fn": 2,
+      "precision": 0.9907407407407407,
+      "recall": 0.981651376146789,
+      "f1": 0.9861751152073732,
+      "cleanCases": 81,
+      "cleanFalseAlarmRate": 0.012345679012345678,
+      "perRule": {
+        "ts-secret-in-public-env": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-secret-env-fallback": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-insecure-random-secret": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-secret-compare-not-constant-time": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-jwt-decode-without-verify": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-sql-interpolated-raw-query": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-shell-command-interpolation": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-regexp-from-input": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-open-redirect": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "react-server-action-missing-auth": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "react-server-action-client-identity": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 1,
+          "precision": 1,
+          "recall": 0.8333333333333334,
+          "f1": 0.9090909090909091
+        },
+        "react-server-action-returns-record": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "react-effect-notifies-parent": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "react-use-uncached-promise": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 1,
+          "precision": 1,
+          "recall": 0.8,
+          "f1": 0.888888888888889
+        },
+        "react-unsanitized-html": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "react-hydration-unsafe-render": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "react-useformstatus-same-component": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "react-transition-state-after-await": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "react-lazy-initial-state": {
+          "tp": 6,
+          "fp": 1,
+          "fn": 0,
+          "precision": 0.8571428571428571,
+          "recall": 1,
+          "f1": 0.923076923076923
+        }
+      },
+      "latency": {
+        "p50": 335.53758300000004,
+        "p90": 408.9377080000004,
+        "n": 182,
+        "tokens": {
+          "input": 1165770,
+          "output": 0
+        }
+      }
+    },
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "kotlin",
+      "split": "dev",
+      "policy": "high",
+      "threshold": 0.8,
+      "tp": 47,
+      "fp": 1,
+      "fn": 8,
+      "precision": 0.9791666666666666,
+      "recall": 0.8545454545454545,
+      "f1": 0.912621359223301,
+      "cleanCases": 45,
+      "cleanFalseAlarmRate": 0.022222222222222223,
+      "perRule": {
+        "kt-unscoped-coroutine": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "kt-blocking-call-not-main-safe": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "kt-runblocking-in-app-code": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 2,
+          "precision": 1,
+          "recall": 0.6666666666666666,
+          "f1": 0.8
+        },
+        "kt-catch-swallows-cancellation": {
+          "tp": 5,
+          "fp": 1,
+          "fn": 0,
+          "precision": 0.8333333333333334,
+          "recall": 1,
+          "f1": 0.9090909090909091
+        },
+        "kt-flow-emit-wrong-context": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "kt-exposed-mutable-state": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 2,
+          "precision": 1,
+          "recall": 0.7142857142857143,
+          "f1": 0.8333333333333333
+        },
+        "kt-state-mutated-in-place": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 2,
+          "precision": 1,
+          "recall": 0.6666666666666666,
+          "f1": 0.8
+        },
+        "kt-collect-without-lifecycle": {
+          "tp": 2,
+          "fp": 0,
+          "fn": 2,
+          "precision": 1,
+          "recall": 0.5,
+          "f1": 0.6666666666666666
+        },
+        "kt-viewmodel-holds-context": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "kt-compose-side-effect-in-composition": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        }
+      },
+      "latency": {
+        "p50": 291.2762499999999,
+        "p90": 375.28266699999995,
+        "n": 95,
+        "tokens": {
+          "input": 318323,
+          "output": 0
+        }
+      }
+    },
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "kotlin",
+      "split": "dev",
+      "policy": "high+medium",
+      "threshold": 0.5,
+      "tp": 54,
+      "fp": 2,
+      "fn": 1,
+      "precision": 0.9642857142857143,
+      "recall": 0.9818181818181818,
+      "f1": 0.972972972972973,
+      "cleanCases": 45,
+      "cleanFalseAlarmRate": 0.022222222222222223,
+      "perRule": {
+        "kt-unscoped-coroutine": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "kt-blocking-call-not-main-safe": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "kt-runblocking-in-app-code": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "kt-catch-swallows-cancellation": {
+          "tp": 5,
+          "fp": 1,
+          "fn": 0,
+          "precision": 0.8333333333333334,
+          "recall": 1,
+          "f1": 0.9090909090909091
+        },
+        "kt-flow-emit-wrong-context": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "kt-exposed-mutable-state": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 1,
+          "precision": 1,
+          "recall": 0.8571428571428571,
+          "f1": 0.923076923076923
+        },
+        "kt-state-mutated-in-place": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "kt-collect-without-lifecycle": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "kt-viewmodel-holds-context": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "kt-compose-side-effect-in-composition": {
+          "tp": 6,
+          "fp": 1,
+          "fn": 0,
+          "precision": 0.8571428571428571,
+          "recall": 1,
+          "f1": 0.923076923076923
+        }
+      },
+      "latency": {
+        "p50": 291.2762499999999,
+        "p90": 375.28266699999995,
+        "n": 95,
+        "tokens": {
+          "input": 318323,
+          "output": 0
+        }
+      }
+    },
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "kotlin",
+      "split": "dev",
+      "policy": "gated high",
+      "threshold": 0.8,
+      "tp": 47,
+      "fp": 1,
+      "fn": 8,
+      "precision": 0.9791666666666666,
+      "recall": 0.8545454545454545,
+      "f1": 0.912621359223301,
+      "cleanCases": 45,
+      "cleanFalseAlarmRate": 0.022222222222222223,
+      "perRule": {
+        "kt-unscoped-coroutine": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "kt-blocking-call-not-main-safe": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "kt-runblocking-in-app-code": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 2,
+          "precision": 1,
+          "recall": 0.6666666666666666,
+          "f1": 0.8
+        },
+        "kt-catch-swallows-cancellation": {
+          "tp": 5,
+          "fp": 1,
+          "fn": 0,
+          "precision": 0.8333333333333334,
+          "recall": 1,
+          "f1": 0.9090909090909091
+        },
+        "kt-flow-emit-wrong-context": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "kt-exposed-mutable-state": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 2,
+          "precision": 1,
+          "recall": 0.7142857142857143,
+          "f1": 0.8333333333333333
+        },
+        "kt-state-mutated-in-place": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 2,
+          "precision": 1,
+          "recall": 0.6666666666666666,
+          "f1": 0.8
+        },
+        "kt-collect-without-lifecycle": {
+          "tp": 2,
+          "fp": 0,
+          "fn": 2,
+          "precision": 1,
+          "recall": 0.5,
+          "f1": 0.6666666666666666
+        },
+        "kt-viewmodel-holds-context": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "kt-compose-side-effect-in-composition": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        }
+      },
+      "latency": {
+        "p50": 291.2762499999999,
+        "p90": 375.28266699999995,
+        "n": 95,
+        "tokens": {
+          "input": 318323,
+          "output": 0
+        }
+      }
+    },
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "kotlin",
+      "split": "dev",
+      "policy": "gated high+medium",
+      "threshold": 0.5,
+      "tp": 54,
+      "fp": 1,
+      "fn": 1,
+      "precision": 0.9818181818181818,
+      "recall": 0.9818181818181818,
+      "f1": 0.9818181818181818,
+      "cleanCases": 45,
+      "cleanFalseAlarmRate": 0.022222222222222223,
+      "perRule": {
+        "kt-unscoped-coroutine": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "kt-blocking-call-not-main-safe": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "kt-runblocking-in-app-code": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "kt-catch-swallows-cancellation": {
+          "tp": 5,
+          "fp": 1,
+          "fn": 0,
+          "precision": 0.8333333333333334,
+          "recall": 1,
+          "f1": 0.9090909090909091
+        },
+        "kt-flow-emit-wrong-context": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "kt-exposed-mutable-state": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 1,
+          "precision": 1,
+          "recall": 0.8571428571428571,
+          "f1": 0.923076923076923
+        },
+        "kt-state-mutated-in-place": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "kt-collect-without-lifecycle": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "kt-viewmodel-holds-context": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "kt-compose-side-effect-in-composition": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        }
+      },
+      "latency": {
+        "p50": 291.2762499999999,
+        "p90": 375.28266699999995,
+        "n": 95,
+        "tokens": {
+          "input": 318323,
+          "output": 0
+        }
+      }
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "swift",
+      "split": "dev",
+      "policy": "high",
+      "threshold": 0.8,
+      "tp": 39,
+      "fp": 0,
+      "fn": 3,
+      "precision": 1,
+      "recall": 0.9285714285714286,
+      "f1": 0.962962962962963,
+      "cleanCases": 49,
+      "cleanFalseAlarmRate": 0,
+      "perRule": {
+        "swift-test-fixed-sleep": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "swift-test-error-path-passes-silently": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 2,
+          "precision": 1,
+          "recall": 0.6666666666666666,
+          "f1": 0.8
+        },
+        "swift-test-unawaited-task": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "swift-test-real-clock": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "swift-test-uncontrolled-randomness": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 1,
+          "precision": 1,
+          "recall": 0.8571428571428571,
+          "f1": 0.923076923076923
+        },
+        "swift-test-real-network": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "swift-test-unordered-assertion": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        }
+      },
+      "latency": {
+        "p50": 279.3474159999987,
+        "p90": 348.911250000001,
+        "n": 87,
+        "tokens": {
+          "input": 224049,
+          "output": 0
+        }
+      }
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "swift",
+      "split": "dev",
+      "policy": "high+medium",
+      "threshold": 0.5,
+      "tp": 41,
+      "fp": 1,
+      "fn": 1,
+      "precision": 0.9761904761904762,
+      "recall": 0.9761904761904762,
+      "f1": 0.9761904761904762,
+      "cleanCases": 49,
+      "cleanFalseAlarmRate": 0.02040816326530612,
+      "perRule": {
+        "swift-test-fixed-sleep": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "swift-test-error-path-passes-silently": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "swift-test-unawaited-task": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "swift-test-real-clock": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "swift-test-uncontrolled-randomness": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 1,
+          "precision": 1,
+          "recall": 0.8571428571428571,
+          "f1": 0.923076923076923
+        },
+        "swift-test-real-network": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "swift-test-unordered-assertion": {
+          "tp": 6,
+          "fp": 1,
+          "fn": 0,
+          "precision": 0.8571428571428571,
+          "recall": 1,
+          "f1": 0.923076923076923
+        }
+      },
+      "latency": {
+        "p50": 279.3474159999987,
+        "p90": 348.911250000001,
+        "n": 87,
+        "tokens": {
+          "input": 224049,
+          "output": 0
+        }
+      }
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "swift",
+      "split": "dev",
+      "policy": "gated high",
+      "threshold": 0.8,
+      "tp": 39,
+      "fp": 0,
+      "fn": 3,
+      "precision": 1,
+      "recall": 0.9285714285714286,
+      "f1": 0.962962962962963,
+      "cleanCases": 49,
+      "cleanFalseAlarmRate": 0,
+      "perRule": {
+        "swift-test-fixed-sleep": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "swift-test-error-path-passes-silently": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 2,
+          "precision": 1,
+          "recall": 0.6666666666666666,
+          "f1": 0.8
+        },
+        "swift-test-unawaited-task": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "swift-test-real-clock": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "swift-test-uncontrolled-randomness": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 1,
+          "precision": 1,
+          "recall": 0.8571428571428571,
+          "f1": 0.923076923076923
+        },
+        "swift-test-real-network": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "swift-test-unordered-assertion": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        }
+      },
+      "latency": {
+        "p50": 279.3474159999987,
+        "p90": 348.911250000001,
+        "n": 87,
+        "tokens": {
+          "input": 224049,
+          "output": 0
+        }
+      }
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "swift",
+      "split": "dev",
+      "policy": "gated high+medium",
+      "threshold": 0.5,
+      "tp": 41,
+      "fp": 0,
+      "fn": 1,
+      "precision": 1,
+      "recall": 0.9761904761904762,
+      "f1": 0.9879518072289156,
+      "cleanCases": 49,
+      "cleanFalseAlarmRate": 0,
+      "perRule": {
+        "swift-test-fixed-sleep": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "swift-test-error-path-passes-silently": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "swift-test-unawaited-task": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "swift-test-real-clock": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "swift-test-uncontrolled-randomness": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 1,
+          "precision": 1,
+          "recall": 0.8571428571428571,
+          "f1": 0.923076923076923
+        },
+        "swift-test-real-network": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "swift-test-unordered-assertion": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        }
+      },
+      "latency": {
+        "p50": 279.3474159999987,
+        "p90": 348.911250000001,
+        "n": 87,
+        "tokens": {
+          "input": 224049,
+          "output": 0
+        }
+      }
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "typescript",
+      "split": "dev",
+      "policy": "high",
+      "threshold": 0.8,
+      "tp": 41,
+      "fp": 0,
+      "fn": 6,
+      "precision": 1,
+      "recall": 0.8723404255319149,
+      "f1": 0.9318181818181819,
+      "cleanCases": 55,
+      "cleanFalseAlarmRate": 0,
+      "perRule": {
+        "ts-test-fixed-sleep": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-test-title-contradicts-assertions": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 1,
+          "precision": 1,
+          "recall": 0.8333333333333334,
+          "f1": 0.9090909090909091
+        },
+        "ts-test-shared-mutable-state": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-test-special-case-in-source": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-test-real-clock": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-test-uncontrolled-randomness": {
+          "tp": 2,
+          "fp": 0,
+          "fn": 4,
+          "precision": 1,
+          "recall": 0.3333333333333333,
+          "f1": 0.5
+        },
+        "ts-test-real-network": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-test-unordered-assertion": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 1,
+          "precision": 1,
+          "recall": 0.8,
+          "f1": 0.888888888888889
+        }
+      },
+      "latency": {
+        "p50": 290.5672080000004,
+        "p90": 422.41362500000105,
+        "n": 98,
+        "tokens": {
+          "input": 286110,
+          "output": 0
+        }
+      }
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "typescript",
+      "split": "dev",
+      "policy": "high+medium",
+      "threshold": 0.5,
+      "tp": 46,
+      "fp": 0,
+      "fn": 1,
+      "precision": 1,
+      "recall": 0.9787234042553191,
+      "f1": 0.989247311827957,
+      "cleanCases": 55,
+      "cleanFalseAlarmRate": 0,
+      "perRule": {
+        "ts-test-fixed-sleep": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-test-title-contradicts-assertions": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 1,
+          "precision": 1,
+          "recall": 0.8333333333333334,
+          "f1": 0.9090909090909091
+        },
+        "ts-test-shared-mutable-state": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-test-special-case-in-source": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-test-real-clock": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-test-uncontrolled-randomness": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-test-real-network": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-test-unordered-assertion": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        }
+      },
+      "latency": {
+        "p50": 290.5672080000004,
+        "p90": 422.41362500000105,
+        "n": 98,
+        "tokens": {
+          "input": 286110,
+          "output": 0
+        }
+      }
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "typescript",
+      "split": "dev",
+      "policy": "gated high",
+      "threshold": 0.8,
+      "tp": 41,
+      "fp": 0,
+      "fn": 6,
+      "precision": 1,
+      "recall": 0.8723404255319149,
+      "f1": 0.9318181818181819,
+      "cleanCases": 55,
+      "cleanFalseAlarmRate": 0,
+      "perRule": {
+        "ts-test-fixed-sleep": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-test-title-contradicts-assertions": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 1,
+          "precision": 1,
+          "recall": 0.8333333333333334,
+          "f1": 0.9090909090909091
+        },
+        "ts-test-shared-mutable-state": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-test-special-case-in-source": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-test-real-clock": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-test-uncontrolled-randomness": {
+          "tp": 2,
+          "fp": 0,
+          "fn": 4,
+          "precision": 1,
+          "recall": 0.3333333333333333,
+          "f1": 0.5
+        },
+        "ts-test-real-network": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-test-unordered-assertion": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 1,
+          "precision": 1,
+          "recall": 0.8,
+          "f1": 0.888888888888889
+        }
+      },
+      "latency": {
+        "p50": 290.5672080000004,
+        "p90": 422.41362500000105,
+        "n": 98,
+        "tokens": {
+          "input": 286110,
+          "output": 0
+        }
+      }
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "typescript",
+      "split": "dev",
+      "policy": "gated high+medium",
+      "threshold": 0.5,
+      "tp": 46,
+      "fp": 0,
+      "fn": 1,
+      "precision": 1,
+      "recall": 0.9787234042553191,
+      "f1": 0.989247311827957,
+      "cleanCases": 55,
+      "cleanFalseAlarmRate": 0,
+      "perRule": {
+        "ts-test-fixed-sleep": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-test-title-contradicts-assertions": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 1,
+          "precision": 1,
+          "recall": 0.8333333333333334,
+          "f1": 0.9090909090909091
+        },
+        "ts-test-shared-mutable-state": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-test-special-case-in-source": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-test-real-clock": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-test-uncontrolled-randomness": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-test-real-network": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-test-unordered-assertion": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        }
+      },
+      "latency": {
+        "p50": 290.5672080000004,
+        "p90": 422.41362500000105,
+        "n": 98,
+        "tokens": {
+          "input": 286110,
+          "output": 0
+        }
+      }
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "kotlin",
+      "split": "dev",
+      "policy": "high",
+      "threshold": 0.8,
+      "tp": 28,
+      "fp": 0,
+      "fn": 11,
+      "precision": 1,
+      "recall": 0.717948717948718,
+      "f1": 0.835820895522388,
+      "cleanCases": 49,
+      "cleanFalseAlarmRate": 0,
+      "perRule": {
+        "kt-test-cannot-fail": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "kt-test-error-path-passes-silently": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 5,
+          "precision": 1,
+          "recall": 0,
+          "f1": 0
+        },
+        "kt-test-launch-without-advance": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 3,
+          "precision": 1,
+          "recall": 0.25,
+          "f1": 0.4
+        },
+        "kt-test-real-clock": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 2,
+          "precision": 1,
+          "recall": 0.7142857142857143,
+          "f1": 0.8333333333333333
+        },
+        "kt-test-uncontrolled-randomness": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "kt-test-real-network": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "kt-test-unordered-assertion": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 1,
+          "precision": 1,
+          "recall": 0.8,
+          "f1": 0.888888888888889
+        }
+      },
+      "latency": {
+        "p50": 272.4391250000008,
+        "p90": 321.7643340000004,
+        "n": 84,
+        "tokens": {
+          "input": 207666,
+          "output": 0
+        }
+      }
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "kotlin",
+      "split": "dev",
+      "policy": "high+medium",
+      "threshold": 0.5,
+      "tp": 39,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "cleanCases": 49,
+      "cleanFalseAlarmRate": 0,
+      "perRule": {
+        "kt-test-cannot-fail": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "kt-test-error-path-passes-silently": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "kt-test-launch-without-advance": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "kt-test-real-clock": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "kt-test-uncontrolled-randomness": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "kt-test-real-network": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "kt-test-unordered-assertion": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        }
+      },
+      "latency": {
+        "p50": 272.4391250000008,
+        "p90": 321.7643340000004,
+        "n": 84,
+        "tokens": {
+          "input": 207666,
+          "output": 0
+        }
+      }
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "kotlin",
+      "split": "dev",
+      "policy": "gated high",
+      "threshold": 0.8,
+      "tp": 28,
+      "fp": 0,
+      "fn": 11,
+      "precision": 1,
+      "recall": 0.717948717948718,
+      "f1": 0.835820895522388,
+      "cleanCases": 49,
+      "cleanFalseAlarmRate": 0,
+      "perRule": {
+        "kt-test-cannot-fail": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "kt-test-error-path-passes-silently": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 5,
+          "precision": 1,
+          "recall": 0,
+          "f1": 0
+        },
+        "kt-test-launch-without-advance": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 3,
+          "precision": 1,
+          "recall": 0.25,
+          "f1": 0.4
+        },
+        "kt-test-real-clock": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 2,
+          "precision": 1,
+          "recall": 0.7142857142857143,
+          "f1": 0.8333333333333333
+        },
+        "kt-test-uncontrolled-randomness": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "kt-test-real-network": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "kt-test-unordered-assertion": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 1,
+          "precision": 1,
+          "recall": 0.8,
+          "f1": 0.888888888888889
+        }
+      },
+      "latency": {
+        "p50": 272.4391250000008,
+        "p90": 321.7643340000004,
+        "n": 84,
+        "tokens": {
+          "input": 207666,
+          "output": 0
+        }
+      }
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "kotlin",
+      "split": "dev",
+      "policy": "gated high+medium",
+      "threshold": 0.5,
+      "tp": 39,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "cleanCases": 49,
+      "cleanFalseAlarmRate": 0,
+      "perRule": {
+        "kt-test-cannot-fail": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "kt-test-error-path-passes-silently": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "kt-test-launch-without-advance": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "kt-test-real-clock": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "kt-test-uncontrolled-randomness": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "kt-test-real-network": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "kt-test-unordered-assertion": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        }
+      },
+      "latency": {
+        "p50": 272.4391250000008,
+        "p90": 321.7643340000004,
+        "n": 84,
+        "tokens": {
+          "input": 207666,
+          "output": 0
+        }
+      }
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "python",
+      "split": "dev",
+      "policy": "high",
+      "threshold": 0.8,
+      "tp": 44,
+      "fp": 0,
+      "fn": 12,
+      "precision": 1,
+      "recall": 0.7857142857142857,
+      "f1": 0.88,
+      "cleanCases": 60,
+      "cleanFalseAlarmRate": 0,
+      "perRule": {
+        "py-test-cannot-fail": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "py-test-fixed-sleep": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "py-test-error-path-passes-silently": {
+          "tp": 2,
+          "fp": 0,
+          "fn": 3,
+          "precision": 1,
+          "recall": 0.4,
+          "f1": 0.5714285714285715
+        },
+        "py-test-title-contradicts-assertions": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 3,
+          "precision": 1,
+          "recall": 0.5,
+          "f1": 0.6666666666666666
+        },
+        "py-test-shared-mutable-state": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 2,
+          "precision": 1,
+          "recall": 0.6,
+          "f1": 0.7499999999999999
+        },
+        "py-test-special-case-in-source": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "py-test-real-clock": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 1,
+          "precision": 1,
+          "recall": 0.8333333333333334,
+          "f1": 0.9090909090909091
+        },
+        "py-test-uncontrolled-randomness": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 3,
+          "precision": 1,
+          "recall": 0.5,
+          "f1": 0.6666666666666666
+        },
+        "py-test-real-network": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "py-test-unordered-assertion": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        }
+      },
+      "latency": {
+        "p50": 277.9078330000011,
+        "p90": 375.011207999999,
+        "n": 112,
+        "tokens": {
+          "input": 341755,
+          "output": 0
+        }
+      }
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "python",
+      "split": "dev",
+      "policy": "high+medium",
+      "threshold": 0.5,
+      "tp": 54,
+      "fp": 0,
+      "fn": 2,
+      "precision": 1,
+      "recall": 0.9642857142857143,
+      "f1": 0.9818181818181818,
+      "cleanCases": 60,
+      "cleanFalseAlarmRate": 0,
+      "perRule": {
+        "py-test-cannot-fail": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "py-test-fixed-sleep": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "py-test-error-path-passes-silently": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "py-test-title-contradicts-assertions": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 2,
+          "precision": 1,
+          "recall": 0.6666666666666666,
+          "f1": 0.8
+        },
+        "py-test-shared-mutable-state": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "py-test-special-case-in-source": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "py-test-real-clock": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "py-test-uncontrolled-randomness": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "py-test-real-network": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "py-test-unordered-assertion": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        }
+      },
+      "latency": {
+        "p50": 277.9078330000011,
+        "p90": 375.011207999999,
+        "n": 112,
+        "tokens": {
+          "input": 341755,
+          "output": 0
+        }
+      }
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "python",
+      "split": "dev",
+      "policy": "gated high",
+      "threshold": 0.8,
+      "tp": 44,
+      "fp": 0,
+      "fn": 12,
+      "precision": 1,
+      "recall": 0.7857142857142857,
+      "f1": 0.88,
+      "cleanCases": 60,
+      "cleanFalseAlarmRate": 0,
+      "perRule": {
+        "py-test-cannot-fail": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "py-test-fixed-sleep": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "py-test-error-path-passes-silently": {
+          "tp": 2,
+          "fp": 0,
+          "fn": 3,
+          "precision": 1,
+          "recall": 0.4,
+          "f1": 0.5714285714285715
+        },
+        "py-test-title-contradicts-assertions": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 3,
+          "precision": 1,
+          "recall": 0.5,
+          "f1": 0.6666666666666666
+        },
+        "py-test-shared-mutable-state": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 2,
+          "precision": 1,
+          "recall": 0.6,
+          "f1": 0.7499999999999999
+        },
+        "py-test-special-case-in-source": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "py-test-real-clock": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 1,
+          "precision": 1,
+          "recall": 0.8333333333333334,
+          "f1": 0.9090909090909091
+        },
+        "py-test-uncontrolled-randomness": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 3,
+          "precision": 1,
+          "recall": 0.5,
+          "f1": 0.6666666666666666
+        },
+        "py-test-real-network": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "py-test-unordered-assertion": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        }
+      },
+      "latency": {
+        "p50": 277.9078330000011,
+        "p90": 375.011207999999,
+        "n": 112,
+        "tokens": {
+          "input": 341755,
+          "output": 0
+        }
+      }
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "python",
+      "split": "dev",
+      "policy": "gated high+medium",
+      "threshold": 0.5,
+      "tp": 54,
+      "fp": 0,
+      "fn": 2,
+      "precision": 1,
+      "recall": 0.9642857142857143,
+      "f1": 0.9818181818181818,
+      "cleanCases": 60,
+      "cleanFalseAlarmRate": 0,
+      "perRule": {
+        "py-test-cannot-fail": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "py-test-fixed-sleep": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "py-test-error-path-passes-silently": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "py-test-title-contradicts-assertions": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 2,
+          "precision": 1,
+          "recall": 0.6666666666666666,
+          "f1": 0.8
+        },
+        "py-test-shared-mutable-state": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "py-test-special-case-in-source": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "py-test-real-clock": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "py-test-uncontrolled-randomness": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "py-test-real-network": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "py-test-unordered-assertion": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        }
+      },
+      "latency": {
+        "p50": 277.9078330000011,
+        "p90": 375.011207999999,
+        "n": 112,
+        "tokens": {
+          "input": 341755,
+          "output": 0
+        }
+      }
+    },
+    {
+      "system": "jev",
+      "pack": "performance",
+      "lang": "kotlin",
+      "split": "dev",
+      "policy": "high",
+      "threshold": 0.8,
+      "tp": 5,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "cleanCases": 15,
+      "cleanFalseAlarmRate": 0,
+      "perRule": {
+        "kt-perf-sequential-suspend-calls": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        }
+      },
+      "latency": {
+        "p50": 338.94845799999996,
+        "p90": 379.46916699999997,
+        "n": 20,
+        "tokens": {
+          "input": 12158,
+          "output": 0
+        }
+      }
+    },
+    {
+      "system": "jev",
+      "pack": "performance",
+      "lang": "kotlin",
+      "split": "dev",
+      "policy": "high+medium",
+      "threshold": 0.5,
+      "tp": 5,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "cleanCases": 15,
+      "cleanFalseAlarmRate": 0,
+      "perRule": {
+        "kt-perf-sequential-suspend-calls": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        }
+      },
+      "latency": {
+        "p50": 338.94845799999996,
+        "p90": 379.46916699999997,
+        "n": 20,
+        "tokens": {
+          "input": 12158,
+          "output": 0
+        }
+      }
+    },
+    {
+      "system": "jev",
+      "pack": "performance",
+      "lang": "kotlin",
+      "split": "dev",
+      "policy": "gated high",
+      "threshold": 0.8,
+      "tp": 5,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "cleanCases": 15,
+      "cleanFalseAlarmRate": 0,
+      "perRule": {
+        "kt-perf-sequential-suspend-calls": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        }
+      },
+      "latency": {
+        "p50": 338.94845799999996,
+        "p90": 379.46916699999997,
+        "n": 20,
+        "tokens": {
+          "input": 12158,
+          "output": 0
+        }
+      }
+    },
+    {
+      "system": "jev",
+      "pack": "performance",
+      "lang": "kotlin",
+      "split": "dev",
+      "policy": "gated high+medium",
+      "threshold": 0.5,
+      "tp": 5,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "cleanCases": 15,
+      "cleanFalseAlarmRate": 0,
+      "perRule": {
+        "kt-perf-sequential-suspend-calls": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        }
+      },
+      "latency": {
+        "p50": 338.94845799999996,
+        "p90": 379.46916699999997,
+        "n": 20,
+        "tokens": {
+          "input": 12158,
+          "output": 0
+        }
+      }
+    },
+    {
+      "system": "jev",
+      "pack": "performance",
+      "lang": "python",
+      "split": "dev",
+      "policy": "high",
+      "threshold": 0.8,
+      "tp": 13,
+      "fp": 0,
+      "fn": 1,
+      "precision": 1,
+      "recall": 0.9285714285714286,
+      "f1": 0.962962962962963,
+      "cleanCases": 17,
+      "cleanFalseAlarmRate": 0,
+      "perRule": {
+        "py-perf-orm-query-in-loop": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 1,
+          "precision": 1,
+          "recall": 0.8571428571428571,
+          "f1": 0.923076923076923
+        },
+        "py-perf-orm-write-in-loop": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        }
+      },
+      "latency": {
+        "p50": 293.646291,
+        "p90": 364.69366699999955,
+        "n": 29,
+        "tokens": {
+          "input": 38051,
+          "output": 0
+        }
+      }
+    },
+    {
+      "system": "jev",
+      "pack": "performance",
+      "lang": "python",
+      "split": "dev",
+      "policy": "high+medium",
+      "threshold": 0.5,
+      "tp": 14,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "cleanCases": 17,
+      "cleanFalseAlarmRate": 0,
+      "perRule": {
+        "py-perf-orm-query-in-loop": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "py-perf-orm-write-in-loop": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        }
+      },
+      "latency": {
+        "p50": 293.646291,
+        "p90": 364.69366699999955,
+        "n": 29,
+        "tokens": {
+          "input": 38051,
+          "output": 0
+        }
+      }
+    },
+    {
+      "system": "jev",
+      "pack": "performance",
+      "lang": "python",
+      "split": "dev",
+      "policy": "gated high",
+      "threshold": 0.8,
+      "tp": 13,
+      "fp": 0,
+      "fn": 1,
+      "precision": 1,
+      "recall": 0.9285714285714286,
+      "f1": 0.962962962962963,
+      "cleanCases": 17,
+      "cleanFalseAlarmRate": 0,
+      "perRule": {
+        "py-perf-orm-query-in-loop": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 1,
+          "precision": 1,
+          "recall": 0.8571428571428571,
+          "f1": 0.923076923076923
+        },
+        "py-perf-orm-write-in-loop": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        }
+      },
+      "latency": {
+        "p50": 293.646291,
+        "p90": 364.69366699999955,
+        "n": 29,
+        "tokens": {
+          "input": 38051,
+          "output": 0
+        }
+      }
+    },
+    {
+      "system": "jev",
+      "pack": "performance",
+      "lang": "python",
+      "split": "dev",
+      "policy": "gated high+medium",
+      "threshold": 0.5,
+      "tp": 14,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "cleanCases": 17,
+      "cleanFalseAlarmRate": 0,
+      "perRule": {
+        "py-perf-orm-query-in-loop": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "py-perf-orm-write-in-loop": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        }
+      },
+      "latency": {
+        "p50": 293.646291,
+        "p90": 364.69366699999955,
+        "n": 29,
+        "tokens": {
+          "input": 38051,
+          "output": 0
+        }
+      }
+    },
+    {
+      "system": "jev",
+      "pack": "performance",
+      "lang": "ruby",
+      "split": "dev",
+      "policy": "high",
+      "threshold": 0.8,
+      "tp": 6,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "cleanCases": 12,
+      "cleanFalseAlarmRate": 0,
+      "perRule": {
+        "rb-perf-n-plus-one": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        }
+      },
+      "latency": {
+        "p50": 277.0857500000002,
+        "p90": 300.2118329999994,
+        "n": 18,
+        "tokens": {
+          "input": 12155,
+          "output": 0
+        }
+      }
+    },
+    {
+      "system": "jev",
+      "pack": "performance",
+      "lang": "ruby",
+      "split": "dev",
+      "policy": "high+medium",
+      "threshold": 0.5,
+      "tp": 6,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "cleanCases": 12,
+      "cleanFalseAlarmRate": 0,
+      "perRule": {
+        "rb-perf-n-plus-one": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        }
+      },
+      "latency": {
+        "p50": 277.0857500000002,
+        "p90": 300.2118329999994,
+        "n": 18,
+        "tokens": {
+          "input": 12155,
+          "output": 0
+        }
+      }
+    },
+    {
+      "system": "jev",
+      "pack": "performance",
+      "lang": "ruby",
+      "split": "dev",
+      "policy": "gated high",
+      "threshold": 0.8,
+      "tp": 6,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "cleanCases": 12,
+      "cleanFalseAlarmRate": 0,
+      "perRule": {
+        "rb-perf-n-plus-one": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        }
+      },
+      "latency": {
+        "p50": 277.0857500000002,
+        "p90": 300.2118329999994,
+        "n": 18,
+        "tokens": {
+          "input": 12155,
+          "output": 0
+        }
+      }
+    },
+    {
+      "system": "jev",
+      "pack": "performance",
+      "lang": "ruby",
+      "split": "dev",
+      "policy": "gated high+medium",
+      "threshold": 0.5,
+      "tp": 6,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "cleanCases": 12,
+      "cleanFalseAlarmRate": 0,
+      "perRule": {
+        "rb-perf-n-plus-one": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        }
+      },
+      "latency": {
+        "p50": 277.0857500000002,
+        "p90": 300.2118329999994,
+        "n": 18,
+        "tokens": {
+          "input": 12155,
+          "output": 0
+        }
+      }
+    }
+  ],
+  "sweeps": [
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "swift",
+      "split": "dev",
+      "threshold": 0.1,
+      "precision": 0.5846153846153846,
+      "recall": 1,
+      "f1": 0.7378640776699029,
+      "cleanFalseAlarmRate": 0.42105263157894735
+    },
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "swift",
+      "split": "dev",
+      "threshold": 0.2,
+      "precision": 0.76,
+      "recall": 1,
+      "f1": 0.8636363636363636,
+      "cleanFalseAlarmRate": 0.15789473684210525
+    },
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "swift",
+      "split": "dev",
+      "threshold": 0.3,
+      "precision": 0.9047619047619048,
+      "recall": 1,
+      "f1": 0.9500000000000001,
+      "cleanFalseAlarmRate": 0.02631578947368421
+    },
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "swift",
+      "split": "dev",
+      "threshold": 0.4,
+      "precision": 0.926829268292683,
+      "recall": 1,
+      "f1": 0.9620253164556963,
+      "cleanFalseAlarmRate": 0.02631578947368421
+    },
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "swift",
+      "split": "dev",
+      "threshold": 0.5,
+      "precision": 0.9743589743589743,
+      "recall": 1,
+      "f1": 0.9870129870129869,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "swift",
+      "split": "dev",
+      "threshold": 0.6,
+      "precision": 0.9722222222222222,
+      "recall": 0.9210526315789473,
+      "f1": 0.9459459459459458,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "swift",
+      "split": "dev",
+      "threshold": 0.7,
+      "precision": 1,
+      "recall": 0.8947368421052632,
+      "f1": 0.9444444444444444,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "swift",
+      "split": "dev",
+      "threshold": 0.8,
+      "precision": 1,
+      "recall": 0.7368421052631579,
+      "f1": 0.8484848484848484,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "swift",
+      "split": "dev",
+      "threshold": 0.9,
+      "precision": 1,
+      "recall": 0.6052631578947368,
+      "f1": 0.7540983606557378,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "typescript",
+      "split": "dev",
+      "threshold": 0.1,
+      "precision": 0.5797872340425532,
+      "recall": 1,
+      "f1": 0.734006734006734,
+      "cleanFalseAlarmRate": 0.38271604938271603
+    },
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "typescript",
+      "split": "dev",
+      "threshold": 0.2,
+      "precision": 0.7714285714285715,
+      "recall": 0.9908256880733946,
+      "f1": 0.8674698795180723,
+      "cleanFalseAlarmRate": 0.16049382716049382
+    },
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "typescript",
+      "split": "dev",
+      "threshold": 0.3,
+      "precision": 0.9152542372881356,
+      "recall": 0.9908256880733946,
+      "f1": 0.9515418502202644,
+      "cleanFalseAlarmRate": 0.037037037037037035
+    },
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "typescript",
+      "split": "dev",
+      "threshold": 0.4,
+      "precision": 0.9391304347826087,
+      "recall": 0.9908256880733946,
+      "f1": 0.9642857142857143,
+      "cleanFalseAlarmRate": 0.037037037037037035
+    },
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "typescript",
+      "split": "dev",
+      "threshold": 0.5,
+      "precision": 0.9553571428571429,
+      "recall": 0.981651376146789,
+      "f1": 0.9683257918552036,
+      "cleanFalseAlarmRate": 0.037037037037037035
+    },
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "typescript",
+      "split": "dev",
+      "threshold": 0.6,
+      "precision": 0.9905660377358491,
+      "recall": 0.963302752293578,
+      "f1": 0.9767441860465116,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "typescript",
+      "split": "dev",
+      "threshold": 0.7,
+      "precision": 1,
+      "recall": 0.9541284403669725,
+      "f1": 0.9765258215962441,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "typescript",
+      "split": "dev",
+      "threshold": 0.8,
+      "precision": 1,
+      "recall": 0.8440366972477065,
+      "f1": 0.9154228855721394,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "typescript",
+      "split": "dev",
+      "threshold": 0.9,
+      "precision": 1,
+      "recall": 0.7706422018348624,
+      "f1": 0.8704663212435233,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "kotlin",
+      "split": "dev",
+      "threshold": 0.1,
+      "precision": 0.453781512605042,
+      "recall": 0.9818181818181818,
+      "f1": 0.6206896551724138,
+      "cleanFalseAlarmRate": 0.5111111111111111
+    },
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "kotlin",
+      "split": "dev",
+      "threshold": 0.2,
+      "precision": 0.7012987012987013,
+      "recall": 0.9818181818181818,
+      "f1": 0.8181818181818182,
+      "cleanFalseAlarmRate": 0.2
+    },
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "kotlin",
+      "split": "dev",
+      "threshold": 0.3,
+      "precision": 0.84375,
+      "recall": 0.9818181818181818,
+      "f1": 0.9075630252100839,
+      "cleanFalseAlarmRate": 0.1111111111111111
+    },
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "kotlin",
+      "split": "dev",
+      "threshold": 0.4,
+      "precision": 0.9473684210526315,
+      "recall": 0.9818181818181818,
+      "f1": 0.9642857142857142,
+      "cleanFalseAlarmRate": 0.044444444444444446
+    },
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "kotlin",
+      "split": "dev",
+      "threshold": 0.5,
+      "precision": 0.9642857142857143,
+      "recall": 0.9818181818181818,
+      "f1": 0.972972972972973,
+      "cleanFalseAlarmRate": 0.022222222222222223
+    },
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "kotlin",
+      "split": "dev",
+      "threshold": 0.6,
+      "precision": 0.9818181818181818,
+      "recall": 0.9818181818181818,
+      "f1": 0.9818181818181818,
+      "cleanFalseAlarmRate": 0.022222222222222223
+    },
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "kotlin",
+      "split": "dev",
+      "threshold": 0.7,
+      "precision": 0.9811320754716981,
+      "recall": 0.9454545454545454,
+      "f1": 0.9629629629629629,
+      "cleanFalseAlarmRate": 0.022222222222222223
+    },
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "kotlin",
+      "split": "dev",
+      "threshold": 0.8,
+      "precision": 0.9791666666666666,
+      "recall": 0.8545454545454545,
+      "f1": 0.912621359223301,
+      "cleanFalseAlarmRate": 0.022222222222222223
+    },
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "kotlin",
+      "split": "dev",
+      "threshold": 0.9,
+      "precision": 1,
+      "recall": 0.7090909090909091,
+      "f1": 0.8297872340425533,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "swift",
+      "split": "dev",
+      "threshold": 0.1,
+      "precision": 0.7,
+      "recall": 1,
+      "f1": 0.8235294117647058,
+      "cleanFalseAlarmRate": 0.20408163265306123
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "swift",
+      "split": "dev",
+      "threshold": 0.2,
+      "precision": 0.84,
+      "recall": 1,
+      "f1": 0.9130434782608696,
+      "cleanFalseAlarmRate": 0.061224489795918366
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "swift",
+      "split": "dev",
+      "threshold": 0.3,
+      "precision": 0.9130434782608695,
+      "recall": 1,
+      "f1": 0.9545454545454545,
+      "cleanFalseAlarmRate": 0.02040816326530612
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "swift",
+      "split": "dev",
+      "threshold": 0.4,
+      "precision": 0.9545454545454546,
+      "recall": 1,
+      "f1": 0.9767441860465117,
+      "cleanFalseAlarmRate": 0.02040816326530612
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "swift",
+      "split": "dev",
+      "threshold": 0.5,
+      "precision": 0.9761904761904762,
+      "recall": 0.9761904761904762,
+      "f1": 0.9761904761904762,
+      "cleanFalseAlarmRate": 0.02040816326530612
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "swift",
+      "split": "dev",
+      "threshold": 0.6,
+      "precision": 0.975609756097561,
+      "recall": 0.9523809523809523,
+      "f1": 0.963855421686747,
+      "cleanFalseAlarmRate": 0.02040816326530612
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "swift",
+      "split": "dev",
+      "threshold": 0.7,
+      "precision": 0.975609756097561,
+      "recall": 0.9523809523809523,
+      "f1": 0.963855421686747,
+      "cleanFalseAlarmRate": 0.02040816326530612
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "swift",
+      "split": "dev",
+      "threshold": 0.8,
+      "precision": 1,
+      "recall": 0.9285714285714286,
+      "f1": 0.962962962962963,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "swift",
+      "split": "dev",
+      "threshold": 0.9,
+      "precision": 1,
+      "recall": 0.6190476190476191,
+      "f1": 0.7647058823529412,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "typescript",
+      "split": "dev",
+      "threshold": 0.1,
+      "precision": 0.8103448275862069,
+      "recall": 1,
+      "f1": 0.8952380952380952,
+      "cleanFalseAlarmRate": 0.09090909090909091
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "typescript",
+      "split": "dev",
+      "threshold": 0.2,
+      "precision": 0.9791666666666666,
+      "recall": 1,
+      "f1": 0.9894736842105264,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "typescript",
+      "split": "dev",
+      "threshold": 0.3,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "typescript",
+      "split": "dev",
+      "threshold": 0.4,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "typescript",
+      "split": "dev",
+      "threshold": 0.5,
+      "precision": 1,
+      "recall": 0.9787234042553191,
+      "f1": 0.989247311827957,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "typescript",
+      "split": "dev",
+      "threshold": 0.6,
+      "precision": 1,
+      "recall": 0.9574468085106383,
+      "f1": 0.9782608695652174,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "typescript",
+      "split": "dev",
+      "threshold": 0.7,
+      "precision": 1,
+      "recall": 0.9361702127659575,
+      "f1": 0.967032967032967,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "typescript",
+      "split": "dev",
+      "threshold": 0.8,
+      "precision": 1,
+      "recall": 0.8723404255319149,
+      "f1": 0.9318181818181819,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "typescript",
+      "split": "dev",
+      "threshold": 0.9,
+      "precision": 1,
+      "recall": 0.723404255319149,
+      "f1": 0.8395061728395062,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "kotlin",
+      "split": "dev",
+      "threshold": 0.1,
+      "precision": 0.6610169491525424,
+      "recall": 1,
+      "f1": 0.7959183673469388,
+      "cleanFalseAlarmRate": 0.2653061224489796
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "kotlin",
+      "split": "dev",
+      "threshold": 0.2,
+      "precision": 0.8125,
+      "recall": 1,
+      "f1": 0.896551724137931,
+      "cleanFalseAlarmRate": 0.12244897959183673
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "kotlin",
+      "split": "dev",
+      "threshold": 0.3,
+      "precision": 0.8666666666666667,
+      "recall": 1,
+      "f1": 0.9285714285714286,
+      "cleanFalseAlarmRate": 0.061224489795918366
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "kotlin",
+      "split": "dev",
+      "threshold": 0.4,
+      "precision": 0.9512195121951219,
+      "recall": 1,
+      "f1": 0.975,
+      "cleanFalseAlarmRate": 0.02040816326530612
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "kotlin",
+      "split": "dev",
+      "threshold": 0.5,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "kotlin",
+      "split": "dev",
+      "threshold": 0.6,
+      "precision": 1,
+      "recall": 0.9487179487179487,
+      "f1": 0.9736842105263158,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "kotlin",
+      "split": "dev",
+      "threshold": 0.7,
+      "precision": 1,
+      "recall": 0.7435897435897436,
+      "f1": 0.8529411764705882,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "kotlin",
+      "split": "dev",
+      "threshold": 0.8,
+      "precision": 1,
+      "recall": 0.717948717948718,
+      "f1": 0.835820895522388,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "kotlin",
+      "split": "dev",
+      "threshold": 0.9,
+      "precision": 1,
+      "recall": 0.5384615384615384,
+      "f1": 0.7000000000000001,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "python",
+      "split": "dev",
+      "threshold": 0.1,
+      "precision": 0.6547619047619048,
+      "recall": 0.9821428571428571,
+      "f1": 0.7857142857142857,
+      "cleanFalseAlarmRate": 0.23333333333333334
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "python",
+      "split": "dev",
+      "threshold": 0.2,
+      "precision": 0.8208955223880597,
+      "recall": 0.9821428571428571,
+      "f1": 0.8943089430894309,
+      "cleanFalseAlarmRate": 0.08333333333333333
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "python",
+      "split": "dev",
+      "threshold": 0.3,
+      "precision": 0.9310344827586207,
+      "recall": 0.9642857142857143,
+      "f1": 0.9473684210526316,
+      "cleanFalseAlarmRate": 0.05
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "python",
+      "split": "dev",
+      "threshold": 0.4,
+      "precision": 1,
+      "recall": 0.9642857142857143,
+      "f1": 0.9818181818181818,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "python",
+      "split": "dev",
+      "threshold": 0.5,
+      "precision": 1,
+      "recall": 0.9642857142857143,
+      "f1": 0.9818181818181818,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "python",
+      "split": "dev",
+      "threshold": 0.6,
+      "precision": 1,
+      "recall": 0.9285714285714286,
+      "f1": 0.962962962962963,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "python",
+      "split": "dev",
+      "threshold": 0.7,
+      "precision": 1,
+      "recall": 0.8392857142857143,
+      "f1": 0.9126213592233009,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "python",
+      "split": "dev",
+      "threshold": 0.8,
+      "precision": 1,
+      "recall": 0.7857142857142857,
+      "f1": 0.88,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "python",
+      "split": "dev",
+      "threshold": 0.9,
+      "precision": 1,
+      "recall": 0.5892857142857143,
+      "f1": 0.7415730337078651,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "performance",
+      "lang": "kotlin",
+      "split": "dev",
+      "threshold": 0.1,
+      "precision": 0.45454545454545453,
+      "recall": 1,
+      "f1": 0.625,
+      "cleanFalseAlarmRate": 0.4
+    },
+    {
+      "system": "jev",
+      "pack": "performance",
+      "lang": "kotlin",
+      "split": "dev",
+      "threshold": 0.2,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "performance",
+      "lang": "kotlin",
+      "split": "dev",
+      "threshold": 0.3,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "performance",
+      "lang": "kotlin",
+      "split": "dev",
+      "threshold": 0.4,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "performance",
+      "lang": "kotlin",
+      "split": "dev",
+      "threshold": 0.5,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "performance",
+      "lang": "kotlin",
+      "split": "dev",
+      "threshold": 0.6,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "performance",
+      "lang": "kotlin",
+      "split": "dev",
+      "threshold": 0.7,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "performance",
+      "lang": "kotlin",
+      "split": "dev",
+      "threshold": 0.8,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "performance",
+      "lang": "kotlin",
+      "split": "dev",
+      "threshold": 0.9,
+      "precision": 1,
+      "recall": 0.6,
+      "f1": 0.7499999999999999,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "performance",
+      "lang": "python",
+      "split": "dev",
+      "threshold": 0.1,
+      "precision": 0.7368421052631579,
+      "recall": 1,
+      "f1": 0.8484848484848484,
+      "cleanFalseAlarmRate": 0.11764705882352941
+    },
+    {
+      "system": "jev",
+      "pack": "performance",
+      "lang": "python",
+      "split": "dev",
+      "threshold": 0.2,
+      "precision": 0.875,
+      "recall": 1,
+      "f1": 0.9333333333333333,
+      "cleanFalseAlarmRate": 0.058823529411764705
+    },
+    {
+      "system": "jev",
+      "pack": "performance",
+      "lang": "python",
+      "split": "dev",
+      "threshold": 0.3,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "performance",
+      "lang": "python",
+      "split": "dev",
+      "threshold": 0.4,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "performance",
+      "lang": "python",
+      "split": "dev",
+      "threshold": 0.5,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "performance",
+      "lang": "python",
+      "split": "dev",
+      "threshold": 0.6,
+      "precision": 1,
+      "recall": 0.9285714285714286,
+      "f1": 0.962962962962963,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "performance",
+      "lang": "python",
+      "split": "dev",
+      "threshold": 0.7,
+      "precision": 1,
+      "recall": 0.9285714285714286,
+      "f1": 0.962962962962963,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "performance",
+      "lang": "python",
+      "split": "dev",
+      "threshold": 0.8,
+      "precision": 1,
+      "recall": 0.9285714285714286,
+      "f1": 0.962962962962963,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "performance",
+      "lang": "python",
+      "split": "dev",
+      "threshold": 0.9,
+      "precision": 1,
+      "recall": 0.9285714285714286,
+      "f1": 0.962962962962963,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "performance",
+      "lang": "ruby",
+      "split": "dev",
+      "threshold": 0.1,
+      "precision": 0.6666666666666666,
+      "recall": 1,
+      "f1": 0.8,
+      "cleanFalseAlarmRate": 0.25
+    },
+    {
+      "system": "jev",
+      "pack": "performance",
+      "lang": "ruby",
+      "split": "dev",
+      "threshold": 0.2,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "performance",
+      "lang": "ruby",
+      "split": "dev",
+      "threshold": 0.3,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "performance",
+      "lang": "ruby",
+      "split": "dev",
+      "threshold": 0.4,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "performance",
+      "lang": "ruby",
+      "split": "dev",
+      "threshold": 0.5,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "performance",
+      "lang": "ruby",
+      "split": "dev",
+      "threshold": 0.6,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "performance",
+      "lang": "ruby",
+      "split": "dev",
+      "threshold": 0.7,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "performance",
+      "lang": "ruby",
+      "split": "dev",
+      "threshold": 0.8,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "performance",
+      "lang": "ruby",
+      "split": "dev",
+      "threshold": 0.9,
+      "precision": 1,
+      "recall": 0.8333333333333334,
+      "f1": 0.9090909090909091,
+      "cleanFalseAlarmRate": 0
+    }
+  ],
+  "bands": [
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "swift",
+      "split": "dev",
+      "lo": 0.8,
+      "hi": 1.01,
+      "findings": 28,
+      "real": 28,
+      "precision": 1
+    },
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "swift",
+      "split": "dev",
+      "lo": 0.5,
+      "hi": 0.8,
+      "findings": 11,
+      "real": 10,
+      "precision": 0.9090909090909091
+    },
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "swift",
+      "split": "dev",
+      "lo": 0.3,
+      "hi": 0.5,
+      "findings": 3,
+      "real": 0,
+      "precision": 0
+    },
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "swift",
+      "split": "dev",
+      "lo": 0.1,
+      "hi": 0.3,
+      "findings": 23,
+      "real": 0,
+      "precision": 0
+    },
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "typescript",
+      "split": "dev",
+      "lo": 0.8,
+      "hi": 1.01,
+      "findings": 92,
+      "real": 92,
+      "precision": 1
+    },
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "typescript",
+      "split": "dev",
+      "lo": 0.5,
+      "hi": 0.8,
+      "findings": 20,
+      "real": 15,
+      "precision": 0.75
+    },
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "typescript",
+      "split": "dev",
+      "lo": 0.3,
+      "hi": 0.5,
+      "findings": 6,
+      "real": 1,
+      "precision": 0.16666666666666666
+    },
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "typescript",
+      "split": "dev",
+      "lo": 0.1,
+      "hi": 0.3,
+      "findings": 70,
+      "real": 1,
+      "precision": 0.014285714285714285
+    },
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "kotlin",
+      "split": "dev",
+      "lo": 0.8,
+      "hi": 1.01,
+      "findings": 48,
+      "real": 47,
+      "precision": 0.9791666666666666
+    },
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "kotlin",
+      "split": "dev",
+      "lo": 0.5,
+      "hi": 0.8,
+      "findings": 8,
+      "real": 7,
+      "precision": 0.875
+    },
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "kotlin",
+      "split": "dev",
+      "lo": 0.3,
+      "hi": 0.5,
+      "findings": 8,
+      "real": 0,
+      "precision": 0
+    },
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "kotlin",
+      "split": "dev",
+      "lo": 0.1,
+      "hi": 0.3,
+      "findings": 55,
+      "real": 0,
+      "precision": 0
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "swift",
+      "split": "dev",
+      "lo": 0.8,
+      "hi": 1.01,
+      "findings": 39,
+      "real": 39,
+      "precision": 1
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "swift",
+      "split": "dev",
+      "lo": 0.5,
+      "hi": 0.8,
+      "findings": 3,
+      "real": 2,
+      "precision": 0.6666666666666666
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "swift",
+      "split": "dev",
+      "lo": 0.3,
+      "hi": 0.5,
+      "findings": 4,
+      "real": 1,
+      "precision": 0.25
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "swift",
+      "split": "dev",
+      "lo": 0.1,
+      "hi": 0.3,
+      "findings": 14,
+      "real": 0,
+      "precision": 0
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "typescript",
+      "split": "dev",
+      "lo": 0.8,
+      "hi": 1.01,
+      "findings": 41,
+      "real": 41,
+      "precision": 1
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "typescript",
+      "split": "dev",
+      "lo": 0.5,
+      "hi": 0.8,
+      "findings": 5,
+      "real": 5,
+      "precision": 1
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "typescript",
+      "split": "dev",
+      "lo": 0.3,
+      "hi": 0.5,
+      "findings": 1,
+      "real": 1,
+      "precision": 1
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "typescript",
+      "split": "dev",
+      "lo": 0.1,
+      "hi": 0.3,
+      "findings": 11,
+      "real": 0,
+      "precision": 0
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "kotlin",
+      "split": "dev",
+      "lo": 0.8,
+      "hi": 1.01,
+      "findings": 28,
+      "real": 28,
+      "precision": 1
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "kotlin",
+      "split": "dev",
+      "lo": 0.5,
+      "hi": 0.8,
+      "findings": 11,
+      "real": 11,
+      "precision": 1
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "kotlin",
+      "split": "dev",
+      "lo": 0.3,
+      "hi": 0.5,
+      "findings": 6,
+      "real": 0,
+      "precision": 0
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "kotlin",
+      "split": "dev",
+      "lo": 0.1,
+      "hi": 0.3,
+      "findings": 14,
+      "real": 0,
+      "precision": 0
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "python",
+      "split": "dev",
+      "lo": 0.8,
+      "hi": 1.01,
+      "findings": 44,
+      "real": 44,
+      "precision": 1
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "python",
+      "split": "dev",
+      "lo": 0.5,
+      "hi": 0.8,
+      "findings": 10,
+      "real": 10,
+      "precision": 1
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "python",
+      "split": "dev",
+      "lo": 0.3,
+      "hi": 0.5,
+      "findings": 4,
+      "real": 0,
+      "precision": 0
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "python",
+      "split": "dev",
+      "lo": 0.1,
+      "hi": 0.3,
+      "findings": 26,
+      "real": 1,
+      "precision": 0.038461538461538464
+    },
+    {
+      "system": "jev",
+      "pack": "performance",
+      "lang": "kotlin",
+      "split": "dev",
+      "lo": 0.8,
+      "hi": 1.01,
+      "findings": 5,
+      "real": 5,
+      "precision": 1
+    },
+    {
+      "system": "jev",
+      "pack": "performance",
+      "lang": "kotlin",
+      "split": "dev",
+      "lo": 0.5,
+      "hi": 0.8,
+      "findings": 0,
+      "real": 0,
+      "precision": null
+    },
+    {
+      "system": "jev",
+      "pack": "performance",
+      "lang": "kotlin",
+      "split": "dev",
+      "lo": 0.3,
+      "hi": 0.5,
+      "findings": 0,
+      "real": 0,
+      "precision": null
+    },
+    {
+      "system": "jev",
+      "pack": "performance",
+      "lang": "kotlin",
+      "split": "dev",
+      "lo": 0.1,
+      "hi": 0.3,
+      "findings": 6,
+      "real": 0,
+      "precision": 0
+    },
+    {
+      "system": "jev",
+      "pack": "performance",
+      "lang": "python",
+      "split": "dev",
+      "lo": 0.8,
+      "hi": 1.01,
+      "findings": 13,
+      "real": 13,
+      "precision": 1
+    },
+    {
+      "system": "jev",
+      "pack": "performance",
+      "lang": "python",
+      "split": "dev",
+      "lo": 0.5,
+      "hi": 0.8,
+      "findings": 1,
+      "real": 1,
+      "precision": 1
+    },
+    {
+      "system": "jev",
+      "pack": "performance",
+      "lang": "python",
+      "split": "dev",
+      "lo": 0.3,
+      "hi": 0.5,
+      "findings": 0,
+      "real": 0,
+      "precision": null
+    },
+    {
+      "system": "jev",
+      "pack": "performance",
+      "lang": "python",
+      "split": "dev",
+      "lo": 0.1,
+      "hi": 0.3,
+      "findings": 5,
+      "real": 0,
+      "precision": 0
+    },
+    {
+      "system": "jev",
+      "pack": "performance",
+      "lang": "ruby",
+      "split": "dev",
+      "lo": 0.8,
+      "hi": 1.01,
+      "findings": 6,
+      "real": 6,
+      "precision": 1
+    },
+    {
+      "system": "jev",
+      "pack": "performance",
+      "lang": "ruby",
+      "split": "dev",
+      "lo": 0.5,
+      "hi": 0.8,
+      "findings": 0,
+      "real": 0,
+      "precision": null
+    },
+    {
+      "system": "jev",
+      "pack": "performance",
+      "lang": "ruby",
+      "split": "dev",
+      "lo": 0.3,
+      "hi": 0.5,
+      "findings": 0,
+      "real": 0,
+      "precision": null
+    },
+    {
+      "system": "jev",
+      "pack": "performance",
+      "lang": "ruby",
+      "split": "dev",
+      "lo": 0.1,
+      "hi": 0.3,
+      "findings": 3,
+      "real": 0,
+      "precision": 0
+    }
+  ]
+}

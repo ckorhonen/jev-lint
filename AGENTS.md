@@ -25,8 +25,9 @@ reword a single rule, use `jev-lint-write-rule`. All five skills are symlinked i
 - `src/inventory.ts` — lists a repo's instructions, skills, docs, linter/CI configs and languages; step 1 of the `jev-lint-rules` skill.
 - `local/` — local-model experiments (Laya server, encoder benchmark, Core ML attempt); venvs and models are gitignored.
 - `src/jev.ts` — minimal TypeSafe client (any `/v1/systemone` server via `TYPESAFE_BASE_URL`); key from `TYPESAFE_API_KEY` or Keychain service `typesafe-api-key`.
-- `rules/*.json` — hygiene pack; `rules/*.practices.json` — best-practice pack; `.jev-lint/` — this repo's own dogfooded repo pack (run `bun src/validate.ts .jev-lint` after changing it).
-- `eval/cases/` — labeled hook payloads: `<lang>[.practices].<dev|holdout>.jsonl`.
+- `rules/<lang>.json` — hygiene pack; `rules/<lang>.<pack>.json` — practices, tests, performance (and security) packs, loaded by file name; `rules/sources/` — each rule's graded evidence. New rules carry `"status": "candidate"` (the hook skips them) until `bun eval/pack-status.ts <holdout summary> --apply` ships the ones that pass. `.jev-lint/` — this repo's own dogfooded repo pack (run `bun src/validate.ts .jev-lint` after changing it).
+- `docs/packs/` — generated pack docs (`bun scripts/pack-docs.ts`; rerun after changing rules or cases).
+- `eval/cases/` — labeled hook payloads: `<lang>[.<pack>][.vN].<dev|holdout>.jsonl` (later batches `vN` carry their own `scope`).
 - `eval/run.ts`, `eval/systems.ts` — offline eval (Jev vs LLM judge vs regex).
 - `eval/skill/run.ts` — skill eval: runs `jev-lint-rules` headless (dry run) on pinned real repos and scores the proposal against gold annotations. Fixtures, gold and results are private and live outside the repo (`~/.local/share/jev-lint/skill-evals`, or `JEV_LINT_SKILL_EVALS`); never commit them or name the repos in public results.
 - `eval/e2e/` — headless Claude Code runs with/without the hook, grading, AI review mapping.

@@ -1,0 +1,42 @@
+{
+  "py-perf-orm-query-in-loop": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://docs.djangoproject.com/en/5.2/topics/db/optimization/",
+        "checked": "2026-09-27",
+        "note": "'Understand select_related() and prefetch_related() thoroughly, and use them'; use foreign key values directly."
+      },
+      {
+        "grade": "C",
+        "url": "https://www.coderabbit.ai/blog/state-of-ai-vs-human-code-generation-report",
+        "checked": "2026-09-27",
+        "note": "Vendor study of 470 OSS PRs: AI-authored PRs had ~1.7x more issues; performance inefficiencies (excessive I/O, N+1 queries, unindexed lookups) ~8x more often; security issues 1.5-2x."
+      }
+    ],
+    "whyNotLinter": "ruff/pylint cannot tell that an attribute is a lazy relationship; nplusone/django-zen-queries catch it only at runtime in tests that exercise the code.",
+    "aiRelevance": "High: CodeRabbit (C) reports N+1 and excessive I/O ~8x more often in AI PRs.",
+    "expectedNoise": "low-med -- relationship vs column is judged from names.",
+    "languageFile": "python"
+  },
+  "py-perf-orm-write-in-loop": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://docs.djangoproject.com/en/5.2/topics/db/optimization/",
+        "checked": "2026-09-27",
+        "note": "bulk_create/bulk_update 'is preferable to' per-object save; 'use a bulk SQL UPDATE statement, via QuerySet.update()'."
+      },
+      {
+        "grade": "C",
+        "url": "https://www.coderabbit.ai/blog/state-of-ai-vs-human-code-generation-report",
+        "checked": "2026-09-27",
+        "note": "Vendor study of 470 OSS PRs: AI-authored PRs had ~1.7x more issues; performance inefficiencies (excessive I/O, N+1 queries, unindexed lookups) ~8x more often; security issues 1.5-2x."
+      }
+    ],
+    "whyNotLinter": "ruff PERF/FURB rules target list building, not ORM calls; no linter knows `.save()` is a DB round trip.",
+    "aiRelevance": "High (C): excessive I/O is the top AI performance finding in the CodeRabbit study.",
+    "expectedNoise": "low.",
+    "languageFile": "python"
+  }
+}

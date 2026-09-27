@@ -1,0 +1,70 @@
+{
+  "language": "rust",
+  "extensions": [".rs"],
+  "rules": [
+    {
+      "id": "rs-blocking-call-in-async",
+      "question": "Does `added_code` make a blocking call directly inside an `async fn` or `async` block — `std::thread::sleep`, `std::fs::*`, `std::net`, `std::process::Command::output()`/`status()`, `std::sync::mpsc::Receiver::recv`, `reqwest::blocking`, a synchronous database client, `futures::executor::block_on`/`Handle::block_on`, or a long CPU-bound loop (hashing passwords, compressing, parsing large files) — instead of the async equivalent or `tokio::task::spawn_blocking`?",
+      "true": "Async code blocks the executor thread, stalling every other task scheduled on it (or panics, in the case of `block_on` inside a runtime).",
+      "false": "It uses async APIs (`tokio::time::sleep`, `tokio::fs`, `tokio::process`, async reqwest, sqlx) or moves blocking work into `spawn_blocking` / `block_in_place`; the blocking call is in a normal (non-async) `fn`; or the work is brief in-memory computation or logging. Holding a `std::sync::Mutex` guard across `.await` is clippy's `await_holding_lock` and doesn't count here.",
+      "fix": "Use the async API or move the blocking work into tokio::task::spawn_blocking (Tokio docs, 'CPU-bound tasks and blocking code').",
+      "when": ["\\basync\\b"]
+    },
+    {
+      "id": "rs-select-cancel-unsafe",
+      "question": "Does `added_code` use `tokio::select!` inside a loop where a branch awaits a future that Tokio documents as not cancellation safe — `AsyncReadExt::read_exact`, `read_to_end`, `read_to_string`, `AsyncWriteExt::write_all` (can lose data), or `tokio::sync::Mutex::lock`, `RwLock::read`/`write`, `Semaphore::acquire`, `Notify::notified` (lose their queue position) — created fresh on every iteration, so the partial work is dropped whenever another branch wins?",
+      "true": "A non-cancel-safe operation is raced in `select!` and recreated each loop iteration, so bytes or queue position are silently lost when another branch completes first.",
+      "false": "Branches use cancel-safe methods (`mpsc::Receiver::recv`, `broadcast::Receiver::recv`, `watch::Receiver::changed`, `TcpListener::accept`, `AsyncReadExt::read`/`read_buf`, `AsyncWriteExt::write`/`write_buf`, `StreamExt::next`); the non-cancel-safe future is created once outside the loop, pinned (`tokio::pin!`) and polled as `&mut fut`; the operation runs in its own spawned task that reports back over a channel; or `select!` isn't inside a loop.",
+      "fix": "Race only cancel-safe operations in select!, or create the future once outside the loop and select on &mut fut (Tokio select! docs, 'Cancellation safety').",
+      "when": ["select!"]
+    },
+    {
+      "id": "rs-spawned-task-error-lost",
+      "question": "Does `added_code` call `tokio::spawn`, `tokio::task::spawn`, or `std::thread::spawn` with a body that can fail (it uses `?`, returns a `Result`, or calls something that returns `Result`) while dropping the returned `JoinHandle` and not logging or handling the error inside the task, so any failure disappears silently?",
+      "true": "A fallible spawned task's handle is discarded, and its error is neither logged nor handled.",
+      "false": "The `JoinHandle` is stored and awaited or joined; the task is added to a `JoinSet` or `TaskTracker` whose results are checked; the task logs or handles its own errors (`if let Err(e) = work().await { tracing::error!(…) }`); or the task body can't fail.",
+      "fix": "Await or track the JoinHandle (JoinSet), or handle and log the error inside the spawned task.",
+      "when": ["spawn"]
+    },
+    {
+      "id": "rs-unsigned-subtraction-underflow",
+      "question": "Does `added_code` subtract from an unsigned integer (`usize`, `u32`, `u64`, including `.len()`, indices, counts, byte offsets, or Unix timestamps held in `u64`) where the right-hand side can be larger than the left and nothing in the snippet rules that out — e.g. `v.len() - 1` on a vector that may be empty, `end - start` on values from input, `remaining -= n` — instead of using `checked_sub`/`saturating_sub` or a prior guard?",
+      "true": "An unsigned subtraction can underflow, which panics in debug builds and silently wraps to a huge value in release builds.",
+      "false": "A guard in the snippet guarantees the left side is at least the right (`if !v.is_empty()`, `if a >= b`, a loop bound like `for i in 1..v.len()`); the code uses `checked_sub`/`saturating_sub`/`wrapping_sub` or `abs_diff`; the operands are signed; or they are constants known to be ordered. `Instant`/`Duration` subtraction belongs to clippy's `unchecked_time_subtraction` and doesn't count.",
+      "fix": "Use checked_sub/saturating_sub or guard the subtraction so the right side can't exceed the left (Rust Reference, 'Integer overflow').",
+      "when": ["[\\w)\\]]\\s*-=?\\s*[\\w(]"]
+    },
+    {
+      "id": "rs-unchecked-unsafe-on-unvalidated",
+      "question": "Does `added_code` call an unsafe unchecked API — `get_unchecked`/`get_unchecked_mut`, `str::from_utf8_unchecked`/`String::from_utf8_unchecked`, `unwrap_unchecked`, `Vec::set_len`, `slice::from_raw_parts(_mut)`, `char::from_u32_unchecked`, `NonZero*::new_unchecked`, `mem::transmute` — on a value whose precondition (index in bounds, valid UTF-8, `Some`/`Ok`, initialized length, valid pointer and length, valid bit pattern) isn't established by a check or construction visible in the snippet, e.g. an index or bytes from a function parameter, user input, a file or the network?",
+      "true": "Undefined behavior depends on an unchecked precondition that nothing verified, typically added 'for performance'.",
+      "false": "The snippet establishes the precondition right before the call (`if i < v.len()`, bytes produced from a `&str`/`String`, `set_len` after writing exactly that many elements, a pointer and length taken from a live slice); the enclosing function is an `unsafe fn` whose `# Safety` doc passes the obligation to callers; or the checked API (`get`, `from_utf8`, `?`) is used. A missing `// SAFETY:` comment is clippy's `undocumented_unsafe_blocks`; a comment alone doesn't make the precondition checked.",
+      "fix": "Use the checked API (get, from_utf8, ?) or validate the precondition right before the unsafe call (std docs: out-of-bounds get_unchecked is undefined behavior; Rustonomicon).",
+      "when": ["unchecked|set_len|from_raw_parts|transmute"]
+    },
+    {
+      "id": "rs-debug-derive-secret",
+      "question": "Does `added_code` `#[derive(Debug)]` on a struct or enum that has a field holding a secret — `password`, `secret`, `token`, `access_token`, `refresh_token`, `api_key`, `private_key`, `client_secret`, session cookie, `Authorization` header value, card number — as a plain `String`, `Vec<u8>` or similar, so `{:?}`, `tracing` field capture or `unwrap` panic messages print it?",
+      "true": "A secret-bearing field is printed verbatim by the derived Debug implementation.",
+      "false": "Secret fields use a redacting wrapper (`secrecy::SecretString`/`SecretBox`, a newtype whose manual `Debug` prints `***`); the type implements `Debug` by hand and skips or redacts the field; or the field only names or points to a secret (`token_expires_at`, `api_key_id`, `secret_name`, `password_hash`).",
+      "fix": "Wrap the secret in secrecy::SecretString or a redacting newtype, or implement Debug by hand to redact it (OWASP Logging Cheat Sheet).",
+      "when": ["Debug"]
+    },
+    {
+      "id": "rs-sql-built-with-format",
+      "question": "Does `added_code` build a SQL statement with `format!`, `push_str`, `+` or `concat!` that interpolates a runtime value (a function parameter, request field, user input, id or search term) and pass it to a database call (`sqlx::query`/`query_as`/`query_scalar`, `execute`, `diesel::sql_query`, rusqlite `execute`/`prepare`/`query_row`, `tokio_postgres` `query`/`execute`), instead of using bind parameters?",
+      "true": "Runtime values are spliced into SQL text, opening SQL injection and breaking on quotes.",
+      "false": "Values are passed as bind parameters (`$1`/`?` with `.bind(v)`, `params![]`, `&[&v]`, `sqlx::query!`); the interpolated part is a compile-time constant or chosen from a fixed allowlist or enum of identifiers (table or column names, `ASC`/`DESC`); a query builder adds the values (`QueryBuilder::push_bind`, SeaQuery, Diesel DSL); or the string isn't SQL.",
+      "fix": "Pass values as bind parameters ($1 + .bind(v), params![]) instead of formatting them into the SQL string (OWASP SQL Injection Prevention Cheat Sheet).",
+      "when": ["select\\b|insert\\b|update\\b|delete\\b|\\bsql|query"]
+    },
+    {
+      "id": "rs-http-client-per-call",
+      "question": "Does `added_code` build a new `reqwest::Client` (`Client::new()` or `Client::builder()…build()`), or call the `reqwest::get(...)` convenience function, inside a loop or inside a function that sends a request and is called repeatedly, instead of creating one client and reusing it?",
+      "true": "A new HTTP client, with its own connection pool and TLS setup, is created for each request or iteration.",
+      "false": "One client is created at startup or outside the loop and passed in, cloned (cheap; the pool is shared), or stored in app state or a `OnceLock`/`LazyLock`; the code is a one-shot `main` making a single request; or no reqwest client is created.",
+      "fix": "Create one reqwest::Client and reuse it (clone it; the pool is shared) (reqwest Client docs).",
+      "when": ["Client::(new|builder)|reqwest::get"]
+    }
+  ]
+}

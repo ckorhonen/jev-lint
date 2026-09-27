@@ -1,0 +1,23 @@
+{
+  "language": "bazel",
+  "extensions": [".bzl", ".bazel"],
+  "filenames": ["BUILD", "WORKSPACE"],
+  "rules": [
+    {
+      "id": "bzl-test-disabled-silently",
+      "question": "Does `added_code` switch off or hide an existing test target -- adding `tags = [\"manual\"]` (or `\"no-ci\"`, `\"notap\"`, `\"broken\"`, `\"disabled\"`), `flaky = True`, `target_compatible_with = [\"@platforms//:incompatible\"]`, or commenting out / removing a `*_test` from a `test_suite` -- with no comment or issue link on or next to it giving the reason?",
+      "true": "A test is excluded from `bazel test //...` (or retried until green) without any stated reason.",
+      "false": "A comment or ticket reference explains the change; the tag is a specific capability tag (`requires-network`, `requires-gpu`, `exclusive`, `requires-osx`, `cpu:4`); `manual` is on a helper, macro-generated or non-test target (the .bzl style guide recommends that); or no test is disabled.",
+      "fix": "Fix the test, or add a comment with the reason and a tracking issue next to the tag.",
+      "when": ["manual|flaky|incompatible|test_suite|no-ci|notap|broken|disabled"]
+    },
+    {
+      "id": "bzl-test-size-mismatch",
+      "question": "Does `added_code` declare a test target with `size = \"small\"` (or `timeout = \"short\"`) whose name, srcs, deps, data, env or args show it is an integration or end-to-end test -- words like `integration`, `e2e`, `docker`, `testcontainers`, a real `postgres`/`mysql`/`redis` server, `selenium`/`playwright`/browser, an emulator, or real network endpoints?",
+      "true": "An integration or e2e test is declared small/short, so it gets a 60 s timeout and small resource reservation and will time out or starve under load.",
+      "false": "The small test is a unit test (mocks, fakes, in-memory data); the integration test is declared `medium`, `large` or `enormous` or has a matching `timeout`; or no size or timeout is set.",
+      "fix": "Declare integration and e2e tests `size = \"medium\"` or larger (Bazel Test Encyclopedia).",
+      "when": ["size\\s*=|timeout\\s*="]
+    }
+  ]
+}

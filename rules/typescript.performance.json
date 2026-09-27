@@ -1,0 +1,49 @@
+{
+  "language": "typescript",
+  "extensions": [".ts", ".tsx", ".mts", ".cts", ".js", ".jsx", ".mjs", ".cjs"],
+  "rules": [
+    {
+      "id": "ts-perf-query-per-item",
+      "question": "Does `added_code` run one database or ORM query per item of a collection -- `prisma.x.findUnique/findFirst/findMany/update/delete`, TypeORM `repository.findOne*`, Drizzle `db.select()...where(eq(...))`, Sequelize `findByPk`/`findOne`, Mongoose `findById`/`findOne`, Knex, or a raw `db.query` -- inside a `for`/`for...of`/`forEach` loop or an `items.map(...)` callback (including `Promise.all(items.map(...))`), where one query with an `in` filter or an `include`/join would fetch or change everything at once?",
+      "true": "The code issues one query per element (N+1), whether sequentially or concurrently.",
+      "false": "Data is fetched in one query (`include`, `in`/`inArray`/`$in`, a join, `relationLoadStrategy: \"join\"`, a DataLoader that batches per tick); writes use `createMany`/`updateMany`/`deleteMany`/a bulk insert; each iteration needs the previous result (cursor pagination); or the loop is over a small fixed list. Whether independent calls are awaited sequentially is `ts-sequential-await-loop`'s question, not this rule's.",
+      "fix": "Fetch all rows in one query with an `in` filter or `include`/join (or `createMany`/`updateMany` for writes) and map the results by id (Prisma docs, 'Solving the n+1 problem').",
+      "when": [
+        "prisma|findUnique|findFirst|findOne|findByPk|findById|findMany|\\.query\\(|select\\(|getRepository|repository|knex|\\.where\\("
+      ]
+    },
+    {
+      "id": "ts-perf-sync-io-in-handler",
+      "question": "Does `added_code` call a synchronous Node.js API that blocks the event loop -- `fs.readFileSync`, `writeFileSync`, `existsSync`, `readdirSync`, `statSync`, `child_process.execSync`/`spawnSync`/`execFileSync`, `zlib.*Sync`, `crypto.pbkdf2Sync`/`scryptSync` -- inside a request handler, middleware, route handler (Express/Fastify/Koa/Hono, Next.js route handler or Server Action), queue/message handler, or other code that runs per request?",
+      "true": "Per-request server code blocks the event loop on synchronous I/O or crypto, stalling every other client.",
+      "false": "The sync call runs once at startup or module load (reading config at top level), in a CLI, build or migration script, or in test setup; the code uses the promise/callback API (`fs.promises`, `await readFile`, `util.promisify(crypto.pbkdf2)`, `crypto.scrypt` with a callback); or it is not server code.",
+      "fix": "Use the async API (`await fs.promises.readFile`, `promisify(crypto.scrypt)`) or move the work to startup or a worker thread (Node.js, 'Don't Block the Event Loop').",
+      "when": ["Sync\\("]
+    },
+    {
+      "id": "ts-perf-unbounded-list-query",
+      "question": "Does `added_code` return or send a list from a request handler (API route, controller, GraphQL resolver, Server Action, loader) that is fetched with no row limit -- `prisma.x.findMany()` without `take`, TypeORM `find()` without `take`, Drizzle `db.select().from(t)` without `.limit()`, Mongoose `Model.find({})` without `.limit()`, or `SELECT ... FROM` without `LIMIT` -- from a table that grows with usage (users, orders, events, messages, logs, comments)?",
+      "true": "An endpoint returns every matching row, so response size and query time grow without bound.",
+      "false": "The query sets `take`/`limit`/`LIMIT` or cursor/page parameters with a server-side maximum; it is scoped to a naturally small set (one user's settings, a fixed lookup/enum table, `where: { id: { in: ids } }` for bounded ids); it aggregates (`count`, `groupBy`, `_sum`); or it runs in a script or export job, not a request handler.",
+      "fix": "Add pagination (`take` plus a cursor or page) with a server-enforced maximum page size (OWASP API4:2023).",
+      "when": ["findMany|\\.find\\(|select\\(|SELECT"]
+    },
+    {
+      "id": "ts-perf-linear-lookup-in-loop",
+      "question": "Does `added_code` search one array from inside a loop or iteration callback over another collection -- `b.find(...)`, `b.filter(...)`, `b.some(...)`, `b.includes(x)`, `b.indexOf(x)`, or `b.findIndex(...)` inside `for`/`forEach`/`map`/`filter`/`reduce` over `a` (including in a React render) -- to match items by id or key, where building a `Map`, `Set` or object index once before the loop would make each lookup constant-time?",
+      "true": "A nested linear search makes the join O(n*m).",
+      "false": "The lookup uses a `Map`, `Set`, object index or `Object.groupBy` built outside the loop; the searched collection is a small fixed constant (e.g. three allowed values) or a string (`str.includes`); both sides are bounded tiny lists; or the search is not inside a loop.",
+      "fix": "Build a `Map`/`Set` keyed by the id once before the loop and look items up in it.",
+      "when": ["\\.(find|filter|some|includes|indexOf|findIndex)\\("],
+      "status": "candidate"
+    },
+    {
+      "id": "ts-perf-unbounded-fan-out",
+      "question": "Does `added_code` start one concurrent request per item of a variable-length or external collection — `Promise.all(items.map(async (x) => fetch/db/sdk call))`, `Promise.allSettled` over a mapped list, or firing promises in a loop — for network or database calls, with no concurrency limit (`p-limit`, `p-map` with `concurrency`, chunking/batching, a queue)?",
+      "true": "Unbounded fan-out of network or DB calls over a collection whose size is not fixed.",
+      "false": "Concurrency is limited (`p-limit`, `p-map({ concurrency })`, `Bottleneck`, chunks of a fixed size, a queue); the collection is a small fixed literal or has an explicit small cap (`.slice(0, 5)`); the work is local/CPU-only; or items are processed sequentially (that is ts-sequential-await-loop's concern, not this rule).",
+      "fix": "Limit concurrency with `p-limit`/`p-map` or fixed-size batches instead of mapping every item into `Promise.all`.",
+      "when": ["Promise\\.(all|allSettled)|\\.map\\s*\\(\\s*async"]
+    }
+  ]
+}

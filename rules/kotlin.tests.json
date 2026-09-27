@@ -1,0 +1,66 @@
+{
+  "language": "kotlin",
+  "extensions": [".kt", ".kts"],
+  "rules": [
+    {
+      "id": "kt-test-cannot-fail",
+      "question": "Does `added_code` add a Kotlin test (a JUnit `@Test`/`@ParameterizedTest` function or a Kotest spec case) that could not fail if the code it is named after were broken, because it (a) has no assertion at all (no `assertEquals`/`assertTrue`/`assertThat`/`assertFailsWith`/`assertThrows`, Kotest matchers like `shouldBe`/`shouldThrow`, MockK `verify`, or Turbine `awaitItem`), (b) only asserts a tautology or a value the test itself just built (`assertTrue(true)`, `x shouldBe x`, `assertNotNull(Foo())` on a constructor call), (c) only checks that a mock returns what the test stubbed (`every { repo.load() } returns user` then `repo.load() shouldBe user`) or `verify`s a call the test itself made on the mock, or (d) mocks or spies the class it claims to test (`mockk<PriceCalculator>()` in `PriceCalculatorTest`)? A weak but real assertion on the result of calling the code under test (`assertNotNull(parser.parse(input))`) does not count.",
+      "true": "At least one added test has no assertion that depends on the real behaviour of the code under test: no assertion, a tautology, an assertion on the test's own stub or input, or the unit under test is itself mocked.",
+      "false": "Every added test calls real code and asserts on its output, raised error, returned value, or a side effect it causes (including calls the unit makes to a mock, with arguments the unit computed). Weak but real assertions on computed results do not count. Fixtures, factories, helpers and setup code without test cases do not count, and neither does code that is not a test. `verify { dependency.save(expectedOrder) }` after calling the real unit counts as a real assertion. An expected-exception test that catches the exception with no `fail()` after the call belongs to kt-test-error-path-passes-silently, not this rule.",
+      "fix": "Make the test exercise the real code and assert on a result that would change if that code broke; delete it if it can't.",
+      "when": [
+        "@Test|@ParameterizedTest|shouldBe|FunSpec|StringSpec|DescribeSpec|BehaviorSpec|FreeSpec|ShouldSpec|WordSpec|FeatureSpec|ExpectSpec|AnnotationSpec|runTest"
+      ],
+      "status": "candidate"
+    },
+    {
+      "id": "kt-test-error-path-passes-silently",
+      "question": "Does `added_code` add a Kotlin test meant to check that code throws that calls it inside `try { … } catch (e: SomeException) { … }` with no `fail(…)` after the call inside `try`, so the test passes when nothing is thrown — instead of `assertFailsWith<…>`, `assertThrows<…>`, Kotest `shouldThrow<…>`, or `runCatching { … }.exceptionOrNull()` asserted non-null?",
+      "true": "An expected-exception test passes silently if the exception is never thrown.",
+      "false": "The test uses `assertFailsWith`/`assertThrows`/`shouldThrow`/`shouldThrowAny`; `fail(…)` follows the call inside `try`; the try/catch is part of a success-path test and the catch fails it; there is no try/catch in a test.",
+      "fix": "Use assertFailsWith<SomeException> { … } (or shouldThrow) so the test fails when nothing is thrown.",
+      "when": ["catch"]
+    },
+    {
+      "id": "kt-test-launch-without-advance",
+      "question": "Does `added_code` add a `runTest` coroutine test that starts work with `launch { … }` or `async { … }` in the test body, or creates a `StandardTestDispatcher(...)` in the test and passes it to the object under test, and then asserts on state that work changes without first calling `advanceUntilIdle()`, `runCurrent()`, `advanceTimeBy(…)`, `job.join()`, or `deferred.await()`, so the assertion runs before the coroutine executes? A `StandardTestDispatcher` created in the test and handed to a view model counts as visible: calling the view model and then asserting with no advance call in between is a yes.",
+      "true": "An assertion runs before a launched coroutine has had a chance to run.",
+      "false": "The test uses `UnconfinedTestDispatcher` (eager); it advances the scheduler, joins, or awaits before asserting; it collects with Turbine (`test { awaitItem() }`); the function under test is `suspend` and awaited directly; the coroutine is launched inside code under test whose dispatcher is configured elsewhere (e.g. a MainDispatcherRule) and no `StandardTestDispatcher` is created in the test — answer no when the dispatcher is not visible.",
+      "fix": "Advance the test scheduler (advanceUntilIdle/runCurrent) or join/await the job before asserting (kotlinx-coroutines-test docs).",
+      "when": ["runTest"]
+    },
+    {
+      "id": "kt-test-real-clock",
+      "question": "Does `added_code` add a JUnit `@Test` function or a Kotest spec whose assertions depend on the current date or time — the code under test reads `System.currentTimeMillis()`, `Instant.now()`, `LocalDate.now()`, `LocalDateTime.now()` or `Clock.System.now()` (or the test does and compares against it), for example asserting an exact timestamp, an expiry, an age, `isToday`, or a formatted date — without controlling the clock (an injected `Clock`/`TimeSource`, `Clock.fixed(...)`, a `TestScope`'s virtual time (`runTest`, `advanceTimeBy`) or a fixed instant passed to the code)? A bounds or tolerance check against times the test itself captured around the call (`before <= x <= after`, `x <= now`, `accuracy:`/`toBeCloseTo`/`shouldBeBetween` around a value read in the same test) is not time-dependent and does not count.",
+      "true": "A test's pass/fail depends on when it runs, because it asserts on time-dependent output while the real clock is used.",
+      "false": "The clock is controlled (an injected `Clock`/`TimeSource`, `Clock.fixed(...)`, a `TestScope`'s virtual time (`runTest`, `advanceTimeBy`) or a fixed instant passed to the code); assertions only check that a timestamp exists or lies between `Instant.now()` values the test captured before and after the call (`shouldBeBetween(before…, after…)`, with or without a margin); or the test does not assert on anything time-dependent. Non-test code does not count.",
+      "fix": "Control the clock in the test (fake timers, a frozen or injected clock) and assert against a fixed time.",
+      "when": ["@Test|FunSpec|StringSpec|DescribeSpec|BehaviorSpec|runTest"],
+      "status": "candidate"
+    },
+    {
+      "id": "kt-test-uncontrolled-randomness",
+      "question": "Does `added_code` add a JUnit `@Test` function or a Kotest spec that asserts an exact value that comes from randomness or generated ids (`Random.nextInt()`/`Random.Default`, `UUID.randomUUID()`, `.random()` or `.shuffled()`) — produced by the code under test or by the test itself — so the assertion can pass or fail from run to run?",
+      "true": "A test compares an exact expected value against output that depends on an unseeded random or generated-id source.",
+      "false": "The source is seeded or injected (a seeded `Random(seed)`, an injected id/random source, or assertions that only check shape); the random value is generated once and the same variable is used on both sides of the comparison; or randomness does not reach any assertion. Non-test code does not count.",
+      "fix": "Seed or inject the random or id source, or assert only on the shape of the generated value.",
+      "when": ["@Test|FunSpec|StringSpec|DescribeSpec|BehaviorSpec|runTest"]
+    },
+    {
+      "id": "kt-test-real-network",
+      "question": "Does `added_code` add a unit test (a JUnit `@Test` function or a Kotest spec) that makes a real network request — `OkHttpClient`/Retrofit/Ktor client calls against a real `https://` URL (not localhost) — directly or through the code under test, with nothing stubbing the HTTP layer?",
+      "true": "A unit test depends on a live external service over the network.",
+      "false": "The network is stubbed or local (`MockWebServer`, a Ktor `MockEngine`, a fake repository/client, or a test explicitly marked as integration (class or file name says so)). Non-test code does not count.",
+      "fix": "Stub the HTTP layer (or start a local test server) so the unit test never depends on a real network.",
+      "when": ["@Test|FunSpec|StringSpec|DescribeSpec|BehaviorSpec|runTest"]
+    },
+    {
+      "id": "kt-test-unordered-assertion",
+      "question": "Does `added_code` add a JUnit `@Test` function or a Kotest spec that asserts an exact order (an exact list/array equality or element at index 0) for results whose order is not guaranteed — iteration of a `Set`/`HashSet`, `HashMap` iteration, results collected from concurrent coroutines, or a Room/SQL query without `ORDER BY`? `awaitAll()` results keep the input order; random output (`shuffled()`, `random()`, `Random`) is kt-test-uncontrolled-randomness's pattern, not this rule's.",
+      "true": "A test asserts a specific order on results whose order the code does not guarantee.",
+      "false": "The test orders or ignores order before asserting (sorting before asserting, `containsExactlyInAnyOrder`/`shouldContainExactlyInAnyOrder`, comparing as sets, or asserting order the code guarantees), or the source is ordered (arrays/lists built in order, sorted results, `awaitAll()` results, `LinkedHashMap`/`mapOf`/`setOf`, which keep insertion order). Exact expectations on `shuffled()`/`random()` output belong to kt-test-uncontrolled-randomness. Non-test code does not count.",
+      "fix": "Sort before asserting or compare without order (as a set or with an order-insensitive matcher).",
+      "when": ["@Test|FunSpec|StringSpec|DescribeSpec|BehaviorSpec|runTest"]
+    }
+  ]
+}

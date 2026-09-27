@@ -1,0 +1,56 @@
+{
+  "language": "bazel",
+  "extensions": [".bzl", ".bazel"],
+  "filenames": ["BUILD", "WORKSPACE"],
+  "rules": [
+    {
+      "id": "bzl-public-visibility",
+      "question": "Does `added_code` set `default_visibility = [\"//visibility:public\"]` in `package(...)`, or give `visibility = [\"//visibility:public\"]` to a target that is an implementation detail -- a helper named `internal`, `impl`, `util`/`utils`, `private`, `testutil`/`testing`/`test_helpers`/`mocks`/`fixtures`, a `testonly = True` target, a generated intermediate (`genrule` output, `*_gen`), or a target created inside a macro?",
+      "true": "A package default or an internal/helper target is made visible to the whole workspace.",
+      "false": "Public visibility is on a target that is the package's intended public API (its main `*_library`, `*_binary`, `*_proto_library`, an `alias` or `exports_files` meant for consumers, a macro's main target forwarding its `visibility` argument); visibility is restricted (`//visibility:private`, `//pkg:__subpackages__`, a `package_group`, specific packages); or no public visibility is added.",
+      "fix": "Restrict visibility to the packages that need it (a `package_group` or `//pkg:__subpackages__`) instead of `//visibility:public` (Bazel BUILD style guide).",
+      "when": ["visibility:public"]
+    },
+    {
+      "id": "bzl-nonhermetic-action",
+      "question": "Does `added_code` add a `genrule` `cmd` (or `cmd_bash`) or a `ctx.actions.run_shell` command that reaches outside its declared inputs -- downloading (`curl`, `wget`, `git clone`, `pip install`, `npm install`, `go get`, `apt-get`), calling tools by absolute host path (`/usr/bin/...`, `/usr/local/...`, `/opt/homebrew/...`), reading `$HOME`, `~` or absolute source-tree paths, writing into the source tree, or embedding the current time or randomness (`date`, `$RANDOM`, `uuidgen`) in outputs?",
+      "true": "A build action depends on the host machine, the network, or the clock, so it is not hermetic or cacheable.",
+      "false": "Tools come from `tools`/`toolchains` via `$(location)`, `$(execpath)` or `ctx.executable`; inputs are declared `srcs`; downloads happen in a repository rule or module extension (`http_archive`, `http_file`, `repository_ctx.download`), where fetching is expected; stamping uses `stamp`/`--workspace_status_command`; or only standard POSIX utilities are called by name (`cp`, `cat`, `sed`, `tar`, `mkdir`).",
+      "fix": "Declare the tool as a `tools`/toolchain dependency and fetch external files with a repository rule (`http_file`/`http_archive`) instead of reaching outside the sandbox (Bazel 'Hermeticity').",
+      "when": ["genrule|run_shell|cmd(_bash)?\\s*="]
+    },
+    {
+      "id": "bzl-genrule-tool-in-srcs",
+      "question": "Does `added_code` add a `genrule` whose `cmd` executes a target -- via `$(location :x)`, `$(execpath :x)` or `$(rootpath :x)` in the command position, or `python3 $(location :script.py)` -- that is listed in `srcs` rather than `tools`, such as a `*_binary`, an `sh_binary`, or a `.sh`/`.py` script the command runs?",
+      "true": "A program run by the genrule is declared in `srcs`, so it is built for the target platform instead of the exec platform.",
+      "false": "Every executed program is in `tools` (or `toolchains`); entries in `srcs` are only read or passed as data arguments to a tool (`cat $(SRCS)`, `$(location :tool) $(location :input.json)`); or the command runs only standard shell utilities; or the target is not a genrule.",
+      "fix": "Move the executed target from `srcs` to `tools` so it is built in the exec configuration (Bazel genrule docs).",
+      "when": ["genrule"]
+    },
+    {
+      "id": "bzl-sandbox-opt-out-unexplained",
+      "question": "Does `added_code` opt a target or action out of sandboxing, remote execution or caching -- tags `no-sandbox`, `no-remote`, `no-remote-exec`, `no-cache`, `local`, `requires-network`, `local = True` on a genrule, or `execution_requirements = {\"no-sandbox\": \"1\"}` -- with no comment explaining why?",
+      "true": "A target escapes the sandbox or cache with no stated reason, usually to paper over an undeclared input or host dependency.",
+      "false": "A comment on or next to the tag says why (e.g. a tool that needs a license server, a test that talks to a real device); the tag only adds resources or scheduling (`exclusive`, `cpu:N`); or no such tag is added.",
+      "fix": "Declare the missing inputs or tools instead of disabling the sandbox, or add a comment with the reason.",
+      "when": ["no-sandbox|no-remote|no-cache|requires-network|\"local\"|local\\s*=\\s*True|execution_requirements"]
+    },
+    {
+      "id": "bzl-macro-fixed-target-names",
+      "question": "Does `added_code` define a Starlark macro (a function in a `.bzl` file that calls rules or `native.*` rules, or a `macro(implementation = ...)`) that creates a target whose `name` is a fixed string or not derived from the macro's `name` argument (e.g. `native.genrule(name = \"gen_config\", ...)` instead of `name = name + \"_gen\"`), so calling the macro twice in one package collides?",
+      "true": "A macro creates targets with hard-coded names.",
+      "false": "Every created target's name is `name` or starts with `name` plus a suffix (`name + \"_lib\"`, `\"%s_gen\" % name`, `\"{}_test\".format(name)`); or the function is a rule or aspect implementation (`def _impl(ctx)`) or a helper that creates no targets.",
+      "fix": "Derive every generated target's name from the macro's `name` (e.g. `name + \"_gen\"`) (Bazel .bzl style guide, Macros).",
+      "when": ["def\\s+\\w+\\(|macro\\("],
+      "status": "candidate"
+    },
+    {
+      "id": "bzl-depset-flatten-in-impl",
+      "question": "Does `added_code`, in a rule or aspect implementation (`def _impl(ctx)`, `def _aspect_impl(target, ctx)`), call `.to_list()` on a transitive depset built from dependencies (`dep[MyInfo].transitive_srcs`, `depset(transitive = ...)`, `dep[DefaultInfo].files`) to loop over it, concatenate it, or turn files into path strings, instead of passing the depset to `ctx.actions.args()` (`args.add_all`) or an action's `inputs`?",
+      "true": "A transitive depset is flattened in analysis, which is O(N^2) across the build graph.",
+      "false": "Depsets are passed straight to `args.add_all(...)` (with `map_each`/`format_each` if needed), `inputs = depset(...)`, or `depset(transitive = [...])`; `.to_list()` is called only on a local, non-transitive depset, or in a test/debug rule on a single target; or the code is not a rule or aspect implementation.",
+      "fix": "Pass the depset directly to `ctx.actions.args().add_all(...)` or to `inputs =` instead of calling `.to_list()` (Bazel 'Optimizing performance' for rules).",
+      "when": ["to_list\\("]
+    }
+  ]
+}

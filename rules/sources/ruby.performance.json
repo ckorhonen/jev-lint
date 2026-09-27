@@ -1,0 +1,22 @@
+{
+  "rb-perf-n-plus-one": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://guides.rubyonrails.org/active_record_querying.html",
+        "checked": "2026-09-27",
+        "note": "N+1 queries problem; 'Prefer using includes'; strict_loading raises on lazy loads."
+      },
+      {
+        "grade": "C",
+        "url": "https://www.coderabbit.ai/blog/state-of-ai-vs-human-code-generation-report",
+        "checked": "2026-09-27",
+        "note": "Vendor study of 470 OSS PRs: AI-authored PRs had ~1.7x more issues; performance inefficiencies (excessive I/O, N+1 queries, unindexed lookups) ~8x more often; security issues 1.5-2x."
+      }
+    ],
+    "whyNotLinter": "RuboCop cannot tell associations from columns; Bullet and strict_loading are runtime-only and need test coverage of the path.",
+    "aiRelevance": "High (C).",
+    "expectedNoise": "low-med.",
+    "languageFile": "ruby"
+  }
+}

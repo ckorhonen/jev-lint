@@ -1,0 +1,69 @@
+{
+  "kt-test-cannot-fail": {
+    "evidence": [
+      {
+        "grade": "A",
+        "url": "rules/typescript.practices.json, rules/swift.practices.json (commit 9426fda)",
+        "checked": "2026-09-27",
+        "note": "Mirrors jev-lint's validated built-ins ts-test-cannot-fail / swift-test-cannot-fail: holdout 12/12 per language, 0 false positives. Evidence that the wording works, not new evidence for this language."
+      },
+      {
+        "grade": "C",
+        "url": "https://arxiv.org/abs/2606.18168",
+        "checked": "2026-09-27",
+        "note": "Banik et al. (preprint, Jun 2026), 86,156 agent-authored test-file patches (Codex, Copilot, Devin, Cursor, Claude Code): 80.2% weak/no oracle; W1 no-assertion 24-85% by agent; W2 existence-only 0-0.4%; W4 mock-only 0-4%; W5 snapshot-only 0-4%."
+      },
+      {
+        "grade": "B",
+        "url": "https://arxiv.org/abs/2602.00409",
+        "checked": "2026-09-27",
+        "note": "Hora & Robbes, MSR 2026: 1.2M commits/2,168 TS/JS/Python repos; 23% of agent commits touch tests vs 13% human; 36% of agent commits add mocks vs 26% human."
+      }
+    ],
+    "whyNotLinter": "detekt has no rule requiring a behaviour-dependent assertion; stub echoes and a mocked subject are semantic.",
+    "aiRelevance": "Banik et al. find 80.2% of agent-authored test-file patches carry weak or no oracle signals (no-assertion is the largest class); Hora & Robbes find agents add mocks in 36% of commits vs 26% for humans.",
+    "expectedNoise": "low",
+    "languageFile": "kotlin",
+    "notes": "Refines best-practices/kotlin.md kt-test-cannot-fail: broader Kotest spec styles and runTest in the gate; MockK verify on unit-computed args made explicit."
+  },
+  "kt-test-error-path-passes-silently": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://kotlinlang.org/api/core/kotlin-test/kotlin.test/assert-fails-with.html",
+        "checked": "2026-09-27 (cited, page not fetched)",
+        "note": "kotlin.test assertFailsWith asserts that a block throws."
+      },
+      {
+        "grade": "C",
+        "url": "https://arxiv.org/abs/2606.18168",
+        "checked": "2026-09-27",
+        "note": "Banik et al. (preprint, Jun 2026), 86,156 agent-authored test-file patches (Codex, Copilot, Devin, Cursor, Claude Code): 80.2% weak/no oracle; W1 no-assertion 24-85% by agent; W2 existence-only 0-0.4%; W4 mock-only 0-4%; W5 snapshot-only 0-4%."
+      }
+    ],
+    "whyNotLinter": "detekt has no rule for expected-exception tests written with try/catch; intent must be read from the test.",
+    "aiRelevance": "Same agent failure mode as the Swift/Python variants.",
+    "expectedNoise": "low",
+    "languageFile": "kotlin"
+  },
+  "kt-test-launch-without-advance": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-test/",
+        "checked": "2026-09-27",
+        "note": "With StandardTestDispatcher launched coroutines don't run until the scheduler advances; 'Always advance the scheduler before asserting on child coroutine effects'; runTest skips delay."
+      },
+      {
+        "grade": "B",
+        "url": "https://mir.cs.illinois.edu/lamyaa/publications/fse14.pdf",
+        "checked": "2026-09-27",
+        "note": "Luo et al., FSE 2014, 161 flaky-test fix commits: Async Wait 45% (34% use a fixed time delay; 54% fixed with waitFor), Concurrency 20%, Test Order Dependency 12% (74% fixed by cleaning shared state)."
+      }
+    ],
+    "whyNotLinter": "detekt has no rule relating `launch` in tests to scheduler advancement; it depends on the dispatcher in use.",
+    "aiRelevance": "Agents migrating from `runBlocking` to `runTest` keep the old assertion order and get tests that pass or fail depending on dispatcher.",
+    "expectedNoise": "med — dispatcher setup is often outside the snippet; the rule is limited to launches visible in the test body.",
+    "languageFile": "kotlin"
+  }
+}

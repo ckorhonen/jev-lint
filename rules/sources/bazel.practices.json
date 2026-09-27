@@ -1,0 +1,116 @@
+{
+  "bzl-public-visibility": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://bazel.build/build/style-guide",
+        "checked": "2026-09-27",
+        "note": "'Avoid setting package default_visibility to //visibility:public'; public only on targets forming the public API."
+      },
+      {
+        "grade": "B",
+        "url": "https://bazel.build/concepts/visibility",
+        "checked": "2026-09-27",
+        "note": "'Avoid setting default_visibility to public... the risk of inadvertently creating public targets increases'; prefer package_group."
+      },
+      {
+        "grade": "B",
+        "url": "https://bazel.build/extending/macros",
+        "checked": "2026-09-27",
+        "note": "'it is an antipattern for a macro to declare a target with public visibility'."
+      }
+    ],
+    "whyNotLinter": "Buildifier has no visibility warning; Bazel only errors when visibility is too narrow, never too wide.",
+    "aiRelevance": "Medium-high (inferred, no study found): the shortest fix for a 'target is not visible' build error is `//visibility:public`.",
+    "expectedNoise": "med -- 'implementation detail' is judged from names; a repo that publishes most targets should disable it.",
+    "languageFile": "bazel"
+  },
+  "bzl-nonhermetic-action": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://bazel.build/basics/hermeticity",
+        "checked": "2026-09-27",
+        "note": "Non-hermeticity sources: host binaries and absolute paths, timestamps/build ids, writing to the source tree."
+      },
+      {
+        "grade": "B",
+        "url": "https://bazel.build/reference/be/general#genrule",
+        "checked": "2026-09-27",
+        "note": "'Do ensure that tools run by a genrule are deterministic and hermetic. They should not write timestamps to their output'; avoid network access."
+      }
+    ],
+    "whyNotLinter": "Buildifier does not parse `cmd` strings; the sandbox allows network by default and absolute host tools work locally, so builds pass until remote execution or another machine.",
+    "aiRelevance": "Medium (inferred): agents translate Makefile/shell habits (curl, /usr/bin/python3) into genrules.",
+    "expectedNoise": "low -- repository rules are excluded explicitly.",
+    "languageFile": "bazel"
+  },
+  "bzl-genrule-tool-in-srcs": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://bazel.build/reference/be/general#genrule",
+        "checked": "2026-09-27",
+        "note": "'Any *_binary or tool to be executed by cmd must appear in this list [tools], not in srcs, to ensure they are built in the correct configuration.'"
+      }
+    ],
+    "whyNotLinter": "Buildifier does not relate `cmd` usage to attributes; the build succeeds on single-platform setups and breaks only when cross-compiling or with remote exec.",
+    "aiRelevance": "Medium (inferred): passes local builds, so agents' tests never catch it.",
+    "expectedNoise": "low.",
+    "languageFile": "bazel"
+  },
+  "bzl-sandbox-opt-out-unexplained": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://bazel.build/basics/hermeticity",
+        "checked": "2026-09-27",
+        "note": "Recommends enforcing sandboxing so actions only see declared inputs."
+      },
+      {
+        "grade": "B",
+        "url": "https://bazel.build/reference/be/general#genrule",
+        "checked": "2026-09-27",
+        "note": "`local = True` forces local execution and bypasses sandbox/remote."
+      }
+    ],
+    "whyNotLinter": "The tags are literal, but they are legitimate when justified; the rule asks whether a justification exists, which needs reading comments.",
+    "aiRelevance": "Medium-high (inferred): adding `no-sandbox` is the quickest way to make a 'file not found in sandbox' error disappear.",
+    "expectedNoise": "low.",
+    "languageFile": "bazel"
+  },
+  "bzl-macro-fixed-target-names": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://bazel.build/rules/bzl-style",
+        "checked": "2026-09-27",
+        "note": "'Generated targets... should have their names prefixed by <name>', restricted visibility and a manual tag."
+      },
+      {
+        "grade": "B",
+        "url": "https://bazel.build/extending/macros",
+        "checked": "2026-09-27",
+        "note": "Symbolic macros enforce the prefix naming at load time; legacy macros do not."
+      }
+    ],
+    "whyNotLinter": "Buildifier `unnamed-macro` only checks that a `name` parameter exists; legacy macros are not checked for derived names.",
+    "aiRelevance": "Medium (inferred): agents write macros that create a fixed helper target and test with one call site only.",
+    "expectedNoise": "low.",
+    "languageFile": "bazel"
+  },
+  "bzl-depset-flatten-in-impl": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://bazel.build/rules/performance",
+        "checked": "2026-09-27",
+        "note": "Avoid flattening depsets: 'doing so usually results in O(N^2) cost'; use ctx.actions.args() to defer expansion."
+      }
+    ],
+    "whyNotLinter": "Buildifier `depset-iteration` flags implicit iteration and `overly-nested-depset` flags depsets in loops; an explicit `.to_list()` on a transitive depset is not flagged.",
+    "aiRelevance": "Medium (inferred): Python-trained habits turn every collection into a list.",
+    "expectedNoise": "low-med -- small local depsets are excluded.",
+    "languageFile": "bazel"
+  }
+}

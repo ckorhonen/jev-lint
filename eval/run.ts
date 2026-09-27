@@ -10,7 +10,7 @@ import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { parseArgs } from "node:util";
-import { type Pack, RULE_FILES, ruleApplies, ruleSetForLanguage } from "../src/lint";
+import { BUILT_IN_PACKS, type BuiltInPack, LANGUAGES, type Pack, RULE_FILES, ruleApplies, ruleSetForLanguage } from "../src/lint";
 import {
   type Case,
   caseCode,
@@ -24,12 +24,13 @@ import {
   REGEX_RULES,
 } from "./systems";
 
+// The harness evaluates candidate rules too (the hook skips them until they pass).
+process.env.JEV_LINT_CANDIDATES ??= "on";
 const ROOT = join(import.meta.dir, "..");
 const RESULTS = join(ROOT, "eval/results");
-const LANGS = ["typescript", "swift"] as const;
+const LANGS = LANGUAGES;
 const SPLITS = ["dev", "holdout"] as const;
-type BuiltInPack = Exclude<Pack, "repo">;
-const PACKS: BuiltInPack[] = ["hygiene", "practices"];
+const PACKS: readonly BuiltInPack[] = BUILT_IN_PACKS;
 
 // Thresholds were fixed before any data was seen; the sweep below shows the alternatives.
 const HIGH = 0.8;
@@ -43,42 +44,53 @@ const { values: args } = parseArgs({
     runs: { type: "string", default: "1" },
     out: { type: "string", default: "summary.json" },
     splits: { type: "string", default: "dev,holdout" },
+    only: { type: "string" }, // comma-separated rule ids: only cases scoped to them (for tuning passes)
   },
 });
 
 const JUDGES = { jev: (c: Case) => judgeJev(c), llm: judgeLlm, regex: judgeRegex, local: judgeLocal } as const;
 type SystemName = keyof typeof JUDGES;
 
+// Case files: <lang>[.<pack>][.<batch>].<split>.jsonl. No pack means hygiene; later batches
+// (e.g. practices.v3) add cases for rules added after the first labeling round, and each case
+// carries its label scope.
+export function parseCaseFile(name: string): { lang: string; pack: BuiltInPack; split: string } | undefined {
+  const parts = name.replace(/\.jsonl$/, "").split(".");
+  if (parts.length < 2 || parts.length > 4) return undefined;
+  const [lang, ...rest] = parts;
+  const split = rest.pop() as string;
+  if (rest.length && /^v\d+$/.test(rest[rest.length - 1])) rest.pop();
+  const pack = (rest[0] ?? "hygiene") as BuiltInPack;
+  if (rest.length > 1 || !BUILT_IN_PACKS.includes(pack)) return undefined;
+  return { lang, pack, split };
+}
+
 function loadCases(): Case[] {
+  const only = args.only ? new Set((args.only as string).split(",")) : undefined;
   const cases: Case[] = [];
-  for (const lang of LANGS) {
-    for (const split of SPLITS) {
-      for (const pack of PACKS) {
-        // <lang>[.<pack>][.<batch>].<split>.jsonl — later batches (e.g. practices.v3) add cases
-        // for rules added after the first labeling round; each case carries its label scope.
-        const prefix = `${lang}.${pack === "hygiene" ? "" : `${pack}.`}`;
-        const files = readdirSync(join(ROOT, "eval/cases")).filter((name) => {
-          if (!name.startsWith(prefix) || !name.endsWith(`.${split}.jsonl`)) return false;
-          const middle = name.slice(prefix.length, -`.${split}.jsonl`.length);
-          return pack === "hygiene" ? middle === "" && !name.includes(".practices.") : middle === "" || /^v\d+$/.test(middle);
-        });
-        for (const name of files) {
-          for (const line of readFileSync(join(ROOT, "eval/cases", name), "utf8").split("\n")) {
-            if (line.trim()) cases.push({ ...JSON.parse(line), pack });
-          }
-        }
-      }
+  for (const name of readdirSync(join(ROOT, "eval/cases")).sort()) {
+    const parsed = parseCaseFile(name);
+    if (!parsed || !(LANGS as readonly string[]).includes(parsed.lang) || !(SPLITS as readonly string[]).includes(parsed.split)) continue;
+    for (const line of readFileSync(join(ROOT, "eval/cases", name), "utf8").split("\n")) {
+      if (!line.trim()) continue;
+      const c = { ...JSON.parse(line), pack: parsed.pack, lang: parsed.lang } as Case;
+      if (!only || (c.scope ?? []).some((id) => only.has(id))) cases.push(c);
     }
   }
   return cases;
 }
 
 // Cache key changes whenever that pack's rule text or the judge model changes.
-const packHash = (pack: BuiltInPack) => createHash("sha256").update(JSON.stringify(RULE_FILES[pack])).digest("hex").slice(0, 10);
-function cacheDir(system: SystemName, run: number, pack: BuiltInPack) {
+// Keyed per pack and language, so rewording a Kotlin rule doesn't re-judge TypeScript cases.
+const packHash = (pack: BuiltInPack, lang: string) =>
+  createHash("sha256")
+    .update(JSON.stringify(RULE_FILES[pack].filter((s) => s.language === lang)))
+    .digest("hex")
+    .slice(0, 10);
+function cacheDir(system: SystemName, run: number, pack: BuiltInPack, lang: string) {
   const variant =
     system === "llm" ? LLM_MODEL : system === "jev" ? (process.env.JEV_LINT_MODEL ?? "jev-latest") : system === "local" ? LOCAL_NAME : "v1";
-  return join(RESULTS, "cache", `${system}-${variant}-${packHash(pack)}-r${run}`);
+  return join(RESULTS, "cache", `${system}-${variant}-${packHash(pack, lang)}-r${run}`);
 }
 
 async function judgeAll(system: SystemName, cases: Case[], run: number) {
@@ -87,7 +99,7 @@ async function judgeAll(system: SystemName, cases: Case[], run: number) {
   let done = 0;
   const worker = async () => {
     for (let c = queue.shift(); c; c = queue.shift()) {
-      const dir = cacheDir(system, run, c.pack);
+      const dir = cacheDir(system, run, c.pack, c.lang);
       mkdirSync(dir, { recursive: true });
       // Key on content too: a case id whose payload changed must not reuse a stale judgment.
       const payloadHash = createHash("sha256").update(JSON.stringify(c.payload)).digest("hex").slice(0, 12);

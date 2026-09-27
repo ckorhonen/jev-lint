@@ -1,0 +1,86 @@
+{
+  "language": "python",
+  "extensions": [".py"],
+  "rules": [
+    {
+      "id": "py-test-cannot-fail",
+      "question": "Does `added_code` add a test (pytest `def test_...` functions or `unittest.TestCase` `test_...` methods) that could not fail if the code it is named after were broken, because it (a) has no assertion at all (`assert`, `self.assert...`, `pytest.raises`), (b) only asserts a tautology or a value the test itself just created (`assert True`, `assert x == x`, `assert Foo() is not None`), (c) only checks that a mock returns what the test configured (`mock.return_value = 3` then `assert mock() == 3`, or `mock.assert_called_once()` right after the test calls the mock itself), or (d) mocks the very unit it claims to test (`@patch`/`monkeypatch` of the very function or class under test)? A test that calls the code inside `try:` and handles the expected error in `except …: pass`/`return` is py-test-error-path-passes-silently's pattern, not this rule's, and does not count here.",
+      "true": "At least one added test has no assertion that depends on the real behaviour of the code under test: no assertion, a tautology, an assertion on the test's own stub or input, or the unit under test is itself mocked.",
+      "false": "Every added test calls real code and asserts on its output, error, returned value or a side effect it causes (including calls the unit makes to a mock, with arguments the unit computed). Weak but real assertions do not count. Fixtures, factories, helpers and setup code without tests do not count, and neither does code that is not a test. An expected-error test that calls the code inside `try:` and passes in `except` with no `pytest.fail()`/`self.fail()` after the call belongs to py-test-error-path-passes-silently, not this rule.",
+      "fix": "Make the test exercise the real code and assert on a result that would change if that code broke; delete it if it can't.",
+      "when": ["def test_|class \\w+\\(.*TestCase\\)"]
+    },
+    {
+      "id": "py-test-fixed-sleep",
+      "question": "Does `added_code` in a pytest or unittest test pause for a fixed time to wait for asynchronous or background work before asserting — `time.sleep(…)` or `await asyncio.sleep(n)` with n > 0 after starting a thread, task, subprocess, server, or queued job — instead of awaiting the task, `thread.join()`, `event.wait(timeout)`, a polling helper with a deadline, or a time-control library (freezegun, time-machine)?",
+      "true": "A test sleeps for a fixed duration and hopes the background work has finished.",
+      "false": "The test awaits the coroutine or task, joins the thread, waits on an Event/Condition/Future, polls with a deadline (`while time.monotonic() < deadline: … time.sleep(0.05)`), freezes or advances time; `asyncio.sleep(0)` to yield; the sleep is inside a fake to simulate latency, or `time.sleep` is being patched. Code that is not a test does not count.",
+      "fix": "Wait on the actual condition (await, join, Event.wait, or a deadline-bounded poll) instead of sleeping (Luo et al. FSE 2014: 45% of flaky tests are async waits, a third of them fixed-time sleeps).",
+      "when": ["sleep"]
+    },
+    {
+      "id": "py-test-error-path-passes-silently",
+      "question": "Does `added_code` add a pytest or unittest test meant to check that code raises that calls the code inside `try: … except SomeError: …` where the `except` block only passes, returns, or asserts on the exception, and there is no `pytest.fail(…)`/`self.fail(…)`/`assert False` after the call inside `try` (and no `else: pytest.fail`), so the test passes when nothing is raised — instead of `with pytest.raises(…)` or `self.assertRaises(…)`?",
+      "true": "An expected-exception test passes silently if the exception is never raised.",
+      "false": "The test uses `pytest.raises`/`assertRaises`/`assertRaisesRegex`; the `try` block calls `pytest.fail`/`self.fail` after the call, or an `else:` clause fails; the try/except handles cleanup in a success-path test. Assertions inside `except` are also flagged by ruff PT017 where enabled.",
+      "fix": "Use `with pytest.raises(SomeError):` (or self.assertRaises) so the test fails when nothing is raised.",
+      "when": ["except"]
+    },
+    {
+      "id": "py-test-title-contradicts-assertions",
+      "question": "Does `added_code` add a Python test whose name or docstring states a specific outcome or value — `test_raises_on_negative_amount`, `test_returns_none_when_missing`, `test_does_not_send_email`, `test_discount_capped_at_50_percent` — while its assertions check a different or opposite outcome or value (e.g. `assert withdraw(-5) == 0` in a test named `…raises…`, `send.assert_called_once()` in `test_does_not_send_email`, `assert order.status == \"cancelled\"` in `test_…does_not_cancel_order`, a successful result asserted in a test named `…rejects…`/`…raises…`/`…fails…` (for example after passing a flag that disables the check), or a 70%-off price asserted in a test named `…capped_at_half…`)? Compare the number or negation in the name with the numbers and the outcome in the assertion; check every added test, not just the first.",
+      "true": "The assertions contradict or ignore the outcome the test name promises.",
+      "false": "Assertions check the named outcome, even loosely; the name is generic (`test_basic`, `test_happy_path`); the name describes a scenario and the assertions check its consequence. Tests with no real assertion belong to py-test-cannot-fail.",
+      "fix": "Make the assertion check the behavior the test name promises, or fix the code; never flip an assertion just to make the test pass.",
+      "when": ["def test_"]
+    },
+    {
+      "id": "py-test-shared-mutable-state",
+      "question": "Does `added_code` add Python tests that share mutable state across tests so the result depends on execution order — a module-level list/dict/object or a `TestCase` class attribute that one test mutates and another reads, a `scope=\"module\"`/`\"session\"` fixture returning a mutable object that tests modify, or a test that relies on rows or files created by an earlier test?",
+      "true": "One test's outcome depends on state left behind by another test.",
+      "false": "Function-scoped fixtures or `setUp` recreate the state; module/session fixtures are only read (a client, an engine, a read-only dataset) or are reset with a teardown; tests use `tmp_path` or transactional DB fixtures; module-level constants never mutated; code that is not a test.",
+      "fix": "Give each test fresh state (function-scoped fixtures or setUp) so tests pass in any order and under pytest-xdist.",
+      "when": ["def test_|TestCase|fixture"]
+    },
+    {
+      "id": "py-test-special-case-in-source",
+      "question": "Does `added_code`, in a non-test source file (`file_path` not under `tests/`/`test/` and not `test_*.py`/`*_test.py`/`conftest.py`), check whether it is running under tests — `'pytest' in sys.modules`, `os.environ.get('PYTEST_CURRENT_TEST')`, `settings.TESTING`, `app.testing`/`app.config['TESTING']`, an `IS_TEST` flag — and in that case return a hardcoded result or skip the real logic, so tests pass without exercising the real behavior?",
+      "true": "Production code short-circuits its own logic when it detects a test run.",
+      "false": "Test-mode checks that only swap infrastructure while the logic under test still runs (SQLite/in-memory DB, disabled telemetry, locmem email backend, eager Celery, shorter timeouts); Django/Flask `TESTING` settings used for configuration only; dependency injection of fakes; the file is a test, fixture, or conftest. Also fine: test-mode configuration that only swaps an endpoint, credential, database URL or client while the real logic still runs.",
+      "fix": "Remove the test-only branch and make the real implementation satisfy the test; inject fakes instead of branching on the environment (ImpossibleBench; Anthropic prompting guide).",
+      "when": ["pytest|PYTEST_CURRENT_TEST|TESTING|is_?test\\b|sys\\.modules"]
+    },
+    {
+      "id": "py-test-real-clock",
+      "question": "Does `added_code` add a pytest `def test_...` or `unittest` `test_...` method whose assertions depend on the current date or time — the code under test reads `datetime.now()`, `datetime.utcnow()`, `date.today()`, `time.time()` or `timezone.now()` (or the test does and compares against it, or calls a function named for the current time such as `…_now()`, `…_today()`), for example asserting an exact timestamp, an expiry, an age, `isToday`, time-of-day output (greetings, opening hours), or a formatted date — without controlling the clock (`freezegun` (`@freeze_time`), `time-machine`, `pytest` monkeypatching of the clock, an injected clock, or a fixed datetime passed to the code)? A bounds or tolerance check against times the test itself captured around the call (`before <= x <= after`, `x <= now`, `accuracy:`/`toBeCloseTo`/`shouldBeBetween` around a value read in the same test) is not time-dependent and does not count.",
+      "true": "A test's pass/fail depends on when it runs, because it asserts on time-dependent output while the real clock is used.",
+      "false": "The clock is controlled (`freezegun` (`@freeze_time`), `time-machine`, `pytest` monkeypatching of the clock, an injected clock, or a fixed datetime passed to the code); assertions only check that a timestamp exists or lies between bounds the test captured with `datetime.now()` before and after the call (`before - timedelta(seconds=1) <= x <= datetime.now() + …`); or the test does not assert on anything time-dependent. Non-test code does not count.",
+      "fix": "Control the clock in the test (fake timers, a frozen or injected clock) and assert against a fixed time.",
+      "when": ["def test_|class \\w+\\(.*TestCase\\)"]
+    },
+    {
+      "id": "py-test-uncontrolled-randomness",
+      "question": "Does `added_code` add a pytest `def test_...` or `unittest` `test_...` method that asserts an exact value that comes from randomness or generated ids (`random.*`, `uuid.uuid4()`, `secrets.*`, `Faker()` without a seed) — produced by the code under test or by the test itself — so the assertion can pass or fail from run to run?",
+      "true": "A test compares an exact expected value against output that depends on an unseeded random or generated-id source.",
+      "false": "The source is seeded or injected (`random.seed(...)`/`Faker.seed(...)`, a mocked or injected random/id source, or assertions that only check shape (type, regex, length)); the random value is generated once and the same variable is used on both sides of the comparison; or randomness does not reach any assertion. Non-test code does not count.",
+      "fix": "Seed or inject the random or id source, or assert only on the shape of the generated value.",
+      "when": ["def test_|class \\w+\\(.*TestCase\\)"]
+    },
+    {
+      "id": "py-test-real-network",
+      "question": "Does `added_code` add a unit test (a pytest `def test_...` or `unittest` `test_...` method) that makes a real network request — `requests`, `httpx`, `urllib`, `aiohttp` or an SDK client against a real `http(s)://` URL (not localhost) — directly or through the code under test, with nothing stubbing the HTTP layer?",
+      "true": "A unit test depends on a live external service over the network.",
+      "false": "The network is stubbed or local (an HTTP mock (`responses`, `respx`, `requests_mock`, `pytest-httpx`, VCR cassettes, a fake client), a local test server, or a test explicitly marked as integration/e2e (`@pytest.mark.integration`, file or class name says so)). Non-test code does not count.",
+      "fix": "Stub the HTTP layer (or start a local test server) so the unit test never depends on a real network.",
+      "when": ["def test_|class \\w+\\(.*TestCase\\)"]
+    },
+    {
+      "id": "py-test-unordered-assertion",
+      "question": "Does `added_code` add a pytest `def test_...` or `unittest` `test_...` method that asserts an exact order (an exact list/array equality or element at index 0) for results whose order is not guaranteed — iteration of a `set`, a `dict` or list filled as concurrent tasks complete, `asyncio.as_completed` completion order, or a query without `order_by`/`ORDER BY`? `asyncio.gather(...)` returns results in argument order and is ordered; random output is py-test-uncontrolled-randomness's pattern, not this rule's.",
+      "true": "A test asserts a specific order on results whose order the code does not guarantee.",
+      "false": "The test orders or ignores order before asserting (sorting before asserting, comparing as sets/`Counter`, `assertCountEqual`, or asserting order that the code guarantees (`order_by`, `sorted`)), or the source is ordered (lists built in order, sorted results, `asyncio.gather` results, which follow argument order, dicts, which keep insertion order). Non-test code does not count.",
+      "fix": "Sort before asserting or compare without order (as a set or with an order-insensitive matcher).",
+      "when": ["def test_|class \\w+\\(.*TestCase\\)"]
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "language": "python",
+  "extensions": [".py"],
+  "rules": [
+    {
+      "id": "py-perf-orm-query-in-loop",
+      "question": "Does `added_code` loop over ORM records (a Django QuerySet or SQLAlchemy result) and, inside the loop or comprehension, touch a related object or run another query per record -- `order.customer.name`, `post.comments.all()`, `post.comments.count()`, `Model.objects.get(...)`, `Model.objects.filter(...)`, `session.get(...)`, `session.execute(select(...))` -- without `select_related`, `prefetch_related`, `joinedload`, `selectinload`, an annotation, or a single bulk query before the loop?",
+      "true": "Each iteration triggers another database query (N+1).",
+      "false": "Related data is loaded up front (`select_related`, `prefetch_related`, `joinedload`, `selectinload`, `annotate(Count(...))`, an `__in`/`.in_()` bulk fetch into a dict); the loop only reads the record's own columns or a foreign-key id (`entry.blog_id`); the loop is over a small fixed list; or the loop is not over database records. Saving, creating or deleting one record per iteration is a write, which belongs to py-perf-orm-write-in-loop, not this rule.",
+      "fix": "Load related data before the loop (select_related/prefetch_related in Django, joinedload/selectinload in SQLAlchemy) or fetch everything with one `__in` query.",
+      "when": ["\\bfor\\b"]
+    },
+    {
+      "id": "py-perf-orm-write-in-loop",
+      "question": "Does `added_code` write to the database once per item inside a loop over a variable-length collection (a queryset, a function argument, a fetched list) -- calling `.save()`, `Model.objects.create(...)`, `.delete()`, or `session.add(obj)` followed by `session.commit()`/`session.flush()` on every iteration -- where a bulk operation (`bulk_create`, `bulk_update`, `QuerySet.update()`/`.delete()`, `session.add_all()` plus one commit, `insert().values([...])`, `executemany`) would do it in one or a few statements? Does not count: a loop over a literal tuple or list of a few values written in the code (`for code in (\"EUR\", \"USD\", \"GBP\"):`), or a loop with a comment explaining that each row must go through `save()` (signals, `save()` overrides).",
+      "true": "The loop issues one write (and often one commit) per item.",
+      "false": "Writes are batched; the loop commits in deliberate fixed-size chunks; each iteration needs per-row model logic that bulk methods skip (signals, `save()` overrides) and a comment says so; the loop runs over a small fixed set of known items; or the code is a test fixture. Also fine: a literal list of a few named items written inline (seed data, fixtures, `for name in ['admin', 'staff']:`), and a loop where a comment explains why each row must go through `save()`.",
+      "fix": "Use `bulk_create`/`bulk_update`/`QuerySet.update()` (Django) or `add_all` plus one commit / `insert().values([...])` (SQLAlchemy).",
+      "when": ["\\bfor\\b|\\bwhile\\b"]
+    },
+    {
+      "id": "py-perf-sequential-awaits",
+      "question": "Does `added_code`, inside an `async def`, await independent I/O calls one after another — a `for` loop that does `await client.get(...)`/`await fetch_x(item)` per item, or two or more consecutive awaits whose arguments don't depend on each other's results — where `asyncio.gather(...)`, `asyncio.TaskGroup` or `anyio` task groups could run them concurrently?",
+      "true": "Independent awaited calls run serially in async code when they could run concurrently.",
+      "false": "Each call needs the previous result; order matters (writes that must be sequential, a rate-limited API with a comment saying so, a DB transaction/session that must not be shared across tasks); calls are already gathered or grouped; the loop has a small fixed bound with a comment; or the code is not async.",
+      "fix": "Run the independent calls concurrently with `asyncio.gather` or a `TaskGroup`, bounded by a semaphore if the list can be large.",
+      "when": ["\\bawait\\b"]
+    },
+    {
+      "id": "py-perf-unbounded-gather",
+      "question": "Does `added_code` start one concurrent task per item of a variable-length or external collection — `asyncio.gather(*[fetch(x) for x in items])`, `create_task` in a loop, or a `TaskGroup` spawning per item — for network or database calls, with no concurrency limit (`asyncio.Semaphore`, bounded queue/worker pool, chunking)?",
+      "true": "Unbounded fan-out of network or DB calls over a collection whose size is not fixed.",
+      "false": "A semaphore, worker pool, queue or chunking bounds concurrency; the collection is a small fixed literal; or the tasks are pure CPU-free local work.",
+      "fix": "Bound the concurrency with an `asyncio.Semaphore` or a fixed-size worker pool.",
+      "when": ["gather\\s*\\(|create_task|TaskGroup|task_group"]
+    }
+  ]
+}

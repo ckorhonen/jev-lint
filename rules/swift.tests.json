@@ -1,0 +1,71 @@
+{
+  "language": "swift",
+  "extensions": [".swift"],
+  "rules": [
+    {
+      "id": "swift-test-cannot-fail",
+      "question": "Does `added_code` add a test (an `XCTestCase` method named `test…` or a Swift Testing `@Test` function) that could not fail if the code it is named after were broken, because it (a) has no `XCTAssert…`/`#expect`/`#require` at all, (b) only asserts a tautology or a value the test itself just created (`XCTAssertTrue(true)`, `XCTAssertNotNil(Foo())`, `#expect(x == x)`), (c) only checks that a mock or stub returns what the test configured it to return, or that a method the test called directly was called, or (d) replaces the very type or function it claims to test with a fake?",
+      "true": "At least one added test has no assertion that depends on the real behaviour of the code under test: no assertion, a tautology, an assertion on the test's own stub or input, or the unit under test is itself faked.",
+      "false": "Every added test calls real code and asserts on its output, thrown error, published state, or a side effect it causes (including calls the unit under test makes to a fake, with arguments the unit computed). Weak but real assertions (`XCTAssertNotNil` on a computed result) do not count. Test helpers, fakes, fixtures and setUp code without test methods do not count, and neither does code that is not a test.",
+      "fix": "Make the test exercise the real code and assert on a result that would change if that code broke; delete it if it can't.",
+      "when": ["XCTestCase|@Test\\b|func\\s+test\\w*\\s*\\("]
+    },
+    {
+      "id": "swift-test-fixed-sleep",
+      "question": "Does `added_code` in an XCTest or Swift Testing test pause for a fixed time to wait for asynchronous work before asserting — `Thread.sleep(forTimeInterval:)`, `sleep(…)`/`usleep(…)`, `try await Task.sleep(for:)`/`Task.sleep(nanoseconds:)`, or `RunLoop.current.run(until: Date().addingTimeInterval(…))` — instead of awaiting the async call, fulfilling and awaiting an `XCTestExpectation`, using Swift Testing `confirmation`, or an injected test clock?",
+      "true": "A test sleeps for a fixed duration and hopes the async work has finished.",
+      "false": "The test is `async` and awaits the call; uses `XCTestExpectation` + `fulfill()` with `wait(for:timeout:)`/`await fulfillment(of:timeout:)`; uses `confirmation`; drives time with a test clock (`TestClock`, `ImmediateClock`); the sleep is inside a fake/stub to simulate latency; `Task.yield()`. Code that is not a test does not count.",
+      "fix": "Await the work, or use expectations/confirmation or a test clock instead of sleeping (Luo et al. FSE 2014: 45% of flaky tests are async waits, a third of them fixed-time sleeps).",
+      "when": ["sleep|RunLoop"]
+    },
+    {
+      "id": "swift-test-error-path-passes-silently",
+      "question": "Does `added_code` add a test meant to check that code throws (its name or comments say it throws, fails, rejects, or errors) that calls the code inside `do { try … } catch { … }` with no `XCTFail(…)`/`Issue.record(…)` after the throwing call inside `do`, so the test passes when nothing is thrown — instead of `XCTAssertThrowsError`, `#expect(throws:)`, or `#require(throws:)`?",
+      "true": "An expected-error test has assertions only in the catch path and passes if no error is thrown.",
+      "false": "The test uses `XCTAssertThrowsError`, `#expect(throws:)`, or `#require(throws:)`; the `do` block records a failure after the throwing call; the do/catch belongs to a success-path test and the catch fails the test (`catch { XCTFail(\"\\(error)\") }`); there is no do/catch in a test.",
+      "fix": "Use XCTAssertThrowsError / #expect(throws:), or add XCTFail/Issue.record after the call so the test fails when nothing is thrown.",
+      "when": ["catch"]
+    },
+    {
+      "id": "swift-test-unawaited-task",
+      "question": "Does `added_code` add a Swift test that starts asynchronous work it does not wait for — `Task { await sut.load() }`, `Task.detached { … }`, `DispatchQueue.global().async { … }`, or calling a completion-handler API — and then asserts on its result or on state it changes without awaiting the task (`await task.value`), fulfilling and awaiting an `XCTestExpectation`, or using Swift Testing `confirmation`, so the assertions run before the work finishes? If the test waits with a fixed sleep (`Thread.sleep`, `Task.sleep`, `usleep`) between starting the work and asserting, that is swift-test-fixed-sleep's pattern, not this rule's.",
+      "true": "Assertions run before the asynchronous work they check has completed.",
+      "false": "The test is `async` and awaits the call directly; it awaits `task.value`; it uses an expectation fulfilled inside the callback plus `wait(for:)`/`await fulfillment(of:)`; it uses `confirmation`; the work is synchronous or runs on an immediate/test scheduler. Fixed sleeps used to wait belong to swift-test-fixed-sleep.",
+      "fix": "Await the work (make the test async, await task.value) or use an expectation/confirmation before asserting (Swift Testing: await asynchronous interactions).",
+      "when": ["Task\\s*(\\.detached)?\\s*\\{|\\.async\\s*\\{|completion|handler:"]
+    },
+    {
+      "id": "swift-test-real-clock",
+      "question": "Does `added_code` add an `XCTestCase` `test…` method or a Swift Testing `@Test` function whose assertions depend on the current date or time — the code under test reads `Date()`, `Date.now`, `ContinuousClock.now` or `CFAbsoluteTimeGetCurrent()` (or the test does and compares against it), for example asserting an exact timestamp, an expiry, an age, `isToday`, a formatted date, or a now-relative property (`isActive`, `isExpired`, `daysRemaining`, `daysUntilDue`, `age`) of an object built from a fixed date — without controlling the clock (an injected clock or `now` closure, a fixed `Date(timeIntervalSince1970:)` passed as the current time, or a test clock (e.g. swift-clocks `TestClock`/`ImmediateClock`))? A bounds or tolerance check against times the test itself captured around the call (`before <= x <= after`, `x <= now`, `accuracy:`/`toBeCloseTo`/`shouldBeBetween` around a value read in the same test) is not time-dependent and does not count.",
+      "true": "A test's pass/fail depends on when it runs, because it asserts on time-dependent output while the real clock is used.",
+      "false": "The clock is controlled (an injected clock or `now` closure, a fixed `Date(timeIntervalSince1970:)` passed as the current time, or a test clock (e.g. swift-clocks `TestClock`/`ImmediateClock`)); assertions only check that a timestamp exists, is not in the future (`<= .now`), or is within a tolerance (`accuracy:`) of a `Date()` captured in the same test; or the test does not assert on anything time-dependent. A fixed start date alone does not control the clock when the asserted property compares it with now. Non-test code does not count.",
+      "fix": "Control the clock in the test (fake timers, a frozen or injected clock) and assert against a fixed time.",
+      "when": ["XCTestCase|@Test\\b|func\\s+test\\w*\\s*\\("]
+    },
+    {
+      "id": "swift-test-uncontrolled-randomness",
+      "question": "Does `added_code` add an `XCTestCase` `test…` method or a Swift Testing `@Test` function that asserts an exact value that comes from randomness or generated ids (`UUID()`, `Int.random`, `.randomElement()`, `.shuffled()` or `SystemRandomNumberGenerator`) — produced by the code under test or by the test itself — so the assertion can pass or fail from run to run?",
+      "true": "A test compares an exact expected value against output that depends on an unseeded random or generated-id source.",
+      "false": "The source is seeded or injected (an injected or seeded generator, a fixed UUID passed in, or assertions that only check shape); the random value is generated once and the same variable is used on both sides of the comparison; or randomness does not reach any assertion. Non-test code does not count.",
+      "fix": "Seed or inject the random or id source, or assert only on the shape of the generated value.",
+      "when": ["XCTestCase|@Test\\b|func\\s+test\\w*\\s*\\("],
+      "status": "candidate"
+    },
+    {
+      "id": "swift-test-real-network",
+      "question": "Does `added_code` add a unit test (an `XCTestCase` `test…` method or a Swift Testing `@Test` function) that makes a real network request — `URLSession.shared`/a real `URLSession` against a real `https://` URL (not localhost) — directly or through the code under test, with nothing stubbing the HTTP layer? Tests explicitly marked as integration tests (the class, file or a doc comment says integration/live/nightly) do not count.",
+      "true": "A unit test depends on a live external service over the network.",
+      "false": "The network is stubbed or local (a stubbed `URLProtocol`, a fake client or protocol mock, a local server, or a test explicitly marked as integration (class or file name says so)). Non-test code does not count.",
+      "fix": "Stub the HTTP layer (or start a local test server) so the unit test never depends on a real network.",
+      "when": ["XCTestCase|@Test\\b|func\\s+test\\w*\\s*\\("]
+    },
+    {
+      "id": "swift-test-unordered-assertion",
+      "question": "Does `added_code` add an `XCTestCase` `test…` method or a Swift Testing `@Test` function that asserts an exact order (an exact list/array equality or element at index 0) for results whose order is not guaranteed — iteration of a `Set`, a `Dictionary`'s keys/values, results appended from concurrent `TaskGroup` children, or a fetch without sort descriptors? Random output (`shuffled()`, `randomElement()`, the system random generator) is swift-test-uncontrolled-randomness's pattern, not this rule's.",
+      "true": "A test asserts a specific order on results whose order the code does not guarantee.",
+      "false": "The test orders or ignores order before asserting (sorting before asserting, comparing as `Set`, or asserting order the code guarantees (sort descriptors, `.sorted`)), or the source is ordered (arrays built in order, sorted results, `async let` tuples). Exact expectations on `shuffled()`/`randomElement()` output belong to swift-test-uncontrolled-randomness. Non-test code does not count.",
+      "fix": "Sort before asserting or compare without order (as a set or with an order-insensitive matcher).",
+      "when": ["XCTestCase|@Test\\b|func\\s+test\\w*\\s*\\("]
+    }
+  ]
+}

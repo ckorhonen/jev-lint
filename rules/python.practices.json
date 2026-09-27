@@ -1,0 +1,70 @@
+{
+  "language": "python",
+  "extensions": [".py"],
+  "rules": [
+    {
+      "id": "py-sync-client-in-async",
+      "question": "Does `added_code` call a synchronous database driver, ORM, or SDK client directly inside an `async def` -- a `psycopg2`/`sqlite3`/`pymysql` cursor, a synchronous SQLAlchemy `Session` (`session.query(...)`, `session.execute(...)` with no `await`), the Django ORM's sync API (`Model.objects.get/filter/create`, iterating a QuerySet, `.save()`), `boto3`, `redis.Redis`, or a synchronous vendor client such as `openai.OpenAI()`, `anthropic.Anthropic()` or `stripe.*` -- instead of its async counterpart or `await asyncio.to_thread(...)` / `sync_to_async(...)`?",
+      "true": "An `async def` body (for example a FastAPI/Starlette route declared `async def`, or a Django async view) makes a blocking database or SDK call that stalls the event loop for every other request.",
+      "false": "The call goes through an async library and is awaited (`AsyncSession`, `asyncpg`, `redis.asyncio`, `aioboto3`, `AsyncOpenAI`, `AsyncAnthropic`, Django's `aget`/`acreate`/`asave`/`async for`), is wrapped in `asyncio.to_thread`, `loop.run_in_executor` or `sync_to_async`, or sits in an ordinary `def` (FastAPI runs plain `def` routes in a threadpool). Quick in-memory work and logging do not count, or the code has no `async def` at all.",
+      "fix": "Use the library's async client (or declare the FastAPI route with plain `def`), or wrap the call in `await asyncio.to_thread(...)` (FastAPI docs, 'Concurrency and async / await').",
+      "when": ["async\\s+def"]
+    },
+    {
+      "id": "py-async-session-shared-concurrently",
+      "question": "Does `added_code` run coroutines concurrently -- with `asyncio.gather(...)`, `asyncio.TaskGroup` / `tg.create_task(...)`, or `asyncio.create_task(...)` -- where two or more of them use the same SQLAlchemy `AsyncSession`, the same `asyncpg`/`aiosqlite`/`psycopg` async connection, or the same transaction object?",
+      "true": "A single session, connection or transaction is shared by tasks that run at the same time.",
+      "false": "Each concurrent task opens its own session or connection (`async with async_session() as s:` inside the task, `async with pool.acquire() as conn:`); the queries on the shared session are awaited one after another; or the concurrently shared object is a pool, engine, or thread-safe HTTP client (`httpx.AsyncClient`, `aiohttp.ClientSession`), not a session or connection; or nothing runs concurrently.",
+      "fix": "Give each concurrent task its own session or pooled connection, or await the queries sequentially (SQLAlchemy asyncio docs: an AsyncSession is not safe for concurrent tasks).",
+      "when": ["gather|TaskGroup|create_task"]
+    },
+    {
+      "id": "py-swallowed-cancellation",
+      "question": "Does `added_code`, inside an `async def`, catch `asyncio.CancelledError` or `BaseException`, or use a bare `except:`, and then not re-raise -- returning, `continue`-ing a loop, only logging, or `pass` -- so that task cancellation (from `task.cancel()`, `asyncio.timeout`, `TaskGroup`, or server shutdown) is swallowed?",
+      "true": "An async function catches cancellation and carries on instead of propagating it.",
+      "false": "The handler ends with a bare `raise` after cleanup; cleanup is in `finally`; the code catches only `Exception` (which does not include `CancelledError` since Python 3.8); or it awaits a task it just cancelled itself and ignores that task's `CancelledError` (`task.cancel()` then `try: await task except CancelledError: pass`); or the code is not in an `async def`.",
+      "fix": "Re-raise `CancelledError` after cleanup (or move cleanup into `finally`) so timeouts, TaskGroups and shutdown keep working (Python docs, asyncio 'Task Cancellation').",
+      "when": ["CancelledError|BaseException|except\\s*:"]
+    },
+    {
+      "id": "py-unscoped-object-lookup",
+      "question": "Does `added_code` add a request handler (FastAPI/Flask route, Django view, or DRF view method) that has an authenticated user available (`current_user`, `request.user`, a `Depends(get_current_user)` parameter) and loads, returns, changes or deletes a record by an id taken from the path, query or body -- `session.get(Invoice, invoice_id)`, `Invoice.objects.get(pk=pk)`, `get_object_or_404(Invoice, pk=pk)`, `db.query(Invoice).filter(Invoice.id == invoice_id).first()` -- without filtering by the owner or tenant or checking permission on the loaded record?",
+      "true": "An authenticated handler fetches a user-owned record by a client-supplied id with no ownership or permission check, so any signed-in user can read or change any record (IDOR/BOLA).",
+      "false": "The query is scoped to the user or tenant (`user_id=current_user.id`, `request.user.invoices.get(...)`, `tenant_id=`), an object-level check runs on the record (`if obj.owner_id != user.id: raise`, `self.check_object_permissions`, `has_object_permission`, a policy call), the view relies on a scoped `get_queryset()`, the endpoint is admin-only by an explicit dependency or decorator, the resource is public by nature (published articles, product catalog), or the handler fetches the user's own record (`/me`).",
+      "fix": "Scope the lookup to the current user or tenant (or run the object-level permission check) before returning or changing the record (OWASP API1:2023).",
+      "when": ["current_user|request\\.user|get_current_user|Depends\\(|login_required|IsAuthenticated|auth"]
+    },
+    {
+      "id": "py-secret-compare-eq",
+      "question": "Does `added_code` compare a secret or a signature with `==` or `!=` -- an HMAC digest (`hmac.new(...).hexdigest()`), a webhook signature header, an API key, a bearer, reset or CSRF token, or a password hash -- instead of `hmac.compare_digest` / `secrets.compare_digest` or the library's verify function?",
+      "true": "A secret or signature is checked with `==`/`!=`, which leaks timing information.",
+      "false": "The comparison uses `hmac.compare_digest`, `secrets.compare_digest`, or a library verifier (`bcrypt.checkpw`, `argon2` `verify`, passlib `verify`, `stripe.Webhook.construct_event`, `jwt.decode`); or the values compared are not secrets (ids, status strings, usernames, content types, token *types*); or the code only checks that a secret is present (`if not token:`).",
+      "fix": "Compare secrets with `hmac.compare_digest(a, b)` (Python docs, hmac).",
+      "when": ["digest|signature|token|secret|api_?key|password|hmac"]
+    },
+    {
+      "id": "py-side-effect-in-transaction",
+      "question": "Does `added_code` send an email, make an HTTP request, publish a message, or enqueue a background task (`send_mail`, `requests.post`, `httpx`, `task.delay(...)`, `.apply_async(...)`, `producer.send`) inside a database transaction block -- Django `with transaction.atomic():` or an `@transaction.atomic` function, SQLAlchemy `with session.begin():` / `async with session.begin():`, or `async with conn.transaction():` -- instead of after the commit?",
+      "true": "An external side effect runs inside the transaction, so it can fire for data that later rolls back, or a worker can run before the row it needs is committed.",
+      "false": "The side effect is registered with `transaction.on_commit(...)` or runs after the transaction block ends; the block only reads and writes the database; or the message goes to an outbox table in the same database inside the transaction; or there is no transaction block.",
+      "fix": "Run the side effect after commit, e.g. `transaction.on_commit(lambda: send_receipt.delay(order.id))` (Django docs, 'Performing actions after commit').",
+      "when": ["atomic|begin\\(|transaction"]
+    },
+    {
+      "id": "py-read-modify-write-race",
+      "question": "Does `added_code` read a counter, balance, stock, or quota field from a database record, change it in Python, and save it back -- e.g. `product.stock -= qty; product.save()` or `account.balance = account.balance + amount; session.commit()` -- without an atomic database update (Django `F()` / `.update(stock=F('stock') - qty)`, SQLAlchemy `update(...).values(col=Model.col - x)`) or a row lock (`select_for_update()`, `with_for_update()`)?",
+      "true": "A read-modify-write of a shared numeric field can lose concurrent updates.",
+      "false": "The update happens in the database (`F()` expression, `update()` with a column expression, SQL `SET x = x - :n`), the row is locked with `select_for_update`/`with_for_update` in the same transaction, an optimistic version check guards the save, or the field is not shared state (a new object being built, a local variable, a per-request draft); or no stored field is updated.",
+      "fix": "Update the field atomically in the database (`F('stock') - qty`, `update().values(...)`) or lock the row with `select_for_update()` first (Django docs, 'Avoiding race conditions using F()').",
+      "when": ["\\+=|-=|\\.save\\(|commit\\(|update"]
+    },
+    {
+      "id": "py-pydantic-construct-bypass",
+      "question": "Does `added_code` create a pydantic model with `Model.model_construct(...)` or `Model.construct(...)` from data that came from outside the program -- a request body, `json.loads`, `response.json()`, a file, a queue message, or `**data` from any of these -- which skips all validation?",
+      "true": "External data is turned into a model with `model_construct`/`construct`, so its fields are never validated.",
+      "false": "The model is built with `Model(...)`, `Model.model_validate(...)`, or `model_validate_json(...)`; or `model_construct` is used only on data the code itself just built or already validated, such as values read back from its own database; or no model is constructed. Also fine: `model_construct` on data that was just validated (the output of `model_validate`/`model_validate_json`, `.model_dump()` of a validated model, or values the code itself computed).",
+      "fix": "Use `Model.model_validate(data)` for anything that came from outside the program (pydantic docs, 'Creating models without validation').",
+      "when": ["construct\\("]
+    }
+  ]
+}

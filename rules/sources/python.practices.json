@@ -1,0 +1,144 @@
+{
+  "py-sync-client-in-async": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://docs.python.org/3/library/asyncio-dev.html",
+        "checked": "2026-09-27",
+        "note": "'Blocking (CPU-bound) code should not be called directly... all concurrent asyncio Tasks and IO operations would be delayed'; use run_in_executor."
+      },
+      {
+        "grade": "B",
+        "url": "https://fastapi.tiangolo.com/async/",
+        "checked": "2026-09-27",
+        "note": "'If you are using a third party library that communicates with something (a database, an API...) and doesn't have support for using await... declare your path operation functions as normally, with just def.'"
+      },
+      {
+        "grade": "B",
+        "url": "https://docs.sqlalchemy.org/en/20/orm/extensions/asyncio.html",
+        "checked": "2026-09-27",
+        "note": "Async use requires AsyncSession/AsyncEngine; the sync Session does blocking IO."
+      }
+    ],
+    "whyNotLinter": "ruff ASYNC210-251 only know a fixed list (time.sleep, requests/httpx sync, urllib, open, subprocess, input, pathlib). No linter knows which DB drivers, ORM calls and vendor SDK clients are synchronous; this rule deliberately names only those, leaving the literal ASYNC cases to ruff.",
+    "aiRelevance": "High (inferred): agents default FastAPI handlers to `async def` and then use sync SDK/DB clients from examples -- the exact case FastAPI's docs warn about. No direct study found.",
+    "expectedNoise": "low -- the client names make sync vs async visible; residual risk is a custom wrapper whose sync/async nature is not shown.",
+    "languageFile": "python"
+  },
+  "py-async-session-shared-concurrently": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://docs.sqlalchemy.org/en/20/orm/extensions/asyncio.html",
+        "checked": "2026-09-27",
+        "note": "'A single instance of AsyncSession is not safe for use in multiple, concurrent tasks'; use a separate AsyncSession per task with asyncio.gather()."
+      }
+    ],
+    "whyNotLinter": "Requires knowing that the shared argument is a session/connection rather than a pool or client; no ruff/mypy rule models object sharing across tasks.",
+    "aiRelevance": "Medium-high (inferred): when asked to speed up sequential awaits (which jev-lint's own gen-sequential-independent-awaits suggests), agents wrap existing `session`-using calls in `gather`. This rule is the safety counterpart.",
+    "expectedNoise": "low -- only fires when a shared session/connection name is passed into concurrent calls.",
+    "languageFile": "python"
+  },
+  "py-swallowed-cancellation": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://docs.python.org/3/library/asyncio-task.html",
+        "checked": "2026-09-27",
+        "note": "'In case asyncio.CancelledError is explicitly caught, it should generally be propagated when clean-up is complete'; TaskGroup and asyncio.timeout() 'might misbehave if a coroutine swallows asyncio.CancelledError'."
+      }
+    ],
+    "whyNotLinter": "ruff (0.14) has no port of flake8-async's no-reraise-cancelled; E722/BLE001 flag the catch syntax but not whether cancellation is re-raised in async code, and they are blind to explicit `except CancelledError`.",
+    "aiRelevance": "Medium (inferred): agents write long-running workers with `except asyncio.CancelledError: log; break/return` or catch-all handlers. No direct study.",
+    "expectedNoise": "low -- the legitimate 'await the task I cancelled' idiom is named in `false`.",
+    "languageFile": "python"
+  },
+  "py-unscoped-object-lookup": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://api-security.owasp.org/editions/2023/en/0xa1-broken-object-level-authorization",
+        "checked": "2026-09-27",
+        "note": "API1:2023, the #1 API risk: validate that the logged-in user may access the record the request id names."
+      },
+      {
+        "grade": "C",
+        "url": "https://semgrep.dev/blog/2025/can-llms-detect-idors-understanding-the-boundaries-of-ai-reasoning/",
+        "checked": "2026-09-27",
+        "note": "Maintainer blog: LLM judges detect missing authorization best when the check is self-contained in the function or absent entirely -- the snippet-visible case this rule targets."
+      },
+      {
+        "grade": "C",
+        "url": "https://www.coderabbit.ai/blog/state-of-ai-vs-human-code-generation-report",
+        "checked": "2026-09-27",
+        "note": "Vendor study of 470 OSS PRs: AI-authored PRs had ~1.7x more issues; performance inefficiencies (excessive I/O, N+1 queries, unindexed lookups) ~8x more often; security issues 1.5-2x."
+      }
+    ],
+    "whyNotLinter": "Authorization is business logic; ruff/bandit have no rule, and CodeQL/Semgrep need app-specific models of the owner field.",
+    "aiRelevance": "High: agents generate CRUD endpoints from a model's fields and routinely omit ownership scoping; CodeRabbit (C) reports 1.5-2x more security issues in AI PRs.",
+    "expectedNoise": "med -- scoping can live in middleware, a base class, or a `get_queryset` outside the snippet; the `false` list covers the visible cases. Dry-run on real repos before enabling by default.",
+    "languageFile": "python"
+  },
+  "py-secret-compare-eq": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://docs.python.org/3/library/hmac.html",
+        "checked": "2026-09-27",
+        "note": "Warning: when comparing digest()/hexdigest() to an externally supplied digest, use compare_digest() instead of == to reduce vulnerability to timing attacks."
+      }
+    ],
+    "whyNotLinter": "Needs to know that the operands are secrets; `==` on strings is otherwise fine. No ruff/bandit rule exists for it.",
+    "aiRelevance": "Medium (inferred): agents hand-roll webhook signature checks (`if sig != expected:`). No direct study.",
+    "expectedNoise": "low -- operand names (`signature`, `expected_digest`, `api_key`) make intent visible.",
+    "languageFile": "python"
+  },
+  "py-side-effect-in-transaction": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://docs.djangoproject.com/en/5.2/topics/db/transactions/",
+        "checked": "2026-09-27",
+        "note": "on_commit() is for background tasks, email notifications and cache invalidation that must happen only if the transaction commits."
+      }
+    ],
+    "whyNotLinter": "Requires recognising external side effects and transaction scope together; no ruff/Django check exists.",
+    "aiRelevance": "Medium-high (inferred): agents add `.delay(obj.id)` right after `obj.save()` wherever the save is, including inside `atomic`.",
+    "expectedNoise": "low -- both the transaction block and the side-effect call must be visible.",
+    "languageFile": "python"
+  },
+  "py-read-modify-write-race": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://docs.djangoproject.com/en/5.2/ref/models/expressions/",
+        "checked": "2026-09-27",
+        "note": "'Avoiding race conditions using F()': a thread can retrieve, increment and save after another retrieved it; 'the work of the first thread will be lost'."
+      },
+      {
+        "grade": "B",
+        "url": "https://docs.djangoproject.com/en/5.2/topics/db/optimization/",
+        "checked": "2026-09-27",
+        "note": "Use F expressions / QuerySet.update() rather than retrieve-set-save."
+      }
+    ],
+    "whyNotLinter": "Needs to recognise that a numeric field is shared persistent state and that no lock/atomic update is used; no static rule does this.",
+    "aiRelevance": "Medium-high (inferred): inventory, credit and balance code written by agents is typically naive read-modify-write.",
+    "expectedNoise": "low-med -- counters on freshly created objects are excluded by `false`.",
+    "languageFile": "python"
+  },
+  "py-pydantic-construct-bypass": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://pydantic.dev/docs/validation/latest/concepts/models/",
+        "checked": "2026-09-27",
+        "note": "'You should only ever use the model_construct() method with data which has already been validated, or that you definitely trust'; V2 made its performance advantage much smaller."
+      }
+    ],
+    "whyNotLinter": "Whether the input is trusted is a data-provenance judgment; a ban on `model_construct` would hit legitimate trusted uses.",
+    "aiRelevance": "Low-medium: agents reach for `model_construct` to silence validation errors. Rare but high impact.",
+    "expectedNoise": "low -- fires only on `construct(` with visibly external data.",
+    "languageFile": "python"
+  }
+}

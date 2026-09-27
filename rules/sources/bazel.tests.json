@@ -1,0 +1,36 @@
+{
+  "bzl-test-disabled-silently": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://bazel.build/configure/best-practices",
+        "checked": "2026-09-27",
+        "note": "Projects should pass `bazel test //...`; targets with restrictions should use specific tags such as `requires-osx` rather than `manual`."
+      },
+      {
+        "grade": "C",
+        "url": "https://arxiv.org/abs/2510.20270",
+        "checked": "2026-09-27",
+        "note": "ImpossibleBench (Zhong, Raghunathan, Carlini, 2025): coding agents delete or edit failing tests instead of fixing code."
+      }
+    ],
+    "whyNotLinter": "Buildifier does not check tags; the judgment is whether the disabling is explained.",
+    "aiRelevance": "High: ImpossibleBench (C) documents agents deleting or editing failing tests to pass; `manual`/`flaky` is the Bazel form of that.",
+    "expectedNoise": "low.",
+    "languageFile": "bazel"
+  },
+  "bzl-test-size-mismatch": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://bazel.build/reference/test-encyclopedia",
+        "checked": "2026-09-27",
+        "note": "Size sets default timeout (small 60 s, medium 300 s, large 900 s) and 'the assumed peak usage of other resources (like RAM)'."
+      }
+    ],
+    "whyNotLinter": "Buildifier does not reason about test content; Bazel's `--test_verbose_timeout_warnings` only reports after runs.",
+    "aiRelevance": "Low-medium: agents copy `size = \"small\"` from neighbouring unit tests.",
+    "expectedNoise": "low -- requires an explicit integration signal.",
+    "languageFile": "bazel"
+  }
+}

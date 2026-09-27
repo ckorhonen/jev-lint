@@ -1,0 +1,137 @@
+{
+  "swift-actor-reentrancy-stale-state": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://github.com/swiftlang/swift-evolution/blob/main/proposals/0306-actors.md",
+        "checked": "2026-09-27",
+        "note": "'actor-isolated state can change across an await ... developers must be sure not to break invariants across an await.'"
+      },
+      {
+        "grade": "B",
+        "url": "https://github.com/swiftlang/swift-book/blob/main/TSPL.docc/LanguageGuide/Concurrency.md",
+        "checked": "2026-09-27",
+        "note": "TSPL: overlapping actor calls are not guaranteed idempotent; 'write them so they don't contain an await in the middle.'"
+      }
+    ],
+    "whyNotLinter": "The compiler accepts reentrant actor code by design (it is data-race safe); whether a pre-await read is still valid is a question about intent. No SwiftLint rule covers it (rule directory checked).",
+    "aiRelevance": "High. Agents write the natural check-await-set shape (duplicate fetches, double submits, lost updates) and Swift 6 compiling cleanly makes them trust it. Grade: inference from how common the pattern is in cache/loader code; no controlled study found.",
+    "expectedNoise": "med — the question says the check and the dependent write must straddle an `await`; code that sets the flag before awaiting is a listed hard negative. The risk is snippets where the actor context isn't visible.",
+    "languageFile": "swift",
+    "evidenceStatus": "meets bar (1 A or 2 B)"
+  },
+  "swift-unchecked-sendable-unsynchronized": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://github.com/swiftlang/swift-migration-guide/blob/main/Guide.docc/CommonProblems.md",
+        "checked": "2026-09-27",
+        "note": "'Only use nonisolated(unsafe) when you are carefully guarding all access to the variable with an external synchronization mechanism'; @unchecked Sendable is for types 'already doing manual synchronization'."
+      },
+      {
+        "grade": "D",
+        "url": "https://dev.to/jbrackin/watch-a-coding-agent-silence-a-swift-6-data-race-instead-of-fixing-it-4jpp",
+        "checked": "2026-09-27",
+        "note": "Blog (2026-06-29): coding agent added @unchecked Sendable to make a data-race error disappear; tests stayed green. Lead only."
+      }
+    ],
+    "whyNotLinter": "The compiler deliberately stops checking once these annotations are present. SwiftLint has only `redundant_sendable` and `incompatible_concurrency_annotation` (opt-in), neither of which asks whether the state is actually synchronized. A regex ban on `@unchecked` would also flag correct lock-protected types.",
+    "aiRelevance": "High. When a build fails under Swift 6, the shortest way to green is adding `@unchecked Sendable` or `nonisolated(unsafe)`, and agents take it (D-grade reports; plausible given how often these annotations show up in pre-2024 training code).",
+    "expectedNoise": "low — correct uses almost always show the lock or queue right next to the state, and the question requires that it be absent.",
+    "languageFile": "swift",
+    "evidenceStatus": "single official B source for the exact API; needs a second B (or A from a repo) before shipping as built-in, or accept it on the strength of the vendor doc"
+  },
+  "swift-cancellation-swallowed-in-loop": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://developer.apple.com/documentation/swift/task/sleep(for:tolerance:clock:)",
+        "checked": "2026-09-27",
+        "note": "'If the task is canceled before the time ends, this function throws CancellationError.'"
+      },
+      {
+        "grade": "B",
+        "url": "https://github.com/swiftlang/swift-book/blob/main/TSPL.docc/LanguageGuide/Concurrency.md",
+        "checked": "2026-09-27",
+        "note": "TSPL 'Task Cancellation': tasks must check cancellation cooperatively with Task.checkCancellation() or Task.isCancelled."
+      }
+    ],
+    "whyNotLinter": "`try?` on a throwing call is legal and often right. Whether it sits in a loop that depends on the thrown error to stop is a judgment about control flow and intent. No SwiftLint rule covers it.",
+    "aiRelevance": "High. Agents write `while true { await refresh(); try? await Task.sleep(for: .seconds(30)) }` polling loops in `.task` or view models because `try?` is the quickest way to satisfy `throws`.",
+    "expectedNoise": "low — the shape (a loop containing `try?` + sleep with no cancellation check) is narrow, and the listed negatives cover the correct variants.",
+    "languageFile": "swift",
+    "evidenceStatus": "meets bar (1 A or 2 B)"
+  },
+  "swift-unstructured-task-in-async-context": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://github.com/swiftlang/swift-book/blob/main/TSPL.docc/LanguageGuide/Concurrency.md",
+        "checked": "2026-09-27",
+        "note": "'an unstructured task doesn't have a parent task ... you're also completely responsible for their correctness.'"
+      },
+      {
+        "grade": "B",
+        "url": "https://github.com/swiftlang/swift-migration-guide/blob/main/Guide.docc/RuntimeBehavior.md",
+        "checked": "2026-09-27",
+        "note": "Migration guide shows task groups with bounded child tasks as the way to fan out work."
+      }
+    ],
+    "whyNotLinter": "`Task { }` is legal everywhere and right in synchronous entry points. Whether the caller is already async and could await, or whether the task is tracked elsewhere, takes judgment. SwiftLint `unhandled_throwing_task` (opt-in) only covers throwing bodies whose error is dropped.",
+    "aiRelevance": "High. Agents bring GCD-era habits into async code (`for x in xs { Task { await upload(x) } }`) and wrap awaits in `Task { }` to get around 'async call in a function that does not support concurrency' errors, even when the caller is already async.",
+    "expectedNoise": "med — synchronous entry points look similar; the `false` list names them explicitly.",
+    "languageFile": "swift",
+    "evidenceStatus": "meets bar (1 A or 2 B)"
+  },
+  "swift-asyncstream-missing-ontermination": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://developer.apple.com/documentation/swift/asyncstream",
+        "checked": "2026-09-27",
+        "note": "The canonical callback-adaptation example 'Sets the continuation's onTermination property to a closure that calls stopMonitoring()'."
+      }
+    ],
+    "whyNotLinter": "Whether the producer is long-lived and needs teardown depends on what it is (observer vs. fixed values). No SwiftLint rule or compiler diagnostic covers it.",
+    "aiRelevance": "Medium-high. Agents often wrap NotificationCenter or delegate APIs in AsyncStream and yield from the callback but leave out onTermination. Grade: inference; it is the same teardown gap as the existing continuation-cancellation rule.",
+    "expectedNoise": "low — the rule only fires when a long-lived producer is visible and onTermination is missing.",
+    "languageFile": "swift",
+    "evidenceStatus": "single official B source for the exact API; needs a second B (or A from a repo) before shipping as built-in, or accept it on the strength of the vendor doc"
+  },
+  "swift-observation-tracking-one-shot": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://github.com/swiftlang/swift-evolution/blob/main/proposals/0395-observability.md",
+        "checked": "2026-09-27",
+        "note": "'When any of the cars change name, the onChange closure is then called on the first change.'"
+      },
+      {
+        "grade": "B",
+        "url": "https://developer.apple.com/documentation/observation/observations",
+        "checked": "2026-09-27",
+        "note": "Observations async sequence exists for tracking ongoing changes."
+      }
+    ],
+    "whyNotLinter": "Whether the caller wants one notification or all of them is intent. The API compiles either way.",
+    "aiRelevance": "Medium. The name reads like a subscription, so agents treat it as one. Volume is low because few edits call this API; each hit is a real bug.",
+    "expectedNoise": "low — rare API, and correct uses show the recursive re-arm.",
+    "languageFile": "swift",
+    "evidenceStatus": "meets bar (1 A or 2 B)"
+  },
+  "swiftui-state-default-heavy-init": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://developer.apple.com/documentation/swiftui/state",
+        "checked": "2026-09-27",
+        "note": "'A State property always instantiates its default value when SwiftUI instantiates the view. For this reason, avoid side effects and performance-intensive work when initializing the default value.' The same guidance appears on the Xcode 27 State() macro page."
+      }
+    ],
+    "whyNotLinter": "Whether an initializer is cheap or does I/O is a judgment about what the call does. SwiftLint `private_swiftui_state` only checks access control.",
+    "aiRelevance": "High during Observation migrations. Agents mechanically replace `@StateObject var x = X()` (lazy autoclosure) with `@State var x = X()` (eager), which moves side-effecting initializers onto every view init.",
+    "expectedNoise": "med — the snippet often doesn't show what an initializer does; the question limits it to side effects visible as written, and plain `Model()` is a listed negative.",
+    "languageFile": "swift",
+    "evidenceStatus": "single official B source for the exact API; needs a second B (or A from a repo) before shipping as built-in, or accept it on the strength of the vendor doc"
+  }
+}

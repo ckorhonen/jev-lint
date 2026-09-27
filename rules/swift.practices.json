@@ -100,12 +100,60 @@
       "when": ["Continuation"]
     },
     {
-      "id": "swift-test-cannot-fail",
-      "question": "Does `added_code` add a test (an `XCTestCase` method named `test…` or a Swift Testing `@Test` function) that could not fail if the code it is named after were broken, because it (a) has no `XCTAssert…`/`#expect`/`#require` at all, (b) only asserts a tautology or a value the test itself just created (`XCTAssertTrue(true)`, `XCTAssertNotNil(Foo())`, `#expect(x == x)`), (c) only checks that a mock or stub returns what the test configured it to return, or that a method the test called directly was called, or (d) replaces the very type or function it claims to test with a fake?",
-      "true": "At least one added test has no assertion that depends on the real behaviour of the code under test: no assertion, a tautology, an assertion on the test's own stub or input, or the unit under test is itself faked.",
-      "false": "Every added test calls real code and asserts on its output, thrown error, published state, or a side effect it causes (including calls the unit under test makes to a fake, with arguments the unit computed). Weak but real assertions (`XCTAssertNotNil` on a computed result) do not count. Test helpers, fakes, fixtures and setUp code without test methods do not count, and neither does code that is not a test.",
-      "fix": "Make the test exercise the real code and assert on a result that would change if that code broke; delete it if it can't.",
-      "when": ["XCTestCase|@Test\\b|func\\s+test\\w*\\s*\\("]
+      "id": "swift-actor-reentrancy-stale-state",
+      "question": "Does `added_code`, inside an `actor` or a `@MainActor`/global-actor-isolated type (such as a view model), check or read isolated state, then `await` something, then act on that check without re-checking it — for example `if cache[key] == nil { let v = await fetch(key); cache[key] = v }` or `if let session, session.isValid { return session }` followed by `let renewed = try await renew(); session = renewed` (concurrent callers fetch or refresh twice), `guard !isLoading else { return }` with an `await` on the next lines before `isLoading = true` is set, or `let current = balance; await audit(); balance = current - amount`? Look for a guard/if on a stored property, then an `await`, then a write to that same property or flag.",
+      "true": "An invariant checked or a value read before an `await` is assumed to still hold after it, although other calls can run on the actor during the suspension and change it.",
+      "false": "State is re-read or re-checked after each `await`; the in-flight flag or marker is set before the first `await` (`isLoading = true` then `await`); in-flight work is deduplicated by storing a `Task` in the dictionary before awaiting it; the read-modify-write happens in a synchronous method with no `await` in between; or there is no `await` between the read and the dependent write. Data races on non-isolated types are the Swift 6 compiler's job and do not count.",
+      "fix": "Re-check state after every await, or record the in-flight Task or flag before awaiting (SE-0306, 'Actor reentrancy').",
+      "when": ["\\bawait\\b"]
+    },
+    {
+      "id": "swift-unchecked-sendable-unsynchronized",
+      "question": "Does `added_code` add `@unchecked Sendable` to a type, or mark a variable `nonisolated(unsafe)`, when the mutable state it covers (`var` stored properties, a mutable class reference, a collection) has no lock, `Mutex`, `OSAllocatedUnfairLock`, `NSLock`, serial `DispatchQueue` or atomic guarding it in the added code, so the annotation only silences Swift 6 strict-concurrency errors?",
+      "true": "An escape hatch is added over mutable state with no visible synchronization, so the data race the compiler reported is still there.",
+      "false": "Every mutable stored property is only read or written while holding a lock, `Mutex` or serial queue shown in the code; the type has only `let` properties of Sendable types (the annotation is redundant, not unsafe); `nonisolated(unsafe)` is on a `let`, or on a variable with a comment naming the lock or queue that guards it; or there is no `@unchecked Sendable` / `nonisolated(unsafe)`. A plain `static var` or global `var` with neither annotation belongs to `swift-unprotected-shared-state`, not this rule.",
+      "fix": "Make it an actor or a value type, or guard every mutable property with a Mutex or lock, instead of silencing the checker (Swift 6 migration guide, 'Manual Synchronization').",
+      "when": ["@unchecked|nonisolated\\s*\\(\\s*unsafe"]
+    },
+    {
+      "id": "swift-cancellation-swallowed-in-loop",
+      "question": "Does `added_code` contain a repeating loop in async code (`while true`, `while !done`, `repeat { } while`, a retry or polling loop) that waits with `try? await Task.sleep(...)` (or `try? await clock.sleep`, or a `catch` that ignores the sleep's error and continues) and never checks `Task.isCancelled` or calls `try Task.checkCancellation()`, so once the task is cancelled the sleep returns immediately and the loop spins forever?",
+      "true": "A polling or retry loop throws away the `CancellationError` from the sleep and has no other cancellation check, so cancellation turns it into a busy loop.",
+      "false": "The loop uses `try await Task.sleep` and lets the error end it; the loop condition or body checks `Task.isCancelled` / calls `Task.checkCancellation()`; the loop `break`s or `return`s when the sleep throws; the loop is a `for await` over an async sequence; or `try? await Task.sleep` appears once, not inside a loop.",
+      "fix": "Use `try await Task.sleep` so cancellation exits the loop, or check `Task.isCancelled` on every iteration (Task.sleep docs: it throws CancellationError when the task is cancelled).",
+      "when": ["sleep"]
+    },
+    {
+      "id": "swift-unstructured-task-in-async-context",
+      "question": "Does `added_code` create an unstructured `Task { ... }` or `Task.detached { ... }` that is neither stored nor awaited, either (a) once per iteration of a `for`/`while` loop to process items concurrently, or (b) inside code that is already async (an `async` function, a SwiftUI `.task { }` modifier, or a task-group child) where the work could just be awaited or run with `withTaskGroup` or `async let`, so cancelling the surrounding task no longer reaches it and its errors are lost? A `Task` started inside an `AsyncStream`/`AsyncThrowingStream` builder closure to feed the continuation is not async context; whether it is cancelled on termination is swift-asyncstream-missing-ontermination's pattern, not this rule's.",
+      "true": "Fire-and-forget tasks are spawned from async code or per loop iteration, escaping structured cancellation and error propagation.",
+      "false": "Work is awaited directly or uses `async let`, `withTaskGroup` or `withThrowingTaskGroup`; the `Task` is stored (`let task = Task { … }`, `self.loadTask = Task { … }`) and later awaited or cancelled; a single `Task { }` starts from synchronous code such as a button action, `init` or a delegate callback; or a comment explains why the work must outlive the caller. `Task { }` inside SwiftUI `.onAppear` belongs to `swiftui-task-in-onappear`, not this rule.",
+      "fix": "Await the work directly or use withTaskGroup/async let; if it must be unstructured, store the Task and cancel it (TSPL, 'Unstructured Concurrency').",
+      "when": ["\\bTask(\\.detached)?\\s*[({]"]
+    },
+    {
+      "id": "swift-asyncstream-missing-ontermination",
+      "question": "Does `added_code` build an `AsyncStream` or `AsyncThrowingStream` (including `makeStream()`) whose continuation is fed by something that keeps running — a `NotificationCenter` observer, a delegate, a `Timer`, a KVO `observe`, a Combine `sink`, a location, sensor or socket start call, or a spawned `Task` — without setting `continuation.onTermination` to remove, stop or cancel it?",
+      "true": "When the consumer stops iterating or its task is cancelled, the observer, timer or task behind the stream keeps running and holding resources.",
+      "false": "`continuation.onTermination = { ... }` removes the observer, invalidates the timer, stops monitoring or cancels the task; the stream yields a fixed set of values and calls `finish()` right away; the producer is a single one-shot callback that calls `finish()`; or no AsyncStream is built.",
+      "fix": "Set continuation.onTermination to tear down the observer, timer or task (AsyncStream docs, QuakeMonitor example).",
+      "when": ["AsyncStream|AsyncThrowingStream|makeStream"]
+    },
+    {
+      "id": "swift-observation-tracking-one-shot",
+      "question": "Does `added_code` call `withObservationTracking { ... } onChange: { ... }` to keep something continuously in sync (UI, cache, persistence, logging on every change) without re-registering, meaning `onChange` never calls the tracking function again, even though `onChange` fires only once, on the first change?",
+      "true": "Observation is set up once and silently stops after the first change.",
+      "false": "`onChange` calls the function that runs `withObservationTracking` again (re-arming it, often via `Task { @MainActor in self.observe() }`); the code iterates the `Observations { }` async sequence instead; or only a single notification is wanted (a one-shot wait that a comment or the surrounding code makes clear).",
+      "fix": "Re-register inside onChange by calling the tracking function again, or iterate `Observations { }` instead (SE-0395: onChange is called on the first change).",
+      "when": ["withObservationTracking"]
+    },
+    {
+      "id": "swiftui-state-default-heavy-init",
+      "question": "Does `added_code` give a SwiftUI `@State` property a default value whose initializer, as written in the snippet, has side effects or does heavy work — network, file or database I/O, building a `ModelContainer`, creating an `AVPlayer`, socket or `Timer` that starts running, decoding a bundled JSON file, or calling a `load…()`/`fetch…()`/`connect…()` function — even though SwiftUI evaluates that default every time it re-creates the view struct?",
+      "true": "The `@State` default-value expression does I/O, starts work or does expensive setup each time the view initializes.",
+      "false": "The default is a literal, an empty collection or a plain initializer of a lightweight model (`@State private var model = FeedModel()`); heavy setup is deferred to `.task { }` into an optional (`@State private var model: FeedModel?`); the property is in the `App` struct; or the property uses `@StateObject`, whose initializer SwiftUI evaluates lazily.",
+      "fix": "Keep @State defaults cheap; create heavy objects in .task into an optional @State, or once in the App, and pass them down (SwiftUI State docs).",
+      "when": ["@State\\b"]
     }
   ]
 }

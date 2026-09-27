@@ -8,7 +8,7 @@ import { lintChange, type Pack, type RuleSet, ruleSetFor } from "../src/lint";
 
 export type Case = {
   id: string;
-  lang: "typescript" | "swift";
+  lang: string;
   split: "dev" | "holdout";
   pack: Exclude<Pack, "repo">; // which rule pack the labels cover; judges only ask that pack's rules
   scope?: string[]; // rule ids the labels were written for; other rules are not scored on this case

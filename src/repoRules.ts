@@ -42,7 +42,8 @@ export function loadRepoDir(dir: string): RepoConfig {
       const rules = parsed.rules
         .filter(isRule)
         .map((r) => ({ ...r, fix: r.fix ?? "", paths: Array.isArray(r.paths) ? r.paths.filter((g) => typeof g === "string") : undefined }));
-      ruleSets.push({ language: parsed.language, extensions: parsed.extensions.map((e) => e.toLowerCase()), rules });
+      const filenames = Array.isArray(parsed.filenames) ? parsed.filenames.filter((f) => typeof f === "string") : undefined;
+      ruleSets.push({ language: parsed.language, extensions: parsed.extensions.map((e) => e.toLowerCase()), filenames, rules });
     } catch {
       // A malformed repo file must never break the hook; skip it.
     }

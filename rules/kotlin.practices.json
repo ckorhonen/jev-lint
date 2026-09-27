@@ -1,0 +1,87 @@
+{
+  "language": "kotlin",
+  "extensions": [".kt", ".kts"],
+  "rules": [
+    {
+      "id": "kt-unscoped-coroutine",
+      "question": "Does `added_code` launch a coroutine on a scope nobody cancels: `GlobalScope.launch`/`GlobalScope.async`, a scope created inline and used right away (`CoroutineScope(Dispatchers.IO).launch { … }`, `CoroutineScope(Job()).async { … }`, `MainScope().launch { … }`), or a new scope created inside a function on every call?",
+      "true": "A coroutine starts in a scope with no owner, so it can leak, outlive its screen or request, and be impossible to cancel or test.",
+      "false": "Work runs in `viewModelScope`, `lifecycleScope`, `rememberCoroutineScope()`, an injected or constructor-passed `CoroutineScope`, a `coroutineScope { }` / `supervisorScope { }` block, or a scope stored in a class property that is cancelled in `close()`, `onCleared()`, `onDestroy()` or `dispose()`; or no coroutine is launched.",
+      "fix": "Launch in a lifecycle-bound or injected scope (viewModelScope, lifecycleScope, or an app scope you own and cancel) instead of GlobalScope or an inline CoroutineScope (Android coroutines best practices, 'Avoid GlobalScope').",
+      "when": ["GlobalScope|CoroutineScope\\s*\\(|MainScope\\s*\\("]
+    },
+    {
+      "id": "kt-blocking-call-not-main-safe",
+      "question": "Does `added_code` itself contain one of these blocking calls — `java.io`/`java.nio.file` file reads or writes (`File.readText`/`writeText`, `FileInputStream`, `Files.readAllBytes`), `SharedPreferences.Editor.commit()`, OkHttp `.execute()`, `HttpURLConnection`/`URL.openConnection()`, JDBC, `Future.get()`, `CountDownLatch.await()`, a DAO method whose name says it blocks (`…Blocking()`, `…Sync()`), or `Thread.sleep` on the main thread — either on the main thread (inside `viewModelScope.launch`/`lifecycleScope.launch` with no other dispatcher, `Dispatchers.Main`, a `@Composable`, or UI callbacks such as `onCreate`/`onClick`) or directly inside a `suspend fun` without `withContext(<IO or injected dispatcher>)`? Only the APIs named here count: ordinary calls to repositories, DAOs, APIs or other project functions (`repository.refresh()`, `userDao.all()`, `api.fetchConfig()`) are assumed to be main-safe suspend functions, `runBlocking` belongs to kt-runblocking-in-app-code, and a `Thread.sleep` inside a `suspend fun` is detekt's `SleepInsteadOfDelay` and does not count.",
+      "true": "Blocking I/O or sleeping runs on the main thread, or inside a suspend function that callers will assume is main-safe.",
+      "false": "The blocking work is inside `withContext(Dispatchers.IO)` / `withContext(ioDispatcher)` / `Dispatchers.Default`, or in a coroutine launched on such a dispatcher; the calls are main-safe suspend APIs (Retrofit, Room or Ktor `suspend` functions, `delay`, DataStore) or unnamed project functions (`repo.load()`, `dao.all()`) whose blocking-ness isn't visible; the code runs on a worker thread, in `main()` or in a test; or there is no blocking call. `runBlocking { … }` is kt-runblocking-in-app-code's pattern, not this rule's. A lone `Thread.sleep` inside a `suspend fun` is detekt's `SleepInsteadOfDelay` (active by default) and does not count alone.",
+      "fix": "Wrap the blocking work in withContext(ioDispatcher) inside the function that does it, or call a main-safe suspend API (Android coroutines best practices, 'Suspend functions should be safe to call from the main thread').",
+      "when": ["suspend|launch|Dispatchers\\.Main|onCreate|onClick|setOnClickListener|onResume|onStart|onViewCreated|@Composable"]
+    },
+    {
+      "id": "kt-runblocking-in-app-code",
+      "question": "Does `added_code` call `runBlocking` inside a `suspend` function, a coroutine, a `@Composable`, an Android component (Activity, Fragment, ViewModel, Service, BroadcastReceiver), an interceptor or a request handler, instead of calling the suspend function from a coroutine scope or making the caller `suspend`?",
+      "true": "`runBlocking` blocks a thread that should stay free, which can freeze the UI (ANR), starve a dispatcher or deadlock.",
+      "false": "`runBlocking` appears only in `main()`, tests (though `runTest` is preferred), or a bridge from truly synchronous framework code that a comment explains (for example an OkHttp `Authenticator` that must return synchronously); or suspend code is called from a proper scope; or `runBlocking` is not used.",
+      "fix": "Call the suspend function from a coroutine scope or make the caller suspend instead of runBlocking (kotlinx.coroutines runBlocking docs).",
+      "when": ["runBlocking"]
+    },
+    {
+      "id": "kt-catch-swallows-cancellation",
+      "question": "Does `added_code` catch `Exception` or `Throwable` (or wrap suspend calls in the standard-library `runCatching`) around suspend calls inside a coroutine or `suspend` function without rethrowing `CancellationException`, so cancelling the coroutine is swallowed and the work continues? Project helpers whose name says they spare cancellation (`runSuspendCatching`, `catchNonCancellation`, `…NonCancellable…`) are not `runCatching` and do not count.",
+      "true": "A broad catch or `runCatching` in suspend code can swallow `CancellationException`, so the coroutine keeps running after it is cancelled.",
+      "false": "The code catches specific exceptions (`IOException`, `HttpException`, `SerializationException`); it rethrows `CancellationException` first (`catch (e: CancellationException) { throw e }` or `if (e is CancellationException) throw e`); it calls `ensureActive()` / `coroutineContext.ensureActive()` in the handler; or the catch doesn't wrap any suspend call.",
+      "fix": "Catch specific exceptions, or rethrow CancellationException before handling the rest (Android coroutines best practices, 'Watch out for exceptions').",
+      "when": ["catch|runCatching"],
+      "status": "candidate"
+    },
+    {
+      "id": "kt-flow-emit-wrong-context",
+      "question": "Does `added_code`, inside a `flow { }` builder, call `emit(...)` from within `withContext(...)`, `launch { }`, `async { }`, another thread, or a callback, instead of changing the upstream context with `.flowOn(...)` or using `channelFlow { }` / `callbackFlow { }` with `send`/`trySend`?",
+      "true": "`emit` runs in a different coroutine context than the flow builder, which throws `IllegalStateException` ('Flow invariant is violated') at runtime.",
+      "false": "The flow uses `.flowOn(dispatcher)`; `withContext` only wraps a computation whose result is emitted outside it (`val x = withContext(io) { load() }; emit(x)`); concurrent or callback-based emission uses `channelFlow`/`callbackFlow` with `send`/`trySend`; or the code has no `flow { }` builder.",
+      "fix": "Emit from the builder's own context and move the upstream work with .flowOn(dispatcher), or switch to channelFlow/callbackFlow (Kotlin docs, 'Flow context').",
+      "when": ["\\bemit\\s*\\("]
+    },
+    {
+      "id": "kt-exposed-mutable-state",
+      "question": "Does `added_code` expose a `MutableStateFlow`, `MutableSharedFlow`, `MutableLiveData`, `Channel`, or Compose `mutableStateOf`/`mutableStateListOf` holder as a public (non-private) property of a ViewModel or state holder, so other classes can change its value directly?",
+      "true": "A mutable state holder is public, so views or other classes can write to it and bypass the state owner.",
+      "false": "The mutable holder is `private` (e.g. `_state`) and exposed read-only as `StateFlow`/`SharedFlow`/`LiveData`/`Flow` (`asStateFlow()`, `asSharedFlow()`, `receiveAsFlow()`) or `State<T>`; a Compose `var x by mutableStateOf(...)` has `private set`; or the class isn't a state owner (a local variable, a test fake).",
+      "fix": "Make the mutable holder private and expose a read-only StateFlow/SharedFlow/State (Android coroutines best practices, 'Don't expose mutable types').",
+      "when": ["MutableStateFlow|MutableSharedFlow|MutableLiveData|mutableState(Of|ListOf|MapOf)|Channel\\s*<|Channel\\s*\\("]
+    },
+    {
+      "id": "kt-state-mutated-in-place",
+      "question": "Does `added_code` change a value held in a `StateFlow`, `LiveData` or Compose `mutableStateOf` in place — calling `add`/`remove`/`clear` on a `MutableList` or `MutableMap` inside it, assigning a property through `.value` (`_uiState.value.isRefreshing = true`, `uiState.value.loading = true`, `_state.value.items.add(x)`), or returning the same instance after mutating it from `update { }` or `.value = …` (`_state.update { it.also { s -> s.count++ } }`, `state.value = state.value.also { it.count++ }`, `apply { … }`) — instead of assigning a new value built with `copy()` or a new collection? Any line of the form `<state>.value.<property> = …` counts even when the same snippet also uses `copy()` elsewhere. Assigning a whole new value to `.value` (`count.value = count.value + 1`, `_state.value = newState`) is not in-place mutation; writing state from a `@Composable` body is kt-compose-side-effect-in-composition's pattern, not this rule's.",
+      "true": "Held state is mutated in place, so the same instance is re-set (StateFlow conflates by equals) and observers or Compose don't see the change.",
+      "false": "Updates assign a new value (`_state.update { it.copy(...) }`, `_state.value = _state.value.copy(...)`, `list + item`); state uses `mutableStateListOf`/`mutableStateMapOf`/`SnapshotStateList`, whose mutations are observed; or no held state is mutated. Creating `mutableStateOf(mutableListOf())` is Compose lint's `MutableCollectionMutableState` and doesn't count on its own.",
+      "fix": "Build a new value with copy()/update { } or a new collection instead of mutating the held state (Compose state docs; StateFlow KDoc).",
+      "when": ["\\.value|StateFlow|LiveData|mutableStateOf|\\.update\\s*\\{"]
+    },
+    {
+      "id": "kt-collect-without-lifecycle",
+      "question": "Does `added_code` collect a Flow in an Activity or Fragment with `lifecycleScope.launch { flow.collect { ... } }` (or `collectLatest`, `launchIn(lifecycleScope)`) without `repeatOnLifecycle(...)` or `flowWithLifecycle(...)`, so collection keeps running while the UI is in the background?",
+      "true": "A UI-layer flow collection isn't tied to the STARTED/RESUMED lifecycle state.",
+      "false": "Collection is wrapped in `repeatOnLifecycle(Lifecycle.State.STARTED)`, uses `flowWithLifecycle`, or happens in Compose via `collectAsStateWithLifecycle`; the collection is in a ViewModel, repository or service, not an Activity or Fragment; or a one-shot `first()` is used. Using `lifecycleScope` instead of `viewLifecycleOwner` in a Fragment is Android Lint's `UnsafeRepeatOnLifecycleDetector`, and `launchWhenStarted` is deprecated (compiler warning), so neither counts on its own.",
+      "fix": "Wrap the collect in repeatOnLifecycle(Lifecycle.State.STARTED) { … } (Android docs, 'Use Kotlin coroutines with lifecycle-aware components').",
+      "when": ["collect|launchIn|launchWhen"]
+    },
+    {
+      "id": "kt-viewmodel-holds-context",
+      "question": "Does `added_code` give a `ViewModel` (a class extending `ViewModel` or `AndroidViewModel`) a constructor parameter, property or stored field of an Activity-, View- or lifecycle-bound type — `Context` (other than the `Application`), `Activity`, `Fragment`, `View` or any `*View`/`*Binding`, `Resources`, `LifecycleOwner`, `Lifecycle`, `NavController` — or assign one to a ViewModel property from a setter or `init`?",
+      "true": "The ViewModel keeps a reference that pins an Activity or Fragment or its views, which leaks when the ViewModel outlives them across configuration changes.",
+      "false": "The ViewModel receives only `Application` (e.g. `AndroidViewModel(application)`), `SavedStateHandle`, repositories or use cases, or a Hilt `@ApplicationContext context: Context`; a Context is passed as a method parameter, used and not stored; or the class isn't a ViewModel.",
+      "fix": "Remove the Context/View/lifecycle reference from the ViewModel; pass the values it needs in, or use Application/@ApplicationContext (Android ViewModel docs).",
+      "when": ["ViewModel"]
+    },
+    {
+      "id": "kt-compose-side-effect-in-composition",
+      "question": "Does `added_code` perform a side effect directly in the body of a `@Composable` function, outside `LaunchedEffect`, `DisposableEffect`, `SideEffect`, `produceState`, `remember { }` or an event lambda such as `onClick` — for example calling a ViewModel or repository method that loads, saves or sends (`viewModel.load()`, `repo.refresh()`), logging an analytics event, writing to a `MutableState`/`MutableStateFlow` that composition reads, calling `navController.navigate(...)`, or showing a Toast or Snackbar?",
+      "true": "Work that should run once or in response to an event runs on every recomposition, possibly in a recomposition loop.",
+      "false": "The side effect is inside an effect handler (`LaunchedEffect(key)`, `DisposableEffect`, `SideEffect`), an event lambda (`onClick = { viewModel.save() }`), or the ViewModel's `init`; or the composable only reads state and emits UI. `launch`/`async` in composition and `StateFlow.value` reads are Compose lint's `CoroutineCreationDuringComposition` and `StateFlowValueCalledInComposition` and don't count here.",
+      "fix": "Move the side effect into LaunchedEffect(key)/SideEffect or an event callback (Compose docs, 'Side-effects in Compose').",
+      "when": ["@Composable|Modifier|Column|Row\\s*[({]|Box\\s*[({]|Scaffold|LazyColumn|Text\\s*\\(|remember"]
+    }
+  ]
+}

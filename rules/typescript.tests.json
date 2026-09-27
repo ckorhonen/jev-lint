@@ -1,0 +1,79 @@
+{
+  "language": "typescript",
+  "extensions": [".ts", ".tsx", ".mts", ".cts", ".js", ".jsx", ".mjs", ".cjs"],
+  "rules": [
+    {
+      "id": "ts-test-cannot-fail",
+      "question": "Does `added_code` add a test (`it(...)`/`test(...)`) that could not fail if the code it is named after were broken, because it (a) has no assertion at all, (b) only asserts a tautology or a value the test itself just created (`expect(true).toBe(true)`, `expect(x).toBe(x)`, `expect(new Foo()).toBeDefined()`), (c) only checks that a mock returns what the test stubbed it to return, or that a function the test called directly was called, or (d) mocks the very module or function it claims to test?",
+      "true": "At least one added test has no assertion that depends on the real behaviour of the code under test: no assertion, a tautology, an assertion on the test's own stub or input, or the unit under test is itself mocked.",
+      "false": "Every added test calls real code and asserts on its output, thrown error, returned value, rendered result, or a side effect it causes (including a mock the unit under test calls, with arguments the unit computed). Weak but real assertions (`toBeTruthy()` on a computed result) do not count. Test helpers, fixtures, factories and setup code without test cases do not count, and neither does code that is not a test.",
+      "fix": "Make the test exercise the real code and assert on a result that would change if that code broke; delete it if it can't.",
+      "when": ["\\b(it|test)(\\.\\w+)?\\s*\\(", "describe\\s*\\("]
+    },
+    {
+      "id": "ts-test-fixed-sleep",
+      "question": "Does `added_code` in a test (Vitest, Jest, Testing Library, Playwright, Cypress) pause for a fixed time to wait for asynchronous work before asserting — `await new Promise(r => setTimeout(r, 500))`, `await sleep(1000)` / `delay(…)` / `wait(…)` helpers — instead of awaiting the operation, using `findBy*`/`waitFor`/`expect.poll`, web-first `expect(locator)` assertions, or fake timers (`vi.useFakeTimers()`/`jest.advanceTimersByTime`)?",
+      "true": "A test sleeps for a fixed duration and hopes the async work has finished.",
+      "false": "The test awaits the promise or event; uses `findBy*`, `waitFor`, `expect.poll`, `toPass`, or web-first assertions; advances fake timers deterministically; the delay is inside a mock or fake server handler to simulate latency (e.g. testing a loading state); a polling helper with a deadline. Playwright `page.waitForTimeout` and Cypress `cy.wait(number)` are already flagged by eslint-plugin-playwright `no-wait-for-timeout` and eslint-plugin-cypress `no-unnecessary-waiting`. Code that is not a test does not count.",
+      "fix": "Wait for the actual condition (await the promise, findBy*/waitFor, web-first assertions) or use fake timers instead of sleeping (Luo et al. FSE 2014: 45% of flaky tests are async waits, a third of them fixed-time sleeps).",
+      "when": ["setTimeout|sleep|delay|wait\\("]
+    },
+    {
+      "id": "ts-test-title-contradicts-assertions",
+      "question": "Does `added_code` add a test whose title states a specific outcome — throws/rejects/returns an error, returns empty or null, is disabled, does not call or send something, redirects, is denied — while its assertions check a different or opposite outcome (e.g. `it('throws on a negative amount', () => { expect(withdraw(-5)).toBe(0) })`, `it('does not send an email', …)` asserting `expect(send).toHaveBeenCalled()`)?",
+      "true": "The assertions contradict or ignore the outcome the test title promises.",
+      "false": "The assertions check the titled outcome, even loosely; the title is generic ('works', 'handles input', 'renders'); the title describes a scenario and the assertions check its stated consequence; `it.todo`/`test.todo`. Tests with no real assertion at all belong to ts-test-cannot-fail.",
+      "fix": "Make the assertion check the behavior the title promises, or fix the code; never flip an assertion just to make the test pass.",
+      "when": ["\\b(it|test)(\\.\\w+)?\\s*\\("]
+    },
+    {
+      "id": "ts-test-shared-mutable-state",
+      "question": "Does `added_code` add tests that share mutable state across test cases so the result depends on execution order — a `let`, array, object, or Map declared at module or `describe` scope that one test mutates (push, assign, set, increment) and another test reads, without being reset in `beforeEach`; or an e2e/Playwright test that relies on data or UI state created by an earlier test (`test.describe.serial`, or a later test assuming the record a previous test created)?",
+      "true": "One test's outcome depends on state left behind by another test.",
+      "false": "State is created inside each test or reset in `beforeEach`/`afterEach`; module-level constants and fixtures that no test mutates; resources set up in `beforeAll` that tests only read (a server, a DB connection, a seeded read-only dataset); Playwright fixtures that give each test its own page/storage; code that is not a test.",
+      "fix": "Create fresh state in each test or reset it in beforeEach so tests pass in any order (Playwright best practices: make tests isolated).",
+      "when": ["describe|beforeAll|before\\(|test\\.describe|\\b(it|test)\\s*\\("]
+    },
+    {
+      "id": "ts-test-special-case-in-source",
+      "question": "Does `added_code`, in a non-test source file (`file_path` not under `test/`, `tests/`, `__tests__/`, `e2e/`, and not `*.test.*`/`*.spec.*`), check whether it is running under tests — `process.env.NODE_ENV === 'test'`, `process.env.VITEST`, `process.env.JEST_WORKER_ID`, `process.env.PLAYWRIGHT_TEST`, a `__TEST__`/`isTest` flag — and in that case return a hardcoded result or skip the real logic, so tests pass without exercising the real behavior? Picking different infrastructure in test mode (an in-memory database, a JSON/no-op mail transport, disabled telemetry) while the function's own logic still runs does not count.",
+      "true": "Production code short-circuits its own logic when it detects a test run.",
+      "false": "Test-mode checks that only swap infrastructure while the logic under test still runs (in-memory database, disabled telemetry/analytics, no-op email transport, shorter timeouts, deterministic seeds, relaxed rate limits); Vitest in-source test blocks (`if (import.meta.vitest)`); dependency injection of fakes; the file is a test, mock, fixture, or test helper.",
+      "fix": "Remove the test-only branch and make the real implementation satisfy the test; inject fakes instead of branching on the environment (ImpossibleBench; Anthropic prompting guide: don't special-case tests).",
+      "when": ["NODE_ENV|VITEST|JEST_WORKER_ID|PLAYWRIGHT_TEST|__TEST__|is_?test\\b|\\btesting\\b"]
+    },
+    {
+      "id": "ts-test-real-clock",
+      "question": "Does `added_code` add a test (`it`/`test` in vitest, jest, bun:test, node:test or Playwright) whose assertions depend on the current date or time — the code under test reads `Date.now()`, `new Date()`, `performance.now()` or a date library's `now()`/`dayjs()`/`DateTime.now()` (or the test does and compares against it), for example asserting an exact timestamp, an expiry, an age, `isToday`, or a formatted date — without controlling the clock (fake timers with a set system time (`vi.useFakeTimers()` + `vi.setSystemTime(...)`, `jest.useFakeTimers().setSystemTime(...)`), an injected clock, or a fixed date passed to the code)? A bounds or tolerance check against times the test itself captured around the call (`before <= x <= after`, `x <= now`, `accuracy:`/`toBeCloseTo`/`shouldBeBetween` around a value read in the same test) is not time-dependent and does not count.",
+      "true": "A test's pass/fail depends on when it runs, because it asserts on time-dependent output while the real clock is used.",
+      "false": "The clock is controlled (fake timers with a set system time (`vi.useFakeTimers()` + `vi.setSystemTime(...)`, `jest.useFakeTimers().setSystemTime(...)`), an injected clock, or a fixed date passed to the code); assertions only check that a timestamp exists (`toBeInstanceOf(Date)`) or lies between `Date.now()` values the test captured before and after the call (`toBeGreaterThanOrEqual(before)`/`toBeLessThanOrEqual(after)`); or the test does not assert on anything time-dependent. Non-test code does not count.",
+      "fix": "Control the clock in the test (fake timers, a frozen or injected clock) and assert against a fixed time.",
+      "when": ["\\b(it|test)(\\.\\w+)?\\s*\\(", "describe\\s*\\("]
+    },
+    {
+      "id": "ts-test-uncontrolled-randomness",
+      "question": "Does `added_code` add a test (`it`/`test` in vitest, jest, bun:test, node:test or Playwright) that asserts an exact value that comes from randomness or generated ids (`Math.random()`, `crypto.randomUUID()`, `nanoid()`, `uuid()`/`v4()`, `faker` without a seed) — produced by the code under test or by the test itself — so the assertion can pass or fail from run to run?",
+      "true": "A test compares an exact expected value against output that depends on an unseeded random or generated-id source.",
+      "false": "The source is seeded or injected (a seeded generator (`faker.seed(...)`), a mocked/injected id or random source, or assertions that only check shape (`expect.any(String)`, a regex, length)); the random value is generated once and the same variable is used on both sides of the comparison; or randomness does not reach any assertion. Non-test code does not count.",
+      "fix": "Seed or inject the random or id source, or assert only on the shape of the generated value.",
+      "when": ["\\b(it|test)(\\.\\w+)?\\s*\\(", "describe\\s*\\("]
+    },
+    {
+      "id": "ts-test-real-network",
+      "question": "Does `added_code` add a unit test (a test (`it`/`test` in vitest, jest, bun:test, node:test or Playwright)) that makes a real network request — `fetch(...)`, `axios`, `got`, `ky` or an SDK client against a real `http(s)://` URL (not localhost) — directly or through the code under test, with nothing stubbing the HTTP layer? Tests explicitly marked as integration, e2e or contract tests (the file name or `describe` title says so) do not count.",
+      "true": "A unit test depends on a live external service over the network.",
+      "false": "The network is stubbed or local (an HTTP mock (msw, nock, `vi.spyOn(globalThis, 'fetch')`, a fake client), `localhost`/a test server the test starts, or a test explicitly marked as an integration/e2e/contract test (file name or `describe` says so, or it is a Playwright `page.goto` against the app)). Non-test code does not count.",
+      "fix": "Stub the HTTP layer (or start a local test server) so the unit test never depends on a real network.",
+      "when": ["\\b(it|test)(\\.\\w+)?\\s*\\(", "describe\\s*\\("]
+    },
+    {
+      "id": "ts-test-unordered-assertion",
+      "question": "Does `added_code` add a test (`it`/`test` in vitest, jest, bun:test, node:test or Playwright) that asserts an exact order (an exact list/array equality or element at index 0) for results whose order is not guaranteed — iteration of a `Set`, a `Map` filled as concurrent callbacks complete, the winner of `Promise.race`/`Promise.any`, items pushed from concurrent callbacks, or a database query without `orderBy`/`ORDER BY`? `Promise.all`/`Promise.allSettled` results keep the input order and are ordered; a random shuffle (`Math.random`, `shuffle`) is ts-test-uncontrolled-randomness's pattern, not this rule's.",
+      "true": "A test asserts a specific order on results whose order the code does not guarantee.",
+      "false": "The test orders or ignores order before asserting (sorting before asserting, `expect.arrayContaining`/`toContainEqual`/`toHaveLength` checks, comparing as sets, or asserting order that the code guarantees (an explicit sort or `orderBy`)), or the source is ordered (arrays/lists built in order, sorted results, `Promise.all`/`Promise.allSettled` results, which keep input order, insertion-ordered maps). Exact expectations on randomly shuffled output belong to ts-test-uncontrolled-randomness. Non-test code does not count.",
+      "fix": "Sort before asserting or compare without order (as a set or with an order-insensitive matcher).",
+      "when": ["\\b(it|test)(\\.\\w+)?\\s*\\(", "describe\\s*\\("],
+      "status": "candidate"
+    }
+  ]
+}

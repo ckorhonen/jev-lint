@@ -1,7 +1,7 @@
 # jev-lint
 
-**A fuzzy linter for coding agents.** It checks the code your agent writes against your
-team's best practices while the agent is still working, not at code review.
+**A fuzzy linter for coding agents.** Your agent writes a file; 0.3 seconds later it hears
+which of your team's rules it just broke, and fixes them before anyone reviews the code.
 
 [![jev-lint in 40 seconds: an agent writes a useEffect fetch, the hook flags a race in 0.3 s, the agent fixes it before review](docs/media/jev-lint-demo-poster.png)](docs/media/jev-lint-demo-1920x1080.mp4)
 
@@ -9,6 +9,38 @@ team's best practices while the agent is still working, not at code review.
 
 📓 **Results and method:** [experiment notebook](https://claude.ai/artifact/BUZG9LEnaiJyaJuaP7tajs)
 (source in `report/`).
+
+## Why use it
+
+- **Catches what linters can't.** "Don't derive state in `useEffect`", "a test must be able
+  to fail", "never trust a client-sent `userId`": rules that need judgment, not a regex.
+  Normally they surface at code review. jev-lint flags them the moment the file is written.
+- **Agents ship fewer violations.** In real runs with the hook on, rule violations per task
+  fell from 2.38 to 1.21 in Claude Code (96 runs) and from 1.67 to 0.92 in Codex (48 runs).
+- **Fixing at the edit is cheaper than fixing after review.** The agent fixes the problem
+  while the file is still open: about +$0.04 and +10 s per task, against about $0.18 and
+  70 s for a review → fix round (measured on our agent runs). With an AI reviewer on every
+  change, a review round still happened in our tests, so the savings show up most with
+  human review; see [What we've found](#what-weve-found-so-far).
+- **Costs almost nothing to run.** About $1.51 per 10,000 edits for the checks. It never
+  blocks the agent: if anything fails, the edit goes through unchanged.
+- **Starts with opinionated defaults.** Tested rule packs for TypeScript and React, Swift and
+  SwiftUI, Kotlin, Rust, Python, Ruby and Bazel, plus cross-language packs for security,
+  test hygiene (tests that can't fail, flaky tests) and performance (158 rules). Every
+  rule passed an evaluation on held-out examples before it was switched on. See
+  [the pack docs](docs/packs/) for a good and bad example of each.
+- **Your rules, not just ours.** The packs are only defaults: turn any pack or rule off, scope
+  it to some folders, or add your own rules for your team and codebase in `.jev-lint/`. One
+  skill reads your agent instructions, docs, skills and linter configs, researches current
+  best practices for your frameworks, and proposes rules for you to approve (nothing a linter
+  already checks). Another writes and tests a single rule when you think of one.
+- **Gets better over time.** Every check is logged. The learning skill finds the mistakes agents
+  keep making, proposes a few targeted fixes to your instructions or rules, and measures
+  whether they worked.
+- **Works where your agents work.** Claude Code and Codex, installed with one command or one
+  pasted prompt. Rules live in your repo (`.jev-lint/`), so the whole team shares them.
+
+It complements linters, type checkers and code review; it doesn't replace them.
 
 ### Set it up with your agent
 
@@ -236,11 +268,21 @@ fine-tuned Kev-4B is in progress. `local/laya_server.py` and `local/bench_encode
 
 ## Rule packs
 
-| Pack | Files | What it checks |
-| --- | --- | --- |
-| `hygiene` | `rules/typescript.json`, `rules/swift.json` | `any`, non-null / force-unwrap, empty catch, debug prints, restating comments, vague names, magic numbers, bare TODOs, hard-coded secrets… |
-| `practices` | `rules/*.practices.json` | React effect misuse (derived state, missing cleanup, fetch races, event logic), overlapping polling / debounced requests, state mutation, index keys, unvalidated external data, sequential awaits, boolean traps; SwiftUI state ownership, expensive `body`, `.onAppear { Task {} }`, retain cycles, main-thread blocking, continuation misuse, continuations without cancellation or that can be overwritten, unprotected shared state, unstable `ForEach` ids, GCD inside async; tests that can't fail (no assertion, tautologies, asserting the test's own stub, mocking the unit under test) |
-| `repo` | `.jev-lint/*.rules.json` in your repo | Whatever the `jev-lint-rules` skill generated from your guidelines |
+These are defaults. Turn a pack or a rule off, or scope it to some folders, in your repo's
+`.jev-lint/config.json` (`packs`, `disable`, `skipPaths`), and add your own rules next to them.
+Each pack has a page with a good and a bad example of every rule, and its holdout numbers.
+
+| Pack | Rules | Languages | What it checks |
+| --- | --- | --- | --- |
+| [`hygiene`](docs/packs/hygiene.md) | 24 | swift, typescript | `any`, non-null / force-unwrap, empty catch, debug prints, restating comments, vague names, magic numbers, bare TODOs, hard-coded secrets |
+| [`practices`](docs/packs/practices.md) | 86 | bazel, kotlin, python, ruby, rust, swift, typescript | React effects and Server Actions, SwiftUI and Swift concurrency, Kotlin coroutines/Flow/Compose, Rust async and `unsafe`, Python async and ORMs, Rails, Bazel, and common security mistakes |
+| [`tests`](docs/packs/tests.md) | 35 | bazel, kotlin, python, ruby, rust, swift, typescript | Tests that can't fail; flaky tests (real clock, unseeded randomness, real network, fixed sleeps, order-dependent assertions, shared state); tests bent to pass |
+| [`performance`](docs/packs/performance.md) | 13 | kotlin, python, ruby, rust, swift, typescript | N+1 queries and per-item writes, sync I/O on request paths, unbounded queries, independent calls awaited one by one, unbounded fan-out |
+| `repo` | yours | any | Your team's rules in `.jev-lint/*.rules.json`, written with the `jev-lint-rules` and `jev-lint-write-rule` skills |
+
+Rules still being evaluated are marked `"status": "candidate"` and are not asked by the hook.
+A rule ships only after it passes on held-out examples written by a separate author
+(precision ≥ 90% on "fix" findings, ≥ 75% overall, recall ≥ 80%) and a dry run on real code.
 
 Two rules were removed because the model is weak at counting and tracing; use a deterministic linter for them:
 
@@ -253,7 +295,7 @@ Two rules were removed because the model is weak at counting and tracing; use a 
 
 | Var | Default | Meaning |
 | --- | --- | --- |
-| `JEV_LINT_PACKS` | `hygiene,practices,repo` | Packs to ask (a repo's `config.json` overrides) |
+| `JEV_LINT_PACKS` | `hygiene,practices,tests,performance,repo` | Packs to ask (a repo's `config.json` overrides) |
 | `JEV_LINT_TIERS` | `high,medium` | `high` drops the double-check tier |
 | `JEV_LINT_GATE` | on | `off` asks every rule. By default a rule is only asked when its `when` patterns match the added code (about a third of rules per edit) |
 | `JEV_LINT_HIGH` / `JEV_LINT_MEDIUM` | `0.8` / `0.5` | Tier thresholds |

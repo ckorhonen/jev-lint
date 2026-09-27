@@ -1,0 +1,14 @@
+{
+  "language": "ruby",
+  "extensions": [".rb", ".rake"],
+  "rules": [
+    {
+      "id": "rb-perf-n-plus-one",
+      "question": "Does `added_code` loop over ActiveRecord records (`.each`, `.map`, `.find_each`, `.sum { }`, or a view `each` block) and, inside the loop, read an association or run a query per record -- `post.author.name`, `order.line_items.sum(:price)`, `user.comments.count`, `Model.find(...)`, `Model.where(...)`, `exists?` -- without `includes`, `preload`, `eager_load`, a counter cache, or one grouped query before the loop? If the relation being looped over was built with `.includes`/`.preload`/`.eager_load` of those associations, reading them (including `.size` or Ruby block `count { }` on them) does not count.",
+      "true": "Each loop iteration triggers another database query (N+1).",
+      "false": "Associations are loaded up front with `includes`/`preload`/`eager_load`; counts use `counter_cache`, `size` on a preloaded association, or a grouped `count`; the relation uses `strict_loading`; the loop only reads the record's own columns or a foreign key (`post.author_id`); or the loop is not over database records. Also fine: associations already loaded with `includes`/`preload`/`eager_load` earlier in the snippet, including `.size`/`.length`/`.to_a` on those loaded associations.",
+      "fix": "Preload associations with `includes` before the loop, or replace per-record queries with one grouped query (Rails Guides, 'Eager Loading Associations').",
+      "when": ["\\.each|\\.map|find_each|\\.collect|\\.sum\\s*\\{|each_with|\\.flat_map|<%"]
+    }
+  ]
+}

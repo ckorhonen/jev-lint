@@ -1,0 +1,225 @@
+{
+  "kt-unscoped-coroutine": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://developer.android.com/kotlin/coroutines/coroutines-best-practices",
+        "checked": "2026-09-27",
+        "note": "'Avoid GlobalScope ... inject a CoroutineScope instead'; 'The ViewModel should create coroutines' with viewModelScope."
+      },
+      {
+        "grade": "B",
+        "url": "https://detekt.dev/docs/rules/coroutines/",
+        "checked": "2026-09-27",
+        "note": "detekt GlobalCoroutineUsage exists but is inactive by default (docs show v2.0.0-alpha.6); nothing covers inline CoroutineScope(...).launch."
+      },
+      {
+        "grade": "D",
+        "url": "https://haidrrrry.medium.com/your-ai-coding-agent-is-writing-broken-kotlin-heres-how-to-fix-it-fbfd65939469",
+        "checked": "2026-09-27",
+        "note": "Blog: AI agents default to GlobalScope, forget cancellation and write 2020–2022-era Android patterns. Lead only."
+      }
+    ],
+    "whyNotLinter": "detekt `GlobalCoroutineUsage` (off by default) catches only the literal `GlobalScope`. Whether an inline `CoroutineScope(...)` is owned and cancelled needs judgment about the surrounding class. If a repo enforces GlobalCoroutineUsage, the GlobalScope part is covered and this rule still adds the inline-scope part.",
+    "aiRelevance": "High. `CoroutineScope(Dispatchers.IO).launch` is the 'make the red squiggle go away' fix agents reach for when calling suspend code from a non-suspend context.",
+    "expectedNoise": "low — owned, stored scopes are listed negatives and are visible in the class.",
+    "languageFile": "kotlin",
+    "evidenceStatus": "meets bar (1 A or 2 B)"
+  },
+  "kt-blocking-call-not-main-safe": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://developer.android.com/kotlin/coroutines/coroutines-best-practices",
+        "checked": "2026-09-27",
+        "note": "'Suspend functions should be main-safe ... This responsibility lies with the class performing the work, not the caller.'"
+      },
+      {
+        "grade": "B",
+        "url": "https://detekt.dev/docs/rules/coroutines/",
+        "checked": "2026-09-27",
+        "note": "detekt SleepInsteadOfDelay (active) covers only Thread.sleep in suspend functions."
+      }
+    ],
+    "whyNotLinter": "Whether a call blocks and which thread the code runs on are semantic. Android Lint's StrictMode-style checks run at runtime, not on source. detekt covers only `Thread.sleep` in suspend functions.",
+    "aiRelevance": "High. Agents write `suspend fun load() = File(path).readText()` or call OkHttp `execute()` in `viewModelScope.launch` because `suspend` looks like it makes code asynchronous.",
+    "expectedNoise": "med — whether a repository call blocks depends on its signature; the question names known-blocking APIs and the false list excludes suspend APIs.",
+    "languageFile": "kotlin",
+    "evidenceStatus": "meets bar (1 A or 2 B)",
+    "overlap": "Overlaps rules/kotlin.performance.json kt-perf-blocking-in-coroutine, which appeared in the working tree during this research (uncommitted). If that pack ships, narrow this rule to the part it doesn't cover (blocking calls in UI callbacks and composables on the main thread) or drop it."
+  },
+  "kt-runblocking-in-app-code": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://github.com/Kotlin/kotlinx.coroutines/blob/master/kotlinx-coroutines-core/concurrent/src/Builders.concurrent.kt",
+        "checked": "2026-09-27",
+        "note": "runBlocking KDoc: 'Calling runBlocking from a suspend function is redundant ... DO NOT DO THIS ... potentially leading to thread starvation issues.'"
+      },
+      {
+        "grade": "D",
+        "url": "https://haidrrrry.medium.com/your-ai-coding-agent-is-writing-broken-kotlin-heres-how-to-fix-it-fbfd65939469",
+        "checked": "2026-09-27",
+        "note": "Blog: AI agents default to GlobalScope, forget cancellation and write 2020–2022-era Android patterns. Lead only."
+      }
+    ],
+    "whyNotLinter": "No detekt, ktlint or Android Lint rule flags runBlocking by context. `ForbiddenMethodCall` could ban it everywhere, but that also hits the legitimate `main()` and synchronous bridge cases.",
+    "aiRelevance": "High. `runBlocking { api.fetch() }` is the most common way agents call a suspend function from non-suspend code.",
+    "expectedNoise": "low — legitimate uses (`main`, tests, commented bridges) are easy to recognize.",
+    "languageFile": "kotlin",
+    "evidenceStatus": "single official B source for the exact API; needs a second B (or A from a repo) before shipping as built-in, or accept it on the strength of the vendor doc"
+  },
+  "kt-catch-swallows-cancellation": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://developer.android.com/kotlin/coroutines/coroutines-best-practices",
+        "checked": "2026-09-27",
+        "note": "'Never consume CancellationException—always rethrow it'; catch specific types like IOException."
+      },
+      {
+        "grade": "B",
+        "url": "https://detekt.dev/docs/rules/coroutines/",
+        "checked": "2026-09-27",
+        "note": "detekt SuspendFunSwallowedCancellation (inactive by default) covers only suspend calls inside runCatching; TooGenericExceptionCaught (active) flags broad catches regardless of cancellation."
+      },
+      {
+        "grade": "D",
+        "url": "https://haidrrrry.medium.com/your-ai-coding-agent-is-writing-broken-kotlin-heres-how-to-fix-it-fbfd65939469",
+        "checked": "2026-09-27",
+        "note": "Blog: AI agents default to GlobalScope, forget cancellation and write 2020–2022-era Android patterns. Lead only."
+      }
+    ],
+    "whyNotLinter": "`TooGenericExceptionCaught` bans broad catches everywhere and says nothing about cancellation. `SuspendFunSwallowedCancellation` is off by default and covers only `runCatching`. Whether a try block is around suspend calls in a coroutine is visible but not tied to a type rule.",
+    "aiRelevance": "High. Agents wrap network calls in `try { … } catch (e: Exception) { _state.value = Error(e) }` inside `viewModelScope.launch` and use `runCatching` as a Result shortcut.",
+    "expectedNoise": "med — the catch must visibly wrap suspend calls; non-suspend catches are listed negatives.",
+    "languageFile": "kotlin",
+    "evidenceStatus": "meets bar (1 A or 2 B)"
+  },
+  "kt-flow-emit-wrong-context": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://kotlinlang.org/docs/coroutines-flow.html",
+        "checked": "2026-09-27",
+        "note": "'a flow() builder function must emit values from the same coroutine context where it runs ... you can't change the coroutine context with withContext()' (example is marked 'This fails with an exception!'); use flowOn."
+      },
+      {
+        "grade": "B",
+        "url": "https://github.com/Kotlin/kotlinx.coroutines/blob/master/kotlinx-coroutines-core/common/src/flow/Builders.kt",
+        "checked": "2026-09-27",
+        "note": "flow {} KDoc: 'emit should happen strictly in the dispatchers of the [block] in order to preserve the flow context ... will result in an IllegalStateException.'"
+      }
+    ],
+    "whyNotLinter": "No detekt, ktlint or Android Lint rule checks it; the failure only shows at runtime. It could be approximated with an AST rule, but no standard tool ships one.",
+    "aiRelevance": "High. Agents combine the two idioms they know best (`flow { }` and `withContext(Dispatchers.IO)`) and the code compiles.",
+    "expectedNoise": "low — the pattern is specific, and the main look-alike (emit after withContext returns) is a listed negative.",
+    "languageFile": "kotlin",
+    "evidenceStatus": "meets bar (1 A or 2 B)"
+  },
+  "kt-exposed-mutable-state": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://developer.android.com/kotlin/coroutines/coroutines-best-practices",
+        "checked": "2026-09-27",
+        "note": "'Don't expose mutable types ... Expose StateFlow instead of MutableStateFlow' with DO / DO NOT examples."
+      },
+      {
+        "grade": "B",
+        "url": "https://developer.android.com/kotlin/flow/stateflow-and-sharedflow",
+        "checked": "2026-09-27",
+        "note": "Canonical example: private _uiState MutableStateFlow, commented 'Backing property to avoid state updates from other classes', exposed as StateFlow."
+      }
+    ],
+    "whyNotLinter": "No detekt or Compose lint rule checks the visibility of mutable flow holders (Compose lint `ComposeMutableParameters` covers composable parameters only). It could be a custom detekt rule, but none ships.",
+    "aiRelevance": "Medium-high. Agents often write `val uiState = MutableStateFlow(...)` to save the backing-property boilerplate.",
+    "expectedNoise": "low — visibility and the holder type are both visible in the snippet.",
+    "languageFile": "kotlin",
+    "evidenceStatus": "meets bar (1 A or 2 B)"
+  },
+  "kt-state-mutated-in-place": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://developer.android.com/develop/ui/compose/state",
+        "checked": "2026-09-27",
+        "note": "'Using mutable objects such as ArrayList<T> or mutableListOf() as state in Compose causes your users to see incorrect or stale data.'"
+      },
+      {
+        "grade": "B",
+        "url": "https://github.com/Kotlin/kotlinx.coroutines/blob/master/kotlinx-coroutines-core/common/src/flow/StateFlow.kt",
+        "checked": "2026-09-27",
+        "note": "'Values in state flow are conflated using Any.equals comparison'; update { } is the atomic way to change it."
+      }
+    ],
+    "whyNotLinter": "It is a semantic question whether a held object is mutated rather than replaced. Lint covers only creating a mutable collection inside mutableStateOf.",
+    "aiRelevance": "Medium-high. Agents coming from imperative code mutate `_state.value.items` directly, and the UI silently fails to update.",
+    "expectedNoise": "low — the mutation shape is literal once the held value is identified.",
+    "languageFile": "kotlin",
+    "evidenceStatus": "meets bar (1 A or 2 B)"
+  },
+  "kt-collect-without-lifecycle": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://developer.android.com/topic/libraries/architecture/views/coroutines-views",
+        "checked": "2026-09-27",
+        "note": "repeatOnLifecycle 'processes the flow emissions only when the UI is visible'; launchWhenX keeps 'upstream flows ... active in the background'."
+      },
+      {
+        "grade": "B",
+        "url": "https://googlesamples.github.io/android-custom-lint-rules/checks/index.md.html",
+        "checked": "2026-09-27",
+        "note": "Lint has RepeatOnLifecycleWrongUsage / UnsafeRepeatOnLifecycleDetector (misuse of repeatOnLifecycle) but nothing for its absence."
+      }
+    ],
+    "whyNotLinter": "Lint checks how repeatOnLifecycle is used, not whether a collection needs it. Whether the enclosing class is a UI component is visible, but no standard rule asks.",
+    "aiRelevance": "Medium-high. `lifecycleScope.launch { vm.state.collect { render(it) } }` is the most common flow-collection snippet from older tutorials.",
+    "expectedNoise": "low — only Activity or Fragment collections without the wrapper qualify.",
+    "languageFile": "kotlin",
+    "evidenceStatus": "meets bar (1 A or 2 B)"
+  },
+  "kt-viewmodel-holds-context": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://developer.android.com/topic/libraries/architecture/viewmodel",
+        "checked": "2026-09-27",
+        "note": "'ViewModels shouldn't hold any references of lifecycle-related APIs such as the Context or Resources to prevent memory leaks.'"
+      },
+      {
+        "grade": "B",
+        "url": "https://googlesamples.github.io/android-custom-lint-rules/checks/index.md.html",
+        "checked": "2026-09-27",
+        "note": "Android Lint StaticFieldLeak covers static fields only; no check for ViewModel members."
+      }
+    ],
+    "whyNotLinter": "`StaticFieldLeak` covers static fields, not ViewModel members. The Application vs. Activity context distinction and the Hilt qualifier take judgment.",
+    "aiRelevance": "High. Agents pass `context` into ViewModels to show Toasts, read resources or build intents.",
+    "expectedNoise": "low — the types are named in the declaration.",
+    "languageFile": "kotlin",
+    "evidenceStatus": "meets bar (1 A or 2 B)"
+  },
+  "kt-compose-side-effect-in-composition": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://developer.android.com/develop/ui/compose/side-effects",
+        "checked": "2026-09-27",
+        "note": "'composables should ideally be side-effect free'; side effects go in Effect APIs."
+      },
+      {
+        "grade": "B",
+        "url": "https://googlesamples.github.io/android-custom-lint-rules/checks/index.md.html",
+        "checked": "2026-09-27",
+        "note": "Compose lint covers launch/async (CoroutineCreationDuringComposition), flow operators and StateFlow.value in composition, but not plain method calls with side effects."
+      }
+    ],
+    "whyNotLinter": "Lint can't tell `viewModel.load()` (side effect) from `viewModel.format(x)` (pure) or an event lambda; that is a question about what the call does.",
+    "aiRelevance": "High. Agents put `LaunchedEffect`-worthy calls (`viewModel.fetch()`) straight into the composable body, and every recomposition re-triggers them.",
+    "expectedNoise": "med — pure helper calls look similar; the question names side-effecting verbs and the false list names effect handlers and lambdas.",
+    "languageFile": "kotlin",
+    "evidenceStatus": "meets bar (1 A or 2 B)"
+  }
+}
