@@ -3,7 +3,10 @@
 // and the jev-lint-learn skill).
 //
 // One JSON line per checked file:
-//   {ts, session, repo, file, tool, changeKind, model, flagged: [{rule, p, tier}], excerpt?}
+//   {ts, session, agent?, repo, file, tool, changeKind, model, flagged: [{rule, p, tier}], excerpt?}
+// `session` is the hook's session_id. Claude Code and Codex both give subagents the root
+// conversation's session_id and add `agent_id` (Codex: the subagent's own thread id), so
+// `agent` is what tells a subagent's edits apart from its parent's.
 // `excerpt` (first 400 chars of the checked code) is kept only when something was flagged.
 // Default path: ~/.local/state/jev-lint/findings.jsonl. JEV_LINT_FINDINGS_LOG=off disables it.
 
@@ -18,6 +21,7 @@ const EXCERPT_CHARS = 400;
 export type CheckRecord = {
   ts: string;
   session?: string;
+  agent?: string; // hook agent_id: set only when the edit was made inside a subagent
   repo: string;
   file: string;
   tool?: string;
@@ -58,11 +62,9 @@ export function isInsideRepo(filePath: string, cwd: string): boolean {
   return rel !== "" && !rel.startsWith("..") && !isAbsolute(rel);
 }
 
-export function toRecords(
-  results: LintResult[],
-  changes: ChangedFile[],
-  event: { session_id?: string; tool_name?: string; cwd?: string },
-): CheckRecord[] {
+type HookIds = { session_id?: string; agent_id?: string; tool_name?: string; cwd?: string };
+
+export function toRecords(results: LintResult[], changes: ChangedFile[], event: HookIds): CheckRecord[] {
   const cwd = event.cwd ?? process.cwd();
   return results.map((r) => {
     const absolute = isAbsolute(r.filePath) ? r.filePath : resolve(cwd, r.filePath);
@@ -72,6 +74,7 @@ export function toRecords(
     return {
       ts: new Date().toISOString(),
       session: event.session_id,
+      ...(event.agent_id ? { agent: event.agent_id } : {}),
       repo,
       file: relative(repo, absolute),
       tool: event.tool_name,
@@ -89,10 +92,7 @@ export function toRecords(
 
 // Failed checks are logged too, so a silently failing hook shows up in the log instead of
 // looking like "no edits".
-export function toErrorRecords(
-  failures: { change: ChangedFile; error: unknown }[],
-  event: { session_id?: string; tool_name?: string; cwd?: string },
-): CheckRecord[] {
+export function toErrorRecords(failures: { change: ChangedFile; error: unknown }[], event: HookIds): CheckRecord[] {
   const cwd = event.cwd ?? process.cwd();
   return failures.map(({ change, error }) => {
     const absolute = isAbsolute(change.filePath) ? change.filePath : resolve(cwd, change.filePath);
@@ -100,6 +100,7 @@ export function toErrorRecords(
     return {
       ts: new Date().toISOString(),
       session: event.session_id,
+      ...(event.agent_id ? { agent: event.agent_id } : {}),
       repo,
       file: relative(repo, absolute),
       tool: event.tool_name,

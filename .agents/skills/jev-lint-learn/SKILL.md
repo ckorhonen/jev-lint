@@ -24,7 +24,7 @@ and give the date to look again. Failed checks (timeouts, API errors) are listed
 If more than 5% failed, fix that first, because a failed check silently shows the agent
 nothing.
 
-What an outcome means, for each first flag of a rule in a (session, file) thread:
+What an outcome means, for each first flag of a rule in a (thread, file) pair (a thread is the main agent of a session or one subagent in it; "sessions" counts conversations):
 
 | Outcome | What happened | Cost |
 |---|---|---|

@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { areaOf, clusters, compare, summarize, wilsonLower } from "../src/findings";
-import type { CheckRecord } from "../src/findingsLog";
+import { areaOf, clusters, compare, summarize, threadOf, wilsonLower } from "../src/findings";
+import { type CheckRecord, toRecords } from "../src/findingsLog";
 
 let clock = 0;
 function check(session: string, file: string, rules: string[], tier: "high" | "medium" = "high"): CheckRecord {
@@ -96,5 +96,38 @@ describe("clusters and comparisons", () => {
     expect(c.before.per100Checks).toBe(50);
     expect(c.after.per100Checks).toBe(0);
     expect(c.ci95[1]).toBeLessThan(0);
+  });
+});
+
+describe("threads", () => {
+  const sub = (session: string, agent: string, file: string, rules: string[]) => ({ ...check(session, file, rules), agent });
+
+  test("records without agent key by session, so older logs still work", () => {
+    expect(threadOf({ session: "s" })).toBe("s");
+    expect(threadOf({})).toBe("?");
+    expect(threadOf({ session: "s", agent: "a1" })).toBe("s/a1");
+  });
+
+  test("subagents sharing a session_id keep separate outcomes for the same file", () => {
+    // Subagent a1 flags and never returns; a2 later writes the file cleanly. Keyed by session
+    // alone that would read as "fixed"; per thread it is unknown for a1.
+    const [s] = summarize([sub("root", "a1", "x.ts", ["r"]), sub("root", "a2", "x.ts", [])]);
+    expect([s.fixed, s.kept, s.unknown]).toEqual([0, 0, 1]);
+  });
+
+  test("subagents of one conversation count as one session", () => {
+    const records = ["a1", "a2", "a3"].flatMap((a) => [sub("root", a, "x.ts", ["r"]), sub("root", a, "x.ts", [])]);
+    const [s] = summarize(records);
+    expect([s.fixed, s.sessions]).toEqual([3, 1]);
+  });
+
+  test("toRecords stores agent_id only when the hook fired inside a subagent", () => {
+    const result = { filePath: "/repo/x.ts", changeKind: "edit" as const, model: "m", findings: [], latencyMs: 1 };
+    const change = { filePath: "/repo/x.ts", addedCode: "x", changeKind: "edit" as const };
+    const [main] = toRecords([result] as never, [change], { session_id: "root", cwd: "/repo" });
+    const [child] = toRecords([result] as never, [change], { session_id: "root", agent_id: "t2", cwd: "/repo" });
+    expect(main.agent).toBeUndefined();
+    expect("agent" in main).toBe(false);
+    expect([child.session, child.agent]).toEqual(["root", "t2"]);
   });
 });

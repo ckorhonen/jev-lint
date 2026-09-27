@@ -4,10 +4,14 @@
 //   bun ~/Repos/jev-lint/src/findings.ts --repo <path> --clusters          # rule × area × test/non-test
 //   bun ~/Repos/jev-lint/src/findings.ts --repo <path> --compare <rule> --at <ISO date>
 //
-// For every finding (session, file, rule) the outcome is:
-//   fixed   — a later check of the same file in the same session no longer flags the rule
+// For every finding (thread, file, rule) the outcome is:
+//   fixed   — a later check of the same file in the same thread no longer flags the rule
 //   kept    — the file was checked again and the rule was still flagged at the last check
-//   unknown — the file was never checked again in that session
+//   unknown — the file was never checked again in that thread
+// A thread is one agent context: the main agent of a session, or one subagent inside it
+// (Claude Code and Codex give subagents the parent's session_id plus their own agent_id), so
+// two subagents editing the same file don't mix outcomes. "sessions" still counts
+// conversations: subagents of one conversation are not independent evidence.
 // "fixed" means the agent made the mistake and corrected it: worth upfront guidance in
 // AGENTS.md so it stops happening. "kept" means the agent disagreed or ignored the hint:
 // a likely false positive, or a rule that needs rewording.
@@ -44,11 +48,17 @@ function isCheckRecord(value: unknown): value is CheckRecord {
   return Boolean(r && typeof r.ts === "string" && typeof r.repo === "string" && typeof r.file === "string" && Array.isArray(r.flagged));
 }
 
+// Records without `agent` (the main agent, or logs from before 2026-09-27) key by session alone.
+export function threadOf(r: Pick<CheckRecord, "session" | "agent">): string {
+  const session = r.session ?? "?";
+  return r.agent ? `${session}/${r.agent}` : session;
+}
+
 export function summarize(allRecords: CheckRecord[]): RuleSummary[] {
   const records = allRecords.filter((r) => !r.error);
   const byThread = new Map<string, CheckRecord[]>();
   for (const r of records) {
-    const key = `${r.session ?? "?"}|${r.repo}|${r.file}`;
+    const key = `${threadOf(r)}|${r.repo}|${r.file}`;
     byThread.set(key, [...(byThread.get(key) ?? []), r]);
   }
 
@@ -76,9 +86,9 @@ export function summarize(allRecords: CheckRecord[]): RuleSummary[] {
     return s;
   };
 
-  for (const [key, checks] of byThread) {
+  for (const checks of byThread.values()) {
     checks.sort((a, b) => a.ts.localeCompare(b.ts));
-    const [session] = key.split("|");
+    const session = checks[0].session ?? "?";
     // One outcome per (thread, rule): judged from the first flag onward.
     const firstFlag = new Map<string, number>();
     checks.forEach((c, i) => {
@@ -132,13 +142,13 @@ export function areaOf(repo: string, file: string): { area: string; test: boolea
   return { area: dir === "." ? "(root)" : dir.split("/").slice(0, 2).join("/"), test: TEST_FILE.test(rel) };
 }
 
-// One finding = the first flag of a rule in a (session, file) thread, with its outcome.
+// One finding = the first flag of a rule in a (thread, file) pair, with its outcome.
 type Finding = { rule: string; session: string; repo: string; file: string; ts: string; outcome: "fixed" | "kept" | "unknown" };
 
 export function findingsOf(allRecords: CheckRecord[]): Finding[] {
   const byThread = new Map<string, CheckRecord[]>();
   for (const r of allRecords.filter((r) => !r.error)) {
-    const key = `${r.session ?? "?"}|${r.repo}|${r.file}`;
+    const key = `${threadOf(r)}|${r.repo}|${r.file}`;
     byThread.set(key, [...(byThread.get(key) ?? []), r]);
   }
   const out: Finding[] = [];
