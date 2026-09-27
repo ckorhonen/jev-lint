@@ -1,37 +1,85 @@
 # jev-lint
 
-**A fuzzy linter for coding agents.** After every file edit in Claude Code or Codex, a
-PostToolUse hook sends the code the edit added to [TypeSafe Jev](https://docs.typesafe.ai)
-in one ~0.3 s call and asks one yes/no question per rule. Findings go back to the agent
-as a hint in two tiers:
-
-- **p ≥ 0.8** — "Likely violations — fix these"
-- **0.5 ≤ p < 0.8** — "Possible violations — double-check; ignore if the code is actually fine"
-
-It targets rules a deterministic linter can't express. Examples: "don't use `useEffect`
-to derive state", "validate JSON before casting it", "don't create an object inline in
-`@ObservedObject`", "resume a continuation exactly once".
+**A fuzzy linter for coding agents.** It checks the code your agent writes against your
+team's best practices while the agent is still working, not at code review.
 
 📓 **Results and method:** [experiment notebook](https://claude.ai/artifact/BUZG9LEnaiJyaJuaP7tajs)
 (source in `report/`).
 
-## Results so far
+## What is this for?
 
-Numbers are from the notebook, measured 26 Sep 2026.
+Every team has best practices and patterns, some common across the industry and some
+specific to the team. For example, a team may have a particular way it wants people to
+use React hooks like `useEffect`. Rules like that can't be checked deterministically:
+there is no regex for "this effect only derives state". So they usually aren't caught
+until code review, by a human or an agent.
 
-| | Jev | GPT-6-Luna (low) |
-| --- | --- | --- |
-| Held-out F1, hygiene rules (TS / Swift) | 99% / 99% | 96% / 97% |
-| Held-out F1, best-practice rules (TS / Swift) | 96% / 96% | 99% / 98% |
-| Median time per check | ~0.3 s | ~1.6 s |
-| Cost per 10,000 edits (both packs) | ~$1.51 | — |
+Catching them at review is expensive. The code goes back to the agent, the agent fixes
+it, and the fix has to be reviewed again.
 
-**Real Claude Code runs on 12 React/SwiftUI tasks:**
-- Graded rule violations per task fell from 2.12 to 1.33 with the hook.
-- On React tasks, the AI reviewer's rule-covered comments fell from 1.42 to 0.25 per task.
-- The hook flagged half of the rule-covered issues a later AI review raised, before that review.
-- It does **not** replace review: about 75% of review findings were logic and design issues no snippet rule can see.
-- Cost: +26% agent cost and about +14 s per task, from the fix-up edits.
+jev-lint moves that check to the moment the file is written. A hook in Claude Code or
+Codex sends the code the agent just added to a fast "System 1" judgment model
+([TypeSafe Jev](https://docs.typesafe.ai)), asking one yes/no question per rule. If a rule
+looks broken, the agent hears about it right away and fixes it while it still has the
+context, with no review round trip.
+
+## Our hypothesis
+
+1. **Immediate feedback beats a review round trip.** An agent that's told about a
+   problem while it's writing the file can fix it in the next edit, instead of waiting
+   for review and a remediation pass.
+2. **It's cheap enough to run on every edit.** Jev takes about 0.3 s and roughly
+   $0.00015 per check, so checking a whole session costs very little.
+3. **It pays for itself.** It may raise the cost per task a little, because the agent
+   now fixes issues as it goes. That should be cancelled out by less review and rework.
+4. **It creates a feedback loop.** Every check is logged, so it's easy to see where
+   agents keep failing, then adjust rules, skills, or the rest of the harness to help
+   them (see the `jev-lint-learn` skill).
+5. **It could run locally, for free.** As an exploration, we're testing Jev-like models
+   hosted on the machine itself, using its GPU or Neural Engine, for lower latency and no
+   cost per check.
+
+## What we've found so far
+
+Measured 26–27 Sep 2026. The notebook has the details and the caveats.
+
+- **The check itself is accurate and fast.** On held-out edits it scored 94–100% F1 (the
+  balance of catching real violations and avoiding false flags). It took about 0.3 s, and
+  the pattern gate means only about a third of the rules are asked for each edit.
+- **Agents act on the feedback (hypothesis 1: supported).** In 96 real Claude Code runs,
+  violations per task fell from 2.38 to 1.21 with the hook running in the background. In
+  48 Codex runs they fell from 1.67 to 0.92. Both drops are statistically significant.
+- **Cost per check is negligible (hypothesis 2: supported).** It's about $1.51 per 10,000
+  edits. The real cost is the agent's own fix-up work, about +$0.03–0.04 and +10 s per task.
+- **Review and rework don't cancel out yet when an AI reviewer checks every change
+  (hypothesis 3: not yet shown).**
+  - Every task still got review comments, 3.6 per task and mostly about logic and design
+    that no rule covers, so a fix round still happened.
+  - The hook ended with about 35% fewer rule violations after review (1.08 vs 1.67 per
+    task, not yet significant), for about +17% agent cost.
+  - The case is strongest with human reviewers, or when no AI reviewer runs on every
+    change.
+- **The feedback loop works (hypothesis 4).** The findings log already showed real noise
+  (debug scripts, domain constants), which led to a fix the same day.
+- **Local models aren't there yet (hypothesis 5: open).**
+  - The best zero-shot local model, Kev-4B, scored 70–75% F1 and took about 1.4 s per edit
+    on an M3 Max.
+  - The Neural Engine couldn't be used through the current model exports.
+  - A Kev-4B fine-tuned on our own labels is being tested now.
+
+## How it works
+
+After every file edit, a PostToolUse hook sends the added code to Jev in one call. Rules
+whose trigger patterns don't appear in the code are skipped. Findings go back to the agent
+in two tiers:
+
+- **p ≥ 0.8** — "Likely violations — fix these"
+- **0.5 ≤ p < 0.8** — "Possible violations — double-check; ignore if the code is actually fine"
+
+The rules target what a deterministic linter can't express. Examples: "don't use
+`useEffect` to derive state", "validate JSON before casting it", "don't create an object
+inline in `@ObservedObject`", "resume a continuation exactly once". Teams can generate their
+own rules from their guidelines with the `jev-lint-rules` skill.
 
 ## Install
 
@@ -113,9 +161,10 @@ The **`jev-lint-learn`** skill turns this into reviewed changes for one repo:
 ## Local models
 
 Kev and Laya serve the same `/v1/systemone` protocol, so `TYPESAFE_BASE_URL=http://127.0.0.1:8009`
-points the hook at a local server. As of 26 Sep 2026 they are not accurate or fast enough on
-these rules (best: Kev-4B at 61–74% held-out F1 and 2–4 s per edit on an M3 Max); see notebook
-Entry 4. `local/laya_server.py` and `local/bench_encoder.py` reproduce the Laya runs.
+points the hook at a local server. As of 27 Sep 2026 they are not accurate or fast enough on
+these rules. The best, Kev-4B with the rule gate, scored 70–75% held-out F1 at about 1.4 s per edit on an
+M3 Max (notebook Entries 4–5). JevLike trained on our labels didn't learn the task (Entry 6), and a
+fine-tuned Kev-4B is in progress. `local/laya_server.py` and `local/bench_encoder.py` reproduce the Laya runs.
 
 ## Rule packs
 
