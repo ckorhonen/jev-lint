@@ -34,7 +34,7 @@ which of your team's rules it just broke, and fixes them before anyone reviews t
   skill reads your agent instructions, docs, skills and linter configs, researches current
   best practices for your frameworks, and proposes rules for you to approve (nothing a linter
   already checks). Another writes and tests a single rule when you think of one.
-- **Gets better over time.** Every check is logged. The learning skill finds the mistakes agents
+- **Gets better over time** ([how](docs/feedback-loop.md)). Every check is logged. The learning skill finds the mistakes agents
   keep making, proposes a few targeted fixes to your instructions or rules, and measures
   whether they worked.
 - **Works where your agents work.** Claude Code and Codex, installed with one command or one
@@ -257,6 +257,15 @@ new line for every flag:
   - a new rule, through `jev-lint-rules`.
 - **Each change is recorded as a hypothesis** with a measurable prediction, then checked later
   with `--compare`.
+
+**Set it up as a loop.** [docs/feedback-loop.md](docs/feedback-loop.md) explains it for humans, and
+gives agents the steps to schedule a weekly review. Each proposed change gets proven before
+it's kept:
+- a rule change against the labeled examples in `.jev-lint/cases.jsonl`;
+- an instruction or skill change with `src/repoEval.ts`, which has an agent do small tasks from
+  `.jev-lint/evals/` twice, with the old and the new instructions, and compares how often it
+  makes the mistake.
+
 
 ## Local models
 

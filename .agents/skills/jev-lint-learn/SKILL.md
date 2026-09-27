@@ -86,14 +86,32 @@ For each change show the user four things:
 - the exact diff;
 - a **hypothesis with a measurable prediction**, e.g. "`ts-no-magic-numbers` findings in `apps/tools` source drop from 5.0 to under 2 per 100 checks over the next 10 sessions".
 
-Instruction files are shared team context, so apply only the approved changes. For rule
-changes, re-run `bun $JEV/src/validate.ts .jev-lint` and require `keep`.
+Instruction files are shared team context, so apply only the approved changes.
+
+**Prove each change before keeping it.**
+
+- **Rule changes:** re-run `bun $JEV/src/validate.ts .jev-lint` and require `keep`. Add the
+  cluster's kept excerpt as a hard negative, or its fixed excerpt as a positive, first.
+- **Instruction or skill changes** (`AGENTS.md`, `CLAUDE.md`, a skill):
+  1. Make sure `.jev-lint/evals/` has a small task that triggers the mistake: a prompt for
+     the kind of change where the cluster occurred, which doesn't mention the rule, plus the
+     rule ids. Write one if needed. See [docs/feedback-loop.md](../../../docs/feedback-loop.md)
+     for the format.
+  2. With the change uncommitted, run `bun $JEV/src/repoEval.ts --base HEAD --reps 3`.
+  3. Keep the change only if the verdict is "change helps". Keep a "no clear difference"
+     only for small, clearly correct wording. Drop anything that hurts.
+  4. Link the result file in the changelog.
 
 **Record it** in `.jev-lint/README.md` under a dated `## Changelog` entry:
 - the change;
 - the evidence (the cluster numbers);
 - the hypothesis;
-- the validation result.
+- the validation or repoEval result.
+
+**Running on a schedule** (report-only, weekly, in its own worktree, pushing a branch and never
+merging): [docs/feedback-loop.md](../../../docs/feedback-loop.md) has the setup for Claude Code
+and Codex. When scheduled, write the report to `.jev-lint/reports/<date>.md`, and treat
+"approved" as "on a branch the user will review".
 
 ## 6. Measure earlier changes
 
