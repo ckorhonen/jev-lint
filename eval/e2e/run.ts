@@ -20,22 +20,95 @@ const { values: args } = parseArgs({
     tasks: { type: "string", default: "" },
     "tasks-file": { type: "string", default: "eval/e2e/tasks.json" },
     tag: { type: "string", default: "" },
+    agent: { type: "string", default: "claude" },
   },
 });
 
 // scaffold defaults to lang; "react" is a TypeScript scaffold with React types installed.
 type Task = { id: string; lang: "typescript" | "swift"; scaffold?: string; prompt: string };
-type Condition = "none" | "jev" | "jev-high";
+// Conditions: which judge, and whether the hook blocks the agent (sync) or runs in the
+// background and wakes it with findings (Claude Code `asyncRewake`; Codex has no rewake).
+type Condition = "none" | "jev" | "jev-high" | "jev-rewake" | "kev-rewake";
+const KEV_URL = process.env.KEV_URL ?? "http://127.0.0.1:8009";
 
 const HOOK_ENV: Record<Exclude<Condition, "none">, string> = {
   jev: "JEV_LINT_TIERS=high,medium",
   "jev-high": "JEV_LINT_TIERS=high",
+  "jev-rewake": "JEV_LINT_MODE=rewake",
+  "kev-rewake": `JEV_LINT_MODE=rewake TYPESAFE_BASE_URL=${KEV_URL} JEV_LINT_TIMEOUT_MS=120000`,
 };
+const isRewake = (c: Condition) => c.endsWith("-rewake");
+
+function hookCommand(condition: Exclude<Condition, "none">, runDir: string) {
+  return `${HOOK_ENV[condition]} JEV_LINT_FINDINGS_LOG='${join(runDir, "findings.jsonl")}' JEV_LINT_LOG='${join(runDir, "jev-log.jsonl")}' bun '${join(REPO, "src/hook.ts")}'`;
+}
 
 function settingsFor(condition: Condition, runDir: string) {
   if (condition === "none") return { hooks: {} };
-  const command = `${HOOK_ENV[condition]} JEV_LINT_LOG='${join(runDir, "jev-log.jsonl")}' bun '${join(REPO, "src/hook.ts")}'`;
-  return { hooks: { PostToolUse: [{ matcher: "Write|Edit|MultiEdit", hooks: [{ type: "command", command, timeout: 15 }] }] } };
+  const hook = isRewake(condition)
+    ? { type: "command", command: hookCommand(condition, runDir), timeout: 180, asyncRewake: true }
+    : { type: "command", command: hookCommand(condition, runDir), timeout: 15 };
+  return { hooks: { PostToolUse: [{ matcher: "Write|Edit|MultiEdit", hooks: [hook] }] } };
+}
+
+// Codex: an isolated CODEX_HOME per run with the user's model settings, a symlink to the
+// existing login, and a hooks.json containing only this condition's hook.
+function codexHome(condition: Condition, runDir: string) {
+  const home = join(runDir, "codex-home");
+  mkdirSync(home, { recursive: true });
+  const userConfig = readFileSync(join(process.env.HOME as string, ".codex/config.toml"), "utf8");
+  const model = userConfig
+    .split("\n")
+    .filter((l) => /^(model|model_reasoning_effort)\s*=/.test(l))
+    .slice(0, 2)
+    .join("\n");
+  writeFileSync(join(home, "config.toml"), `${model}\n\n[features]\nhooks = true\n`);
+  if (!existsSync(join(home, "auth.json"))) symlinkSync(join(process.env.HOME as string, ".codex/auth.json"), join(home, "auth.json"));
+  const hooks =
+    condition === "none"
+      ? { hooks: {} }
+      : {
+          hooks: {
+            PostToolUse: [
+              {
+                matcher: "Edit|Write|apply_patch",
+                hooks: [{ type: "command", command: hookCommand(condition as Exclude<Condition, "none">, runDir), timeout: 15 }],
+              },
+            ],
+          },
+        };
+  writeFileSync(join(home, "hooks.json"), JSON.stringify(hooks));
+  return home;
+}
+
+function runCodex(task: Task, condition: Condition, runDir: string, workDir: string) {
+  const cliArgs = [
+    "exec",
+    "--skip-git-repo-check",
+    "--dangerously-bypass-approvals-and-sandbox",
+    "--dangerously-bypass-hook-trust",
+    "--json",
+    task.prompt,
+  ];
+  const started = Date.now();
+  return new Promise<{ exitCode: number; wallMs: number }>((resolve) => {
+    const child = spawn(process.env.CODEX_BIN ?? "/opt/homebrew/bin/codex", cliArgs, {
+      cwd: workDir,
+      env: { ...process.env, CODEX_HOME: codexHome(condition, runDir) },
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    const out: Buffer[] = [];
+    const err: Buffer[] = [];
+    child.stdout.on("data", (d) => out.push(d));
+    child.stderr.on("data", (d) => err.push(d));
+    const killer = setTimeout(() => child.kill("SIGTERM"), 15 * 60_000);
+    child.on("close", (code) => {
+      clearTimeout(killer);
+      writeFileSync(join(runDir, "transcript.jsonl"), Buffer.concat(out));
+      writeFileSync(join(runDir, "stderr.txt"), Buffer.concat(err));
+      resolve({ exitCode: code ?? -1, wallMs: Date.now() - started });
+    });
+  });
 }
 
 function runClaude(task: Task, condition: Condition, runDir: string, workDir: string) {
@@ -106,6 +179,7 @@ function buildCheck(workDir: string, lang: Task["lang"]) {
 function transcriptStats(runDir: string) {
   const lines = readFileSync(join(runDir, "transcript.jsonl"), "utf8").split("\n").filter(Boolean);
   let edits = 0;
+  let rewakes = 0;
   let result: Record<string, unknown> = {};
   for (const line of lines) {
     let msg: any;
@@ -115,6 +189,18 @@ function transcriptStats(runDir: string) {
       continue;
     }
     if (msg.type === "result") result = msg;
+    // Codex exec --json: file edits are item.completed/file_change; usage comes on turn.completed.
+    if (msg.type === "item.completed" && msg.item?.type === "file_change") edits++;
+    if (msg.type === "turn.completed" && msg.usage) {
+      result = {
+        ...result,
+        codex_input_tokens: msg.usage.input_tokens,
+        codex_cached_tokens: msg.usage.cached_input_tokens,
+        codex_output_tokens: msg.usage.output_tokens,
+      };
+    }
+    // Claude Code asyncRewake: findings arrive later as a message that quotes the hook's stderr.
+    if (msg.type !== "assistant" && line.includes("jev-lint:")) rewakes++;
     if (msg.type === "assistant") {
       for (const block of msg.message?.content ?? []) {
         if (block.type === "tool_use" && ["Write", "Edit", "MultiEdit"].includes(block.name)) {
@@ -125,6 +211,10 @@ function transcriptStats(runDir: string) {
   }
   return {
     edits,
+    rewakes,
+    codexTokens: result.codex_input_tokens
+      ? { input: Number(result.codex_input_tokens), cached: Number(result.codex_cached_tokens), output: Number(result.codex_output_tokens) }
+      : undefined,
     costUsd: Number(result.total_cost_usd ?? 0),
     durationMs: Number(result.duration_ms ?? 0),
     numTurns: Number(result.num_turns ?? 0),
@@ -163,9 +253,11 @@ async function runOne(task: Task, condition: Condition, rep: number) {
   cpSync(scaffold, workDir, { recursive: true, filter: (src) => !src.includes("node_modules") && !src.includes(".build") });
   if (existsSync(join(scaffold, "node_modules"))) symlinkSync(join(scaffold, "node_modules"), join(workDir, "node_modules"));
 
-  const claude = await runClaude(task, condition, runDir, workDir);
+  const claude =
+    args.agent === "codex" ? await runCodex(task, condition, runDir, workDir) : await runClaude(task, condition, runDir, workDir);
   const files = sourceFiles(workDir, task.lang).map((f) => ({ path: relative(workDir, f), content: readFileSync(f, "utf8") }));
   const result = {
+    agent: args.agent,
     task: task.id,
     lang: task.lang,
     condition,

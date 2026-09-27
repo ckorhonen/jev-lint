@@ -63,6 +63,16 @@ To make the skills available in every repo, link them into your skill directorie
 for s in jev-lint-rules jev-lint-eval; do ln -s ~/Repos/jev-lint/.agents/skills/$s ~/.claude/skills/$s; done
 ```
 
+**Async (Claude Code only):** to keep the agent from waiting on the check (useful with a slower
+local judge), run it in the background and let findings wake the agent:
+
+```json
+{ "type": "command", "command": "JEV_LINT_MODE=rewake JEV_LINT_MODEL=jev-1.13.0 bun ~/Repos/jev-lint/src/hook.ts", "timeout": 180, "asyncRewake": true }
+```
+
+Codex supports `async` hooks but not rewake, so keep Codex synchronous. Codex needs
+`[features] hooks = true` in `config.toml` and, the first time, trusting the hook (or `--dangerously-bypass-hook-trust` in automation).
+
 The hook fails open: on a timeout, an API error or an unknown file type it exits 0 silently.
 **Privacy:** the added code of every edit to a matching file is sent to TypeSafe.
 
@@ -112,7 +122,14 @@ Entry 4. `local/laya_server.py` and `local/bench_encoder.py` reproduce the Laya 
 | Pack | Files | What it checks |
 | --- | --- | --- |
 | `hygiene` | `rules/typescript.json`, `rules/swift.json` | `any`, non-null / force-unwrap, empty catch, debug prints, restating comments, vague names, magic numbers, bare TODOs, hard-coded secrets… |
-| `practices` | `rules/*.practices.json` | React effect misuse (derived state, missing cleanup, fetch races, event logic), state mutation, index keys, unvalidated external data, sequential awaits, boolean traps; SwiftUI state ownership, expensive `body`, `.onAppear { Task {} }`, retain cycles, main-thread blocking, continuation misuse, unprotected shared state, unstable `ForEach` ids, GCD inside async |
+
+Two rules were removed because the model is weak at counting and tracing; use a deterministic linter for them:
+
+| Removed rule | Use instead |
+| --- | --- |
+| `ts-no-deep-nesting` | ESLint `max-depth` (and `complexity`); SwiftLint `nesting` / `cyclomatic_complexity` for Swift |
+| `ts-no-floating-promise` | typescript-eslint `@typescript-eslint/no-floating-promises` (needs type-aware linting) |
+| `practices` | `rules/*.practices.json` | React effect misuse (derived state, missing cleanup, fetch races, event logic), overlapping polling / debounced requests, state mutation, index keys, unvalidated external data, sequential awaits, boolean traps; SwiftUI state ownership, expensive `body`, `.onAppear { Task {} }`, retain cycles, main-thread blocking, continuation misuse, continuations without cancellation or that can be overwritten, unprotected shared state, unstable `ForEach` ids, GCD inside async |
 | `repo` | `.jev-lint/*.rules.json` in your repo | Whatever the `jev-lint-rules` skill generated from your guidelines |
 
 ### Options (environment variables on the hook command)
@@ -121,8 +138,9 @@ Entry 4. `local/laya_server.py` and `local/bench_encoder.py` reproduce the Laya 
 | --- | --- | --- |
 | `JEV_LINT_PACKS` | `hygiene,practices,repo` | Packs to ask (a repo's `config.json` overrides) |
 | `JEV_LINT_TIERS` | `high,medium` | `high` drops the double-check tier |
+| `JEV_LINT_GATE` | on | `off` asks every rule. By default a rule is only asked when its `when` patterns match the added code (about a third of rules per edit) |
 | `JEV_LINT_HIGH` / `JEV_LINT_MEDIUM` | `0.8` / `0.5` | Tier thresholds |
-| `JEV_LINT_MODE` | `context` | `block` sends findings as `decision: "block"` instead of `additionalContext` |
+| `JEV_LINT_MODE` | `context` | `block` sends findings as `decision: "block"`; `rewake` is for Claude Code async hooks (see below) |
 | `JEV_LINT_MODEL` | `jev-latest` | Pin `jev-1.13.0` so model updates can't shift thresholds |
 | `JEV_LINT_TIMEOUT_MS` | `8000` | Per-call timeout |
 | `JEV_LINT_LOG` | unset | Debug: append every raw judgment to a JSONL file |

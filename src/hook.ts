@@ -3,6 +3,8 @@
 // feeds rule findings back to the agent. Fails open: any error exits 0 silently.
 //
 // Env: JEV_LINT_MODE=context (default, additionalContext) | block (decision: "block")
+//      | rewake: for Claude Code hooks with "asyncRewake": true — the hook runs in the
+//        background; findings go to stderr with exit code 2, which wakes the agent with them.
 //      JEV_LINT_TIERS=high,medium (default) | high
 //      JEV_LINT_LOG=/path/to/log.jsonl to record every judgment (debug)
 //      JEV_LINT_FINDINGS_LOG=path|off  findings log for feedback (default ~/.local/state/jev-lint/findings.jsonl)
@@ -13,6 +15,8 @@ import { appendRecords, toRecords } from "./findingsLog";
 import { formatFeedback, type LintResult, lintChange } from "./lint";
 
 const MAX_FILES = 8;
+// 0 unless rewake mode has findings to deliver. Errors never change it: the hook fails open.
+let exitCode = 0;
 const MAX_PARALLEL = 4;
 
 async function main() {
@@ -44,7 +48,10 @@ async function main() {
   }
 
   const feedback = formatFeedback(results);
-  if (feedback) {
+  if (feedback && process.env.JEV_LINT_MODE === "rewake") {
+    process.stderr.write(feedback);
+    exitCode = 2;
+  } else if (feedback) {
     const output =
       process.env.JEV_LINT_MODE === "block"
         ? { decision: "block", reason: feedback }
@@ -65,4 +72,4 @@ main()
   .catch((err) => {
     if (process.env.JEV_LINT_DEBUG) process.stderr.write(`[jev-lint] ${err}\n`);
   })
-  .finally(() => process.exit(0));
+  .finally(() => process.exit(exitCode));

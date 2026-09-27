@@ -8,96 +8,70 @@
       "question": "Does `added_code` create a new object inline for an `@ObservedObject` property (e.g. `@ObservedObject var model = ProfileModel()`), so the view owns an object SwiftUI may recreate on every re-render, instead of using `@StateObject` (or `@State` with an `@Observable` class)?",
       "true": "An `@ObservedObject` property is initialized with a new instance inside the view.",
       "false": "Owned objects use `@StateObject` or `@State`, and `@ObservedObject` is only used for objects passed in from outside.",
-      "fix": "Use `@StateObject` (or `@State` for `@Observable`) for objects the view creates.",
-      "when": ["@ObservedObject"]
+      "fix": "Use `@StateObject` (or `@State` for `@Observable`) for objects the view creates."
     },
     {
       "id": "swiftui-state-not-private",
       "question": "Does `added_code` declare a SwiftUI `@State` or `@StateObject` property that is not `private` and is meant to be set by the parent view (for example `@State var user: User` with no default value, filled in through the initializer)?",
       "true": "View-owned state is exposed and initialized from outside, so later parent updates are silently ignored.",
       "false": "All `@State`/`@StateObject` properties are `private` with local defaults, and data from the parent comes in as `let`, `@Binding`, or an environment value.",
-      "fix": "Make @State private; take parent data as `let` or `@Binding`.",
-      "when": ["@State|@StateObject"]
+      "fix": "Make @State private; take parent data as `let` or `@Binding`."
     },
     {
       "id": "swiftui-expensive-body",
-      "question": "Does `added_code` do expensive work inside a SwiftUI view's `body` (or a computed property or helper that `body` calls each render) \u2014 creating a `DateFormatter`, `NumberFormatter`, `JSONDecoder`, or regex; sorting or filtering a large collection; decoding data; or reading files?",
+      "question": "Does `added_code` do expensive work inside a SwiftUI view's `body` (or a computed property or helper that `body` calls each render) — creating a `DateFormatter`, `NumberFormatter`, `JSONDecoder`, or regex; sorting or filtering a large collection; decoding data; or reading files?",
       "true": "Work that should be cached or done once runs on every render of the view.",
       "false": "Formatters and decoders are static or cached, heavy work happens in the model or a `.task`, or the body only lays out views.",
-      "fix": "Cache formatters as static properties and move heavy work into the model or `.task`.",
-      "when": ["\\bbody\\b"]
+      "fix": "Cache formatters as static properties and move heavy work into the model or `.task`."
     },
     {
       "id": "swiftui-task-in-onappear",
       "question": "Does `added_code` start async work with `Task { ... }` inside a SwiftUI `.onAppear` modifier instead of using the `.task` modifier, which cancels automatically when the view disappears?",
       "true": "`.onAppear { Task { await ... } }` launches work that is never cancelled.",
       "false": "Async work starts in `.task` / `.task(id:)`, or the Task is stored and cancelled in `.onDisappear`, or there is no async work in onAppear.",
-      "fix": "Use `.task { await ... }` so the work is cancelled with the view.",
-      "when": ["onAppear"]
+      "fix": "Use `.task { await ... }` so the work is cancelled with the view."
     },
     {
       "id": "swift-escaping-closure-retain-cycle",
-      "question": "Does `added_code` store or register an escaping closure that captures `self` strongly inside a class \u2014 a `Timer` block, a `NotificationCenter` observer block, a Combine `sink` stored in `cancellables`, or a closure assigned to a property \u2014 without `[weak self]` or `[unowned self]`, creating a retain cycle?",
+      "question": "Does `added_code` store or register an escaping closure that captures `self` strongly inside a class — a `Timer` block, a `NotificationCenter` observer block, a Combine `sink` stored in `cancellables`, or a closure assigned to a property — without `[weak self]` or `[unowned self]`, creating a retain cycle?",
       "true": "A long-lived closure owned (directly or indirectly) by self references self strongly.",
       "false": "Such closures capture `[weak self]`/`[unowned self]`, or the closures are non-escaping or one-shot (map, forEach, withAnimation, a single URLSession or DispatchQueue call), or the code is a SwiftUI struct.",
-      "fix": "Capture `[weak self]` in stored or registered closures and cancel them when done.",
-      "when": ["\\bself\\b"]
+      "fix": "Capture `[weak self]` in stored or registered closures and cancel them when done."
     },
     {
       "id": "swift-blocking-main-thread",
-      "question": "Does `added_code` do blocking work on the main thread or in UI code \u2014 `Data(contentsOf:)` or `String(contentsOf:)` on a network URL, `Thread.sleep`, `DispatchSemaphore.wait()`, or a synchronous network request \u2014 inside a view, view controller, or `@MainActor` type?",
+      "question": "Does `added_code` do blocking work on the main thread or in UI code — `Data(contentsOf:)` or `String(contentsOf:)` on a network URL, `Thread.sleep`, `DispatchSemaphore.wait()`, or a synchronous network request — inside a view, view controller, or `@MainActor` type?",
       "true": "UI code blocks the main thread waiting on I/O, a sleep, or a semaphore.",
       "false": "Blocking I/O happens off the main actor, or the code uses async APIs such as `URLSession.data(from:)` and `Task.sleep`.",
-      "fix": "Use async APIs (URLSession.data, Task.sleep) or move the work off the main actor.",
-      "when": ["contentsOf|sleep|semaphore|\\.wait\\(|sendSynchronous"]
+      "fix": "Use async APIs (URLSession.data, Task.sleep) or move the work off the main actor."
     },
     {
       "id": "swift-continuation-misuse",
       "question": "Does `added_code` use `withCheckedContinuation`, `withCheckedThrowingContinuation`, or an unsafe continuation in a way where some path could resume the continuation more than once, or never resume it (for example a callback that can fire repeatedly, or an early `return` / error branch that skips `resume`)?",
       "true": "At least one code path resumes twice or not at all.",
-      "false": "Every path resumes exactly once, or no continuations are used. A continuation stored in a property that another call could overwrite, or a bridge without a cancellation handler, are separate rules and do not count here: answer yes only if a path in the added code itself calls resume twice or returns without resuming.",
-      "fix": "Make sure every path resumes exactly once; guard repeated callbacks and resume on errors.",
-      "when": ["Continuation"]
+      "false": "Every path resumes exactly once, or no continuations are used.",
+      "fix": "Make sure every path resumes exactly once; guard repeated callbacks and resume on errors."
     },
     {
       "id": "swift-unprotected-shared-state",
-      "question": "Does `added_code` declare mutable state that is shared across threads or tasks \u2014 a `static var`, a global `var`, or a mutable property on a class singleton or cache used from background queues or concurrent tasks \u2014 without an actor, a lock, a serial queue, or `@MainActor` protecting it?",
+      "question": "Does `added_code` declare mutable state that is shared across threads or tasks — a `static var`, a global `var`, or a mutable property on a class singleton or cache used from background queues or concurrent tasks — without an actor, a lock, a serial queue, or `@MainActor` protecting it?",
       "true": "Shared mutable state can be read and written concurrently with no synchronization.",
       "false": "Shared state is inside an actor, guarded by a lock/serial queue/Mutex, main-actor isolated, or immutable (`let`).",
-      "fix": "Put the state in an actor, guard it with a lock, or isolate it to the main actor.",
-      "when": ["\\bvar\\b"]
+      "fix": "Put the state in an actor, guard it with a lock, or isolate it to the main actor."
     },
     {
       "id": "swiftui-foreach-unstable-id",
       "question": "Does `added_code` use SwiftUI `ForEach` with `id: \\.self` over values that may not be unique or that change (model structs, user-editable strings, duplicate values), or over `indices` of a collection that can be modified, instead of a stable identifier?",
       "true": "ForEach identifies rows by value or index for data that can change or repeat.",
       "false": "Rows use an `Identifiable` stable id, or `id: \\.self` is used on a fixed set of unique constants (enum cases, a static range).",
-      "fix": "Make the model Identifiable with a stable id and use it in ForEach.",
-      "when": ["ForEach"]
+      "fix": "Make the model Identifiable with a stable id and use it in ForEach."
     },
     {
       "id": "swift-dispatch-in-async",
       "question": "Does `added_code` call `DispatchQueue.main.async` (or `DispatchQueue.global().async`) from inside an `async` function or a `Task`, mixing Grand Central Dispatch into Swift concurrency code instead of using `await MainActor.run` or `@MainActor`?",
       "true": "Async/await code hops threads with DispatchQueue instead of actors.",
       "false": "Async code uses `MainActor.run`, `@MainActor`, or actors; DispatchQueue appears only in callback-based (non-async) code, or not at all.",
-      "fix": "Use `await MainActor.run { }` or mark the type/function `@MainActor`.",
-      "when": ["DispatchQueue"]
-    },
-    {
-      "id": "swift-continuation-cancellation",
-      "question": "Does `added_code` wrap a callback- or delegate-based operation (an upload, download, request, location or permission call) in `withCheckedContinuation` / `withCheckedThrowingContinuation` without `withTaskCancellationHandler` or any other way to cancel the underlying operation, so cancelling the Swift task leaves that work running and the caller waiting?",
-      "true": "A continuation bridges long-running callback work but cancelling the task does not cancel the work.",
-      "false": "The bridge uses `withTaskCancellationHandler` (or registers a cancel hook) to stop the underlying operation, or the wrapped call is instant and cannot be cancelled, or no continuation is used.",
-      "fix": "Wrap the bridge in withTaskCancellationHandler and cancel the underlying operation in onCancel.",
-      "when": ["Continuation"]
-    },
-    {
-      "id": "swift-continuation-stored-overwrite",
-      "question": "Does `added_code` store a continuation in an instance property (for example `self.continuation = continuation`) where a second concurrent call can overwrite the first stored continuation before it is resumed, leaving the first caller suspended forever?",
-      "true": "A single stored continuation property can be replaced by a concurrent call, stranding the earlier caller.",
-      "false": "Concurrent calls are rejected or queued while one is pending, continuations are kept per request (for example in a dictionary keyed by id), or the continuation is only a local variable.",
-      "fix": "Reject or queue calls while a continuation is pending, or key continuations by request id.",
-      "when": ["Continuation"]
+      "fix": "Use `await MainActor.run { }` or mark the type/function `@MainActor`."
     }
   ]
 }

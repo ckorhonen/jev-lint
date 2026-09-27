@@ -87,6 +87,8 @@ describe("lint helpers", () => {
       latencyMs: 1,
       inputTokens: 1,
       model: "m",
+      asked: 1,
+      gatedOut: 0,
     };
     expect(formatFeedback([{ ...base, findings: [] }])).toBe("");
     const text = formatFeedback([{ ...base, findings: [{ ruleId: "r", probability: 0.6, tier: "medium", fix: "do x" }] }]);
@@ -95,5 +97,22 @@ describe("lint helpers", () => {
     expect(text).toContain("only the code this edit added");
     const whole = formatFeedback([{ ...base, changeKind: "write", findings: [{ ruleId: "r", probability: 0.9, tier: "high", fix: "x" }] }]);
     expect(whole).toContain("whole file");
+  });
+});
+
+describe("rule gate", () => {
+  test("a rule with no matching `when` pattern is skipped; rules without `when` always apply", async () => {
+    const { gateRules } = await import("../src/lint");
+    const set = {
+      language: "typescript",
+      extensions: [".ts"],
+      rules: [
+        { id: "effect", question: "q", true: "t", false: "f", fix: "x", when: ["useEffect"] },
+        { id: "always", question: "q", true: "t", false: "f", fix: "x" },
+        { id: "broken", question: "q", true: "t", false: "f", fix: "x", when: ["(unclosed"] },
+      ],
+    };
+    expect(gateRules(set, "const a = 1;").rules.map((r) => r.id)).toEqual(["always", "broken"]);
+    expect(gateRules(set, "useEffect(() => {}, [])").rules.map((r) => r.id)).toEqual(["effect", "always", "broken"]);
   });
 });

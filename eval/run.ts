@@ -7,11 +7,22 @@
 // that pack's rules, and only those rules are scored.
 
 import { createHash } from "node:crypto";
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { parseArgs } from "node:util";
-import { type Pack, RULE_FILES, ruleSetForLanguage } from "../src/lint";
-import { type Case, type Judgment, judgeJev, judgeLlm, judgeLocal, judgeRegex, LLM_MODEL, LOCAL_NAME, REGEX_RULES } from "./systems";
+import { type Pack, RULE_FILES, ruleApplies, ruleSetForLanguage } from "../src/lint";
+import {
+  type Case,
+  caseCode,
+  type Judgment,
+  judgeJev,
+  judgeLlm,
+  judgeLocal,
+  judgeRegex,
+  LLM_MODEL,
+  LOCAL_NAME,
+  REGEX_RULES,
+} from "./systems";
 
 const ROOT = join(import.meta.dir, "..");
 const RESULTS = join(ROOT, "eval/results");
@@ -43,10 +54,18 @@ function loadCases(): Case[] {
   for (const lang of LANGS) {
     for (const split of SPLITS) {
       for (const pack of PACKS) {
-        const file = join(ROOT, `eval/cases/${lang}.${pack === "hygiene" ? "" : `${pack}.`}${split}.jsonl`);
-        if (!existsSync(file)) continue;
-        for (const line of readFileSync(file, "utf8").split("\n")) {
-          if (line.trim()) cases.push({ ...JSON.parse(line), pack });
+        // <lang>[.<pack>][.<batch>].<split>.jsonl — later batches (e.g. practices.v3) add cases
+        // for rules added after the first labeling round; each case carries its label scope.
+        const prefix = `${lang}.${pack === "hygiene" ? "" : `${pack}.`}`;
+        const files = readdirSync(join(ROOT, "eval/cases")).filter((name) => {
+          if (!name.startsWith(prefix) || !name.endsWith(`.${split}.jsonl`)) return false;
+          const middle = name.slice(prefix.length, -`.${split}.jsonl`.length);
+          return pack === "hygiene" ? middle === "" && !name.includes(".practices.") : middle === "" || /^v\d+$/.test(middle);
+        });
+        for (const name of files) {
+          for (const line of readFileSync(join(ROOT, "eval/cases", name), "utf8").split("\n")) {
+            if (line.trim()) cases.push({ ...JSON.parse(line), pack });
+          }
         }
       }
     }
@@ -110,7 +129,7 @@ function score(cases: Case[], judgments: Map<string, Judgment>, threshold: numbe
   for (const c of cases) {
     const j = judgments.get(c.id);
     if (!j || j.error) continue;
-    const ids = ruleIds(c.lang, c.pack).filter((id) => !ruleFilter || ruleFilter(id));
+    const ids = ruleIds(c.lang, c.pack).filter((id) => (!c.scope || c.scope.includes(id)) && (!ruleFilter || ruleFilter(id)));
     let anyFlag = false;
     for (const id of ids) {
       const predicted = (j.scores[id] ?? 0) >= threshold;
@@ -142,6 +161,7 @@ function bandPrecision(cases: Case[], judgments: Map<string, Judgment>, lo: numb
     const j = judgments.get(c.id);
     if (!j || j.error) continue;
     for (const [id, p] of Object.entries(j.scores)) {
+      if (c.scope && !c.scope.includes(id)) continue;
       if (p >= lo && p < hi) {
         total++;
         if (c.labels.includes(id)) real++;
@@ -182,6 +202,17 @@ async function main() {
     }
   }
 
+  const caseById = new Map(cases.map((c) => [c.id, c]));
+  // How many rules the gate leaves per edit, per pack and language.
+  const gateStats: Record<string, { cases: number; rules: number; asked: number }> = {};
+  for (const c of cases) {
+    const rules = ruleSetForLanguage(c.lang, [c.pack])?.rules ?? [];
+    const code = caseCode(c);
+    const key = `${c.pack}.${c.lang}`;
+    gateStats[key] ??= { cases: 0, rules: rules.length, asked: 0 };
+    gateStats[key].cases++;
+    gateStats[key].asked += rules.filter((r) => ruleApplies(r, code)).length;
+  }
   const caseCounts: Record<string, number> = {};
   for (const c of cases) caseCounts[`${c.pack}.${c.lang}.${c.split}`] = (caseCounts[`${c.pack}.${c.lang}.${c.split}`] ?? 0) + 1;
   const errors: Record<string, number> = {};
@@ -192,6 +223,17 @@ async function main() {
   for (const system of systems) {
     const runsForSystem = judgments[system] as Map<string, Judgment>[];
     errors[system] = [...runsForSystem[0].values()].filter((j) => j.error).length;
+    // Gated view of the same judgments: rules whose `when` patterns miss the case's code are
+    // not asked, i.e. score 0. Local judges already ran gated, so this is a no-op for them.
+    const gated = new Map<string, Judgment>();
+    for (const [id, j] of runsForSystem[0]) {
+      const c = caseById.get(id);
+      if (!c) continue;
+      const code = caseCode(c);
+      const rules = ruleSetForLanguage(c.lang, [c.pack])?.rules ?? [];
+      const applicable = new Set(rules.filter((r) => ruleApplies(r, code)).map((r) => r.id));
+      gated.set(id, { ...j, scores: Object.fromEntries(Object.entries(j.scores).map(([k, v]) => [k, applicable.has(k) ? v : 0])) });
+    }
     for (const pack of PACKS) {
       if (system === "regex" && pack !== "hygiene") continue;
       for (const lang of LANGS) {
@@ -205,8 +247,12 @@ async function main() {
                 ? { high: 0.9, "high+medium": 0.6 }
                 : { high: 1 };
           const regexCovered = ruleIds(lang, "hygiene").filter((id) => REGEX_RULES[id]);
+          if (system === "jev" || system === "llm") {
+            for (const [policy, threshold] of Object.entries(policies)) policies[`gated ${policy}`] = threshold;
+          }
           for (const [policy, threshold] of Object.entries(policies)) {
-            const scored = runsForSystem.map((m) => score(subset, m, threshold));
+            const source = policy.startsWith("gated ") ? [gated] : runsForSystem;
+            const scored = source.map((m) => score(subset, m, threshold));
             results.push({
               system,
               pack,
@@ -272,6 +318,7 @@ async function main() {
     JSON.stringify(
       {
         generatedAt: new Date().toISOString(),
+        gateStats,
         llmModel: LLM_MODEL,
         thresholds: { HIGH, MEDIUM },
         caseCounts,

@@ -11,6 +11,7 @@ export type Case = {
   lang: "typescript" | "swift";
   split: "dev" | "holdout";
   pack: Exclude<Pack, "repo">; // which rule pack the labels cover; judges only ask that pack's rules
+  scope?: string[]; // rule ids the labels were written for; other rules are not scored on this case
   payload: { tool_name: string; tool_input: Record<string, unknown> };
   labels: string[];
   notes?: string;
@@ -37,14 +38,23 @@ function mergeMax(target: Record<string, number>, source: Record<string, number>
 // A local model server speaking the same /v1/systemone protocol (Kev, Laya, ...).
 // LOCAL_BASE_URL picks the server; LOCAL_NAME names the cache variant.
 export const LOCAL_NAME = process.env.LOCAL_NAME ?? "local";
-export const judgeLocal = (c: Case) => judgeJev(c, process.env.LOCAL_BASE_URL ?? "http://127.0.0.1:8009");
+// Local judges run gated by default (the realistic config for latency); LOCAL_GATE=off asks every rule.
+export const judgeLocal = (c: Case) => judgeJev(c, process.env.LOCAL_BASE_URL ?? "http://127.0.0.1:8009", process.env.LOCAL_GATE !== "off");
 
-export async function judgeJev(c: Case, baseUrl?: string): Promise<Judgment> {
+// Jev and the LLM baseline ask every rule (gate off) so gated metrics can be computed from the
+// same judgments by masking; see caseCode / gated policies in run.ts.
+export function caseCode(c: Case): string {
+  return changesFor(c)
+    .map((ch) => ch.addedCode)
+    .join("\n");
+}
+
+export async function judgeJev(c: Case, baseUrl?: string, gate = false): Promise<Judgment> {
   const scores: Record<string, number> = {};
   let latencyMs = 0;
   let inputTokens = 0;
   const results = await Promise.all(
-    changesFor(c).map((ch) => lintChange(ch, { timeoutMs: 120_000, retries: 4, packs: [c.pack], baseUrl })),
+    changesFor(c).map((ch) => lintChange(ch, { timeoutMs: 120_000, retries: 4, packs: [c.pack], baseUrl, gate })),
   );
   for (const r of results) {
     if (!r) continue;

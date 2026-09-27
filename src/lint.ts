@@ -7,7 +7,9 @@ import type { ChangedFile } from "./extract";
 import { askNouls, type NoulQuestion } from "./jev";
 import { findRepoConfig } from "./repoRules";
 
-export type Rule = { id: string; question: string; true: string; false: string; fix: string };
+// `when`: optional regex sources (case-insensitive). The rule is only asked when one of
+// them matches the added code — a cheap, recall-safe gate that cuts model calls.
+export type Rule = { id: string; question: string; true: string; false: string; fix: string; when?: string[] };
 export type RuleSet = { language: string; extensions: string[]; rules: Rule[] };
 export type Tier = "high" | "medium";
 export type Finding = { ruleId: string; probability: number; tier: Tier; fix: string };
@@ -61,6 +63,28 @@ export function ruleSetFor(filePath: string, packs?: Pack[], cwd = process.cwd()
   return merged?.rules.length ? merged : undefined;
 }
 
+const gateCache = new Map<string, RegExp[]>();
+
+export function ruleApplies(rule: Rule, code: string): boolean {
+  if (!rule.when?.length) return true;
+  let patterns = gateCache.get(rule.id);
+  if (!patterns) {
+    patterns = rule.when.flatMap((source) => {
+      try {
+        return [new RegExp(source, "im")];
+      } catch {
+        return []; // a broken pattern must not hide the rule; see below
+      }
+    });
+    gateCache.set(rule.id, patterns);
+  }
+  return patterns.length === 0 || patterns.some((re) => re.test(code));
+}
+
+export function gateRules(ruleSet: RuleSet, code: string): RuleSet {
+  return { ...ruleSet, rules: ruleSet.rules.filter((r) => ruleApplies(r, code)) };
+}
+
 export function buildQuestions(ruleSet: RuleSet): Record<string, NoulQuestion> {
   return Object.fromEntries(
     ruleSet.rules.map((rule) => [rule.id, { type: "noul", instructions: rule.question, criteria: { true: rule.true, false: rule.false } }]),
@@ -82,24 +106,38 @@ export type LintResult = {
   latencyMs: number;
   inputTokens: number;
   model: string;
+  asked: number; // rules sent to the model after gating
+  gatedOut: number; // rules skipped by their `when` patterns
 };
 
 export async function lintChange(
   change: ChangedFile,
-  opts: { timeoutMs?: number; retries?: number; thresholds?: typeof THRESHOLDS; packs?: Pack[]; cwd?: string; baseUrl?: string } = {},
+  opts: {
+    timeoutMs?: number;
+    retries?: number;
+    thresholds?: typeof THRESHOLDS;
+    packs?: Pack[];
+    cwd?: string;
+    baseUrl?: string;
+    gate?: boolean;
+  } = {},
 ): Promise<LintResult | undefined> {
   const ruleSet = ruleSetFor(change.filePath, opts.packs, opts.cwd);
   if (!ruleSet || !change.addedCode.trim() || change.addedCode.length > MAX_ADDED_CHARS) return undefined;
 
+  const gate = opts.gate ?? process.env.JEV_LINT_GATE !== "off";
+  const asked = gate ? gateRules(ruleSet, change.addedCode) : ruleSet;
   const state = { language: ruleSet.language, file_path: change.filePath, added_code: change.addedCode };
   const started = performance.now();
-  const response = await askNouls(state, buildQuestions(ruleSet), opts);
+  const response = asked.rules.length
+    ? await askNouls(state, buildQuestions(asked), opts)
+    : { answers: {}, usage: { input_tokens: 0, output_tokens: 0 }, model: "gated" };
   const latencyMs = performance.now() - started;
 
   const probabilities: Record<string, number> = {};
   const findings: Finding[] = [];
   for (const rule of ruleSet.rules) {
-    const probability = response.answers[rule.id]?.noul ?? 0;
+    const probability = (response.answers as Record<string, { noul: number }>)[rule.id]?.noul ?? 0;
     probabilities[rule.id] = probability;
     const tier = tierFor(probability, opts.thresholds);
     if (tier) findings.push({ ruleId: rule.id, probability, tier, fix: rule.fix });
@@ -115,6 +153,8 @@ export async function lintChange(
     latencyMs,
     inputTokens: response.usage.input_tokens,
     model: response.model,
+    asked: asked.rules.length,
+    gatedOut: ruleSet.rules.length - asked.rules.length,
   };
 }
 

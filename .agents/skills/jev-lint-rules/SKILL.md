@@ -63,6 +63,7 @@ Writing rules that work:
 - **Put the exceptions in `false`:** the look-alikes that are fine, and "or the code does not do X at all".
 - **Make the `true` and `false` criteria say the same thing as the question.** Never phrase them as opposites of it.
 - **Prefix ids with `repo-`** so they never collide with built-in rules.
+- **Add a broad `when` gate:** a list of case-insensitive regexes, such as the APIs or keywords that must appear for the rule to possibly apply (`["useEffect"]`, `["db\\.|prisma|knex"]`). The rule is only asked when one matches, which saves most model calls. The gate must never cost recall: when unsure, widen it or leave it out.
 - **Write `fix` as one imperative sentence** that cites the guideline source; the agent sees it.
 - **Optionally add `.jev-lint/config.json`,** e.g. `{ "packs": ["repo", "practices"] }`. By default the hook uses hygiene + practices + repo.
 
