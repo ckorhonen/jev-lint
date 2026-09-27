@@ -108,7 +108,13 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12.5px}
   <div class="eyebrow">Contents</div>
   <ol id="toc-list">
     <li><a href="#answer">Current answer</a></li>
-    <li><a href="#e5">Entry 5 · Gate, async, Codex <span class="tag new">latest</span></a>
+    <li><a href="#e6">Entry 6 · JevLike, and is it worth it? <span class="tag new">latest</span></a>
+      <ol>
+        <li><a href="#e6-jevlike">JevLike</a></li>
+        <li><a href="#e6-worth">Worth it vs review?</a></li>
+      </ol>
+    </li>
+    <li><a href="#e5">Entry 5 · Gate, async, Codex</a>
       <ol>
         <li><a href="#e5-gate">Rule gate</a></li>
         <li><a href="#e5-rules">New rules</a></li>
@@ -163,7 +169,7 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12.5px}
   <section id="answer">
     <h2>Current answer</h2>
     <div class="verdict">
-      <p class="eyebrow">Recommendation as of Entry 5</p>
+      <p class="eyebrow">Recommendation as of Entry 6</p>
       <p><b>Adopt it with both rule packs, as a non-blocking hint.</b> On best-practice rules like "don't mirror a prop into state with an effect", Jev is accurate once each rule is worded narrowly. In real agent runs it cut graded rule violations by about a third. On React tasks, it cut the review comments our rules cover from 1.42 to 0.25 per task. SwiftUI tasks had too few of those comments to show an effect. It does not replace an AI code reviewer. About three quarters of what the reviewer raised was logic and design problems that no snippet-level rule can see.</p>
     </div>
     <div class="facts">
@@ -188,8 +194,59 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12.5px}
     {{CHART_LATENCY}}
   </section>
 
+  <section class="entry" id="e6">
+    <h2>Entry 6 · JevLike, and is the hook worth its cost? <span class="date">26 Sep 2026</span> <span class="tag new">latest</span></h2>
+
+    <h3 id="e6-jevlike">JevLike</h3>
+    <p><b>Question.</b> Is <a href="https://github.com/vinnylarouge/jevlike">JevLike</a> better trained than Kev or Laya for this?</p>
+    <p><b>What it is.</b> It's a training kit rather than a pretrained judge. It provides an option-attention scoring head, which you train on your own labeled data over either a byte encoder learned from scratch or a frozen Hugging Face encoder. Its only released checkpoints are for Doom, chess and synthetic menus, so there's nothing to run zero-shot on code rules.</p>
+    <p><b>So we trained it on our own labels.</b> The training data was the tuning split, 5,536 rule judgments with only 342 violations (about 10 per rule); held-out edits were used only for scoring. The labels are the subagent-written ones, not Jev outputs. Each row was "Rule + exceptions + code → no/yes". We trained two variants, using its recommended settings:</p>
+    <ul>
+      <li>a byte encoder from scratch with 4 KB of context;</li>
+      <li>a frozen Qwen2.5-0.5B with a rank-256 head, 768 tokens of context and 4 epochs on the Mac GPU.</li>
+    </ul>
+    {{JEVLIKE_TABLE}}
+    <ul>
+      <li><b>Neither learned the task.</b> Both validation losses (0.283 and 0.279) sit at the "always guess the base rate" level (0.288). Neither ever reaches p ≥ 0.5, and even the best possible threshold gives 10–47% F1 while flagging most clean edits.</li>
+      <li><b>It's fast:</b> {{JEVLIKE_MS}} ms per rule for the Qwen variant. Speed was never the problem; the training data is. A frozen encoder plus a small head needs far more than about 10 examples per rule to learn a judgment like "this effect only derives state".</li>
+      <li><b>For fine-tuning,</b> start from a model already trained to judge text (Kev, whose decision head is pretrained) rather than from a bare encoder, and grow the labeled set. That's the Entry 5 plan, unchanged.</li>
+    </ul>
+
+    <h3 id="e6-worth">Is the hook worth its cost if a reviewer would catch it anyway?</h3>
+    <p><b>Setup.</b> We took the Entry 5 Claude Code runs and gave each one the AI reviewer's comments (Luna, blind), exactly as a review would send them. The same agent (Sonnet) then did one fix round. Four pipelines:</p>
+    <ul>
+      <li>no hook;</li>
+      <li>sync Jev hook;</li>
+      <li>async Jev hook;</li>
+      <li>async Jev hook left on during the fix round too ("always on").</li>
+    </ul>
+    <p>The graded rule violations are measured on the final code.</p>
+    {{CHART_PIPE_COST}}
+    {{CHART_PIPE_VIOL}}
+    {{PIPE_TABLE}}
+    <ul>
+      <li><b>The hook never saved a fix round.</b> All 24 no-hook tasks got review comments (3.6 per task), and only 2 of 24 got nothing but rule-covered comments. A fix round costs about $0.17–0.19 and 70 s whichever pipeline came before it. So the hook's roughly $0.05 is not paid back in cheaper remediation.</li>
+      <li><b>The review loop narrows the gap, but doesn't close it.</b>
+        <ul>
+          <li>Before review, the hook halves violations (2.38 → 1.21 async).</li>
+          <li>Review plus fix takes the no-hook code down to 1.67; always-on ends at 1.08.</li>
+          <li>With 24 pairs, that difference isn't yet significant (95% CI crosses zero).</li>
+          <li>The reviewer only ever flagged about 40% of rule violations, so the rest survive review.</li>
+        </ul>
+      </li>
+      <li><b>Fix rounds create new violations.</b> Without the hook, the fix round raised the violation count in 7–8 of 24 tasks in the hook arms, from new code nobody checked. With the hook left on, it caught 14 issues in 12 of the 24 fix rounds.</li>
+    </ul>
+    <p><b>When the cost is justified:</b></p>
+    <ul>
+      <li><b>Human review.</b> Before review, the hook halves the rule-covered comments a reviewer would otherwise write (sync: 0.96 → 0.50 per task). At about $0.04 per task, it's cheap against even one minute of a reviewer's time.</li>
+      <li><b>No AI review on every change,</b> for example local iteration, long agent sessions and small commits. There the hook is the only check, and it cut violations by about half with significance (Entry 5).</li>
+      <li><b>Review latency.</b> A real review cycle (CI, queue, reviewer) takes minutes to hours. The async hook's cost is about 10 s of agent time, and the agent doesn't wait for it.</li>
+    </ul>
+    <p><b>When it's marginal:</b> when an AI reviewer and a fix round already run on every task. Then it only buys the residual quality, roughly 35% fewer rule violations (not yet significant), for about +17% agent cost. A cheaper design for that setup: run the Jev check once at review time, in about 0.3 s per file and with no extra agent turns, and add its findings to the reviewer's comments. The single fix round then covers both. That's untested.</p>
+  </section>
+
   <section class="entry" id="e5">
-    <h2>Entry 5 · Rule gate, async hooks, new rules, Codex <span class="date">26 Sep 2026</span> <span class="tag new">latest</span></h2>
+    <h2>Entry 5 · Rule gate, async hooks, new rules, Codex <span class="date">26 Sep 2026</span></h2>
     <p><b>Question.</b> Entry 4 found that the local model's time grows with the number of rules asked, and that hooks block the agent while they run. Four questions follow. Can a cheap pattern gate skip rules that can't apply without losing catches? Does running the check in the background (Claude Code's <code>asyncRewake</code>) still change the agent's code? Does the hook work in Codex? Do the new rules for the reviewer's misses hold up?</p>
     <p><b>Changes in this entry:</b></p>
     <ul>
@@ -449,6 +506,7 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12.5px}
     <h2>Recommendation</h2>
     <ol>
       <li><b>Install the hook with both packs</b> in Claude Code (and Codex once its CLI is fixed on this machine). Run it as a non-blocking hint with thresholds 0.8 / 0.5, and pin <code>JEV_LINT_MODEL=jev-1.13.0</code>.</li>
+      <li><b>Match the setup to your review process.</b> With human review or no per-change AI review, run the hook, async and always on. If an AI reviewer plus a fix round already run on every task, the hook is marginal (Entry 6). Consider a review-time Jev check instead, which is cheaper and untested.</li>
       <li><b>Keep the gate on</b> (the default). It skips about two thirds of rule checks per edit at no measured recall cost.</li>
       <li><b>In Claude Code, run it async:</b> <code>asyncRewake: true</code> with <code>JEV_LINT_MODE=rewake</code>. It's as effective as synchronous and saves about 6 s per task, though a larger run should confirm it before relying on it. In Codex, keep it synchronous, since Codex has no rewake.</li>
       <li><b>Let each repo learn from the hook.</b> The findings log records what fired and whether the agent fixed or kept it. Run the <code>jev-lint-learn</code> skill weekly on active repos: it turns recurring fixes into AGENTS.md guidance, and repeatedly ignored flags into rule rewrites. In its first real use, it narrowed this repo's own stdout rule after a false positive.</li>
@@ -464,7 +522,8 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12.5px}
     <ul>
       <li><b>Fine-tune Kev-4B, then Kev-0.8B,</b> on our tuning-split labels, following the Entry 5 plan. Never use Jev outputs: TypeSafe's terms forbid it.</li>
       <li><b>A second wording pass</b> on <code>swift-continuation-misuse</code> and <code>react-effect-fetch-race</code>, the two rules the new ones crowd.</li>
-      <li><b>A bigger async run</b> to settle whether async feedback reduces review comments as much as sync.</li>
+      <li><b>A bigger async run</b> to settle whether async feedback reduces review comments as much as sync, and whether always-on beats review-and-fix significantly.</li>
+      <li><b>Review-time check:</b> run Jev once per changed file at review time and merge its findings into the reviewer's comments. Compare that with the always-on hook on cost and final violations.</li>
       <li><b>Neural Engine, only with a model built for it.</b> A shared-state encoder in Apple's Neural Engine layout, if a fine-tuned small model turns out accurate enough.</li>
       <li><b>More coverage of the reviewer's categories.</b> Try rules for the misses (debounce and poll races, continuation cancellation), and check whether they stay precise.</li>
       <li><b>Bigger end-to-end runs.</b> More repeats, a weaker and a stronger agent model, and real repositories instead of scaffolds.</li>
@@ -500,6 +559,7 @@ python3 report/build.py path/to/DepartureMono-Regular.woff2 # rebuild this page<
   <section id="log">
     <h2>Changelog</h2>
     <ul>
+      <li><b>26 Sep 2026, Entry 6.</b> JevLike trained on our tuning labels (two variants), and a review-and-fix round for 96 Entry 5 runs (72 unhooked, 24 with the hook on) to price the hook against remediation.</li>
       <li><b>26 Sep 2026, Entry 5.</b>
         <ul>
           <li>Rule gate (<code>when</code> patterns), and the async <code>rewake</code> hook mode.</li>

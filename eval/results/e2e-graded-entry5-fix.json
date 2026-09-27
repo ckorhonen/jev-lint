@@ -1,0 +1,5366 @@
+[
+  {
+    "task": "react-metrics-poller",
+    "lang": "typescript",
+    "condition": "jev+fix",
+    "rep": 1,
+    "reviewFindings": 2,
+    "ruleCoveredFindings": 0,
+    "fix": {
+      "wallMs": 15947,
+      "costUsd": 0.0926228,
+      "durationMs": 15023,
+      "turns": 5
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 3,
+      "rewakes": 0,
+      "costUsd": 0.0926228,
+      "durationMs": 15023,
+      "numTurns": 10,
+      "isError": false
+    },
+    "hook": {
+      "calls": 3,
+      "findingsShown": 4,
+      "highShown": 2,
+      "mediumShown": 2,
+      "errors": 0,
+      "meanLatencyMs": 346.110486,
+      "editsAfterFeedback": 2
+    },
+    "original": {
+      "costUsd": 0.21109440000000002,
+      "durationMs": 76900
+    },
+    "lines": 169,
+    "violations": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-empty-catch": 0,
+      "ts-no-debug-console": 0,
+      "ts-no-restating-comment": 0,
+      "ts-no-vague-names": 0,
+      "ts-no-magic-numbers": 0,
+      "ts-no-commented-out-code": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0,
+      "ts-no-ts-ignore": 0,
+      "react-derived-state-effect": 0,
+      "react-effect-missing-cleanup": 0,
+      "react-effect-fetch-race": 0,
+      "react-effect-for-event": 0,
+      "react-state-mutation": 0,
+      "react-index-key": 0,
+      "react-props-mirrored-in-state": 0,
+      "ts-unvalidated-external-data": 0,
+      "ts-sequential-await-loop": 0,
+      "ts-boolean-trap": 0,
+      "react-async-overlap": 0
+    },
+    "totalViolations": 0,
+    "regexHits": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-debug-console": 0,
+      "ts-no-empty-catch": 0,
+      "ts-no-ts-ignore": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "react-user-search",
+    "lang": "typescript",
+    "condition": "jev+fix",
+    "rep": 1,
+    "reviewFindings": 3,
+    "ruleCoveredFindings": 1,
+    "fix": {
+      "wallMs": 44493,
+      "costUsd": 0.12997260000000002,
+      "durationMs": 43528,
+      "turns": 5
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 3,
+      "rewakes": 0,
+      "costUsd": 0.12997260000000002,
+      "durationMs": 43528,
+      "numTurns": 6,
+      "isError": false
+    },
+    "hook": {
+      "calls": 3,
+      "findingsShown": 2,
+      "highShown": 1,
+      "mediumShown": 1,
+      "errors": 0,
+      "meanLatencyMs": 301.1456666666666,
+      "editsAfterFeedback": 2
+    },
+    "original": {
+      "costUsd": 0.11575200000000002,
+      "durationMs": 30529
+    },
+    "lines": 132,
+    "violations": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-empty-catch": 0,
+      "ts-no-debug-console": 0,
+      "ts-no-restating-comment": 0,
+      "ts-no-vague-names": 1,
+      "ts-no-magic-numbers": 0,
+      "ts-no-commented-out-code": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0,
+      "ts-no-ts-ignore": 0,
+      "react-derived-state-effect": 0,
+      "react-effect-missing-cleanup": 0,
+      "react-effect-fetch-race": 0,
+      "react-effect-for-event": 0,
+      "react-state-mutation": 0,
+      "react-index-key": 0,
+      "react-props-mirrored-in-state": 0,
+      "ts-unvalidated-external-data": 0,
+      "ts-sequential-await-loop": 0,
+      "ts-boolean-trap": 0,
+      "react-async-overlap": 0
+    },
+    "totalViolations": 1,
+    "regexHits": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-debug-console": 0,
+      "ts-no-empty-catch": 0,
+      "ts-no-ts-ignore": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "react-signup-form",
+    "lang": "typescript",
+    "condition": "none+fix",
+    "rep": 1,
+    "reviewFindings": 5,
+    "ruleCoveredFindings": 2,
+    "fix": {
+      "wallMs": 125893,
+      "costUsd": 0.23573340000000004,
+      "durationMs": 124980,
+      "turns": 13
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 1,
+      "rewakes": 0,
+      "costUsd": 0.23573340000000004,
+      "durationMs": 124980,
+      "numTurns": 5,
+      "isError": false
+    },
+    "hook": {
+      "calls": 0,
+      "findingsShown": 0,
+      "highShown": 0,
+      "mediumShown": 0,
+      "errors": 0,
+      "meanLatencyMs": 0,
+      "editsAfterFeedback": 0
+    },
+    "original": {
+      "costUsd": 0.1132502,
+      "durationMs": 34397
+    },
+    "lines": 253,
+    "violations": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-empty-catch": 0,
+      "ts-no-debug-console": 0,
+      "ts-no-restating-comment": 0,
+      "ts-no-vague-names": 2,
+      "ts-no-magic-numbers": 1,
+      "ts-no-commented-out-code": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0,
+      "ts-no-ts-ignore": 0,
+      "react-derived-state-effect": 0,
+      "react-effect-missing-cleanup": 0,
+      "react-effect-fetch-race": 0,
+      "react-effect-for-event": 0,
+      "react-state-mutation": 0,
+      "react-index-key": 0,
+      "react-props-mirrored-in-state": 0,
+      "ts-unvalidated-external-data": 1,
+      "ts-sequential-await-loop": 0,
+      "ts-boolean-trap": 0,
+      "react-async-overlap": 0
+    },
+    "totalViolations": 4,
+    "regexHits": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 1,
+      "ts-no-debug-console": 0,
+      "ts-no-empty-catch": 0,
+      "ts-no-ts-ignore": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "react-user-search",
+    "lang": "typescript",
+    "condition": "jev-rewake+fix",
+    "rep": 1,
+    "reviewFindings": 2,
+    "ruleCoveredFindings": 1,
+    "fix": {
+      "wallMs": 45301,
+      "costUsd": 0.1474332,
+      "durationMs": 44440,
+      "turns": 7
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 3,
+      "rewakes": 0,
+      "costUsd": 0.1474332,
+      "durationMs": 44440,
+      "numTurns": 6,
+      "isError": false
+    },
+    "hook": {
+      "calls": 3,
+      "findingsShown": 3,
+      "highShown": 1,
+      "mediumShown": 2,
+      "errors": 0,
+      "meanLatencyMs": 258.83120833333334,
+      "editsAfterFeedback": 2
+    },
+    "original": {
+      "costUsd": 0.12375599999999999,
+      "durationMs": 34355
+    },
+    "lines": 137,
+    "violations": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-empty-catch": 0,
+      "ts-no-debug-console": 0,
+      "ts-no-restating-comment": 0,
+      "ts-no-vague-names": 0,
+      "ts-no-magic-numbers": 0,
+      "ts-no-commented-out-code": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0,
+      "ts-no-ts-ignore": 0,
+      "react-derived-state-effect": 0,
+      "react-effect-missing-cleanup": 0,
+      "react-effect-fetch-race": 0,
+      "react-effect-for-event": 0,
+      "react-state-mutation": 0,
+      "react-index-key": 0,
+      "react-props-mirrored-in-state": 0,
+      "ts-unvalidated-external-data": 0,
+      "ts-sequential-await-loop": 0,
+      "ts-boolean-trap": 0,
+      "react-async-overlap": 0
+    },
+    "totalViolations": 0,
+    "regexHits": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-debug-console": 0,
+      "ts-no-empty-catch": 0,
+      "ts-no-ts-ignore": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "react-metrics-poller",
+    "lang": "typescript",
+    "condition": "none+fix",
+    "rep": 1,
+    "reviewFindings": 2,
+    "ruleCoveredFindings": 2,
+    "fix": {
+      "wallMs": 59829,
+      "costUsd": 0.17923760000000002,
+      "durationMs": 58867,
+      "turns": 10
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 1,
+      "rewakes": 0,
+      "costUsd": 0.17923760000000002,
+      "durationMs": 58867,
+      "numTurns": 5,
+      "isError": false
+    },
+    "hook": {
+      "calls": 0,
+      "findingsShown": 0,
+      "highShown": 0,
+      "mediumShown": 0,
+      "errors": 0,
+      "meanLatencyMs": 0,
+      "editsAfterFeedback": 0
+    },
+    "original": {
+      "costUsd": 0.1014656,
+      "durationMs": 23964
+    },
+    "lines": 145,
+    "violations": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-empty-catch": 0,
+      "ts-no-debug-console": 0,
+      "ts-no-restating-comment": 0,
+      "ts-no-vague-names": 3,
+      "ts-no-magic-numbers": 0,
+      "ts-no-commented-out-code": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0,
+      "ts-no-ts-ignore": 0,
+      "react-derived-state-effect": 0,
+      "react-effect-missing-cleanup": 0,
+      "react-effect-fetch-race": 0,
+      "react-effect-for-event": 0,
+      "react-state-mutation": 0,
+      "react-index-key": 0,
+      "react-props-mirrored-in-state": 0,
+      "ts-unvalidated-external-data": 0,
+      "ts-sequential-await-loop": 0,
+      "ts-boolean-trap": 0,
+      "react-async-overlap": 0
+    },
+    "totalViolations": 3,
+    "regexHits": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-debug-console": 0,
+      "ts-no-empty-catch": 0,
+      "ts-no-ts-ignore": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "react-user-search",
+    "lang": "typescript",
+    "condition": "none+fix",
+    "rep": 1,
+    "reviewFindings": 3,
+    "ruleCoveredFindings": 2,
+    "fix": {
+      "wallMs": 93535,
+      "costUsd": 0.22019020000000003,
+      "durationMs": 92614,
+      "turns": 11
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 1,
+      "rewakes": 0,
+      "costUsd": 0.22019020000000003,
+      "durationMs": 92614,
+      "numTurns": 8,
+      "isError": false
+    },
+    "hook": {
+      "calls": 0,
+      "findingsShown": 0,
+      "highShown": 0,
+      "mediumShown": 0,
+      "errors": 0,
+      "meanLatencyMs": 0,
+      "editsAfterFeedback": 0
+    },
+    "original": {
+      "costUsd": 0.1076272,
+      "durationMs": 24925
+    },
+    "lines": 135,
+    "violations": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-empty-catch": 0,
+      "ts-no-debug-console": 0,
+      "ts-no-restating-comment": 0,
+      "ts-no-vague-names": 5,
+      "ts-no-magic-numbers": 0,
+      "ts-no-commented-out-code": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0,
+      "ts-no-ts-ignore": 0,
+      "react-derived-state-effect": 0,
+      "react-effect-missing-cleanup": 0,
+      "react-effect-fetch-race": 0,
+      "react-effect-for-event": 0,
+      "react-state-mutation": 0,
+      "react-index-key": 0,
+      "react-props-mirrored-in-state": 0,
+      "ts-unvalidated-external-data": 0,
+      "ts-sequential-await-loop": 0,
+      "ts-boolean-trap": 0,
+      "react-async-overlap": 0
+    },
+    "totalViolations": 5,
+    "regexHits": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-debug-console": 0,
+      "ts-no-empty-catch": 0,
+      "ts-no-ts-ignore": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "react-chat-room",
+    "lang": "typescript",
+    "condition": "jev+fix",
+    "rep": 1,
+    "reviewFindings": 2,
+    "ruleCoveredFindings": 0,
+    "fix": {
+      "wallMs": 40735,
+      "costUsd": 0.1303316,
+      "durationMs": 39929,
+      "turns": 5
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 2,
+      "rewakes": 0,
+      "costUsd": 0.1303316,
+      "durationMs": 39929,
+      "numTurns": 6,
+      "isError": false
+    },
+    "hook": {
+      "calls": 2,
+      "findingsShown": 1,
+      "highShown": 1,
+      "mediumShown": 0,
+      "errors": 0,
+      "meanLatencyMs": 309.1415415,
+      "editsAfterFeedback": 1
+    },
+    "original": {
+      "costUsd": 0.1147522,
+      "durationMs": 29707
+    },
+    "lines": 146,
+    "violations": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-empty-catch": 0,
+      "ts-no-debug-console": 0,
+      "ts-no-restating-comment": 0,
+      "ts-no-vague-names": 1,
+      "ts-no-magic-numbers": 0,
+      "ts-no-commented-out-code": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0,
+      "ts-no-ts-ignore": 0,
+      "react-derived-state-effect": 0,
+      "react-effect-missing-cleanup": 0,
+      "react-effect-fetch-race": 0,
+      "react-effect-for-event": 0,
+      "react-state-mutation": 0,
+      "react-index-key": 0,
+      "react-props-mirrored-in-state": 0,
+      "ts-unvalidated-external-data": 0,
+      "ts-sequential-await-loop": 0,
+      "ts-boolean-trap": 0,
+      "react-async-overlap": 0
+    },
+    "totalViolations": 1,
+    "regexHits": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-debug-console": 0,
+      "ts-no-empty-catch": 0,
+      "ts-no-ts-ignore": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "react-metrics-poller",
+    "lang": "typescript",
+    "condition": "jev-rewake+fix",
+    "rep": 1,
+    "reviewFindings": 3,
+    "ruleCoveredFindings": 1,
+    "fix": {
+      "wallMs": 54670,
+      "costUsd": 0.16703199999999999,
+      "durationMs": 53892,
+      "turns": 8
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 5,
+      "rewakes": 0,
+      "costUsd": 0.16703199999999999,
+      "durationMs": 53892,
+      "numTurns": 10,
+      "isError": false
+    },
+    "hook": {
+      "calls": 5,
+      "findingsShown": 4,
+      "highShown": 2,
+      "mediumShown": 2,
+      "errors": 0,
+      "meanLatencyMs": 335.9798164,
+      "editsAfterFeedback": 4
+    },
+    "original": {
+      "costUsd": 0.275105,
+      "durationMs": 101610
+    },
+    "lines": 240,
+    "violations": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-empty-catch": 0,
+      "ts-no-debug-console": 0,
+      "ts-no-restating-comment": 0,
+      "ts-no-vague-names": 0,
+      "ts-no-magic-numbers": 0,
+      "ts-no-commented-out-code": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0,
+      "ts-no-ts-ignore": 0,
+      "react-derived-state-effect": 0,
+      "react-effect-missing-cleanup": 0,
+      "react-effect-fetch-race": 0,
+      "react-effect-for-event": 0,
+      "react-state-mutation": 0,
+      "react-index-key": 0,
+      "react-props-mirrored-in-state": 0,
+      "ts-unvalidated-external-data": 0,
+      "ts-sequential-await-loop": 0,
+      "ts-boolean-trap": 0,
+      "react-async-overlap": 0
+    },
+    "totalViolations": 0,
+    "regexHits": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-debug-console": 0,
+      "ts-no-empty-catch": 0,
+      "ts-no-ts-ignore": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "react-chat-room",
+    "lang": "typescript",
+    "condition": "jev-rewake+fix",
+    "rep": 1,
+    "reviewFindings": 4,
+    "ruleCoveredFindings": 0,
+    "fix": {
+      "wallMs": 49717,
+      "costUsd": 0.1547592,
+      "durationMs": 48946,
+      "turns": 9
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 2,
+      "rewakes": 0,
+      "costUsd": 0.1547592,
+      "durationMs": 48946,
+      "numTurns": 8,
+      "isError": false
+    },
+    "hook": {
+      "calls": 2,
+      "findingsShown": 1,
+      "highShown": 1,
+      "mediumShown": 0,
+      "errors": 0,
+      "meanLatencyMs": 377.917708,
+      "editsAfterFeedback": 1
+    },
+    "original": {
+      "costUsd": 0.13827820000000002,
+      "durationMs": 45343
+    },
+    "lines": 159,
+    "violations": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-empty-catch": 0,
+      "ts-no-debug-console": 0,
+      "ts-no-restating-comment": 0,
+      "ts-no-vague-names": 0,
+      "ts-no-magic-numbers": 0,
+      "ts-no-commented-out-code": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0,
+      "ts-no-ts-ignore": 0,
+      "react-derived-state-effect": 0,
+      "react-effect-missing-cleanup": 0,
+      "react-effect-fetch-race": 0,
+      "react-effect-for-event": 0,
+      "react-state-mutation": 0,
+      "react-index-key": 0,
+      "react-props-mirrored-in-state": 0,
+      "ts-unvalidated-external-data": 0,
+      "ts-sequential-await-loop": 0,
+      "ts-boolean-trap": 0,
+      "react-async-overlap": 0
+    },
+    "totalViolations": 0,
+    "regexHits": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-debug-console": 0,
+      "ts-no-empty-catch": 0,
+      "ts-no-ts-ignore": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "react-signup-form",
+    "lang": "typescript",
+    "condition": "jev-rewake+fix",
+    "rep": 1,
+    "reviewFindings": 4,
+    "ruleCoveredFindings": 2,
+    "fix": {
+      "wallMs": 77461,
+      "costUsd": 0.26724120000000007,
+      "durationMs": 76621,
+      "turns": 12
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 3,
+      "rewakes": 0,
+      "costUsd": 0.26724120000000007,
+      "durationMs": 76621,
+      "numTurns": 7,
+      "isError": false
+    },
+    "hook": {
+      "calls": 3,
+      "findingsShown": 2,
+      "highShown": 0,
+      "mediumShown": 2,
+      "errors": 0,
+      "meanLatencyMs": 316.9782083333333,
+      "editsAfterFeedback": 2
+    },
+    "original": {
+      "costUsd": 0.153124,
+      "durationMs": 44697
+    },
+    "lines": 276,
+    "violations": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-empty-catch": 0,
+      "ts-no-debug-console": 0,
+      "ts-no-restating-comment": 0,
+      "ts-no-vague-names": 0,
+      "ts-no-magic-numbers": 0,
+      "ts-no-commented-out-code": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0,
+      "ts-no-ts-ignore": 0,
+      "react-derived-state-effect": 0,
+      "react-effect-missing-cleanup": 0,
+      "react-effect-fetch-race": 0,
+      "react-effect-for-event": 0,
+      "react-state-mutation": 0,
+      "react-index-key": 0,
+      "react-props-mirrored-in-state": 0,
+      "ts-unvalidated-external-data": 0,
+      "ts-sequential-await-loop": 0,
+      "ts-boolean-trap": 0,
+      "react-async-overlap": 0
+    },
+    "totalViolations": 0,
+    "regexHits": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 1,
+      "ts-no-debug-console": 0,
+      "ts-no-empty-catch": 0,
+      "ts-no-ts-ignore": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "react-chat-room",
+    "lang": "typescript",
+    "condition": "none+fix",
+    "rep": 1,
+    "reviewFindings": 5,
+    "ruleCoveredFindings": 0,
+    "fix": {
+      "wallMs": 55002,
+      "costUsd": 0.18688500000000002,
+      "durationMs": 54106,
+      "turns": 10
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 1,
+      "rewakes": 0,
+      "costUsd": 0.18688500000000002,
+      "durationMs": 54106,
+      "numTurns": 6,
+      "isError": false
+    },
+    "hook": {
+      "calls": 0,
+      "findingsShown": 0,
+      "highShown": 0,
+      "mediumShown": 0,
+      "errors": 0,
+      "meanLatencyMs": 0,
+      "editsAfterFeedback": 0
+    },
+    "original": {
+      "costUsd": 0.11229679999999999,
+      "durationMs": 32369
+    },
+    "lines": 154,
+    "violations": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-empty-catch": 1,
+      "ts-no-debug-console": 0,
+      "ts-no-restating-comment": 0,
+      "ts-no-vague-names": 0,
+      "ts-no-magic-numbers": 0,
+      "ts-no-commented-out-code": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0,
+      "ts-no-ts-ignore": 0,
+      "react-derived-state-effect": 0,
+      "react-effect-missing-cleanup": 0,
+      "react-effect-fetch-race": 0,
+      "react-effect-for-event": 0,
+      "react-state-mutation": 0,
+      "react-index-key": 0,
+      "react-props-mirrored-in-state": 0,
+      "ts-unvalidated-external-data": 0,
+      "ts-sequential-await-loop": 0,
+      "ts-boolean-trap": 0,
+      "react-async-overlap": 0
+    },
+    "totalViolations": 1,
+    "regexHits": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-debug-console": 0,
+      "ts-no-empty-catch": 1,
+      "ts-no-ts-ignore": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "react-signup-form",
+    "lang": "typescript",
+    "condition": "jev+fix",
+    "rep": 1,
+    "reviewFindings": 4,
+    "ruleCoveredFindings": 0,
+    "fix": {
+      "wallMs": 73981,
+      "costUsd": 0.21011559999999999,
+      "durationMs": 73206,
+      "turns": 8
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 4,
+      "rewakes": 0,
+      "costUsd": 0.21011559999999999,
+      "durationMs": 73206,
+      "numTurns": 8,
+      "isError": false
+    },
+    "hook": {
+      "calls": 4,
+      "findingsShown": 2,
+      "highShown": 2,
+      "mediumShown": 0,
+      "errors": 0,
+      "meanLatencyMs": 292.06213525,
+      "editsAfterFeedback": 3
+    },
+    "original": {
+      "costUsd": 0.1631964,
+      "durationMs": 49137
+    },
+    "lines": 273,
+    "violations": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-empty-catch": 0,
+      "ts-no-debug-console": 0,
+      "ts-no-restating-comment": 0,
+      "ts-no-vague-names": 4,
+      "ts-no-magic-numbers": 1,
+      "ts-no-commented-out-code": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0,
+      "ts-no-ts-ignore": 0,
+      "react-derived-state-effect": 0,
+      "react-effect-missing-cleanup": 0,
+      "react-effect-fetch-race": 0,
+      "react-effect-for-event": 0,
+      "react-state-mutation": 0,
+      "react-index-key": 0,
+      "react-props-mirrored-in-state": 0,
+      "ts-unvalidated-external-data": 0,
+      "ts-sequential-await-loop": 0,
+      "ts-boolean-trap": 0,
+      "react-async-overlap": 0
+    },
+    "totalViolations": 5,
+    "regexHits": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 1,
+      "ts-no-debug-console": 0,
+      "ts-no-empty-catch": 0,
+      "ts-no-ts-ignore": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "react-todo-board",
+    "lang": "typescript",
+    "condition": "jev-rewake+fix",
+    "rep": 1,
+    "reviewFindings": 4,
+    "ruleCoveredFindings": 1,
+    "fix": {
+      "wallMs": 44312,
+      "costUsd": 0.1514394,
+      "durationMs": 43342,
+      "turns": 8
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 1,
+      "rewakes": 0,
+      "costUsd": 0.1514394,
+      "durationMs": 43342,
+      "numTurns": 7,
+      "isError": false
+    },
+    "hook": {
+      "calls": 1,
+      "findingsShown": 0,
+      "highShown": 0,
+      "mediumShown": 0,
+      "errors": 0,
+      "meanLatencyMs": 342.740417,
+      "editsAfterFeedback": 0
+    },
+    "original": {
+      "costUsd": 0.117423,
+      "durationMs": 34606
+    },
+    "lines": 259,
+    "violations": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-empty-catch": 1,
+      "ts-no-debug-console": 0,
+      "ts-no-restating-comment": 0,
+      "ts-no-vague-names": 0,
+      "ts-no-magic-numbers": 1,
+      "ts-no-commented-out-code": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0,
+      "ts-no-ts-ignore": 0,
+      "react-derived-state-effect": 0,
+      "react-effect-missing-cleanup": 0,
+      "react-effect-fetch-race": 0,
+      "react-effect-for-event": 0,
+      "react-state-mutation": 0,
+      "react-index-key": 0,
+      "react-props-mirrored-in-state": 0,
+      "ts-unvalidated-external-data": 0,
+      "ts-sequential-await-loop": 0,
+      "ts-boolean-trap": 0,
+      "react-async-overlap": 0
+    },
+    "totalViolations": 2,
+    "regexHits": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-debug-console": 0,
+      "ts-no-empty-catch": 1,
+      "ts-no-ts-ignore": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "react-profile-editor",
+    "lang": "typescript",
+    "condition": "none+fix",
+    "rep": 1,
+    "reviewFindings": 6,
+    "ruleCoveredFindings": 1,
+    "fix": {
+      "wallMs": 151900,
+      "costUsd": 0.15338840000000004,
+      "durationMs": 150699,
+      "turns": 11
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 2,
+      "rewakes": 0,
+      "costUsd": 0.15338840000000004,
+      "durationMs": 150699,
+      "numTurns": 6,
+      "isError": false
+    },
+    "hook": {
+      "calls": 0,
+      "findingsShown": 0,
+      "highShown": 0,
+      "mediumShown": 0,
+      "errors": 0,
+      "meanLatencyMs": 0,
+      "editsAfterFeedback": 0
+    },
+    "original": {
+      "costUsd": 0.11043899999999998,
+      "durationMs": 28299
+    },
+    "lines": 165,
+    "violations": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-empty-catch": 0,
+      "ts-no-debug-console": 0,
+      "ts-no-restating-comment": 0,
+      "ts-no-vague-names": 0,
+      "ts-no-magic-numbers": 0,
+      "ts-no-commented-out-code": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0,
+      "ts-no-ts-ignore": 0,
+      "react-derived-state-effect": 0,
+      "react-effect-missing-cleanup": 0,
+      "react-effect-fetch-race": 0,
+      "react-effect-for-event": 0,
+      "react-state-mutation": 0,
+      "react-index-key": 0,
+      "react-props-mirrored-in-state": 1,
+      "ts-unvalidated-external-data": 0,
+      "ts-sequential-await-loop": 0,
+      "ts-boolean-trap": 0,
+      "react-async-overlap": 0
+    },
+    "totalViolations": 1,
+    "regexHits": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-debug-console": 0,
+      "ts-no-empty-catch": 0,
+      "ts-no-ts-ignore": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "react-todo-board",
+    "lang": "typescript",
+    "condition": "none+fix",
+    "rep": 1,
+    "reviewFindings": 4,
+    "ruleCoveredFindings": 0,
+    "fix": {
+      "wallMs": 115716,
+      "costUsd": 0.1759188,
+      "durationMs": 108003,
+      "turns": 8
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 1,
+      "rewakes": 0,
+      "costUsd": 0.1759188,
+      "durationMs": 108003,
+      "numTurns": 7,
+      "isError": false
+    },
+    "hook": {
+      "calls": 0,
+      "findingsShown": 0,
+      "highShown": 0,
+      "mediumShown": 0,
+      "errors": 0,
+      "meanLatencyMs": 0,
+      "editsAfterFeedback": 0
+    },
+    "original": {
+      "costUsd": 0.1179872,
+      "durationMs": 32161
+    },
+    "lines": 264,
+    "violations": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-empty-catch": 1,
+      "ts-no-debug-console": 0,
+      "ts-no-restating-comment": 0,
+      "ts-no-vague-names": 1,
+      "ts-no-magic-numbers": 0,
+      "ts-no-commented-out-code": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0,
+      "ts-no-ts-ignore": 0,
+      "react-derived-state-effect": 0,
+      "react-effect-missing-cleanup": 0,
+      "react-effect-fetch-race": 0,
+      "react-effect-for-event": 0,
+      "react-state-mutation": 0,
+      "react-index-key": 0,
+      "react-props-mirrored-in-state": 0,
+      "ts-unvalidated-external-data": 0,
+      "ts-sequential-await-loop": 0,
+      "ts-boolean-trap": 0,
+      "react-async-overlap": 0
+    },
+    "totalViolations": 2,
+    "regexHits": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-debug-console": 0,
+      "ts-no-empty-catch": 1,
+      "ts-no-ts-ignore": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "react-todo-board",
+    "lang": "typescript",
+    "condition": "jev+fix",
+    "rep": 1,
+    "reviewFindings": 11,
+    "ruleCoveredFindings": 0,
+    "fix": {
+      "wallMs": 219191,
+      "costUsd": 0.272263,
+      "durationMs": 218203,
+      "turns": 7
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 1,
+      "rewakes": 0,
+      "costUsd": 0.272263,
+      "durationMs": 218203,
+      "numTurns": 7,
+      "isError": false
+    },
+    "hook": {
+      "calls": 1,
+      "findingsShown": 0,
+      "highShown": 0,
+      "mediumShown": 0,
+      "errors": 0,
+      "meanLatencyMs": 302.82962499999996,
+      "editsAfterFeedback": 0
+    },
+    "original": {
+      "costUsd": 0.1168892,
+      "durationMs": 34155
+    },
+    "lines": 258,
+    "violations": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-empty-catch": 1,
+      "ts-no-debug-console": 0,
+      "ts-no-restating-comment": 0,
+      "ts-no-vague-names": 2,
+      "ts-no-magic-numbers": 1,
+      "ts-no-commented-out-code": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0,
+      "ts-no-ts-ignore": 0,
+      "react-derived-state-effect": 0,
+      "react-effect-missing-cleanup": 0,
+      "react-effect-fetch-race": 0,
+      "react-effect-for-event": 0,
+      "react-state-mutation": 0,
+      "react-index-key": 0,
+      "react-props-mirrored-in-state": 0,
+      "ts-unvalidated-external-data": 0,
+      "ts-sequential-await-loop": 0,
+      "ts-boolean-trap": 0,
+      "react-async-overlap": 0
+    },
+    "totalViolations": 4,
+    "regexHits": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-debug-console": 0,
+      "ts-no-empty-catch": 1,
+      "ts-no-ts-ignore": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "swiftui-search",
+    "lang": "swift",
+    "condition": "jev+fix",
+    "rep": 1,
+    "reviewFindings": 2,
+    "ruleCoveredFindings": 1,
+    "fix": {
+      "wallMs": 78258,
+      "costUsd": 0.15370520000000001,
+      "durationMs": 77343,
+      "turns": 5
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 1,
+      "rewakes": 0,
+      "costUsd": 0.15370520000000001,
+      "durationMs": 77343,
+      "numTurns": 6,
+      "isError": false
+    },
+    "hook": {
+      "calls": 1,
+      "findingsShown": 1,
+      "highShown": 0,
+      "mediumShown": 1,
+      "errors": 0,
+      "meanLatencyMs": 326.810125,
+      "editsAfterFeedback": 0
+    },
+    "original": {
+      "costUsd": 0.14592720000000003,
+      "durationMs": 85905
+    },
+    "lines": 156,
+    "violations": {
+      "swift-no-force-unwrap": 0,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-restating-comment": 0,
+      "swift-no-vague-names": 0,
+      "swift-no-magic-numbers": 0,
+      "swift-no-commented-out-code": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0,
+      "swift-ui-off-main": 0,
+      "swift-prefer-guard": 0,
+      "swiftui-observedobject-owned": 0,
+      "swiftui-state-not-private": 0,
+      "swiftui-expensive-body": 0,
+      "swiftui-task-in-onappear": 0,
+      "swift-escaping-closure-retain-cycle": 0,
+      "swift-blocking-main-thread": 0,
+      "swift-continuation-misuse": 0,
+      "swift-unprotected-shared-state": 0,
+      "swiftui-foreach-unstable-id": 0,
+      "swift-dispatch-in-async": 0,
+      "swift-continuation-cancellation": 0,
+      "swift-continuation-stored-overwrite": 0
+    },
+    "totalViolations": 0,
+    "regexHits": {
+      "swift-no-force-unwrap": 0,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "swiftui-search",
+    "lang": "swift",
+    "condition": "none+fix",
+    "rep": 1,
+    "reviewFindings": 2,
+    "ruleCoveredFindings": 0,
+    "fix": {
+      "wallMs": 51608,
+      "costUsd": 0.1324828,
+      "durationMs": 50252,
+      "turns": 7
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 1,
+      "rewakes": 0,
+      "costUsd": 0.1324828,
+      "durationMs": 50252,
+      "numTurns": 6,
+      "isError": false
+    },
+    "hook": {
+      "calls": 0,
+      "findingsShown": 0,
+      "highShown": 0,
+      "mediumShown": 0,
+      "errors": 0,
+      "meanLatencyMs": 0,
+      "editsAfterFeedback": 0
+    },
+    "original": {
+      "costUsd": 0.1314768,
+      "durationMs": 166996
+    },
+    "lines": 140,
+    "violations": {
+      "swift-no-force-unwrap": 0,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-restating-comment": 0,
+      "swift-no-vague-names": 0,
+      "swift-no-magic-numbers": 0,
+      "swift-no-commented-out-code": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0,
+      "swift-ui-off-main": 0,
+      "swift-prefer-guard": 0,
+      "swiftui-observedobject-owned": 0,
+      "swiftui-state-not-private": 0,
+      "swiftui-expensive-body": 0,
+      "swiftui-task-in-onappear": 0,
+      "swift-escaping-closure-retain-cycle": 0,
+      "swift-blocking-main-thread": 0,
+      "swift-continuation-misuse": 0,
+      "swift-unprotected-shared-state": 0,
+      "swiftui-foreach-unstable-id": 0,
+      "swift-dispatch-in-async": 0,
+      "swift-continuation-cancellation": 0,
+      "swift-continuation-stored-overwrite": 0
+    },
+    "totalViolations": 0,
+    "regexHits": {
+      "swift-no-force-unwrap": 0,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "react-profile-editor",
+    "lang": "typescript",
+    "condition": "jev+fix",
+    "rep": 1,
+    "reviewFindings": 5,
+    "ruleCoveredFindings": 0,
+    "fix": {
+      "wallMs": 138559,
+      "costUsd": 0.1941836,
+      "durationMs": 128959,
+      "turns": 12
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 3,
+      "rewakes": 0,
+      "costUsd": 0.1941836,
+      "durationMs": 128959,
+      "numTurns": 7,
+      "isError": false
+    },
+    "hook": {
+      "calls": 3,
+      "findingsShown": 2,
+      "highShown": 1,
+      "mediumShown": 1,
+      "errors": 0,
+      "meanLatencyMs": 353.454639,
+      "editsAfterFeedback": 1
+    },
+    "original": {
+      "costUsd": 0.1353304,
+      "durationMs": 59907
+    },
+    "lines": 171,
+    "violations": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-empty-catch": 0,
+      "ts-no-debug-console": 0,
+      "ts-no-restating-comment": 0,
+      "ts-no-vague-names": 1,
+      "ts-no-magic-numbers": 0,
+      "ts-no-commented-out-code": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0,
+      "ts-no-ts-ignore": 0,
+      "react-derived-state-effect": 0,
+      "react-effect-missing-cleanup": 0,
+      "react-effect-fetch-race": 0,
+      "react-effect-for-event": 0,
+      "react-state-mutation": 0,
+      "react-index-key": 0,
+      "react-props-mirrored-in-state": 0,
+      "ts-unvalidated-external-data": 0,
+      "ts-sequential-await-loop": 0,
+      "ts-boolean-trap": 0,
+      "react-async-overlap": 0
+    },
+    "totalViolations": 1,
+    "regexHits": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-debug-console": 0,
+      "ts-no-empty-catch": 0,
+      "ts-no-ts-ignore": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "swiftui-search",
+    "lang": "swift",
+    "condition": "jev-rewake+fix",
+    "rep": 1,
+    "reviewFindings": 3,
+    "ruleCoveredFindings": 1,
+    "fix": {
+      "wallMs": 61953,
+      "costUsd": 0.12227460000000001,
+      "durationMs": 56402,
+      "turns": 7
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 1,
+      "rewakes": 0,
+      "costUsd": 0.12227460000000001,
+      "durationMs": 56402,
+      "numTurns": 6,
+      "isError": false
+    },
+    "hook": {
+      "calls": 1,
+      "findingsShown": 0,
+      "highShown": 0,
+      "mediumShown": 0,
+      "errors": 0,
+      "meanLatencyMs": 310.483709,
+      "editsAfterFeedback": 0
+    },
+    "original": {
+      "costUsd": 0.137945,
+      "durationMs": 78210
+    },
+    "lines": 131,
+    "violations": {
+      "swift-no-force-unwrap": 0,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-restating-comment": 0,
+      "swift-no-vague-names": 1,
+      "swift-no-magic-numbers": 1,
+      "swift-no-commented-out-code": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0,
+      "swift-ui-off-main": 0,
+      "swift-prefer-guard": 0,
+      "swiftui-observedobject-owned": 0,
+      "swiftui-state-not-private": 0,
+      "swiftui-expensive-body": 0,
+      "swiftui-task-in-onappear": 0,
+      "swift-escaping-closure-retain-cycle": 0,
+      "swift-blocking-main-thread": 0,
+      "swift-continuation-misuse": 0,
+      "swift-unprotected-shared-state": 0,
+      "swiftui-foreach-unstable-id": 0,
+      "swift-dispatch-in-async": 0,
+      "swift-continuation-cancellation": 0,
+      "swift-continuation-stored-overwrite": 0
+    },
+    "totalViolations": 2,
+    "regexHits": {
+      "swift-no-force-unwrap": 0,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "swiftui-stopwatch",
+    "lang": "swift",
+    "condition": "jev-rewake+fix",
+    "rep": 1,
+    "reviewFindings": 5,
+    "ruleCoveredFindings": 0,
+    "fix": {
+      "wallMs": 53428,
+      "costUsd": 0.15363,
+      "durationMs": 52618,
+      "turns": 7
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 4,
+      "rewakes": 0,
+      "costUsd": 0.15363,
+      "durationMs": 52618,
+      "numTurns": 10,
+      "isError": false
+    },
+    "hook": {
+      "calls": 4,
+      "findingsShown": 2,
+      "highShown": 1,
+      "mediumShown": 1,
+      "errors": 0,
+      "meanLatencyMs": 282.21670800000004,
+      "editsAfterFeedback": 3
+    },
+    "original": {
+      "costUsd": 0.1716706,
+      "durationMs": 80281
+    },
+    "lines": 128,
+    "violations": {
+      "swift-no-force-unwrap": 0,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-restating-comment": 0,
+      "swift-no-vague-names": 0,
+      "swift-no-magic-numbers": 0,
+      "swift-no-commented-out-code": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0,
+      "swift-ui-off-main": 0,
+      "swift-prefer-guard": 0,
+      "swiftui-observedobject-owned": 0,
+      "swiftui-state-not-private": 0,
+      "swiftui-expensive-body": 0,
+      "swiftui-task-in-onappear": 0,
+      "swift-escaping-closure-retain-cycle": 0,
+      "swift-blocking-main-thread": 0,
+      "swift-continuation-misuse": 0,
+      "swift-unprotected-shared-state": 0,
+      "swiftui-foreach-unstable-id": 0,
+      "swift-dispatch-in-async": 0,
+      "swift-continuation-cancellation": 0,
+      "swift-continuation-stored-overwrite": 0
+    },
+    "totalViolations": 0,
+    "regexHits": {
+      "swift-no-force-unwrap": 0,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "swiftui-stopwatch",
+    "lang": "swift",
+    "condition": "none+fix",
+    "rep": 1,
+    "reviewFindings": 3,
+    "ruleCoveredFindings": 0,
+    "fix": {
+      "wallMs": 56119,
+      "costUsd": 0.09919860000000001,
+      "durationMs": 53588,
+      "turns": 5
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 2,
+      "rewakes": 0,
+      "costUsd": 0.09919860000000001,
+      "durationMs": 53588,
+      "numTurns": 7,
+      "isError": false
+    },
+    "hook": {
+      "calls": 0,
+      "findingsShown": 0,
+      "highShown": 0,
+      "mediumShown": 0,
+      "errors": 0,
+      "meanLatencyMs": 0,
+      "editsAfterFeedback": 0
+    },
+    "original": {
+      "costUsd": 0.11261280000000001,
+      "durationMs": 51634
+    },
+    "lines": 108,
+    "violations": {
+      "swift-no-force-unwrap": 0,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-restating-comment": 0,
+      "swift-no-vague-names": 0,
+      "swift-no-magic-numbers": 6,
+      "swift-no-commented-out-code": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0,
+      "swift-ui-off-main": 0,
+      "swift-prefer-guard": 0,
+      "swiftui-observedobject-owned": 0,
+      "swiftui-state-not-private": 0,
+      "swiftui-expensive-body": 0,
+      "swiftui-task-in-onappear": 0,
+      "swift-escaping-closure-retain-cycle": 0,
+      "swift-blocking-main-thread": 0,
+      "swift-continuation-misuse": 0,
+      "swift-unprotected-shared-state": 0,
+      "swiftui-foreach-unstable-id": 1,
+      "swift-dispatch-in-async": 0,
+      "swift-continuation-cancellation": 0,
+      "swift-continuation-stored-overwrite": 0
+    },
+    "totalViolations": 7,
+    "regexHits": {
+      "swift-no-force-unwrap": 0,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "swiftui-stopwatch",
+    "lang": "swift",
+    "condition": "jev+fix",
+    "rep": 1,
+    "reviewFindings": 4,
+    "ruleCoveredFindings": 0,
+    "fix": {
+      "wallMs": 67610,
+      "costUsd": 0.13322160000000002,
+      "durationMs": 66726,
+      "turns": 6
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 5,
+      "rewakes": 0,
+      "costUsd": 0.13322160000000002,
+      "durationMs": 66726,
+      "numTurns": 11,
+      "isError": false
+    },
+    "hook": {
+      "calls": 5,
+      "findingsShown": 1,
+      "highShown": 1,
+      "mediumShown": 0,
+      "errors": 0,
+      "meanLatencyMs": 357.852175,
+      "editsAfterFeedback": 4
+    },
+    "original": {
+      "costUsd": 0.2037442,
+      "durationMs": 116052
+    },
+    "lines": 123,
+    "violations": {
+      "swift-no-force-unwrap": 0,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-restating-comment": 0,
+      "swift-no-vague-names": 0,
+      "swift-no-magic-numbers": 1,
+      "swift-no-commented-out-code": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0,
+      "swift-ui-off-main": 0,
+      "swift-prefer-guard": 0,
+      "swiftui-observedobject-owned": 0,
+      "swiftui-state-not-private": 0,
+      "swiftui-expensive-body": 0,
+      "swiftui-task-in-onappear": 0,
+      "swift-escaping-closure-retain-cycle": 0,
+      "swift-blocking-main-thread": 0,
+      "swift-continuation-misuse": 0,
+      "swift-unprotected-shared-state": 0,
+      "swiftui-foreach-unstable-id": 0,
+      "swift-dispatch-in-async": 0,
+      "swift-continuation-cancellation": 0,
+      "swift-continuation-stored-overwrite": 0
+    },
+    "totalViolations": 1,
+    "regexHits": {
+      "swift-no-force-unwrap": 0,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "react-profile-editor",
+    "lang": "typescript",
+    "condition": "jev-rewake+fix",
+    "rep": 1,
+    "reviewFindings": 6,
+    "ruleCoveredFindings": 4,
+    "fix": {
+      "wallMs": 106191,
+      "costUsd": 0.1646506,
+      "durationMs": 76818,
+      "turns": 8
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 3,
+      "rewakes": 0,
+      "costUsd": 0.1646506,
+      "durationMs": 76818,
+      "numTurns": 7,
+      "isError": false
+    },
+    "hook": {
+      "calls": 3,
+      "findingsShown": 1,
+      "highShown": 1,
+      "mediumShown": 0,
+      "errors": 0,
+      "meanLatencyMs": 328.55965266666664,
+      "editsAfterFeedback": 1
+    },
+    "original": {
+      "costUsd": 0.13468860000000002,
+      "durationMs": 39781
+    },
+    "lines": 174,
+    "violations": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-empty-catch": 0,
+      "ts-no-debug-console": 0,
+      "ts-no-restating-comment": 0,
+      "ts-no-vague-names": 2,
+      "ts-no-magic-numbers": 0,
+      "ts-no-commented-out-code": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0,
+      "ts-no-ts-ignore": 0,
+      "react-derived-state-effect": 0,
+      "react-effect-missing-cleanup": 0,
+      "react-effect-fetch-race": 0,
+      "react-effect-for-event": 0,
+      "react-state-mutation": 0,
+      "react-index-key": 0,
+      "react-props-mirrored-in-state": 0,
+      "ts-unvalidated-external-data": 0,
+      "ts-sequential-await-loop": 0,
+      "ts-boolean-trap": 0,
+      "react-async-overlap": 0
+    },
+    "totalViolations": 2,
+    "regexHits": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-debug-console": 0,
+      "ts-no-empty-catch": 0,
+      "ts-no-ts-ignore": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "swiftui-settings",
+    "lang": "swift",
+    "condition": "none+fix",
+    "rep": 1,
+    "reviewFindings": 2,
+    "ruleCoveredFindings": 0,
+    "fix": {
+      "wallMs": 143935,
+      "costUsd": 0.2181436,
+      "durationMs": 142782,
+      "turns": 11
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 1,
+      "rewakes": 0,
+      "costUsd": 0.2181436,
+      "durationMs": 142782,
+      "numTurns": 6,
+      "isError": false
+    },
+    "hook": {
+      "calls": 0,
+      "findingsShown": 0,
+      "highShown": 0,
+      "mediumShown": 0,
+      "errors": 0,
+      "meanLatencyMs": 0,
+      "editsAfterFeedback": 0
+    },
+    "original": {
+      "costUsd": 0.1432034,
+      "durationMs": 78617
+    },
+    "lines": 131,
+    "violations": {
+      "swift-no-force-unwrap": 0,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-restating-comment": 0,
+      "swift-no-vague-names": 0,
+      "swift-no-magic-numbers": 0,
+      "swift-no-commented-out-code": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0,
+      "swift-ui-off-main": 0,
+      "swift-prefer-guard": 0,
+      "swiftui-observedobject-owned": 0,
+      "swiftui-state-not-private": 0,
+      "swiftui-expensive-body": 0,
+      "swiftui-task-in-onappear": 0,
+      "swift-escaping-closure-retain-cycle": 0,
+      "swift-blocking-main-thread": 0,
+      "swift-continuation-misuse": 0,
+      "swift-unprotected-shared-state": 0,
+      "swiftui-foreach-unstable-id": 0,
+      "swift-dispatch-in-async": 0,
+      "swift-continuation-cancellation": 0,
+      "swift-continuation-stored-overwrite": 0
+    },
+    "totalViolations": 0,
+    "regexHits": {
+      "swift-no-force-unwrap": 0,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "swiftui-thumbnail-grid",
+    "lang": "swift",
+    "condition": "none+fix",
+    "rep": 1,
+    "reviewFindings": 3,
+    "ruleCoveredFindings": 0,
+    "fix": {
+      "wallMs": 95720,
+      "costUsd": 0.23510860000000003,
+      "durationMs": 94838,
+      "turns": 9
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 1,
+      "rewakes": 0,
+      "costUsd": 0.23510860000000003,
+      "durationMs": 94838,
+      "numTurns": 6,
+      "isError": false
+    },
+    "hook": {
+      "calls": 0,
+      "findingsShown": 0,
+      "highShown": 0,
+      "mediumShown": 0,
+      "errors": 0,
+      "meanLatencyMs": 0,
+      "editsAfterFeedback": 0
+    },
+    "original": {
+      "costUsd": 0.129443,
+      "durationMs": 53394
+    },
+    "lines": 178,
+    "violations": {
+      "swift-no-force-unwrap": 0,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-restating-comment": 0,
+      "swift-no-vague-names": 0,
+      "swift-no-magic-numbers": 0,
+      "swift-no-commented-out-code": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0,
+      "swift-ui-off-main": 0,
+      "swift-prefer-guard": 0,
+      "swiftui-observedobject-owned": 0,
+      "swiftui-state-not-private": 0,
+      "swiftui-expensive-body": 0,
+      "swiftui-task-in-onappear": 0,
+      "swift-escaping-closure-retain-cycle": 0,
+      "swift-blocking-main-thread": 0,
+      "swift-continuation-misuse": 0,
+      "swift-unprotected-shared-state": 0,
+      "swiftui-foreach-unstable-id": 0,
+      "swift-dispatch-in-async": 0,
+      "swift-continuation-cancellation": 0,
+      "swift-continuation-stored-overwrite": 0
+    },
+    "totalViolations": 0,
+    "regexHits": {
+      "swift-no-force-unwrap": 0,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 1,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "swiftui-settings",
+    "lang": "swift",
+    "condition": "jev+fix",
+    "rep": 1,
+    "reviewFindings": 2,
+    "ruleCoveredFindings": 0,
+    "fix": {
+      "wallMs": 70468,
+      "costUsd": 0.1900358,
+      "durationMs": 69751,
+      "turns": 9
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 1,
+      "rewakes": 0,
+      "costUsd": 0.1900358,
+      "durationMs": 69751,
+      "numTurns": 6,
+      "isError": false
+    },
+    "hook": {
+      "calls": 1,
+      "findingsShown": 0,
+      "highShown": 0,
+      "mediumShown": 0,
+      "errors": 0,
+      "meanLatencyMs": 328.5335,
+      "editsAfterFeedback": 0
+    },
+    "original": {
+      "costUsd": 0.1510572,
+      "durationMs": 71180
+    },
+    "lines": 143,
+    "violations": {
+      "swift-no-force-unwrap": 0,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-restating-comment": 0,
+      "swift-no-vague-names": 0,
+      "swift-no-magic-numbers": 1,
+      "swift-no-commented-out-code": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0,
+      "swift-ui-off-main": 0,
+      "swift-prefer-guard": 0,
+      "swiftui-observedobject-owned": 0,
+      "swiftui-state-not-private": 0,
+      "swiftui-expensive-body": 0,
+      "swiftui-task-in-onappear": 0,
+      "swift-escaping-closure-retain-cycle": 0,
+      "swift-blocking-main-thread": 0,
+      "swift-continuation-misuse": 0,
+      "swift-unprotected-shared-state": 0,
+      "swiftui-foreach-unstable-id": 0,
+      "swift-dispatch-in-async": 0,
+      "swift-continuation-cancellation": 0,
+      "swift-continuation-stored-overwrite": 0
+    },
+    "totalViolations": 1,
+    "regexHits": {
+      "swift-no-force-unwrap": 0,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "swiftui-settings",
+    "lang": "swift",
+    "condition": "jev-rewake+fix",
+    "rep": 1,
+    "reviewFindings": 2,
+    "ruleCoveredFindings": 1,
+    "fix": {
+      "wallMs": 52764,
+      "costUsd": 0.17037820000000004,
+      "durationMs": 51976,
+      "turns": 10
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 1,
+      "rewakes": 0,
+      "costUsd": 0.17037820000000004,
+      "durationMs": 51976,
+      "numTurns": 6,
+      "isError": false
+    },
+    "hook": {
+      "calls": 1,
+      "findingsShown": 0,
+      "highShown": 0,
+      "mediumShown": 0,
+      "errors": 0,
+      "meanLatencyMs": 287.818834,
+      "editsAfterFeedback": 0
+    },
+    "original": {
+      "costUsd": 0.15092519999999998,
+      "durationMs": 61509
+    },
+    "lines": 139,
+    "violations": {
+      "swift-no-force-unwrap": 0,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-restating-comment": 0,
+      "swift-no-vague-names": 1,
+      "swift-no-magic-numbers": 2,
+      "swift-no-commented-out-code": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0,
+      "swift-ui-off-main": 0,
+      "swift-prefer-guard": 0,
+      "swiftui-observedobject-owned": 0,
+      "swiftui-state-not-private": 0,
+      "swiftui-expensive-body": 0,
+      "swiftui-task-in-onappear": 0,
+      "swift-escaping-closure-retain-cycle": 0,
+      "swift-blocking-main-thread": 0,
+      "swift-continuation-misuse": 0,
+      "swift-unprotected-shared-state": 0,
+      "swiftui-foreach-unstable-id": 0,
+      "swift-dispatch-in-async": 0,
+      "swift-continuation-cancellation": 0,
+      "swift-continuation-stored-overwrite": 0
+    },
+    "totalViolations": 3,
+    "regexHits": {
+      "swift-no-force-unwrap": 0,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "swiftui-thumbnail-grid",
+    "lang": "swift",
+    "condition": "jev+fix",
+    "rep": 1,
+    "reviewFindings": 2,
+    "ruleCoveredFindings": 0,
+    "fix": {
+      "wallMs": 61515,
+      "costUsd": 0.17577279999999998,
+      "durationMs": 60769,
+      "turns": 9
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 1,
+      "rewakes": 0,
+      "costUsd": 0.17577279999999998,
+      "durationMs": 60769,
+      "numTurns": 6,
+      "isError": false
+    },
+    "hook": {
+      "calls": 1,
+      "findingsShown": 0,
+      "highShown": 0,
+      "mediumShown": 0,
+      "errors": 0,
+      "meanLatencyMs": 323.750625,
+      "editsAfterFeedback": 0
+    },
+    "original": {
+      "costUsd": 0.1412704,
+      "durationMs": 78192
+    },
+    "lines": 174,
+    "violations": {
+      "swift-no-force-unwrap": 0,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-restating-comment": 0,
+      "swift-no-vague-names": 2,
+      "swift-no-magic-numbers": 1,
+      "swift-no-commented-out-code": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0,
+      "swift-ui-off-main": 0,
+      "swift-prefer-guard": 0,
+      "swiftui-observedobject-owned": 0,
+      "swiftui-state-not-private": 0,
+      "swiftui-expensive-body": 0,
+      "swiftui-task-in-onappear": 0,
+      "swift-escaping-closure-retain-cycle": 0,
+      "swift-blocking-main-thread": 0,
+      "swift-continuation-misuse": 0,
+      "swift-unprotected-shared-state": 0,
+      "swiftui-foreach-unstable-id": 1,
+      "swift-dispatch-in-async": 0,
+      "swift-continuation-cancellation": 0,
+      "swift-continuation-stored-overwrite": 0
+    },
+    "totalViolations": 4,
+    "regexHits": {
+      "swift-no-force-unwrap": 0,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "swiftui-thumbnail-grid",
+    "lang": "swift",
+    "condition": "jev-rewake+fix",
+    "rep": 1,
+    "reviewFindings": 4,
+    "ruleCoveredFindings": 0,
+    "fix": {
+      "wallMs": 81808,
+      "costUsd": 0.20452399999999998,
+      "durationMs": 81063,
+      "turns": 7
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 4,
+      "rewakes": 0,
+      "costUsd": 0.20452399999999998,
+      "durationMs": 81063,
+      "numTurns": 9,
+      "isError": false
+    },
+    "hook": {
+      "calls": 4,
+      "findingsShown": 2,
+      "highShown": 0,
+      "mediumShown": 2,
+      "errors": 0,
+      "meanLatencyMs": 312.35586474999997,
+      "editsAfterFeedback": 3
+    },
+    "original": {
+      "costUsd": 0.18827600000000003,
+      "durationMs": 91029
+    },
+    "lines": 150,
+    "violations": {
+      "swift-no-force-unwrap": 0,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-restating-comment": 0,
+      "swift-no-vague-names": 1,
+      "swift-no-magic-numbers": 0,
+      "swift-no-commented-out-code": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0,
+      "swift-ui-off-main": 0,
+      "swift-prefer-guard": 0,
+      "swiftui-observedobject-owned": 0,
+      "swiftui-state-not-private": 0,
+      "swiftui-expensive-body": 0,
+      "swiftui-task-in-onappear": 0,
+      "swift-escaping-closure-retain-cycle": 0,
+      "swift-blocking-main-thread": 0,
+      "swift-continuation-misuse": 0,
+      "swift-unprotected-shared-state": 0,
+      "swiftui-foreach-unstable-id": 0,
+      "swift-dispatch-in-async": 0,
+      "swift-continuation-cancellation": 0,
+      "swift-continuation-stored-overwrite": 0
+    },
+    "totalViolations": 1,
+    "regexHits": {
+      "swift-no-force-unwrap": 0,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "swiftui-chat",
+    "lang": "swift",
+    "condition": "none+fix",
+    "rep": 1,
+    "reviewFindings": 5,
+    "ruleCoveredFindings": 0,
+    "fix": {
+      "wallMs": 81297,
+      "costUsd": 0.21789359999999997,
+      "durationMs": 80548,
+      "turns": 8
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 1,
+      "rewakes": 0,
+      "costUsd": 0.21789359999999997,
+      "durationMs": 80548,
+      "numTurns": 6,
+      "isError": false
+    },
+    "hook": {
+      "calls": 0,
+      "findingsShown": 0,
+      "highShown": 0,
+      "mediumShown": 0,
+      "errors": 0,
+      "meanLatencyMs": 0,
+      "editsAfterFeedback": 0
+    },
+    "original": {
+      "costUsd": 0.14214520000000003,
+      "durationMs": 94741
+    },
+    "lines": 166,
+    "violations": {
+      "swift-no-force-unwrap": 1,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-restating-comment": 0,
+      "swift-no-vague-names": 0,
+      "swift-no-magic-numbers": 0,
+      "swift-no-commented-out-code": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0,
+      "swift-ui-off-main": 0,
+      "swift-prefer-guard": 0,
+      "swiftui-observedobject-owned": 0,
+      "swiftui-state-not-private": 0,
+      "swiftui-expensive-body": 0,
+      "swiftui-task-in-onappear": 0,
+      "swift-escaping-closure-retain-cycle": 0,
+      "swift-blocking-main-thread": 0,
+      "swift-continuation-misuse": 0,
+      "swift-unprotected-shared-state": 0,
+      "swiftui-foreach-unstable-id": 0,
+      "swift-dispatch-in-async": 0,
+      "swift-continuation-cancellation": 0,
+      "swift-continuation-stored-overwrite": 0
+    },
+    "totalViolations": 1,
+    "regexHits": {
+      "swift-no-force-unwrap": 1,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "swiftui-chat",
+    "lang": "swift",
+    "condition": "jev+fix",
+    "rep": 1,
+    "reviewFindings": 4,
+    "ruleCoveredFindings": 0,
+    "fix": {
+      "wallMs": 121100,
+      "costUsd": 0.26128439999999997,
+      "durationMs": 120415,
+      "turns": 8
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 2,
+      "rewakes": 0,
+      "costUsd": 0.26128439999999997,
+      "durationMs": 120415,
+      "numTurns": 8,
+      "isError": false
+    },
+    "hook": {
+      "calls": 2,
+      "findingsShown": 2,
+      "highShown": 1,
+      "mediumShown": 1,
+      "errors": 0,
+      "meanLatencyMs": 276.966875,
+      "editsAfterFeedback": 1
+    },
+    "original": {
+      "costUsd": 0.1811548,
+      "durationMs": 81328
+    },
+    "lines": 195,
+    "violations": {
+      "swift-no-force-unwrap": 0,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-restating-comment": 0,
+      "swift-no-vague-names": 0,
+      "swift-no-magic-numbers": 0,
+      "swift-no-commented-out-code": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0,
+      "swift-ui-off-main": 0,
+      "swift-prefer-guard": 0,
+      "swiftui-observedobject-owned": 0,
+      "swiftui-state-not-private": 0,
+      "swiftui-expensive-body": 0,
+      "swiftui-task-in-onappear": 0,
+      "swift-escaping-closure-retain-cycle": 0,
+      "swift-blocking-main-thread": 0,
+      "swift-continuation-misuse": 0,
+      "swift-unprotected-shared-state": 0,
+      "swiftui-foreach-unstable-id": 0,
+      "swift-dispatch-in-async": 0,
+      "swift-continuation-cancellation": 0,
+      "swift-continuation-stored-overwrite": 0
+    },
+    "totalViolations": 0,
+    "regexHits": {
+      "swift-no-force-unwrap": 0,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "swift-legacy-bridge",
+    "lang": "swift",
+    "condition": "jev-rewake+fix",
+    "rep": 1,
+    "reviewFindings": 6,
+    "ruleCoveredFindings": 5,
+    "fix": {
+      "wallMs": 201115,
+      "costUsd": 0.4104582,
+      "durationMs": 200354,
+      "turns": 11
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 2,
+      "rewakes": 0,
+      "costUsd": 0.4104582,
+      "durationMs": 200354,
+      "numTurns": 7,
+      "isError": false
+    },
+    "hook": {
+      "calls": 2,
+      "findingsShown": 3,
+      "highShown": 1,
+      "mediumShown": 2,
+      "errors": 0,
+      "meanLatencyMs": 300.76779150000004,
+      "editsAfterFeedback": 1
+    },
+    "original": {
+      "costUsd": 0.15987259999999998,
+      "durationMs": 94743
+    },
+    "lines": 186,
+    "violations": {
+      "swift-no-force-unwrap": 0,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-restating-comment": 0,
+      "swift-no-vague-names": 0,
+      "swift-no-magic-numbers": 0,
+      "swift-no-commented-out-code": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0,
+      "swift-ui-off-main": 0,
+      "swift-prefer-guard": 0,
+      "swiftui-observedobject-owned": 0,
+      "swiftui-state-not-private": 0,
+      "swiftui-expensive-body": 0,
+      "swiftui-task-in-onappear": 0,
+      "swift-escaping-closure-retain-cycle": 1,
+      "swift-blocking-main-thread": 0,
+      "swift-continuation-misuse": 0,
+      "swift-unprotected-shared-state": 0,
+      "swiftui-foreach-unstable-id": 0,
+      "swift-dispatch-in-async": 0,
+      "swift-continuation-cancellation": 0,
+      "swift-continuation-stored-overwrite": 0
+    },
+    "totalViolations": 1,
+    "regexHits": {
+      "swift-no-force-unwrap": 0,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "react-user-search",
+    "lang": "typescript",
+    "condition": "none+fix",
+    "rep": 2,
+    "reviewFindings": 3,
+    "ruleCoveredFindings": 2,
+    "fix": {
+      "wallMs": 65647,
+      "costUsd": 0.1812514,
+      "durationMs": 64905,
+      "turns": 9
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 1,
+      "rewakes": 0,
+      "costUsd": 0.1812514,
+      "durationMs": 64905,
+      "numTurns": 5,
+      "isError": false
+    },
+    "hook": {
+      "calls": 0,
+      "findingsShown": 0,
+      "highShown": 0,
+      "mediumShown": 0,
+      "errors": 0,
+      "meanLatencyMs": 0,
+      "editsAfterFeedback": 0
+    },
+    "original": {
+      "costUsd": 0.0953582,
+      "durationMs": 27799
+    },
+    "lines": 129,
+    "violations": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-empty-catch": 0,
+      "ts-no-debug-console": 0,
+      "ts-no-restating-comment": 0,
+      "ts-no-vague-names": 2,
+      "ts-no-magic-numbers": 0,
+      "ts-no-commented-out-code": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0,
+      "ts-no-ts-ignore": 0,
+      "react-derived-state-effect": 0,
+      "react-effect-missing-cleanup": 0,
+      "react-effect-fetch-race": 0,
+      "react-effect-for-event": 0,
+      "react-state-mutation": 0,
+      "react-index-key": 0,
+      "react-props-mirrored-in-state": 0,
+      "ts-unvalidated-external-data": 0,
+      "ts-sequential-await-loop": 0,
+      "ts-boolean-trap": 0,
+      "react-async-overlap": 0
+    },
+    "totalViolations": 2,
+    "regexHits": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-debug-console": 0,
+      "ts-no-empty-catch": 0,
+      "ts-no-ts-ignore": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "react-metrics-poller",
+    "lang": "typescript",
+    "condition": "none+fix",
+    "rep": 2,
+    "reviewFindings": 2,
+    "ruleCoveredFindings": 2,
+    "fix": {
+      "wallMs": 31761,
+      "costUsd": 0.1273968,
+      "durationMs": 30999,
+      "turns": 7
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 1,
+      "rewakes": 0,
+      "costUsd": 0.1273968,
+      "durationMs": 30999,
+      "numTurns": 5,
+      "isError": false
+    },
+    "hook": {
+      "calls": 0,
+      "findingsShown": 0,
+      "highShown": 0,
+      "mediumShown": 0,
+      "errors": 0,
+      "meanLatencyMs": 0,
+      "editsAfterFeedback": 0
+    },
+    "original": {
+      "costUsd": 0.10061800000000001,
+      "durationMs": 30004
+    },
+    "lines": 148,
+    "violations": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-empty-catch": 0,
+      "ts-no-debug-console": 0,
+      "ts-no-restating-comment": 0,
+      "ts-no-vague-names": 0,
+      "ts-no-magic-numbers": 0,
+      "ts-no-commented-out-code": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0,
+      "ts-no-ts-ignore": 0,
+      "react-derived-state-effect": 0,
+      "react-effect-missing-cleanup": 0,
+      "react-effect-fetch-race": 0,
+      "react-effect-for-event": 0,
+      "react-state-mutation": 0,
+      "react-index-key": 0,
+      "react-props-mirrored-in-state": 0,
+      "ts-unvalidated-external-data": 0,
+      "ts-sequential-await-loop": 0,
+      "ts-boolean-trap": 0,
+      "react-async-overlap": 0
+    },
+    "totalViolations": 0,
+    "regexHits": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-debug-console": 0,
+      "ts-no-empty-catch": 0,
+      "ts-no-ts-ignore": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "swift-legacy-bridge",
+    "lang": "swift",
+    "condition": "none+fix",
+    "rep": 1,
+    "reviewFindings": 3,
+    "ruleCoveredFindings": 2,
+    "fix": {
+      "wallMs": 95556,
+      "costUsd": 0.21146840000000006,
+      "durationMs": 94802,
+      "turns": 9
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 1,
+      "rewakes": 0,
+      "costUsd": 0.21146840000000006,
+      "durationMs": 94802,
+      "numTurns": 6,
+      "isError": false
+    },
+    "hook": {
+      "calls": 0,
+      "findingsShown": 0,
+      "highShown": 0,
+      "mediumShown": 0,
+      "errors": 0,
+      "meanLatencyMs": 0,
+      "editsAfterFeedback": 0
+    },
+    "original": {
+      "costUsd": 0.11041880000000001,
+      "durationMs": 50763
+    },
+    "lines": 115,
+    "violations": {
+      "swift-no-force-unwrap": 0,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-restating-comment": 0,
+      "swift-no-vague-names": 0,
+      "swift-no-magic-numbers": 0,
+      "swift-no-commented-out-code": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0,
+      "swift-ui-off-main": 0,
+      "swift-prefer-guard": 0,
+      "swiftui-observedobject-owned": 0,
+      "swiftui-state-not-private": 0,
+      "swiftui-expensive-body": 0,
+      "swiftui-task-in-onappear": 0,
+      "swift-escaping-closure-retain-cycle": 0,
+      "swift-blocking-main-thread": 0,
+      "swift-continuation-misuse": 0,
+      "swift-unprotected-shared-state": 0,
+      "swiftui-foreach-unstable-id": 0,
+      "swift-dispatch-in-async": 0,
+      "swift-continuation-cancellation": 1,
+      "swift-continuation-stored-overwrite": 0
+    },
+    "totalViolations": 1,
+    "regexHits": {
+      "swift-no-force-unwrap": 1,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "react-user-search",
+    "lang": "typescript",
+    "condition": "jev+fix",
+    "rep": 2,
+    "reviewFindings": 2,
+    "ruleCoveredFindings": 1,
+    "fix": {
+      "wallMs": 39588,
+      "costUsd": 0.12306860000000001,
+      "durationMs": 38815,
+      "turns": 6
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 4,
+      "rewakes": 0,
+      "costUsd": 0.12306860000000001,
+      "durationMs": 38815,
+      "numTurns": 11,
+      "isError": false
+    },
+    "hook": {
+      "calls": 4,
+      "findingsShown": 3,
+      "highShown": 1,
+      "mediumShown": 2,
+      "errors": 0,
+      "meanLatencyMs": 303.3019585,
+      "editsAfterFeedback": 3
+    },
+    "original": {
+      "costUsd": 0.148308,
+      "durationMs": 36221
+    },
+    "lines": 133,
+    "violations": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-empty-catch": 0,
+      "ts-no-debug-console": 0,
+      "ts-no-restating-comment": 0,
+      "ts-no-vague-names": 0,
+      "ts-no-magic-numbers": 0,
+      "ts-no-commented-out-code": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0,
+      "ts-no-ts-ignore": 0,
+      "react-derived-state-effect": 0,
+      "react-effect-missing-cleanup": 0,
+      "react-effect-fetch-race": 0,
+      "react-effect-for-event": 0,
+      "react-state-mutation": 0,
+      "react-index-key": 0,
+      "react-props-mirrored-in-state": 0,
+      "ts-unvalidated-external-data": 0,
+      "ts-sequential-await-loop": 0,
+      "ts-boolean-trap": 0,
+      "react-async-overlap": 0
+    },
+    "totalViolations": 0,
+    "regexHits": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-debug-console": 0,
+      "ts-no-empty-catch": 0,
+      "ts-no-ts-ignore": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "swiftui-chat",
+    "lang": "swift",
+    "condition": "jev-rewake+fix",
+    "rep": 1,
+    "reviewFindings": 4,
+    "ruleCoveredFindings": 0,
+    "fix": {
+      "wallMs": 87784,
+      "costUsd": 0.18670400000000004,
+      "durationMs": 87039,
+      "turns": 6
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 3,
+      "rewakes": 0,
+      "costUsd": 0.18670400000000004,
+      "durationMs": 87039,
+      "numTurns": 9,
+      "isError": false
+    },
+    "hook": {
+      "calls": 3,
+      "findingsShown": 0,
+      "highShown": 0,
+      "mediumShown": 0,
+      "errors": 1,
+      "meanLatencyMs": 267.77662499999997,
+      "editsAfterFeedback": 0
+    },
+    "original": {
+      "costUsd": 0.15074700000000002,
+      "durationMs": 66835
+    },
+    "lines": 169,
+    "violations": {
+      "swift-no-force-unwrap": 1,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-restating-comment": 0,
+      "swift-no-vague-names": 0,
+      "swift-no-magic-numbers": 0,
+      "swift-no-commented-out-code": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0,
+      "swift-ui-off-main": 0,
+      "swift-prefer-guard": 0,
+      "swiftui-observedobject-owned": 0,
+      "swiftui-state-not-private": 0,
+      "swiftui-expensive-body": 0,
+      "swiftui-task-in-onappear": 0,
+      "swift-escaping-closure-retain-cycle": 0,
+      "swift-blocking-main-thread": 0,
+      "swift-continuation-misuse": 0,
+      "swift-unprotected-shared-state": 0,
+      "swiftui-foreach-unstable-id": 0,
+      "swift-dispatch-in-async": 0,
+      "swift-continuation-cancellation": 0,
+      "swift-continuation-stored-overwrite": 0
+    },
+    "totalViolations": 1,
+    "regexHits": {
+      "swift-no-force-unwrap": 1,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "react-user-search",
+    "lang": "typescript",
+    "condition": "jev-rewake+fix",
+    "rep": 2,
+    "reviewFindings": 3,
+    "ruleCoveredFindings": 1,
+    "fix": {
+      "wallMs": 70580,
+      "costUsd": 0.18784980000000004,
+      "durationMs": 69844,
+      "turns": 9
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 3,
+      "rewakes": 0,
+      "costUsd": 0.18784980000000004,
+      "durationMs": 69844,
+      "numTurns": 7,
+      "isError": false
+    },
+    "hook": {
+      "calls": 3,
+      "findingsShown": 3,
+      "highShown": 1,
+      "mediumShown": 2,
+      "errors": 0,
+      "meanLatencyMs": 332.61876366666667,
+      "editsAfterFeedback": 2
+    },
+    "original": {
+      "costUsd": 0.12829600000000002,
+      "durationMs": 34670
+    },
+    "lines": 146,
+    "violations": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-empty-catch": 0,
+      "ts-no-debug-console": 0,
+      "ts-no-restating-comment": 0,
+      "ts-no-vague-names": 0,
+      "ts-no-magic-numbers": 0,
+      "ts-no-commented-out-code": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0,
+      "ts-no-ts-ignore": 0,
+      "react-derived-state-effect": 0,
+      "react-effect-missing-cleanup": 0,
+      "react-effect-fetch-race": 0,
+      "react-effect-for-event": 0,
+      "react-state-mutation": 0,
+      "react-index-key": 0,
+      "react-props-mirrored-in-state": 0,
+      "ts-unvalidated-external-data": 0,
+      "ts-sequential-await-loop": 0,
+      "ts-boolean-trap": 0,
+      "react-async-overlap": 0
+    },
+    "totalViolations": 0,
+    "regexHits": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-debug-console": 0,
+      "ts-no-empty-catch": 0,
+      "ts-no-ts-ignore": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "react-metrics-poller",
+    "lang": "typescript",
+    "condition": "jev-rewake+fix",
+    "rep": 2,
+    "reviewFindings": 4,
+    "ruleCoveredFindings": 1,
+    "fix": {
+      "wallMs": 64225,
+      "costUsd": 0.19838720000000004,
+      "durationMs": 63485,
+      "turns": 9
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 4,
+      "rewakes": 0,
+      "costUsd": 0.19838720000000004,
+      "durationMs": 63485,
+      "numTurns": 8,
+      "isError": false
+    },
+    "hook": {
+      "calls": 4,
+      "findingsShown": 5,
+      "highShown": 2,
+      "mediumShown": 3,
+      "errors": 0,
+      "meanLatencyMs": 321.573375,
+      "editsAfterFeedback": 3
+    },
+    "original": {
+      "costUsd": 0.1776756,
+      "durationMs": 60716
+    },
+    "lines": 165,
+    "violations": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-empty-catch": 0,
+      "ts-no-debug-console": 0,
+      "ts-no-restating-comment": 0,
+      "ts-no-vague-names": 0,
+      "ts-no-magic-numbers": 0,
+      "ts-no-commented-out-code": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0,
+      "ts-no-ts-ignore": 0,
+      "react-derived-state-effect": 0,
+      "react-effect-missing-cleanup": 0,
+      "react-effect-fetch-race": 0,
+      "react-effect-for-event": 0,
+      "react-state-mutation": 0,
+      "react-index-key": 0,
+      "react-props-mirrored-in-state": 0,
+      "ts-unvalidated-external-data": 0,
+      "ts-sequential-await-loop": 0,
+      "ts-boolean-trap": 0,
+      "react-async-overlap": 0
+    },
+    "totalViolations": 0,
+    "regexHits": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-debug-console": 0,
+      "ts-no-empty-catch": 0,
+      "ts-no-ts-ignore": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "react-signup-form",
+    "lang": "typescript",
+    "condition": "jev-rewake+fix",
+    "rep": 2,
+    "reviewFindings": 3,
+    "ruleCoveredFindings": 2,
+    "fix": {
+      "wallMs": 50336,
+      "costUsd": 0.19976920000000004,
+      "durationMs": 49626,
+      "turns": 11
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 3,
+      "rewakes": 0,
+      "costUsd": 0.19976920000000004,
+      "durationMs": 49626,
+      "numTurns": 6,
+      "isError": false
+    },
+    "hook": {
+      "calls": 3,
+      "findingsShown": 2,
+      "highShown": 0,
+      "mediumShown": 2,
+      "errors": 0,
+      "meanLatencyMs": 291.9177223333333,
+      "editsAfterFeedback": 2
+    },
+    "original": {
+      "costUsd": 0.145719,
+      "durationMs": 45181
+    },
+    "lines": 263,
+    "violations": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-empty-catch": 0,
+      "ts-no-debug-console": 0,
+      "ts-no-restating-comment": 0,
+      "ts-no-vague-names": 0,
+      "ts-no-magic-numbers": 1,
+      "ts-no-commented-out-code": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0,
+      "ts-no-ts-ignore": 0,
+      "react-derived-state-effect": 0,
+      "react-effect-missing-cleanup": 0,
+      "react-effect-fetch-race": 0,
+      "react-effect-for-event": 0,
+      "react-state-mutation": 0,
+      "react-index-key": 0,
+      "react-props-mirrored-in-state": 0,
+      "ts-unvalidated-external-data": 0,
+      "ts-sequential-await-loop": 0,
+      "ts-boolean-trap": 0,
+      "react-async-overlap": 0
+    },
+    "totalViolations": 1,
+    "regexHits": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 1,
+      "ts-no-debug-console": 0,
+      "ts-no-empty-catch": 0,
+      "ts-no-ts-ignore": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "react-metrics-poller",
+    "lang": "typescript",
+    "condition": "jev+fix",
+    "rep": 2,
+    "reviewFindings": 3,
+    "ruleCoveredFindings": 1,
+    "fix": {
+      "wallMs": 58486,
+      "costUsd": 0.16286820000000002,
+      "durationMs": 57393,
+      "turns": 6
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 3,
+      "rewakes": 0,
+      "costUsd": 0.16286820000000002,
+      "durationMs": 57393,
+      "numTurns": 9,
+      "isError": false
+    },
+    "hook": {
+      "calls": 3,
+      "findingsShown": 2,
+      "highShown": 1,
+      "mediumShown": 1,
+      "errors": 0,
+      "meanLatencyMs": 282.3995136666667,
+      "editsAfterFeedback": 2
+    },
+    "original": {
+      "costUsd": 0.149683,
+      "durationMs": 46853
+    },
+    "lines": 162,
+    "violations": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-empty-catch": 0,
+      "ts-no-debug-console": 0,
+      "ts-no-restating-comment": 0,
+      "ts-no-vague-names": 0,
+      "ts-no-magic-numbers": 1,
+      "ts-no-commented-out-code": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0,
+      "ts-no-ts-ignore": 0,
+      "react-derived-state-effect": 0,
+      "react-effect-missing-cleanup": 0,
+      "react-effect-fetch-race": 0,
+      "react-effect-for-event": 0,
+      "react-state-mutation": 0,
+      "react-index-key": 0,
+      "react-props-mirrored-in-state": 0,
+      "ts-unvalidated-external-data": 0,
+      "ts-sequential-await-loop": 0,
+      "ts-boolean-trap": 0,
+      "react-async-overlap": 0
+    },
+    "totalViolations": 1,
+    "regexHits": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-debug-console": 0,
+      "ts-no-empty-catch": 0,
+      "ts-no-ts-ignore": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "react-signup-form",
+    "lang": "typescript",
+    "condition": "none+fix",
+    "rep": 2,
+    "reviewFindings": 4,
+    "ruleCoveredFindings": 2,
+    "fix": {
+      "wallMs": 44051,
+      "costUsd": 0.144737,
+      "durationMs": 43310,
+      "turns": 8
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 1,
+      "rewakes": 0,
+      "costUsd": 0.144737,
+      "durationMs": 43310,
+      "numTurns": 5,
+      "isError": false
+    },
+    "hook": {
+      "calls": 0,
+      "findingsShown": 0,
+      "highShown": 0,
+      "mediumShown": 0,
+      "errors": 0,
+      "meanLatencyMs": 0,
+      "editsAfterFeedback": 0
+    },
+    "original": {
+      "costUsd": 0.11442699999999999,
+      "durationMs": 40009
+    },
+    "lines": 234,
+    "violations": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-empty-catch": 0,
+      "ts-no-debug-console": 0,
+      "ts-no-restating-comment": 0,
+      "ts-no-vague-names": 2,
+      "ts-no-magic-numbers": 1,
+      "ts-no-commented-out-code": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0,
+      "ts-no-ts-ignore": 0,
+      "react-derived-state-effect": 0,
+      "react-effect-missing-cleanup": 0,
+      "react-effect-fetch-race": 0,
+      "react-effect-for-event": 0,
+      "react-state-mutation": 0,
+      "react-index-key": 0,
+      "react-props-mirrored-in-state": 0,
+      "ts-unvalidated-external-data": 1,
+      "ts-sequential-await-loop": 0,
+      "ts-boolean-trap": 0,
+      "react-async-overlap": 0
+    },
+    "totalViolations": 4,
+    "regexHits": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 1,
+      "ts-no-debug-console": 0,
+      "ts-no-empty-catch": 0,
+      "ts-no-ts-ignore": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "react-signup-form",
+    "lang": "typescript",
+    "condition": "jev+fix",
+    "rep": 2,
+    "reviewFindings": 4,
+    "ruleCoveredFindings": 0,
+    "fix": {
+      "wallMs": 64413,
+      "costUsd": 0.22982400000000003,
+      "durationMs": 63607,
+      "turns": 10
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 3,
+      "rewakes": 0,
+      "costUsd": 0.22982400000000003,
+      "durationMs": 63607,
+      "numTurns": 6,
+      "isError": false
+    },
+    "hook": {
+      "calls": 3,
+      "findingsShown": 2,
+      "highShown": 0,
+      "mediumShown": 2,
+      "errors": 0,
+      "meanLatencyMs": 302.645736,
+      "editsAfterFeedback": 2
+    },
+    "original": {
+      "costUsd": 0.1512814,
+      "durationMs": 55652
+    },
+    "lines": 252,
+    "violations": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-empty-catch": 0,
+      "ts-no-debug-console": 0,
+      "ts-no-restating-comment": 0,
+      "ts-no-vague-names": 0,
+      "ts-no-magic-numbers": 1,
+      "ts-no-commented-out-code": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0,
+      "ts-no-ts-ignore": 0,
+      "react-derived-state-effect": 0,
+      "react-effect-missing-cleanup": 0,
+      "react-effect-fetch-race": 0,
+      "react-effect-for-event": 0,
+      "react-state-mutation": 0,
+      "react-index-key": 0,
+      "react-props-mirrored-in-state": 0,
+      "ts-unvalidated-external-data": 0,
+      "ts-sequential-await-loop": 0,
+      "ts-boolean-trap": 0,
+      "react-async-overlap": 0
+    },
+    "totalViolations": 1,
+    "regexHits": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 1,
+      "ts-no-debug-console": 0,
+      "ts-no-empty-catch": 0,
+      "ts-no-ts-ignore": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "react-chat-room",
+    "lang": "typescript",
+    "condition": "none+fix",
+    "rep": 2,
+    "reviewFindings": 3,
+    "ruleCoveredFindings": 0,
+    "fix": {
+      "wallMs": 48233,
+      "costUsd": 0.1416944,
+      "durationMs": 47282,
+      "turns": 6
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 1,
+      "rewakes": 0,
+      "costUsd": 0.1416944,
+      "durationMs": 47282,
+      "numTurns": 6,
+      "isError": false
+    },
+    "hook": {
+      "calls": 0,
+      "findingsShown": 0,
+      "highShown": 0,
+      "mediumShown": 0,
+      "errors": 0,
+      "meanLatencyMs": 0,
+      "editsAfterFeedback": 0
+    },
+    "original": {
+      "costUsd": 0.10943220000000001,
+      "durationMs": 31478
+    },
+    "lines": 167,
+    "violations": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-empty-catch": 1,
+      "ts-no-debug-console": 0,
+      "ts-no-restating-comment": 0,
+      "ts-no-vague-names": 0,
+      "ts-no-magic-numbers": 0,
+      "ts-no-commented-out-code": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0,
+      "ts-no-ts-ignore": 0,
+      "react-derived-state-effect": 0,
+      "react-effect-missing-cleanup": 0,
+      "react-effect-fetch-race": 0,
+      "react-effect-for-event": 0,
+      "react-state-mutation": 0,
+      "react-index-key": 0,
+      "react-props-mirrored-in-state": 0,
+      "ts-unvalidated-external-data": 0,
+      "ts-sequential-await-loop": 0,
+      "ts-boolean-trap": 0,
+      "react-async-overlap": 0
+    },
+    "totalViolations": 1,
+    "regexHits": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-debug-console": 0,
+      "ts-no-empty-catch": 1,
+      "ts-no-ts-ignore": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "swift-legacy-bridge",
+    "lang": "swift",
+    "condition": "jev+fix",
+    "rep": 1,
+    "reviewFindings": 3,
+    "ruleCoveredFindings": 2,
+    "fix": {
+      "wallMs": 124637,
+      "costUsd": 0.246128,
+      "durationMs": 123940,
+      "turns": 7
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 4,
+      "rewakes": 0,
+      "costUsd": 0.246128,
+      "durationMs": 123940,
+      "numTurns": 10,
+      "isError": false
+    },
+    "hook": {
+      "calls": 4,
+      "findingsShown": 6,
+      "highShown": 3,
+      "mediumShown": 3,
+      "errors": 0,
+      "meanLatencyMs": 368.14649999999995,
+      "editsAfterFeedback": 3
+    },
+    "original": {
+      "costUsd": 0.36665999999999993,
+      "durationMs": 204232
+    },
+    "lines": 171,
+    "violations": {
+      "swift-no-force-unwrap": 0,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-restating-comment": 0,
+      "swift-no-vague-names": 0,
+      "swift-no-magic-numbers": 1,
+      "swift-no-commented-out-code": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0,
+      "swift-ui-off-main": 0,
+      "swift-prefer-guard": 0,
+      "swiftui-observedobject-owned": 0,
+      "swiftui-state-not-private": 0,
+      "swiftui-expensive-body": 0,
+      "swiftui-task-in-onappear": 0,
+      "swift-escaping-closure-retain-cycle": 0,
+      "swift-blocking-main-thread": 0,
+      "swift-continuation-misuse": 0,
+      "swift-unprotected-shared-state": 0,
+      "swiftui-foreach-unstable-id": 0,
+      "swift-dispatch-in-async": 0,
+      "swift-continuation-cancellation": 2,
+      "swift-continuation-stored-overwrite": 0
+    },
+    "totalViolations": 3,
+    "regexHits": {
+      "swift-no-force-unwrap": 0,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "react-chat-room",
+    "lang": "typescript",
+    "condition": "jev+fix",
+    "rep": 2,
+    "reviewFindings": 3,
+    "ruleCoveredFindings": 1,
+    "fix": {
+      "wallMs": 53828,
+      "costUsd": 0.17363340000000002,
+      "durationMs": 52999,
+      "turns": 9
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 2,
+      "rewakes": 0,
+      "costUsd": 0.17363340000000002,
+      "durationMs": 52999,
+      "numTurns": 6,
+      "isError": false
+    },
+    "hook": {
+      "calls": 2,
+      "findingsShown": 1,
+      "highShown": 1,
+      "mediumShown": 0,
+      "errors": 0,
+      "meanLatencyMs": 313.5700415,
+      "editsAfterFeedback": 1
+    },
+    "original": {
+      "costUsd": 0.1168748,
+      "durationMs": 30466
+    },
+    "lines": 180,
+    "violations": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-empty-catch": 0,
+      "ts-no-debug-console": 0,
+      "ts-no-restating-comment": 0,
+      "ts-no-vague-names": 1,
+      "ts-no-magic-numbers": 0,
+      "ts-no-commented-out-code": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0,
+      "ts-no-ts-ignore": 0,
+      "react-derived-state-effect": 0,
+      "react-effect-missing-cleanup": 0,
+      "react-effect-fetch-race": 0,
+      "react-effect-for-event": 0,
+      "react-state-mutation": 0,
+      "react-index-key": 0,
+      "react-props-mirrored-in-state": 0,
+      "ts-unvalidated-external-data": 0,
+      "ts-sequential-await-loop": 0,
+      "ts-boolean-trap": 0,
+      "react-async-overlap": 0
+    },
+    "totalViolations": 1,
+    "regexHits": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-debug-console": 0,
+      "ts-no-empty-catch": 0,
+      "ts-no-ts-ignore": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "react-todo-board",
+    "lang": "typescript",
+    "condition": "none+fix",
+    "rep": 2,
+    "reviewFindings": 4,
+    "ruleCoveredFindings": 1,
+    "fix": {
+      "wallMs": 60149,
+      "costUsd": 0.2002966,
+      "durationMs": 59359,
+      "turns": 11
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 1,
+      "rewakes": 0,
+      "costUsd": 0.2002966,
+      "durationMs": 59359,
+      "numTurns": 7,
+      "isError": false
+    },
+    "hook": {
+      "calls": 0,
+      "findingsShown": 0,
+      "highShown": 0,
+      "mediumShown": 0,
+      "errors": 0,
+      "meanLatencyMs": 0,
+      "editsAfterFeedback": 0
+    },
+    "original": {
+      "costUsd": 0.11476159999999999,
+      "durationMs": 34600
+    },
+    "lines": 238,
+    "violations": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-empty-catch": 0,
+      "ts-no-debug-console": 0,
+      "ts-no-restating-comment": 0,
+      "ts-no-vague-names": 0,
+      "ts-no-magic-numbers": 0,
+      "ts-no-commented-out-code": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0,
+      "ts-no-ts-ignore": 0,
+      "react-derived-state-effect": 0,
+      "react-effect-missing-cleanup": 0,
+      "react-effect-fetch-race": 0,
+      "react-effect-for-event": 0,
+      "react-state-mutation": 0,
+      "react-index-key": 0,
+      "react-props-mirrored-in-state": 0,
+      "ts-unvalidated-external-data": 0,
+      "ts-sequential-await-loop": 0,
+      "ts-boolean-trap": 0,
+      "react-async-overlap": 0
+    },
+    "totalViolations": 0,
+    "regexHits": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-debug-console": 0,
+      "ts-no-empty-catch": 1,
+      "ts-no-ts-ignore": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "react-chat-room",
+    "lang": "typescript",
+    "condition": "jev-rewake+fix",
+    "rep": 2,
+    "reviewFindings": 3,
+    "ruleCoveredFindings": 0,
+    "fix": {
+      "wallMs": 33922,
+      "costUsd": 0.11911820000000001,
+      "durationMs": 32826,
+      "turns": 6
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 2,
+      "rewakes": 0,
+      "costUsd": 0.11911820000000001,
+      "durationMs": 32826,
+      "numTurns": 7,
+      "isError": false
+    },
+    "hook": {
+      "calls": 2,
+      "findingsShown": 1,
+      "highShown": 1,
+      "mediumShown": 0,
+      "errors": 0,
+      "meanLatencyMs": 289.227625,
+      "editsAfterFeedback": 1
+    },
+    "original": {
+      "costUsd": 0.12563059999999998,
+      "durationMs": 39977
+    },
+    "lines": 140,
+    "violations": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-empty-catch": 0,
+      "ts-no-debug-console": 0,
+      "ts-no-restating-comment": 0,
+      "ts-no-vague-names": 1,
+      "ts-no-magic-numbers": 0,
+      "ts-no-commented-out-code": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0,
+      "ts-no-ts-ignore": 0,
+      "react-derived-state-effect": 0,
+      "react-effect-missing-cleanup": 0,
+      "react-effect-fetch-race": 0,
+      "react-effect-for-event": 0,
+      "react-state-mutation": 0,
+      "react-index-key": 0,
+      "react-props-mirrored-in-state": 0,
+      "ts-unvalidated-external-data": 0,
+      "ts-sequential-await-loop": 0,
+      "ts-boolean-trap": 0,
+      "react-async-overlap": 0
+    },
+    "totalViolations": 1,
+    "regexHits": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-debug-console": 0,
+      "ts-no-empty-catch": 0,
+      "ts-no-ts-ignore": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "swiftui-search",
+    "lang": "swift",
+    "condition": "jev+fix",
+    "rep": 2,
+    "reviewFindings": 2,
+    "ruleCoveredFindings": 1,
+    "fix": {
+      "wallMs": 31945,
+      "costUsd": 0.0970346,
+      "durationMs": 31233,
+      "turns": 5
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 1,
+      "rewakes": 0,
+      "costUsd": 0.0970346,
+      "durationMs": 31233,
+      "numTurns": 6,
+      "isError": false
+    },
+    "hook": {
+      "calls": 1,
+      "findingsShown": 1,
+      "highShown": 1,
+      "mediumShown": 0,
+      "errors": 0,
+      "meanLatencyMs": 251.463709,
+      "editsAfterFeedback": 0
+    },
+    "original": {
+      "costUsd": 0.13914759999999998,
+      "durationMs": 55666
+    },
+    "lines": 148,
+    "violations": {
+      "swift-no-force-unwrap": 0,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-restating-comment": 0,
+      "swift-no-vague-names": 0,
+      "swift-no-magic-numbers": 0,
+      "swift-no-commented-out-code": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0,
+      "swift-ui-off-main": 0,
+      "swift-prefer-guard": 0,
+      "swiftui-observedobject-owned": 0,
+      "swiftui-state-not-private": 0,
+      "swiftui-expensive-body": 0,
+      "swiftui-task-in-onappear": 0,
+      "swift-escaping-closure-retain-cycle": 0,
+      "swift-blocking-main-thread": 0,
+      "swift-continuation-misuse": 0,
+      "swift-unprotected-shared-state": 0,
+      "swiftui-foreach-unstable-id": 0,
+      "swift-dispatch-in-async": 0,
+      "swift-continuation-cancellation": 0,
+      "swift-continuation-stored-overwrite": 0
+    },
+    "totalViolations": 0,
+    "regexHits": {
+      "swift-no-force-unwrap": 0,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "react-todo-board",
+    "lang": "typescript",
+    "condition": "jev-rewake+fix",
+    "rep": 2,
+    "reviewFindings": 4,
+    "ruleCoveredFindings": 1,
+    "fix": {
+      "wallMs": 75953,
+      "costUsd": 0.1831022,
+      "durationMs": 75138,
+      "turns": 7
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 1,
+      "rewakes": 0,
+      "costUsd": 0.1831022,
+      "durationMs": 75138,
+      "numTurns": 7,
+      "isError": false
+    },
+    "hook": {
+      "calls": 1,
+      "findingsShown": 0,
+      "highShown": 0,
+      "mediumShown": 0,
+      "errors": 0,
+      "meanLatencyMs": 346.21508300000005,
+      "editsAfterFeedback": 0
+    },
+    "original": {
+      "costUsd": 0.113234,
+      "durationMs": 30857
+    },
+    "lines": 246,
+    "violations": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-empty-catch": 1,
+      "ts-no-debug-console": 0,
+      "ts-no-restating-comment": 0,
+      "ts-no-vague-names": 0,
+      "ts-no-magic-numbers": 0,
+      "ts-no-commented-out-code": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0,
+      "ts-no-ts-ignore": 0,
+      "react-derived-state-effect": 0,
+      "react-effect-missing-cleanup": 0,
+      "react-effect-fetch-race": 0,
+      "react-effect-for-event": 0,
+      "react-state-mutation": 0,
+      "react-index-key": 0,
+      "react-props-mirrored-in-state": 0,
+      "ts-unvalidated-external-data": 0,
+      "ts-sequential-await-loop": 0,
+      "ts-boolean-trap": 0,
+      "react-async-overlap": 0
+    },
+    "totalViolations": 1,
+    "regexHits": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-debug-console": 0,
+      "ts-no-empty-catch": 1,
+      "ts-no-ts-ignore": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "react-todo-board",
+    "lang": "typescript",
+    "condition": "jev+fix",
+    "rep": 2,
+    "reviewFindings": 7,
+    "ruleCoveredFindings": 1,
+    "fix": {
+      "wallMs": 83661,
+      "costUsd": 0.2655634,
+      "durationMs": 82820,
+      "turns": 12
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 1,
+      "rewakes": 0,
+      "costUsd": 0.2655634,
+      "durationMs": 82820,
+      "numTurns": 7,
+      "isError": false
+    },
+    "hook": {
+      "calls": 1,
+      "findingsShown": 0,
+      "highShown": 0,
+      "mediumShown": 0,
+      "errors": 0,
+      "meanLatencyMs": 312.13649999999996,
+      "editsAfterFeedback": 0
+    },
+    "original": {
+      "costUsd": 0.116014,
+      "durationMs": 35627
+    },
+    "lines": 254,
+    "violations": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-empty-catch": 1,
+      "ts-no-debug-console": 0,
+      "ts-no-restating-comment": 0,
+      "ts-no-vague-names": 0,
+      "ts-no-magic-numbers": 2,
+      "ts-no-commented-out-code": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0,
+      "ts-no-ts-ignore": 0,
+      "react-derived-state-effect": 0,
+      "react-effect-missing-cleanup": 0,
+      "react-effect-fetch-race": 0,
+      "react-effect-for-event": 0,
+      "react-state-mutation": 0,
+      "react-index-key": 0,
+      "react-props-mirrored-in-state": 0,
+      "ts-unvalidated-external-data": 0,
+      "ts-sequential-await-loop": 0,
+      "ts-boolean-trap": 0,
+      "react-async-overlap": 0
+    },
+    "totalViolations": 3,
+    "regexHits": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-debug-console": 0,
+      "ts-no-empty-catch": 1,
+      "ts-no-ts-ignore": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "swiftui-stopwatch",
+    "lang": "swift",
+    "condition": "none+fix",
+    "rep": 2,
+    "reviewFindings": 5,
+    "ruleCoveredFindings": 0,
+    "fix": {
+      "wallMs": 47501,
+      "costUsd": 0.1279706,
+      "durationMs": 46638,
+      "turns": 5
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 1,
+      "rewakes": 0,
+      "costUsd": 0.1279706,
+      "durationMs": 46638,
+      "numTurns": 6,
+      "isError": false
+    },
+    "hook": {
+      "calls": 0,
+      "findingsShown": 0,
+      "highShown": 0,
+      "mediumShown": 0,
+      "errors": 0,
+      "meanLatencyMs": 0,
+      "editsAfterFeedback": 0
+    },
+    "original": {
+      "costUsd": 0.1027402,
+      "durationMs": 34110
+    },
+    "lines": 112,
+    "violations": {
+      "swift-no-force-unwrap": 0,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-restating-comment": 0,
+      "swift-no-vague-names": 0,
+      "swift-no-magic-numbers": 0,
+      "swift-no-commented-out-code": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0,
+      "swift-ui-off-main": 0,
+      "swift-prefer-guard": 0,
+      "swiftui-observedobject-owned": 0,
+      "swiftui-state-not-private": 0,
+      "swiftui-expensive-body": 0,
+      "swiftui-task-in-onappear": 0,
+      "swift-escaping-closure-retain-cycle": 0,
+      "swift-blocking-main-thread": 0,
+      "swift-continuation-misuse": 0,
+      "swift-unprotected-shared-state": 0,
+      "swiftui-foreach-unstable-id": 1,
+      "swift-dispatch-in-async": 0,
+      "swift-continuation-cancellation": 0,
+      "swift-continuation-stored-overwrite": 0
+    },
+    "totalViolations": 1,
+    "regexHits": {
+      "swift-no-force-unwrap": 0,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "react-profile-editor",
+    "lang": "typescript",
+    "condition": "jev+fix",
+    "rep": 2,
+    "reviewFindings": 5,
+    "ruleCoveredFindings": 1,
+    "fix": {
+      "wallMs": 50556,
+      "costUsd": 0.156879,
+      "durationMs": 49771,
+      "turns": 12
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 5,
+      "rewakes": 0,
+      "costUsd": 0.156879,
+      "durationMs": 49771,
+      "numTurns": 9,
+      "isError": false
+    },
+    "hook": {
+      "calls": 5,
+      "findingsShown": 2,
+      "highShown": 1,
+      "mediumShown": 1,
+      "errors": 0,
+      "meanLatencyMs": 285.02007480000003,
+      "editsAfterFeedback": 3
+    },
+    "original": {
+      "costUsd": 0.1526774,
+      "durationMs": 38282
+    },
+    "lines": 160,
+    "violations": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-empty-catch": 0,
+      "ts-no-debug-console": 0,
+      "ts-no-restating-comment": 0,
+      "ts-no-vague-names": 0,
+      "ts-no-magic-numbers": 0,
+      "ts-no-commented-out-code": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0,
+      "ts-no-ts-ignore": 0,
+      "react-derived-state-effect": 0,
+      "react-effect-missing-cleanup": 0,
+      "react-effect-fetch-race": 0,
+      "react-effect-for-event": 0,
+      "react-state-mutation": 0,
+      "react-index-key": 0,
+      "react-props-mirrored-in-state": 1,
+      "ts-unvalidated-external-data": 0,
+      "ts-sequential-await-loop": 0,
+      "ts-boolean-trap": 0,
+      "react-async-overlap": 0
+    },
+    "totalViolations": 1,
+    "regexHits": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-debug-console": 0,
+      "ts-no-empty-catch": 0,
+      "ts-no-ts-ignore": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "swiftui-search",
+    "lang": "swift",
+    "condition": "none+fix",
+    "rep": 2,
+    "reviewFindings": 4,
+    "ruleCoveredFindings": 2,
+    "fix": {
+      "wallMs": 47981,
+      "costUsd": 0.14160660000000003,
+      "durationMs": 47265,
+      "turns": 7
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 1,
+      "rewakes": 0,
+      "costUsd": 0.14160660000000003,
+      "durationMs": 47265,
+      "numTurns": 6,
+      "isError": false
+    },
+    "hook": {
+      "calls": 0,
+      "findingsShown": 0,
+      "highShown": 0,
+      "mediumShown": 0,
+      "errors": 0,
+      "meanLatencyMs": 0,
+      "editsAfterFeedback": 0
+    },
+    "original": {
+      "costUsd": 0.1324122,
+      "durationMs": 56826
+    },
+    "lines": 149,
+    "violations": {
+      "swift-no-force-unwrap": 0,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-restating-comment": 0,
+      "swift-no-vague-names": 0,
+      "swift-no-magic-numbers": 0,
+      "swift-no-commented-out-code": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0,
+      "swift-ui-off-main": 0,
+      "swift-prefer-guard": 0,
+      "swiftui-observedobject-owned": 0,
+      "swiftui-state-not-private": 0,
+      "swiftui-expensive-body": 0,
+      "swiftui-task-in-onappear": 0,
+      "swift-escaping-closure-retain-cycle": 0,
+      "swift-blocking-main-thread": 0,
+      "swift-continuation-misuse": 0,
+      "swift-unprotected-shared-state": 0,
+      "swiftui-foreach-unstable-id": 0,
+      "swift-dispatch-in-async": 0,
+      "swift-continuation-cancellation": 0,
+      "swift-continuation-stored-overwrite": 0
+    },
+    "totalViolations": 0,
+    "regexHits": {
+      "swift-no-force-unwrap": 0,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "react-profile-editor",
+    "lang": "typescript",
+    "condition": "none+fix",
+    "rep": 2,
+    "reviewFindings": 7,
+    "ruleCoveredFindings": 1,
+    "fix": {
+      "wallMs": 72482,
+      "costUsd": 0.1925698,
+      "durationMs": 71709,
+      "turns": 10
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 2,
+      "rewakes": 0,
+      "costUsd": 0.1925698,
+      "durationMs": 71709,
+      "numTurns": 6,
+      "isError": false
+    },
+    "hook": {
+      "calls": 0,
+      "findingsShown": 0,
+      "highShown": 0,
+      "mediumShown": 0,
+      "errors": 0,
+      "meanLatencyMs": 0,
+      "editsAfterFeedback": 0
+    },
+    "original": {
+      "costUsd": 0.1118684,
+      "durationMs": 29930
+    },
+    "lines": 172,
+    "violations": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-empty-catch": 0,
+      "ts-no-debug-console": 0,
+      "ts-no-restating-comment": 0,
+      "ts-no-vague-names": 0,
+      "ts-no-magic-numbers": 0,
+      "ts-no-commented-out-code": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0,
+      "ts-no-ts-ignore": 0,
+      "react-derived-state-effect": 0,
+      "react-effect-missing-cleanup": 0,
+      "react-effect-fetch-race": 0,
+      "react-effect-for-event": 0,
+      "react-state-mutation": 0,
+      "react-index-key": 0,
+      "react-props-mirrored-in-state": 0,
+      "ts-unvalidated-external-data": 0,
+      "ts-sequential-await-loop": 0,
+      "ts-boolean-trap": 0,
+      "react-async-overlap": 0
+    },
+    "totalViolations": 0,
+    "regexHits": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-debug-console": 0,
+      "ts-no-empty-catch": 0,
+      "ts-no-ts-ignore": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "swiftui-settings",
+    "lang": "swift",
+    "condition": "jev-rewake+fix",
+    "rep": 2,
+    "reviewFindings": 1,
+    "ruleCoveredFindings": 0,
+    "fix": {
+      "wallMs": 33527,
+      "costUsd": 0.0895612,
+      "durationMs": 32817,
+      "turns": 5
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 3,
+      "rewakes": 0,
+      "costUsd": 0.0895612,
+      "durationMs": 32817,
+      "numTurns": 8,
+      "isError": false
+    },
+    "hook": {
+      "calls": 3,
+      "findingsShown": 1,
+      "highShown": 0,
+      "mediumShown": 1,
+      "errors": 0,
+      "meanLatencyMs": 264.1080973333333,
+      "editsAfterFeedback": 2
+    },
+    "original": {
+      "costUsd": 0.1784546,
+      "durationMs": 66275
+    },
+    "lines": 139,
+    "violations": {
+      "swift-no-force-unwrap": 0,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-restating-comment": 0,
+      "swift-no-vague-names": 0,
+      "swift-no-magic-numbers": 0,
+      "swift-no-commented-out-code": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0,
+      "swift-ui-off-main": 0,
+      "swift-prefer-guard": 0,
+      "swiftui-observedobject-owned": 0,
+      "swiftui-state-not-private": 0,
+      "swiftui-expensive-body": 0,
+      "swiftui-task-in-onappear": 0,
+      "swift-escaping-closure-retain-cycle": 0,
+      "swift-blocking-main-thread": 0,
+      "swift-continuation-misuse": 0,
+      "swift-unprotected-shared-state": 0,
+      "swiftui-foreach-unstable-id": 0,
+      "swift-dispatch-in-async": 0,
+      "swift-continuation-cancellation": 0,
+      "swift-continuation-stored-overwrite": 0
+    },
+    "totalViolations": 0,
+    "regexHits": {
+      "swift-no-force-unwrap": 0,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "react-profile-editor",
+    "lang": "typescript",
+    "condition": "jev-rewake+fix",
+    "rep": 2,
+    "reviewFindings": 6,
+    "ruleCoveredFindings": 0,
+    "fix": {
+      "wallMs": 57586,
+      "costUsd": 0.185095,
+      "durationMs": 56888,
+      "turns": 12
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 5,
+      "rewakes": 0,
+      "costUsd": 0.185095,
+      "durationMs": 56888,
+      "numTurns": 11,
+      "isError": false
+    },
+    "hook": {
+      "calls": 5,
+      "findingsShown": 2,
+      "highShown": 2,
+      "mediumShown": 0,
+      "errors": 0,
+      "meanLatencyMs": 328.59395860000006,
+      "editsAfterFeedback": 3
+    },
+    "original": {
+      "costUsd": 0.1762788,
+      "durationMs": 50838
+    },
+    "lines": 173,
+    "violations": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-empty-catch": 0,
+      "ts-no-debug-console": 0,
+      "ts-no-restating-comment": 0,
+      "ts-no-vague-names": 0,
+      "ts-no-magic-numbers": 0,
+      "ts-no-commented-out-code": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0,
+      "ts-no-ts-ignore": 0,
+      "react-derived-state-effect": 0,
+      "react-effect-missing-cleanup": 0,
+      "react-effect-fetch-race": 0,
+      "react-effect-for-event": 0,
+      "react-state-mutation": 0,
+      "react-index-key": 0,
+      "react-props-mirrored-in-state": 1,
+      "ts-unvalidated-external-data": 0,
+      "ts-sequential-await-loop": 0,
+      "ts-boolean-trap": 0,
+      "react-async-overlap": 0
+    },
+    "totalViolations": 1,
+    "regexHits": {
+      "ts-no-explicit-any": 0,
+      "ts-no-non-null-assertion": 0,
+      "ts-no-debug-console": 0,
+      "ts-no-empty-catch": 0,
+      "ts-no-ts-ignore": 0,
+      "ts-no-bare-todo": 0,
+      "ts-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "swiftui-search",
+    "lang": "swift",
+    "condition": "jev-rewake+fix",
+    "rep": 2,
+    "reviewFindings": 3,
+    "ruleCoveredFindings": 1,
+    "fix": {
+      "wallMs": 50585,
+      "costUsd": 0.11241600000000002,
+      "durationMs": 49861,
+      "turns": 5
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 2,
+      "rewakes": 0,
+      "costUsd": 0.11241600000000002,
+      "durationMs": 49861,
+      "numTurns": 7,
+      "isError": false
+    },
+    "hook": {
+      "calls": 2,
+      "findingsShown": 1,
+      "highShown": 0,
+      "mediumShown": 1,
+      "errors": 0,
+      "meanLatencyMs": 242.3432085,
+      "editsAfterFeedback": 1
+    },
+    "original": {
+      "costUsd": 0.1633702,
+      "durationMs": 64143
+    },
+    "lines": 142,
+    "violations": {
+      "swift-no-force-unwrap": 0,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-restating-comment": 0,
+      "swift-no-vague-names": 0,
+      "swift-no-magic-numbers": 0,
+      "swift-no-commented-out-code": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0,
+      "swift-ui-off-main": 0,
+      "swift-prefer-guard": 0,
+      "swiftui-observedobject-owned": 0,
+      "swiftui-state-not-private": 0,
+      "swiftui-expensive-body": 0,
+      "swiftui-task-in-onappear": 0,
+      "swift-escaping-closure-retain-cycle": 0,
+      "swift-blocking-main-thread": 0,
+      "swift-continuation-misuse": 0,
+      "swift-unprotected-shared-state": 0,
+      "swiftui-foreach-unstable-id": 0,
+      "swift-dispatch-in-async": 0,
+      "swift-continuation-cancellation": 0,
+      "swift-continuation-stored-overwrite": 0
+    },
+    "totalViolations": 0,
+    "regexHits": {
+      "swift-no-force-unwrap": 0,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "swiftui-stopwatch",
+    "lang": "swift",
+    "condition": "jev-rewake+fix",
+    "rep": 2,
+    "reviewFindings": 5,
+    "ruleCoveredFindings": 0,
+    "fix": {
+      "wallMs": 64455,
+      "costUsd": 0.15834759999999998,
+      "durationMs": 63727,
+      "turns": 7
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 1,
+      "rewakes": 0,
+      "costUsd": 0.15834759999999998,
+      "durationMs": 63727,
+      "numTurns": 6,
+      "isError": false
+    },
+    "hook": {
+      "calls": 1,
+      "findingsShown": 0,
+      "highShown": 0,
+      "mediumShown": 0,
+      "errors": 0,
+      "meanLatencyMs": 252.62637499999997,
+      "editsAfterFeedback": 0
+    },
+    "original": {
+      "costUsd": 0.106958,
+      "durationMs": 41486
+    },
+    "lines": 109,
+    "violations": {
+      "swift-no-force-unwrap": 0,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-restating-comment": 0,
+      "swift-no-vague-names": 0,
+      "swift-no-magic-numbers": 0,
+      "swift-no-commented-out-code": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0,
+      "swift-ui-off-main": 0,
+      "swift-prefer-guard": 0,
+      "swiftui-observedobject-owned": 0,
+      "swiftui-state-not-private": 0,
+      "swiftui-expensive-body": 0,
+      "swiftui-task-in-onappear": 0,
+      "swift-escaping-closure-retain-cycle": 0,
+      "swift-blocking-main-thread": 0,
+      "swift-continuation-misuse": 0,
+      "swift-unprotected-shared-state": 0,
+      "swiftui-foreach-unstable-id": 0,
+      "swift-dispatch-in-async": 0,
+      "swift-continuation-cancellation": 0,
+      "swift-continuation-stored-overwrite": 0
+    },
+    "totalViolations": 0,
+    "regexHits": {
+      "swift-no-force-unwrap": 0,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "swiftui-settings",
+    "lang": "swift",
+    "condition": "jev+fix",
+    "rep": 2,
+    "reviewFindings": 1,
+    "ruleCoveredFindings": 0,
+    "fix": {
+      "wallMs": 41839,
+      "costUsd": 0.14292080000000001,
+      "durationMs": 40785,
+      "turns": 8
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 6,
+      "rewakes": 0,
+      "costUsd": 0.14292080000000001,
+      "durationMs": 40785,
+      "numTurns": 13,
+      "isError": false
+    },
+    "hook": {
+      "calls": 6,
+      "findingsShown": 0,
+      "highShown": 0,
+      "mediumShown": 0,
+      "errors": 0,
+      "meanLatencyMs": 281.7041945,
+      "editsAfterFeedback": 0
+    },
+    "original": {
+      "costUsd": 0.22000719999999999,
+      "durationMs": 77072
+    },
+    "lines": 151,
+    "violations": {
+      "swift-no-force-unwrap": 0,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-restating-comment": 0,
+      "swift-no-vague-names": 0,
+      "swift-no-magic-numbers": 0,
+      "swift-no-commented-out-code": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0,
+      "swift-ui-off-main": 0,
+      "swift-prefer-guard": 0,
+      "swiftui-observedobject-owned": 0,
+      "swiftui-state-not-private": 0,
+      "swiftui-expensive-body": 0,
+      "swiftui-task-in-onappear": 0,
+      "swift-escaping-closure-retain-cycle": 0,
+      "swift-blocking-main-thread": 0,
+      "swift-continuation-misuse": 0,
+      "swift-unprotected-shared-state": 0,
+      "swiftui-foreach-unstable-id": 0,
+      "swift-dispatch-in-async": 0,
+      "swift-continuation-cancellation": 0,
+      "swift-continuation-stored-overwrite": 0
+    },
+    "totalViolations": 0,
+    "regexHits": {
+      "swift-no-force-unwrap": 0,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "swiftui-thumbnail-grid",
+    "lang": "swift",
+    "condition": "none+fix",
+    "rep": 2,
+    "reviewFindings": 2,
+    "ruleCoveredFindings": 0,
+    "fix": {
+      "wallMs": 37859,
+      "costUsd": 0.1153556,
+      "durationMs": 37112,
+      "turns": 5
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 1,
+      "rewakes": 0,
+      "costUsd": 0.1153556,
+      "durationMs": 37112,
+      "numTurns": 6,
+      "isError": false
+    },
+    "hook": {
+      "calls": 0,
+      "findingsShown": 0,
+      "highShown": 0,
+      "mediumShown": 0,
+      "errors": 0,
+      "meanLatencyMs": 0,
+      "editsAfterFeedback": 0
+    },
+    "original": {
+      "costUsd": 0.144997,
+      "durationMs": 59707
+    },
+    "lines": 160,
+    "violations": {
+      "swift-no-force-unwrap": 0,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-restating-comment": 0,
+      "swift-no-vague-names": 0,
+      "swift-no-magic-numbers": 0,
+      "swift-no-commented-out-code": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0,
+      "swift-ui-off-main": 0,
+      "swift-prefer-guard": 0,
+      "swiftui-observedobject-owned": 0,
+      "swiftui-state-not-private": 0,
+      "swiftui-expensive-body": 0,
+      "swiftui-task-in-onappear": 0,
+      "swift-escaping-closure-retain-cycle": 0,
+      "swift-blocking-main-thread": 0,
+      "swift-continuation-misuse": 0,
+      "swift-unprotected-shared-state": 0,
+      "swiftui-foreach-unstable-id": 0,
+      "swift-dispatch-in-async": 0,
+      "swift-continuation-cancellation": 0,
+      "swift-continuation-stored-overwrite": 0
+    },
+    "totalViolations": 0,
+    "regexHits": {
+      "swift-no-force-unwrap": 0,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "swiftui-settings",
+    "lang": "swift",
+    "condition": "none+fix",
+    "rep": 2,
+    "reviewFindings": 1,
+    "ruleCoveredFindings": 0,
+    "fix": {
+      "wallMs": 43437,
+      "costUsd": 0.1212782,
+      "durationMs": 42748,
+      "turns": 6
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 2,
+      "rewakes": 0,
+      "costUsd": 0.1212782,
+      "durationMs": 42748,
+      "numTurns": 8,
+      "isError": false
+    },
+    "hook": {
+      "calls": 0,
+      "findingsShown": 0,
+      "highShown": 0,
+      "mediumShown": 0,
+      "errors": 0,
+      "meanLatencyMs": 0,
+      "editsAfterFeedback": 0
+    },
+    "original": {
+      "costUsd": 0.17562180000000002,
+      "durationMs": 69194
+    },
+    "lines": 160,
+    "violations": {
+      "swift-no-force-unwrap": 0,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-restating-comment": 0,
+      "swift-no-vague-names": 1,
+      "swift-no-magic-numbers": 0,
+      "swift-no-commented-out-code": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0,
+      "swift-ui-off-main": 0,
+      "swift-prefer-guard": 0,
+      "swiftui-observedobject-owned": 0,
+      "swiftui-state-not-private": 0,
+      "swiftui-expensive-body": 0,
+      "swiftui-task-in-onappear": 0,
+      "swift-escaping-closure-retain-cycle": 0,
+      "swift-blocking-main-thread": 0,
+      "swift-continuation-misuse": 0,
+      "swift-unprotected-shared-state": 0,
+      "swiftui-foreach-unstable-id": 0,
+      "swift-dispatch-in-async": 0,
+      "swift-continuation-cancellation": 0,
+      "swift-continuation-stored-overwrite": 0
+    },
+    "totalViolations": 1,
+    "regexHits": {
+      "swift-no-force-unwrap": 0,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "swiftui-thumbnail-grid",
+    "lang": "swift",
+    "condition": "jev+fix",
+    "rep": 2,
+    "reviewFindings": 4,
+    "ruleCoveredFindings": 0,
+    "fix": {
+      "wallMs": 50894,
+      "costUsd": 0.145078,
+      "durationMs": 50161,
+      "turns": 6
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 1,
+      "rewakes": 0,
+      "costUsd": 0.145078,
+      "durationMs": 50161,
+      "numTurns": 6,
+      "isError": false
+    },
+    "hook": {
+      "calls": 1,
+      "findingsShown": 0,
+      "highShown": 0,
+      "mediumShown": 0,
+      "errors": 0,
+      "meanLatencyMs": 306.940625,
+      "editsAfterFeedback": 0
+    },
+    "original": {
+      "costUsd": 0.1373436,
+      "durationMs": 55714
+    },
+    "lines": 162,
+    "violations": {
+      "swift-no-force-unwrap": 0,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-restating-comment": 0,
+      "swift-no-vague-names": 1,
+      "swift-no-magic-numbers": 0,
+      "swift-no-commented-out-code": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0,
+      "swift-ui-off-main": 0,
+      "swift-prefer-guard": 0,
+      "swiftui-observedobject-owned": 0,
+      "swiftui-state-not-private": 0,
+      "swiftui-expensive-body": 0,
+      "swiftui-task-in-onappear": 0,
+      "swift-escaping-closure-retain-cycle": 0,
+      "swift-blocking-main-thread": 0,
+      "swift-continuation-misuse": 0,
+      "swift-unprotected-shared-state": 0,
+      "swiftui-foreach-unstable-id": 1,
+      "swift-dispatch-in-async": 0,
+      "swift-continuation-cancellation": 0,
+      "swift-continuation-stored-overwrite": 0
+    },
+    "totalViolations": 2,
+    "regexHits": {
+      "swift-no-force-unwrap": 0,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "swiftui-stopwatch",
+    "lang": "swift",
+    "condition": "jev+fix",
+    "rep": 2,
+    "reviewFindings": 5,
+    "ruleCoveredFindings": 0,
+    "fix": {
+      "wallMs": 68258,
+      "costUsd": 0.158134,
+      "durationMs": 67500,
+      "turns": 5
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 2,
+      "rewakes": 0,
+      "costUsd": 0.158134,
+      "durationMs": 67500,
+      "numTurns": 7,
+      "isError": false
+    },
+    "hook": {
+      "calls": 2,
+      "findingsShown": 0,
+      "highShown": 0,
+      "mediumShown": 0,
+      "errors": 0,
+      "meanLatencyMs": 304.1056665,
+      "editsAfterFeedback": 0
+    },
+    "original": {
+      "costUsd": 0.12570160000000002,
+      "durationMs": 84522
+    },
+    "lines": 142,
+    "violations": {
+      "swift-no-force-unwrap": 0,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-restating-comment": 0,
+      "swift-no-vague-names": 0,
+      "swift-no-magic-numbers": 1,
+      "swift-no-commented-out-code": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0,
+      "swift-ui-off-main": 0,
+      "swift-prefer-guard": 0,
+      "swiftui-observedobject-owned": 0,
+      "swiftui-state-not-private": 0,
+      "swiftui-expensive-body": 0,
+      "swiftui-task-in-onappear": 0,
+      "swift-escaping-closure-retain-cycle": 0,
+      "swift-blocking-main-thread": 0,
+      "swift-continuation-misuse": 0,
+      "swift-unprotected-shared-state": 0,
+      "swiftui-foreach-unstable-id": 0,
+      "swift-dispatch-in-async": 0,
+      "swift-continuation-cancellation": 0,
+      "swift-continuation-stored-overwrite": 0
+    },
+    "totalViolations": 1,
+    "regexHits": {
+      "swift-no-force-unwrap": 0,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "swiftui-chat",
+    "lang": "swift",
+    "condition": "none+fix",
+    "rep": 2,
+    "reviewFindings": 3,
+    "ruleCoveredFindings": 0,
+    "fix": {
+      "wallMs": 67797,
+      "costUsd": 0.15975099999999998,
+      "durationMs": 67050,
+      "turns": 6
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 4,
+      "rewakes": 0,
+      "costUsd": 0.15975099999999998,
+      "durationMs": 67050,
+      "numTurns": 11,
+      "isError": false
+    },
+    "hook": {
+      "calls": 0,
+      "findingsShown": 0,
+      "highShown": 0,
+      "mediumShown": 0,
+      "errors": 0,
+      "meanLatencyMs": 0,
+      "editsAfterFeedback": 0
+    },
+    "original": {
+      "costUsd": 0.192327,
+      "durationMs": 54703
+    },
+    "lines": 175,
+    "violations": {
+      "swift-no-force-unwrap": 1,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-restating-comment": 0,
+      "swift-no-vague-names": 0,
+      "swift-no-magic-numbers": 0,
+      "swift-no-commented-out-code": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0,
+      "swift-ui-off-main": 0,
+      "swift-prefer-guard": 0,
+      "swiftui-observedobject-owned": 0,
+      "swiftui-state-not-private": 0,
+      "swiftui-expensive-body": 0,
+      "swiftui-task-in-onappear": 0,
+      "swift-escaping-closure-retain-cycle": 0,
+      "swift-blocking-main-thread": 0,
+      "swift-continuation-misuse": 0,
+      "swift-unprotected-shared-state": 0,
+      "swiftui-foreach-unstable-id": 0,
+      "swift-dispatch-in-async": 0,
+      "swift-continuation-cancellation": 0,
+      "swift-continuation-stored-overwrite": 0
+    },
+    "totalViolations": 1,
+    "regexHits": {
+      "swift-no-force-unwrap": 1,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "swiftui-thumbnail-grid",
+    "lang": "swift",
+    "condition": "jev-rewake+fix",
+    "rep": 2,
+    "reviewFindings": 5,
+    "ruleCoveredFindings": 0,
+    "fix": {
+      "wallMs": 65588,
+      "costUsd": 0.16629359999999999,
+      "durationMs": 64663,
+      "turns": 6
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 1,
+      "rewakes": 0,
+      "costUsd": 0.16629359999999999,
+      "durationMs": 64663,
+      "numTurns": 6,
+      "isError": false
+    },
+    "hook": {
+      "calls": 1,
+      "findingsShown": 0,
+      "highShown": 0,
+      "mediumShown": 0,
+      "errors": 0,
+      "meanLatencyMs": 248.02341700000002,
+      "editsAfterFeedback": 0
+    },
+    "original": {
+      "costUsd": 0.1384268,
+      "durationMs": 62989
+    },
+    "lines": 161,
+    "violations": {
+      "swift-no-force-unwrap": 0,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-restating-comment": 0,
+      "swift-no-vague-names": 1,
+      "swift-no-magic-numbers": 0,
+      "swift-no-commented-out-code": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0,
+      "swift-ui-off-main": 0,
+      "swift-prefer-guard": 0,
+      "swiftui-observedobject-owned": 0,
+      "swiftui-state-not-private": 0,
+      "swiftui-expensive-body": 0,
+      "swiftui-task-in-onappear": 0,
+      "swift-escaping-closure-retain-cycle": 0,
+      "swift-blocking-main-thread": 0,
+      "swift-continuation-misuse": 0,
+      "swift-unprotected-shared-state": 0,
+      "swiftui-foreach-unstable-id": 1,
+      "swift-dispatch-in-async": 0,
+      "swift-continuation-cancellation": 0,
+      "swift-continuation-stored-overwrite": 0
+    },
+    "totalViolations": 2,
+    "regexHits": {
+      "swift-no-force-unwrap": 0,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "swift-legacy-bridge",
+    "lang": "swift",
+    "condition": "none+fix",
+    "rep": 2,
+    "reviewFindings": 5,
+    "ruleCoveredFindings": 4,
+    "fix": {
+      "wallMs": 107341,
+      "costUsd": 0.2296568,
+      "durationMs": 106600,
+      "turns": 5
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 1,
+      "rewakes": 0,
+      "costUsd": 0.2296568,
+      "durationMs": 106600,
+      "numTurns": 6,
+      "isError": false
+    },
+    "hook": {
+      "calls": 0,
+      "findingsShown": 0,
+      "highShown": 0,
+      "mediumShown": 0,
+      "errors": 0,
+      "meanLatencyMs": 0,
+      "editsAfterFeedback": 0
+    },
+    "original": {
+      "costUsd": 0.1184466,
+      "durationMs": 43807
+    },
+    "lines": 162,
+    "violations": {
+      "swift-no-force-unwrap": 0,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-restating-comment": 0,
+      "swift-no-vague-names": 2,
+      "swift-no-magic-numbers": 3,
+      "swift-no-commented-out-code": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0,
+      "swift-ui-off-main": 0,
+      "swift-prefer-guard": 0,
+      "swiftui-observedobject-owned": 0,
+      "swiftui-state-not-private": 0,
+      "swiftui-expensive-body": 0,
+      "swiftui-task-in-onappear": 0,
+      "swift-escaping-closure-retain-cycle": 0,
+      "swift-blocking-main-thread": 0,
+      "swift-continuation-misuse": 0,
+      "swift-unprotected-shared-state": 0,
+      "swiftui-foreach-unstable-id": 0,
+      "swift-dispatch-in-async": 0,
+      "swift-continuation-cancellation": 0,
+      "swift-continuation-stored-overwrite": 0
+    },
+    "totalViolations": 5,
+    "regexHits": {
+      "swift-no-force-unwrap": 1,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "swift-legacy-bridge",
+    "lang": "swift",
+    "condition": "jev+fix",
+    "rep": 2,
+    "reviewFindings": 2,
+    "ruleCoveredFindings": 2,
+    "fix": {
+      "wallMs": 119574,
+      "costUsd": 0.2375832,
+      "durationMs": 118830,
+      "turns": 8
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 1,
+      "rewakes": 0,
+      "costUsd": 0.2375832,
+      "durationMs": 118830,
+      "numTurns": 6,
+      "isError": false
+    },
+    "hook": {
+      "calls": 1,
+      "findingsShown": 2,
+      "highShown": 1,
+      "mediumShown": 1,
+      "errors": 0,
+      "meanLatencyMs": 338.367292,
+      "editsAfterFeedback": 0
+    },
+    "original": {
+      "costUsd": 0.1320912,
+      "durationMs": 51179
+    },
+    "lines": 76,
+    "violations": {
+      "swift-no-force-unwrap": 0,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-restating-comment": 0,
+      "swift-no-vague-names": 0,
+      "swift-no-magic-numbers": 4,
+      "swift-no-commented-out-code": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0,
+      "swift-ui-off-main": 0,
+      "swift-prefer-guard": 0,
+      "swiftui-observedobject-owned": 0,
+      "swiftui-state-not-private": 0,
+      "swiftui-expensive-body": 0,
+      "swiftui-task-in-onappear": 0,
+      "swift-escaping-closure-retain-cycle": 0,
+      "swift-blocking-main-thread": 0,
+      "swift-continuation-misuse": 0,
+      "swift-unprotected-shared-state": 0,
+      "swiftui-foreach-unstable-id": 0,
+      "swift-dispatch-in-async": 0,
+      "swift-continuation-cancellation": 1,
+      "swift-continuation-stored-overwrite": 0
+    },
+    "totalViolations": 5,
+    "regexHits": {
+      "swift-no-force-unwrap": 0,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "swiftui-chat",
+    "lang": "swift",
+    "condition": "jev+fix",
+    "rep": 2,
+    "reviewFindings": 5,
+    "ruleCoveredFindings": 0,
+    "fix": {
+      "wallMs": 67455,
+      "costUsd": 0.1806202,
+      "durationMs": 66681,
+      "turns": 7
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 5,
+      "rewakes": 0,
+      "costUsd": 0.1806202,
+      "durationMs": 66681,
+      "numTurns": 12,
+      "isError": false
+    },
+    "hook": {
+      "calls": 5,
+      "findingsShown": 1,
+      "highShown": 1,
+      "mediumShown": 0,
+      "errors": 0,
+      "meanLatencyMs": 280.9948416,
+      "editsAfterFeedback": 4
+    },
+    "original": {
+      "costUsd": 0.25187620000000005,
+      "durationMs": 78260
+    },
+    "lines": 188,
+    "violations": {
+      "swift-no-force-unwrap": 0,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-restating-comment": 0,
+      "swift-no-vague-names": 0,
+      "swift-no-magic-numbers": 0,
+      "swift-no-commented-out-code": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0,
+      "swift-ui-off-main": 0,
+      "swift-prefer-guard": 0,
+      "swiftui-observedobject-owned": 0,
+      "swiftui-state-not-private": 0,
+      "swiftui-expensive-body": 0,
+      "swiftui-task-in-onappear": 0,
+      "swift-escaping-closure-retain-cycle": 0,
+      "swift-blocking-main-thread": 0,
+      "swift-continuation-misuse": 0,
+      "swift-unprotected-shared-state": 0,
+      "swiftui-foreach-unstable-id": 0,
+      "swift-dispatch-in-async": 1,
+      "swift-continuation-cancellation": 0,
+      "swift-continuation-stored-overwrite": 0
+    },
+    "totalViolations": 1,
+    "regexHits": {
+      "swift-no-force-unwrap": 0,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "swiftui-chat",
+    "lang": "swift",
+    "condition": "jev-rewake+fix",
+    "rep": 2,
+    "reviewFindings": 6,
+    "ruleCoveredFindings": 0,
+    "fix": {
+      "wallMs": 73588,
+      "costUsd": 0.19212780000000002,
+      "durationMs": 72822,
+      "turns": 7
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 2,
+      "rewakes": 0,
+      "costUsd": 0.19212780000000002,
+      "durationMs": 72822,
+      "numTurns": 8,
+      "isError": false
+    },
+    "hook": {
+      "calls": 2,
+      "findingsShown": 1,
+      "highShown": 1,
+      "mediumShown": 0,
+      "errors": 0,
+      "meanLatencyMs": 406.2996255,
+      "editsAfterFeedback": 1
+    },
+    "original": {
+      "costUsd": 0.1771624,
+      "durationMs": 67850
+    },
+    "lines": 173,
+    "violations": {
+      "swift-no-force-unwrap": 0,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-restating-comment": 0,
+      "swift-no-vague-names": 1,
+      "swift-no-magic-numbers": 0,
+      "swift-no-commented-out-code": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0,
+      "swift-ui-off-main": 0,
+      "swift-prefer-guard": 0,
+      "swiftui-observedobject-owned": 0,
+      "swiftui-state-not-private": 0,
+      "swiftui-expensive-body": 0,
+      "swiftui-task-in-onappear": 0,
+      "swift-escaping-closure-retain-cycle": 0,
+      "swift-blocking-main-thread": 0,
+      "swift-continuation-misuse": 0,
+      "swift-unprotected-shared-state": 0,
+      "swiftui-foreach-unstable-id": 0,
+      "swift-dispatch-in-async": 0,
+      "swift-continuation-cancellation": 0,
+      "swift-continuation-stored-overwrite": 0
+    },
+    "totalViolations": 1,
+    "regexHits": {
+      "swift-no-force-unwrap": 0,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0
+    }
+  },
+  {
+    "task": "swift-legacy-bridge",
+    "lang": "swift",
+    "condition": "jev-rewake+fix",
+    "rep": 2,
+    "reviewFindings": 3,
+    "ruleCoveredFindings": 2,
+    "fix": {
+      "wallMs": 114472,
+      "costUsd": 0.24827380000000002,
+      "durationMs": 113737,
+      "turns": 9
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 3,
+      "rewakes": 0,
+      "costUsd": 0.24827380000000002,
+      "durationMs": 113737,
+      "numTurns": 9,
+      "isError": false
+    },
+    "hook": {
+      "calls": 3,
+      "findingsShown": 3,
+      "highShown": 1,
+      "mediumShown": 2,
+      "errors": 0,
+      "meanLatencyMs": 352.55218066666663,
+      "editsAfterFeedback": 2
+    },
+    "original": {
+      "costUsd": 0.20722219999999997,
+      "durationMs": 81052
+    },
+    "lines": 127,
+    "violations": {
+      "swift-no-force-unwrap": 0,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-restating-comment": 0,
+      "swift-no-vague-names": 0,
+      "swift-no-magic-numbers": 3,
+      "swift-no-commented-out-code": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 0,
+      "swift-ui-off-main": 0,
+      "swift-prefer-guard": 0,
+      "swiftui-observedobject-owned": 0,
+      "swiftui-state-not-private": 0,
+      "swiftui-expensive-body": 0,
+      "swiftui-task-in-onappear": 0,
+      "swift-escaping-closure-retain-cycle": 0,
+      "swift-blocking-main-thread": 0,
+      "swift-continuation-misuse": 0,
+      "swift-unprotected-shared-state": 2,
+      "swiftui-foreach-unstable-id": 0,
+      "swift-dispatch-in-async": 0,
+      "swift-continuation-cancellation": 2,
+      "swift-continuation-stored-overwrite": 0
+    },
+    "totalViolations": 7,
+    "regexHits": {
+      "swift-no-force-unwrap": 1,
+      "swift-no-force-try": 0,
+      "swift-no-force-cast": 0,
+      "swift-no-debug-print": 0,
+      "swift-no-empty-catch": 0,
+      "swift-no-bare-todo": 0,
+      "swift-no-hardcoded-secret": 1
+    }
+  }
+]

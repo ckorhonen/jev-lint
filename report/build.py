@@ -141,7 +141,7 @@ def line_chart(lines, title, xs, height=230, y_label=""):
 
 def hbar_stack(rows, segments, title, total_label=True):
     """rows: [(label, [values per segment])], segments: [(label, cls)]. Values are counts."""
-    w, left, right, row_h, top = 680, 150, 40, 30, 8
+    w, left, right, row_h, top = 680, 170, 50, 30, 8
     height = top + row_h * len(rows) + 8
     max_total = max(sum(v) for _, v in rows) or 1
     scale = (w - left - right) / max_total
@@ -574,6 +574,63 @@ for label, c in [("No hook", "none"), ("Jev hook (sync)", "jev")]:
     codex_rows.append([label, f"{st.mean(r['totalViolations'] for r in rows):.2f}", diff, f"{st.mean(r['wallMs'] for r in rows) / 1000:.0f} s",
                        f"{st.mean(r['transcript']['edits'] for r in rows):.1f}", str(sum(r['hook']['findingsShown'] for r in rows)), f"{sum(r['build']['ok'] for r in rows)}/{len(rows)}"])
 
+# ---------------------------------------------------------------- Entry 6: JevLike, and is it worth it?
+
+JL = {"Tiny byte encoder": load(RES / "local/jevlike-tiny.json"), "Frozen Qwen2.5-0.5B + head": load(RES / "local/jevlike-qwen05b.json")}
+jl_rows = []
+for name, d in JL.items():
+    for pack, lang in [("hygiene", "typescript"), ("hygiene", "swift"), ("practices", "typescript"), ("practices", "swift")]:
+        at5 = next(r for r in d["results"] if r["pack"] == pack and r["lang"] == lang and r["policy"] == "gated high+medium")
+        best = next(r for r in d["results"] if r["pack"] == pack and r["lang"] == lang and r["policy"] == "gated best-threshold")
+        jev = res(summary5, "jev", pack, lang, "holdout", "gated high+medium")
+        jl_rows.append([name, f"{pack.title()} · {'TS' if lang == 'typescript' else 'Swift'}", pct(at5["f1"]),
+                        f"{pct(best['f1'])} at {best['threshold']:g} ({pct(best['cleanFalseAlarmRate'])} clean flagged)", pct(jev["f1"])])
+
+FIX = load(RES / "e2e-graded-entry5-fix.json")
+FIXHOOK = load(RES / "e2e-graded-entry5-fixhook.json")
+pipelines = [("No hook", "none", FIX, "none+fix"), ("Jev sync (fix round unhooked)", "jev", FIX, "jev+fix"),
+             ("Jev async (fix round unhooked)", "jev-rewake", FIX, "jev-rewake+fix"), ("Jev async, always on", "jev-rewake", FIXHOOK, "jev-rewake+fixhook")]
+
+
+def pipe(label, cond, src, fixcond):
+    fx = [r for r in src if r["condition"] == fixcond]
+    base = [r for r in G5 if r["condition"] == cond]
+    return {"label": label, "build_cost": st.mean(r["transcript"]["costUsd"] for r in base), "fix_cost": st.mean(r["fix"]["costUsd"] for r in fx),
+            "build_s": st.mean(r["transcript"]["durationMs"] for r in base) / 1000, "fix_s": st.mean(r["fix"]["durationMs"] for r in fx) / 1000,
+            "before": st.mean(r["totalViolations"] for r in base), "after": st.mean(r["totalViolations"] for r in fx),
+            "comments": st.mean(r["reviewFindings"] for r in fx), "covered": st.mean(r["ruleCoveredFindings"] for r in fx)}
+
+
+PIPES = [pipe(*p) for p in pipelines]
+chart_pipe_cost = hbar_stack([(p["label"].replace(" (fix round unhooked)", ""), [round(p["build_cost"], 3), round(p["fix_cost"], 3)]) for p in PIPES],
+                             [("Build round ($)", "s2"), ("Review fix round ($)", "s3")], "Agent cost per task, build plus one review-fix round")
+chart_pipe_viol = grouped_bars([(p["label"].replace(" (fix round unhooked)", ""), p["label"]) for p in PIPES],
+                               [("Before review", "before", "s3"), ("After review + fix", "after", "s1")],
+                               lambda g, k: next(p[k] for p in PIPES if p["label"] == g), "Graded rule violations per task",
+                               fmt=lambda v: f"{v:.2f}", max_v=3, ticks=(0, 1, 2, 3), height=230)
+nonefix = {(r["task"], r["rep"]): r for r in FIX if r["condition"] == "none+fix"}
+
+
+def pipe_diff(src, fixcond, key):
+    d = []
+    for r in src:
+        if r["condition"] != fixcond:
+            continue
+        b = nonefix[(r["task"], r["rep"])]
+        d.append(key(r) - key(b))
+    random.seed(0)
+    boot = sorted(st.mean(random.choices(d, k=len(d))) for _ in range(5000))
+    return st.mean(d), boot[125], boot[4875], sum(x < 0 for x in d), sum(x > 0 for x in d)
+
+
+pipe_rows = []
+for (label, cond, src, fixcond), p in zip(pipelines, PIPES):
+    total_cost = lambda r: r["original"]["costUsd"] + r["fix"]["costUsd"]
+    viol = "—" if cond == "none" else "{:+.2f} ({:+.2f} to {:+.2f}); {} better, {} worse".format(*pipe_diff(src, fixcond, lambda r: r["totalViolations"]))
+    cost = "—" if cond == "none" else "{:+.3f} ({:+.3f} to {:+.3f})".format(*pipe_diff(src, fixcond, total_cost)[:3])
+    pipe_rows.append([label, f"{p['comments']:.2f} ({p['covered']:.2f})", f"${p['build_cost'] + p['fix_cost']:.3f}", cost,
+                      f"{p['build_s'] + p['fix_s']:.0f} s", f"{p['before']:.2f} → {p['after']:.2f}", viol])
+
 # ---------------------------------------------------------------- page
 
 N = lambda x: f"{x:.2f}"
@@ -589,6 +646,10 @@ ctx = dict(
     CHART_KEV_GATE=chart_kev_gate, KEV_LAT_BEFORE=f"{kev_lat[0]:.1f}", KEV_LAT_AFTER=f"{kev_lat[1]:.1f}",
     BATCH_TABLE=table(["Edit", "Code tokens", "Rules", "Rules per pass (default)", "Batched", "One rule per pass"], batch_rows),
     CHART_E5=chart_e5_viol,
+    JEVLIKE_TABLE=table(["JevLike variant", "Pack · lang", "F1 at p ≥ 0.5", "Best F1 at any threshold", "Jev (gated)"], jl_rows),
+    JEVLIKE_MS=f"{JL['Frozen Qwen2.5-0.5B + head']['median_ms_per_rule']:.0f}",
+    CHART_PIPE_COST=chart_pipe_cost, CHART_PIPE_VIOL=chart_pipe_viol,
+    PIPE_TABLE=table(["Pipeline", "Review comments / task (rule-covered)", "Agent cost / task", "Cost vs no hook (95% CI)", "Agent time / task", "Violations: before → after fix", "Final violations vs no hook (95% CI)"], pipe_rows),
     E5_TABLE=table(["Condition", "Violations / task", "Change vs none (95% CI)", "Time / task", "Cost / task", "Findings shown (high / medium)", "Mean hook time", "Rule-covered review findings / task", "Builds"], e5_rows),
     CODEX_TABLE=table(["Codex condition", "Violations / task", "Change vs none (95% CI)", "Time / task", "Edits / task", "Findings shown", "Builds"], codex_rows),
     LOCAL_TABLE=table(["Model", "Pack · lang", "F1 (p ≥ 0.5)", "Clean edits flagged", "High tier P / R", "Best F1 (threshold)", "Median time"], local_rows),

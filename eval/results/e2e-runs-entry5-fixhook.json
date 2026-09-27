@@ -1,0 +1,1162 @@
+[
+  {
+    "task": "react-chat-room",
+    "lang": "typescript",
+    "condition": "jev-rewake+fixhook",
+    "rep": 1,
+    "reviewFindings": 4,
+    "ruleCoveredFindings": 0,
+    "fix": {
+      "wallMs": 42586,
+      "costUsd": 0.16575359999999997,
+      "durationMs": 41541,
+      "turns": 9
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 2,
+      "rewakes": 0,
+      "costUsd": 0.16575359999999997,
+      "durationMs": 41541,
+      "numTurns": 8,
+      "isError": false
+    },
+    "hook": {
+      "calls": 2,
+      "findingsShown": 1,
+      "highShown": 1,
+      "mediumShown": 0,
+      "errors": 0,
+      "meanLatencyMs": 377.917708,
+      "editsAfterFeedback": 1
+    },
+    "original": {
+      "costUsd": 0.13827820000000002,
+      "durationMs": 45343
+    },
+    "files": [
+      {
+        "path": "src/ChatRoom.tsx",
+        "content": "import { useCallback, useEffect, useRef, useState } from \"react\";\n\ninterface ChatMessage {\n  id: string;\n  author: string;\n  text: string;\n  sentAt: string;\n}\n\ninterface ChatRoomProps {\n  roomId: string;\n}\n\nconst MAX_RECONNECT_DELAY_MS = 10_000;\nconst BASE_RECONNECT_DELAY_MS = 500;\nconst MAX_MESSAGES = 500;\n\nfunction isChatMessage(value: unknown): value is ChatMessage {\n  if (typeof value !== \"object\" || value === null) return false;\n  const candidate = value as Record<string, unknown>;\n  return (\n    typeof candidate.id === \"string\" &&\n    typeof candidate.author === \"string\" &&\n    typeof candidate.text === \"string\" &&\n    typeof candidate.sentAt === \"string\"\n  );\n}\n\nexport function ChatRoom({ roomId }: ChatRoomProps) {\n  const [messages, setMessages] = useState<ChatMessage[]>([]);\n  const [draft, setDraft] = useState(\"\");\n  const [isReconnecting, setIsReconnecting] = useState(false);\n\n  const socketRef = useRef<WebSocket | null>(null);\n  const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);\n  const reconnectAttemptRef = useRef(0);\n  const closingForSwitchRef = useRef(false);\n  const bottomRef = useRef<HTMLDivElement | null>(null);\n\n  const prevRoomIdRef = useRef(roomId);\n  if (prevRoomIdRef.current !== roomId) {\n    prevRoomIdRef.current = roomId;\n    setMessages([]);\n    setDraft(\"\");\n  }\n\n  useEffect(() => {\n    reconnectAttemptRef.current = 0;\n    closingForSwitchRef.current = false;\n\n    let cancelled = false;\n\n    const connect = () => {\n      if (cancelled) return;\n\n      const socket = new WebSocket(\n        `wss://chat.example.com/rooms/${encodeURIComponent(roomId)}`,\n      );\n      socketRef.current = socket;\n\n      socket.onopen = () => {\n        if (cancelled) return;\n        reconnectAttemptRef.current = 0;\n        setIsReconnecting(false);\n      };\n\n      socket.onmessage = (event) => {\n        if (cancelled) return;\n        try {\n          const parsed: unknown = JSON.parse(event.data as string);\n          if (isChatMessage(parsed)) {\n            setMessages((prev) =>\n              [...prev, parsed].slice(-MAX_MESSAGES),\n            );\n          }\n        } catch (error) {\n          console.warn(\"Failed to parse chat message payload\", error);\n        }\n      };\n\n      socket.onclose = () => {\n        if (cancelled || closingForSwitchRef.current) return;\n        setIsReconnecting(true);\n        const attempt = reconnectAttemptRef.current + 1;\n        reconnectAttemptRef.current = attempt;\n        const delay = Math.min(\n          BASE_RECONNECT_DELAY_MS * 2 ** (attempt - 1),\n          MAX_RECONNECT_DELAY_MS,\n        );\n        reconnectTimeoutRef.current = setTimeout(connect, delay);\n      };\n\n      socket.onerror = () => {\n        socket.close();\n      };\n    };\n\n    connect();\n\n    return () => {\n      cancelled = true;\n      closingForSwitchRef.current = true;\n      if (reconnectTimeoutRef.current !== null) {\n        clearTimeout(reconnectTimeoutRef.current);\n        reconnectTimeoutRef.current = null;\n      }\n      socketRef.current?.close();\n      socketRef.current = null;\n    };\n  }, [roomId]);\n\n  useEffect(() => {\n    bottomRef.current?.scrollIntoView({ block: \"end\" });\n  }, [messages]);\n\n  const sendMessage = useCallback(() => {\n    const text = draft.trim();\n    const socket = socketRef.current;\n    if (!text || !socket || socket.readyState !== WebSocket.OPEN) return;\n    socket.send(JSON.stringify({ text }));\n    setDraft(\"\");\n  }, [draft]);\n\n  const handleSubmit = useCallback(\n    (event: React.FormEvent<HTMLFormElement>) => {\n      event.preventDefault();\n      sendMessage();\n    },\n    [sendMessage],\n  );\n\n  return (\n    <div className=\"chat-room\">\n      {isReconnecting && <div className=\"chat-room__banner\">Reconnecting…</div>}\n      <ul className=\"chat-room__messages\">\n        {messages.map((message) => (\n          <li key={message.id} className=\"chat-room__message\">\n            <span className=\"chat-room__author\">{message.author}</span>\n            <span className=\"chat-room__text\">{message.text}</span>\n            <time className=\"chat-room__time\" dateTime={message.sentAt}>\n              {new Date(message.sentAt).toLocaleTimeString()}\n            </time>\n          </li>\n        ))}\n      </ul>\n      <div ref={bottomRef} />\n      <form className=\"chat-room__form\" onSubmit={handleSubmit}>\n        <input\n          type=\"text\"\n          value={draft}\n          onChange={(event) => setDraft(event.target.value)}\n          placeholder=\"Type a message…\"\n        />\n        <button type=\"submit\">Send</button>\n      </form>\n    </div>\n  );\n}\n\nexport default ChatRoom;\n"
+      },
+      {
+        "path": "src/index.ts",
+        "content": "export {};\n"
+      }
+    ]
+  },
+  {
+    "task": "react-metrics-poller",
+    "lang": "typescript",
+    "condition": "jev-rewake+fixhook",
+    "rep": 1,
+    "reviewFindings": 3,
+    "ruleCoveredFindings": 1,
+    "fix": {
+      "wallMs": 53058,
+      "costUsd": 0.1577188,
+      "durationMs": 51922,
+      "turns": 7
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 5,
+      "rewakes": 0,
+      "costUsd": 0.1577188,
+      "durationMs": 51922,
+      "numTurns": 10,
+      "isError": false
+    },
+    "hook": {
+      "calls": 5,
+      "findingsShown": 4,
+      "highShown": 2,
+      "mediumShown": 2,
+      "errors": 0,
+      "meanLatencyMs": 335.9798164,
+      "editsAfterFeedback": 4
+    },
+    "original": {
+      "costUsd": 0.275105,
+      "durationMs": 101610
+    },
+    "files": [
+      {
+        "path": "src/index.ts",
+        "content": "export {};\n"
+      },
+      {
+        "path": "src/MetricsPanel.tsx",
+        "content": "import { useEffect, useRef, useState } from \"react\";\n\ninterface Metric {\n  name: string;\n  value: number;\n  unit: string;\n}\n\nconst POLL_INTERVAL_MS = 10_000;\n\nconst styles: Record<string, React.CSSProperties> = {\n  panel: {\n    border: \"1px solid #d0d7de\",\n    borderRadius: 8,\n    padding: 16,\n    maxWidth: 480,\n    fontFamily: \"system-ui, sans-serif\",\n  },\n  header: {\n    display: \"flex\",\n    justifyContent: \"space-between\",\n    alignItems: \"baseline\",\n    marginBottom: 12,\n  },\n  title: {\n    margin: 0,\n    fontSize: 16,\n    fontWeight: 600,\n  },\n  updated: {\n    fontSize: 12,\n    color: \"#57606a\",\n  },\n  error: {\n    color: \"#cf222e\",\n    fontSize: 13,\n    marginBottom: 8,\n  },\n  table: {\n    width: \"100%\",\n    borderCollapse: \"collapse\",\n  },\n  row: {\n    borderTop: \"1px solid #eaeef2\",\n    transition: \"background-color 0.6s ease\",\n  },\n  rowChanged: {\n    backgroundColor: \"#fff8c5\",\n  },\n  cell: {\n    padding: \"6px 4px\",\n    fontSize: 14,\n    textAlign: \"left\",\n  },\n  valueCell: {\n    padding: \"6px 4px\",\n    fontSize: 14,\n    textAlign: \"right\",\n    fontVariantNumeric: \"tabular-nums\",\n  },\n};\n\nfunction isMetric(value: unknown): value is Metric {\n  if (typeof value !== \"object\" || value === null) {\n    return false;\n  }\n  const candidate = value as Record<string, unknown>;\n  return (\n    typeof candidate.name === \"string\" &&\n    typeof candidate.value === \"number\" &&\n    Number.isFinite(candidate.value) &&\n    typeof candidate.unit === \"string\"\n  );\n}\n\nfunction isMetricArray(value: unknown): value is Metric[] {\n  return Array.isArray(value) && value.every(isMetric);\n}\n\nfunction formatSecondsAgo(lastUpdated: Date | null, now: Date): string {\n  if (lastUpdated === null) {\n    return \"never\";\n  }\n  const seconds = Math.max(0, Math.round((now.getTime() - lastUpdated.getTime()) / 1000));\n  if (seconds === 0) {\n    return \"just now\";\n  }\n  return `${seconds} second${seconds === 1 ? \"\" : \"s\"} ago`;\n}\n\nexport default function MetricsPanel(): React.JSX.Element {\n  const [metrics, setMetrics] = useState<Metric[]>([]);\n  const [changedNames, setChangedNames] = useState<ReadonlySet<string>>(new Set());\n  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);\n  const [error, setError] = useState<string | null>(null);\n  const [now, setNow] = useState<Date>(() => new Date());\n\n  const previousValuesRef = useRef<Map<string, number>>(new Map());\n\n  useEffect(() => {\n    let cancelled = false;\n    let isPolling = false;\n    let pollTimeoutId: ReturnType<typeof setTimeout> | null = null;\n    // Bumped whenever polling starts/stops so a stale in-flight request\n    // (e.g. from before the tab was hidden) can't apply its result or\n    // reschedule once a newer poll loop has taken over.\n    let generation = 0;\n\n    async function fetchMetrics(requestGeneration: number): Promise<void> {\n      try {\n        const response = await fetch(\"/api/metrics\");\n        if (!response.ok) {\n          throw new Error(`Request failed with status ${response.status}`);\n        }\n        const responseBody: unknown = await response.json();\n        if (cancelled || requestGeneration !== generation) {\n          return;\n        }\n        if (!isMetricArray(responseBody)) {\n          throw new Error(\"Received malformed metrics data\");\n        }\n        const fetchedMetrics = responseBody;\n\n        const previousValues = previousValuesRef.current;\n        const changed = new Set<string>();\n        for (const metric of fetchedMetrics) {\n          const previousValue = previousValues.get(metric.name);\n          if (previousValue !== undefined && previousValue !== metric.value) {\n            changed.add(metric.name);\n          }\n        }\n        previousValuesRef.current = new Map(\n          fetchedMetrics.map((metric) => [metric.name, metric.value]),\n        );\n\n        setMetrics(fetchedMetrics);\n        setChangedNames(changed);\n        setLastUpdated(new Date());\n        setError(null);\n      } catch (err) {\n        if (!cancelled && requestGeneration === generation) {\n          setError(err instanceof Error ? err.message : \"Failed to load metrics\");\n        }\n      }\n    }\n\n    async function pollOnce(requestGeneration: number): Promise<void> {\n      await fetchMetrics(requestGeneration);\n      if (isPolling && !cancelled && requestGeneration === generation) {\n        pollTimeoutId = setTimeout(() => {\n          void pollOnce(requestGeneration);\n        }, POLL_INTERVAL_MS);\n      }\n    }\n\n    function startPolling(): void {\n      if (isPolling) {\n        return;\n      }\n      isPolling = true;\n      generation += 1;\n      void pollOnce(generation);\n    }\n\n    function stopPolling(): void {\n      isPolling = false;\n      generation += 1;\n      if (pollTimeoutId !== null) {\n        clearTimeout(pollTimeoutId);\n        pollTimeoutId = null;\n      }\n    }\n\n    function handleVisibilityChange(): void {\n      if (document.hidden) {\n        stopPolling();\n      } else {\n        startPolling();\n      }\n    }\n\n    if (!document.hidden) {\n      startPolling();\n    }\n\n    document.addEventListener(\"visibilitychange\", handleVisibilityChange);\n\n    return () => {\n      cancelled = true;\n      stopPolling();\n      document.removeEventListener(\"visibilitychange\", handleVisibilityChange);\n    };\n  }, []);\n\n  useEffect(() => {\n    const tickId = setInterval(() => setNow(new Date()), 1000);\n    return () => clearInterval(tickId);\n  }, []);\n\n  return (\n    <div style={styles.panel}>\n      <div style={styles.header}>\n        <h2 style={styles.title}>Metrics</h2>\n        <span style={styles.updated}>Last updated {formatSecondsAgo(lastUpdated, now)}</span>\n      </div>\n\n      {error !== null && <div style={styles.error}>{error}</div>}\n\n      {metrics.length === 0 && error === null ? (\n        <div>Loading metrics…</div>\n      ) : (\n        <table style={styles.table}>\n          <thead>\n            <tr>\n              <th style={styles.cell} scope=\"col\">\n                Name\n              </th>\n              <th style={styles.valueCell} scope=\"col\">\n                Value\n              </th>\n            </tr>\n          </thead>\n          <tbody>\n            {metrics.map((metric) => {\n              const rowStyle = changedNames.has(metric.name)\n                ? { ...styles.row, ...styles.rowChanged }\n                : styles.row;\n              return (\n                <tr key={metric.name} style={rowStyle}>\n                  <td style={styles.cell}>{metric.name}</td>\n                  <td style={styles.valueCell}>\n                    {metric.value} {metric.unit}\n                  </td>\n                </tr>\n              );\n            })}\n          </tbody>\n        </table>\n      )}\n    </div>\n  );\n}\n"
+      }
+    ]
+  },
+  {
+    "task": "react-user-search",
+    "lang": "typescript",
+    "condition": "jev-rewake+fixhook",
+    "rep": 1,
+    "reviewFindings": 2,
+    "ruleCoveredFindings": 1,
+    "fix": {
+      "wallMs": 53921,
+      "costUsd": 0.1799076,
+      "durationMs": 52844,
+      "turns": 9
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 3,
+      "rewakes": 0,
+      "costUsd": 0.1799076,
+      "durationMs": 52844,
+      "numTurns": 6,
+      "isError": false
+    },
+    "hook": {
+      "calls": 3,
+      "findingsShown": 3,
+      "highShown": 1,
+      "mediumShown": 2,
+      "errors": 0,
+      "meanLatencyMs": 258.83120833333334,
+      "editsAfterFeedback": 2
+    },
+    "original": {
+      "costUsd": 0.12375599999999999,
+      "durationMs": 34355
+    },
+    "files": [
+      {
+        "path": "src/UserSearch.tsx",
+        "content": "import { useEffect, useMemo, useRef, useState } from \"react\";\n\ninterface User {\n  id: string;\n  name: string;\n  email: string;\n}\n\ntype SortField = \"name\" | \"email\";\n\nconst DEBOUNCE_MS = 300;\n\nfunction isUser(value: unknown): value is User {\n  if (typeof value !== \"object\" || value === null) {\n    return false;\n  }\n  const candidate = value as Record<string, unknown>;\n  return (\n    typeof candidate.id === \"string\" &&\n    typeof candidate.name === \"string\" &&\n    typeof candidate.email === \"string\"\n  );\n}\n\nfunction isUserArray(value: unknown): value is User[] {\n  return Array.isArray(value) && value.every(isUser);\n}\n\nexport default function UserSearch() {\n  const [query, setQuery] = useState(\"\");\n  const [debouncedQuery, setDebouncedQuery] = useState(\"\");\n  const [users, setUsers] = useState<User[]>([]);\n  const [loading, setLoading] = useState(false);\n  const [error, setError] = useState<string | null>(null);\n  const [sortField, setSortField] = useState<SortField>(\"name\");\n  const requestIdRef = useRef(0);\n\n  useEffect(() => {\n    const timer = setTimeout(() => setDebouncedQuery(query), DEBOUNCE_MS);\n    return () => clearTimeout(timer);\n  }, [query]);\n\n  function handleQueryChange(value: string) {\n    setQuery(value);\n    setUsers([]);\n    setError(null);\n    setLoading(value.trim() !== \"\");\n  }\n\n  useEffect(() => {\n    if (debouncedQuery.trim() === \"\") {\n      setUsers([]);\n      setError(null);\n      setLoading(false);\n      return;\n    }\n\n    const requestId = ++requestIdRef.current;\n    const controller = new AbortController();\n    setLoading(true);\n    setError(null);\n\n    fetch(`/api/users?q=${encodeURIComponent(debouncedQuery)}`, {\n      signal: controller.signal,\n    })\n      .then((res) => {\n        if (!res.ok) {\n          throw new Error(`Request failed with status ${res.status}`);\n        }\n        return res.json() as Promise<unknown>;\n      })\n      .then((payload) => {\n        if (requestIdRef.current !== requestId) {\n          return;\n        }\n        if (!isUserArray(payload)) {\n          throw new Error(\"Received malformed user data\");\n        }\n        setUsers(payload);\n        setLoading(false);\n      })\n      .catch((err: unknown) => {\n        if (requestIdRef.current !== requestId) {\n          return;\n        }\n        if (err instanceof DOMException && err.name === \"AbortError\") {\n          return;\n        }\n        setError(err instanceof Error ? err.message : \"Failed to fetch users\");\n        setUsers([]);\n        setLoading(false);\n      });\n\n    return () => controller.abort();\n  }, [debouncedQuery]);\n\n  const sortedUsers = useMemo(() => {\n    return [...users].sort((a, b) => a[sortField].localeCompare(b[sortField]));\n  }, [users, sortField]);\n\n  return (\n    <div>\n      <input\n        type=\"text\"\n        value={query}\n        onChange={(e) => handleQueryChange(e.target.value)}\n        placeholder=\"Search users...\"\n        aria-label=\"Search users\"\n      />\n\n      <div>\n        <label htmlFor=\"sort-field\">Sort by: </label>\n        <select\n          id=\"sort-field\"\n          value={sortField}\n          onChange={(e) => setSortField(e.target.value as SortField)}\n        >\n          <option value=\"name\">Name</option>\n          <option value=\"email\">Email</option>\n        </select>\n      </div>\n\n      {loading && <p role=\"status\">Loading...</p>}\n      {error && <p role=\"alert\">Error: {error}</p>}\n\n      {!loading && !error && debouncedQuery.trim() !== \"\" && (\n        <p>\n          {sortedUsers.length} result{sortedUsers.length === 1 ? \"\" : \"s\"}\n        </p>\n      )}\n\n      <ul>\n        {sortedUsers.map((user) => (\n          <li key={user.id}>\n            {user.name} ({user.email})\n          </li>\n        ))}\n      </ul>\n    </div>\n  );\n}\n"
+      },
+      {
+        "path": "src/index.ts",
+        "content": "export {};\n"
+      }
+    ]
+  },
+  {
+    "task": "swiftui-search",
+    "lang": "swift",
+    "condition": "jev-rewake+fixhook",
+    "rep": 1,
+    "reviewFindings": 3,
+    "ruleCoveredFindings": 1,
+    "fix": {
+      "wallMs": 26238,
+      "costUsd": 0.10534560000000001,
+      "durationMs": 25465,
+      "turns": 5
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 1,
+      "rewakes": 0,
+      "costUsd": 0.10534560000000001,
+      "durationMs": 25465,
+      "numTurns": 6,
+      "isError": false
+    },
+    "hook": {
+      "calls": 1,
+      "findingsShown": 0,
+      "highShown": 0,
+      "mediumShown": 0,
+      "errors": 0,
+      "meanLatencyMs": 310.483709,
+      "editsAfterFeedback": 0
+    },
+    "original": {
+      "costUsd": 0.137945,
+      "durationMs": 78210
+    },
+    "files": [
+      {
+        "path": "Sources/App/SearchScreen.swift",
+        "content": "import Foundation\nimport SwiftUI\n\nstruct SearchResult: Identifiable, Decodable {\n    let id: String\n    let title: String\n    let subtitle: String\n}\n\n@MainActor\nfinal class SearchViewModel: ObservableObject {\n    @Published var query: String = \"\" {\n        didSet { scheduleSearch() }\n    }\n    @Published private(set) var results: [SearchResult] = []\n    @Published private(set) var isLoading = false\n    @Published private(set) var errorMessage: String?\n\n    private var searchTask: Task<Void, Never>?\n    private let debounceInterval: Duration = .milliseconds(300)\n    private let session: URLSession\n\n    init(session: URLSession = .shared) {\n        self.session = session\n    }\n\n    deinit {\n        searchTask?.cancel()\n    }\n\n    private func scheduleSearch() {\n        searchTask?.cancel()\n\n        let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)\n        guard !trimmed.isEmpty else {\n            results = []\n            errorMessage = nil\n            isLoading = false\n            return\n        }\n\n        searchTask = Task {\n            try? await Task.sleep(for: debounceInterval)\n            guard !Task.isCancelled else { return }\n            await performSearch(for: trimmed)\n        }\n    }\n\n    private func performSearch(for text: String) async {\n        isLoading = true\n        errorMessage = nil\n\n        var components = URLComponents(string: \"https://api.example.com/search\")\n        components?.queryItems = [URLQueryItem(name: \"q\", value: text)]\n\n        guard let url = components?.url else {\n            isLoading = false\n            errorMessage = \"Invalid search URL.\"\n            return\n        }\n\n        do {\n            let (data, response) = try await session.data(from: url)\n            guard !Task.isCancelled else { return }\n\n            guard let httpResponse = response as? HTTPURLResponse else {\n                throw URLError(.badServerResponse)\n            }\n            guard (200..<300).contains(httpResponse.statusCode) else {\n                throw URLError(.badServerResponse)\n            }\n\n            let decoded = try await Task.detached(priority: .userInitiated) {\n                try JSONDecoder().decode([SearchResult].self, from: data)\n            }.value\n            guard !Task.isCancelled else { return }\n            results = decoded\n            isLoading = false\n        } catch {\n            guard !Task.isCancelled else { return }\n            results = []\n            isLoading = false\n            errorMessage = error.localizedDescription\n        }\n    }\n}\n\nstruct SearchScreen: View {\n    @StateObject private var viewModel = SearchViewModel()\n\n    var body: some View {\n        VStack(spacing: 0) {\n            TextField(\"Search\", text: $viewModel.query)\n                .textFieldStyle(.roundedBorder)\n                .padding()\n\n            content\n        }\n        .frame(minWidth: 320, minHeight: 400)\n    }\n\n    @ViewBuilder\n    private var content: some View {\n        if viewModel.isLoading {\n            ProgressView()\n                .frame(maxWidth: .infinity, maxHeight: .infinity)\n        } else if let errorMessage = viewModel.errorMessage {\n            Text(errorMessage)\n                .foregroundStyle(.red)\n                .frame(maxWidth: .infinity, maxHeight: .infinity)\n        } else if viewModel.query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {\n            Text(\"Start typing to search.\")\n                .foregroundStyle(.secondary)\n                .frame(maxWidth: .infinity, maxHeight: .infinity)\n        } else if viewModel.results.isEmpty {\n            Text(\"No results.\")\n                .foregroundStyle(.secondary)\n                .frame(maxWidth: .infinity, maxHeight: .infinity)\n        } else {\n            List(viewModel.results) { result in\n                VStack(alignment: .leading) {\n                    Text(result.title)\n                    Text(result.subtitle)\n                        .font(.subheadline)\n                        .foregroundStyle(.secondary)\n                }\n            }\n        }\n    }\n}\n"
+      },
+      {
+        "path": "Sources/App/App.swift",
+        "content": "import Foundation\n"
+      }
+    ]
+  },
+  {
+    "task": "react-todo-board",
+    "lang": "typescript",
+    "condition": "jev-rewake+fixhook",
+    "rep": 1,
+    "reviewFindings": 4,
+    "ruleCoveredFindings": 1,
+    "fix": {
+      "wallMs": 40107,
+      "costUsd": 0.16466899999999998,
+      "durationMs": 39365,
+      "turns": 9
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 1,
+      "rewakes": 0,
+      "costUsd": 0.16466899999999998,
+      "durationMs": 39365,
+      "numTurns": 7,
+      "isError": false
+    },
+    "hook": {
+      "calls": 1,
+      "findingsShown": 0,
+      "highShown": 0,
+      "mediumShown": 0,
+      "errors": 0,
+      "meanLatencyMs": 342.740417,
+      "editsAfterFeedback": 0
+    },
+    "original": {
+      "costUsd": 0.117423,
+      "durationMs": 34606
+    },
+    "files": [
+      {
+        "path": "src/TodoBoard.tsx",
+        "content": "import { useEffect, useMemo, useRef, useState } from \"react\";\nimport type { ChangeEvent, FormEvent } from \"react\";\n\ninterface Todo {\n  id: string;\n  text: string;\n  done: boolean;\n}\n\ntype Filter = \"all\" | \"active\" | \"done\";\n\nconst STORAGE_KEY = \"todo-board:items\";\n\nfunction isTodo(value: unknown): value is Todo {\n  return (\n    typeof value === \"object\" &&\n    value !== null &&\n    typeof (value as Todo).id === \"string\" &&\n    typeof (value as Todo).text === \"string\" &&\n    typeof (value as Todo).done === \"boolean\"\n  );\n}\n\nfunction loadTodos(): Todo[] {\n  if (typeof localStorage === \"undefined\") return [];\n  try {\n    const raw = localStorage.getItem(STORAGE_KEY);\n    if (!raw) return [];\n    const parsed = JSON.parse(raw);\n    if (!Array.isArray(parsed)) return [];\n    return parsed.filter(isTodo);\n  } catch {\n    return [];\n  }\n}\n\nfunction createId(): string {\n  return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;\n}\n\nexport default function TodoBoard() {\n  const [todos, setTodos] = useState<Todo[]>(() => loadTodos());\n  const [newText, setNewText] = useState(\"\");\n  const [filter, setFilter] = useState<Filter>(\"all\");\n  const [editingId, setEditingId] = useState<string | null>(null);\n  const [editingText, setEditingText] = useState(\"\");\n  const cancelingEditRef = useRef(false);\n\n  useEffect(() => {\n    if (typeof localStorage === \"undefined\") return;\n    try {\n      localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));\n    } catch (error) {\n      console.warn(\"Failed to persist todos to localStorage\", error);\n    }\n  }, [todos]);\n\n  const remainingCount = useMemo(\n    () => todos.filter((todo) => !todo.done).length,\n    [todos],\n  );\n\n  const visibleTodos = useMemo(() => {\n    switch (filter) {\n      case \"active\":\n        return todos.filter((todo) => !todo.done);\n      case \"done\":\n        return todos.filter((todo) => todo.done);\n      default:\n        return todos;\n    }\n  }, [todos, filter]);\n\n  function handleAdd(event: FormEvent) {\n    event.preventDefault();\n    const text = newText.trim();\n    if (!text) return;\n    setTodos((prev) => [...prev, { id: createId(), text, done: false }]);\n    setNewText(\"\");\n  }\n\n  function handleToggle(id: string) {\n    setTodos((prev) =>\n      prev.map((todo) =>\n        todo.id === id ? { ...todo, done: !todo.done } : todo,\n      ),\n    );\n  }\n\n  function handleDelete(id: string) {\n    setTodos((prev) => prev.filter((todo) => todo.id !== id));\n    if (editingId === id) {\n      setEditingId(null);\n      setEditingText(\"\");\n    }\n  }\n\n  function startEdit(todo: Todo) {\n    setEditingId(todo.id);\n    setEditingText(todo.text);\n  }\n\n  function cancelEdit() {\n    setEditingId(null);\n    setEditingText(\"\");\n  }\n\n  function commitEdit(id: string) {\n    const text = editingText.trim();\n    if (!text) {\n      handleDelete(id);\n      return;\n    }\n    setTodos((prev) =>\n      prev.map((todo) => (todo.id === id ? { ...todo, text } : todo)),\n    );\n    setEditingId(null);\n    setEditingText(\"\");\n  }\n\n  function moveUp(index: number) {\n    if (index === 0) return;\n    setTodos((prev) => {\n      const next = [...prev];\n      [next[index - 1], next[index]] = [next[index], next[index - 1]];\n      return next;\n    });\n  }\n\n  function moveDown(index: number) {\n    setTodos((prev) => {\n      if (index === prev.length - 1) return prev;\n      const next = [...prev];\n      [next[index], next[index + 1]] = [next[index + 1], next[index]];\n      return next;\n    });\n  }\n\n  return (\n    <div className=\"todo-board\">\n      <h1>Todo Board</h1>\n\n      <form onSubmit={handleAdd} className=\"todo-add-form\">\n        <input\n          type=\"text\"\n          value={newText}\n          placeholder=\"Add a new todo…\"\n          onChange={(event: ChangeEvent<HTMLInputElement>) =>\n            setNewText(event.target.value)\n          }\n        />\n        <button type=\"submit\">Add</button>\n      </form>\n\n      <div className=\"todo-filters\">\n        {([\"all\", \"active\", \"done\"] as Filter[]).map((option) => (\n          <button\n            key={option}\n            type=\"button\"\n            aria-pressed={filter === option}\n            onClick={() => setFilter(option)}\n          >\n            {option[0].toUpperCase() + option.slice(1)}\n          </button>\n        ))}\n      </div>\n\n      <p className=\"todo-count\">\n        {remainingCount} item{remainingCount === 1 ? \"\" : \"s\"} remaining\n      </p>\n\n      <ul className=\"todo-list\">\n        {visibleTodos.map((todo) => {\n          const index = todos.findIndex((item) => item.id === todo.id);\n          const isEditing = editingId === todo.id;\n          return (\n            <li key={todo.id} className=\"todo-item\">\n              <input\n                type=\"checkbox\"\n                checked={todo.done}\n                onChange={() => handleToggle(todo.id)}\n              />\n\n              {isEditing ? (\n                <input\n                  type=\"text\"\n                  value={editingText}\n                  autoFocus\n                  onChange={(event: ChangeEvent<HTMLInputElement>) =>\n                    setEditingText(event.target.value)\n                  }\n                  onBlur={() => {\n                    if (cancelingEditRef.current) {\n                      cancelingEditRef.current = false;\n                      return;\n                    }\n                    commitEdit(todo.id);\n                  }}\n                  onKeyDown={(event) => {\n                    if (event.key === \"Enter\") {\n                      event.preventDefault();\n                      commitEdit(todo.id);\n                    } else if (event.key === \"Escape\") {\n                      cancelingEditRef.current = true;\n                      cancelEdit();\n                    }\n                  }}\n                />\n              ) : (\n                <span\n                  className={todo.done ? \"todo-text done\" : \"todo-text\"}\n                  onDoubleClick={() => startEdit(todo)}\n                >\n                  {todo.text}\n                </span>\n              )}\n\n              <div className=\"todo-actions\">\n                <button\n                  type=\"button\"\n                  onClick={() => moveUp(index)}\n                  disabled={index === 0}\n                  aria-label=\"Move up\"\n                >\n                  ↑\n                </button>\n                <button\n                  type=\"button\"\n                  onClick={() => moveDown(index)}\n                  disabled={index === todos.length - 1}\n                  aria-label=\"Move down\"\n                >\n                  ↓\n                </button>\n                {isEditing ? (\n                  <button type=\"button\" onClick={() => commitEdit(todo.id)}>\n                    Save\n                  </button>\n                ) : (\n                  <button type=\"button\" onClick={() => startEdit(todo)}>\n                    Edit\n                  </button>\n                )}\n                <button type=\"button\" onClick={() => handleDelete(todo.id)}>\n                  Delete\n                </button>\n              </div>\n            </li>\n          );\n        })}\n      </ul>\n    </div>\n  );\n}\n"
+      },
+      {
+        "path": "src/index.ts",
+        "content": "export {};\n"
+      }
+    ]
+  },
+  {
+    "task": "react-signup-form",
+    "lang": "typescript",
+    "condition": "jev-rewake+fixhook",
+    "rep": 1,
+    "reviewFindings": 4,
+    "ruleCoveredFindings": 2,
+    "fix": {
+      "wallMs": 85045,
+      "costUsd": 0.26248900000000003,
+      "durationMs": 83883,
+      "turns": 14
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 3,
+      "rewakes": 0,
+      "costUsd": 0.26248900000000003,
+      "durationMs": 83883,
+      "numTurns": 7,
+      "isError": false
+    },
+    "hook": {
+      "calls": 3,
+      "findingsShown": 2,
+      "highShown": 0,
+      "mediumShown": 2,
+      "errors": 0,
+      "meanLatencyMs": 316.9782083333333,
+      "editsAfterFeedback": 2
+    },
+    "original": {
+      "costUsd": 0.153124,
+      "durationMs": 44697
+    },
+    "files": [
+      {
+        "path": "src/index.ts",
+        "content": "export {};\n"
+      },
+      {
+        "path": "src/SignupForm.tsx",
+        "content": "import { useRef, useState, FormEvent } from \"react\";\n\ntype FormFields = \"name\" | \"email\" | \"password\" | \"confirmPassword\" | \"acceptTerms\";\n\ninterface FormState {\n  name: string;\n  email: string;\n  password: string;\n  confirmPassword: string;\n  acceptTerms: boolean;\n}\n\ntype FieldErrors = Partial<Record<FormFields, string>>;\n\nconst initialState: FormState = {\n  name: \"\",\n  email: \"\",\n  password: \"\",\n  confirmPassword: \"\",\n  acceptTerms: false,\n};\n\nconst FORM_FIELDS: FormFields[] = [\"name\", \"email\", \"password\", \"confirmPassword\", \"acceptTerms\"];\n\nconst EMAIL_PATTERN = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;\n\nfunction validate(form: FormState): FieldErrors {\n  const errors: FieldErrors = {};\n\n  if (!form.name.trim()) {\n    errors.name = \"Name is required.\";\n  }\n\n  if (!form.email.trim()) {\n    errors.email = \"Email is required.\";\n  } else if (!EMAIL_PATTERN.test(form.email)) {\n    errors.email = \"Enter a valid email address.\";\n  }\n\n  if (!form.password) {\n    errors.password = \"Password is required.\";\n  } else if (form.password.length < 8) {\n    errors.password = \"Password must be at least 8 characters.\";\n  }\n\n  if (!form.confirmPassword) {\n    errors.confirmPassword = \"Please confirm your password.\";\n  } else if (form.confirmPassword !== form.password) {\n    errors.confirmPassword = \"Passwords do not match.\";\n  }\n\n  if (!form.acceptTerms) {\n    errors.acceptTerms = \"You must accept the terms to continue.\";\n  }\n\n  return errors;\n}\n\ninterface SignupSuccessResponse {\n  id: string;\n}\n\ninterface SignupErrorResponse {\n  errors: Partial<Record<FormFields, string>>;\n}\n\nfunction isSignupErrorResponse(body: unknown): body is SignupErrorResponse {\n  return (\n    typeof body === \"object\" &&\n    body !== null &&\n    \"errors\" in body &&\n    typeof (body as { errors: unknown }).errors === \"object\" &&\n    (body as { errors: unknown }).errors !== null\n  );\n}\n\nfunction isSignupSuccessResponse(body: unknown): body is SignupSuccessResponse {\n  return (\n    typeof body === \"object\" &&\n    body !== null &&\n    \"id\" in body &&\n    typeof (body as { id: unknown }).id === \"string\"\n  );\n}\n\nfunction sanitizeFieldErrors(errors: Record<string, unknown>): FieldErrors {\n  const sanitized: FieldErrors = {};\n  for (const field of FORM_FIELDS) {\n    const value = errors[field];\n    if (typeof value === \"string\" && value.trim().length > 0) {\n      sanitized[field] = value;\n    }\n  }\n  return sanitized;\n}\n\nexport default function SignupForm() {\n  const [form, setForm] = useState<FormState>(initialState);\n  const [errors, setErrors] = useState<FieldErrors>({});\n  const [submitting, setSubmitting] = useState(false);\n  const [submitError, setSubmitError] = useState<string | null>(null);\n  const [accountId, setAccountId] = useState<string | null>(null);\n  const submittingRef = useRef(false);\n\n  function updateField<K extends keyof FormState>(field: K, value: FormState[K]) {\n    setForm((prev) => ({ ...prev, [field]: value }));\n    setErrors((prev) => ({ ...prev, [field]: undefined }));\n  }\n\n  async function handleSubmit(event: FormEvent<HTMLFormElement>) {\n    event.preventDefault();\n\n    if (submittingRef.current) {\n      return;\n    }\n\n    setSubmitError(null);\n\n    const validationErrors = validate(form);\n    if (Object.keys(validationErrors).length > 0) {\n      setErrors(validationErrors);\n      return;\n    }\n\n    submittingRef.current = true;\n    setSubmitting(true);\n    try {\n      const response = await fetch(\"/api/signup\", {\n        method: \"POST\",\n        headers: { \"Content-Type\": \"application/json\" },\n        body: JSON.stringify({\n          name: form.name,\n          email: form.email,\n          password: form.password,\n          acceptTerms: form.acceptTerms,\n        }),\n      });\n\n      const responseBody: unknown = await response.json().catch(() => null);\n\n      if (!response.ok) {\n        if (isSignupErrorResponse(responseBody)) {\n          const sanitizedErrors = sanitizeFieldErrors(responseBody.errors);\n          if (Object.keys(sanitizedErrors).length > 0) {\n            setErrors(sanitizedErrors);\n          } else {\n            setSubmitError(\"Something went wrong. Please try again.\");\n          }\n        } else {\n          setSubmitError(\"Something went wrong. Please try again.\");\n        }\n        return;\n      }\n\n      if (!isSignupSuccessResponse(responseBody)) {\n        setSubmitError(\"Unexpected response from server.\");\n        return;\n      }\n\n      setAccountId(responseBody.id);\n      setForm(initialState);\n      setErrors({});\n    } catch {\n      setSubmitError(\"Network error. Please try again.\");\n    } finally {\n      submittingRef.current = false;\n      setSubmitting(false);\n    }\n  }\n\n  if (accountId) {\n    return (\n      <div role=\"status\">\n        <p>Account created successfully! Your account id is {accountId}.</p>\n      </div>\n    );\n  }\n\n  return (\n    <form onSubmit={handleSubmit} noValidate>\n      <div>\n        <label htmlFor=\"name\">Name</label>\n        <input\n          id=\"name\"\n          type=\"text\"\n          value={form.name}\n          onChange={(e) => updateField(\"name\", e.target.value)}\n          disabled={submitting}\n          aria-invalid={errors.name ? true : undefined}\n          aria-describedby={errors.name ? \"name-error\" : undefined}\n        />\n        {errors.name && (\n          <span id=\"name-error\" role=\"alert\">\n            {errors.name}\n          </span>\n        )}\n      </div>\n\n      <div>\n        <label htmlFor=\"email\">Email</label>\n        <input\n          id=\"email\"\n          type=\"email\"\n          value={form.email}\n          onChange={(e) => updateField(\"email\", e.target.value)}\n          disabled={submitting}\n          aria-invalid={errors.email ? true : undefined}\n          aria-describedby={errors.email ? \"email-error\" : undefined}\n        />\n        {errors.email && (\n          <span id=\"email-error\" role=\"alert\">\n            {errors.email}\n          </span>\n        )}\n      </div>\n\n      <div>\n        <label htmlFor=\"password\">Password</label>\n        <input\n          id=\"password\"\n          type=\"password\"\n          value={form.password}\n          onChange={(e) => updateField(\"password\", e.target.value)}\n          disabled={submitting}\n          aria-invalid={errors.password ? true : undefined}\n          aria-describedby={errors.password ? \"password-error\" : undefined}\n        />\n        {errors.password && (\n          <span id=\"password-error\" role=\"alert\">\n            {errors.password}\n          </span>\n        )}\n      </div>\n\n      <div>\n        <label htmlFor=\"confirmPassword\">Confirm Password</label>\n        <input\n          id=\"confirmPassword\"\n          type=\"password\"\n          value={form.confirmPassword}\n          onChange={(e) => updateField(\"confirmPassword\", e.target.value)}\n          disabled={submitting}\n          aria-invalid={errors.confirmPassword ? true : undefined}\n          aria-describedby={errors.confirmPassword ? \"confirmPassword-error\" : undefined}\n        />\n        {errors.confirmPassword && (\n          <span id=\"confirmPassword-error\" role=\"alert\">\n            {errors.confirmPassword}\n          </span>\n        )}\n      </div>\n\n      <div>\n        <label htmlFor=\"acceptTerms\">\n          <input\n            id=\"acceptTerms\"\n            type=\"checkbox\"\n            checked={form.acceptTerms}\n            onChange={(e) => updateField(\"acceptTerms\", e.target.checked)}\n            disabled={submitting}\n            aria-invalid={errors.acceptTerms ? true : undefined}\n            aria-describedby={errors.acceptTerms ? \"acceptTerms-error\" : undefined}\n          />\n          I accept the terms and conditions\n        </label>\n        {errors.acceptTerms && (\n          <span id=\"acceptTerms-error\" role=\"alert\">\n            {errors.acceptTerms}\n          </span>\n        )}\n      </div>\n\n      {submitError && <p role=\"alert\">{submitError}</p>}\n\n      <button type=\"submit\" disabled={submitting}>\n        {submitting ? \"Signing up...\" : \"Sign up\"}\n      </button>\n    </form>\n  );\n}\n"
+      }
+    ]
+  },
+  {
+    "task": "react-profile-editor",
+    "lang": "typescript",
+    "condition": "jev-rewake+fixhook",
+    "rep": 1,
+    "reviewFindings": 6,
+    "ruleCoveredFindings": 4,
+    "fix": {
+      "wallMs": 92797,
+      "costUsd": 0.1967678,
+      "durationMs": 92061,
+      "turns": 12
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 3,
+      "rewakes": 0,
+      "costUsd": 0.1967678,
+      "durationMs": 92061,
+      "numTurns": 7,
+      "isError": false
+    },
+    "hook": {
+      "calls": 3,
+      "findingsShown": 1,
+      "highShown": 1,
+      "mediumShown": 0,
+      "errors": 0,
+      "meanLatencyMs": 328.55965266666664,
+      "editsAfterFeedback": 1
+    },
+    "original": {
+      "costUsd": 0.13468860000000002,
+      "durationMs": 39781
+    },
+    "files": [
+      {
+        "path": "src/useUserProfiles.ts",
+        "content": "import { useEffect, useMemo, useState } from \"react\";\nimport type { User } from \"./ProfileEditor\";\n\nexport interface UserProfileState {\n  data: User | null;\n  loading: boolean;\n  error: string | null;\n}\n\nexport interface UseUserProfilesResult {\n  profiles: Record<string, UserProfileState>;\n  loading: boolean;\n}\n\nfunction isUser(value: unknown): value is User {\n  if (typeof value !== \"object\" || value === null) return false;\n  const candidate = value as Record<string, unknown>;\n  return (\n    typeof candidate.id === \"string\" &&\n    typeof candidate.displayName === \"string\" &&\n    typeof candidate.bio === \"string\" &&\n    typeof candidate.avatarUrl === \"string\"\n  );\n}\n\nasync function fetchUser(id: string, signal: AbortSignal): Promise<User> {\n  const response = await fetch(`/api/users/${encodeURIComponent(id)}`, { signal });\n  if (!response.ok) {\n    throw new Error(`Failed to load user ${id}: ${response.status}`);\n  }\n  const body: unknown = await response.json();\n  if (!isUser(body)) {\n    throw new Error(`Malformed user response for ${id}`);\n  }\n  if (body.id !== id) {\n    throw new Error(`Requested user ${id} but received ${body.id}`);\n  }\n  return body;\n}\n\nfunction getOwnProfile(\n  profiles: Record<string, UserProfileState>,\n  id: string\n): UserProfileState | undefined {\n  return Object.prototype.hasOwnProperty.call(profiles, id) ? profiles[id] : undefined;\n}\n\nexport function useUserProfiles(ids: string[]): UseUserProfilesResult {\n  const [profiles, setProfiles] = useState<Record<string, UserProfileState>>({});\n\n  const key = JSON.stringify(ids);\n\n  useEffect(() => {\n    const controller = new AbortController();\n\n    setProfiles(\n      Object.fromEntries(\n        ids.map((id) => [id, { data: null, loading: true, error: null } as UserProfileState])\n      )\n    );\n\n    ids.forEach((id) => {\n      fetchUser(id, controller.signal)\n        .then((data) => {\n          if (controller.signal.aborted) return;\n          setProfiles((prev) => ({ ...prev, [id]: { data, loading: false, error: null } }));\n        })\n        .catch((err) => {\n          if (controller.signal.aborted) return;\n          const message = err instanceof Error ? err.message : \"Failed to load user\";\n          setProfiles((prev) => ({ ...prev, [id]: { data: null, loading: false, error: message } }));\n        });\n    });\n\n    return () => controller.abort();\n    // eslint-disable-next-line react-hooks/exhaustive-deps\n  }, [key]);\n\n  const visibleProfiles = useMemo(() => {\n    const profilesForCurrentIds: Record<string, UserProfileState> = {};\n    for (const id of ids) {\n      profilesForCurrentIds[id] = getOwnProfile(profiles, id) ?? { data: null, loading: true, error: null };\n    }\n    return profilesForCurrentIds;\n    // eslint-disable-next-line react-hooks/exhaustive-deps\n  }, [key, profiles]);\n\n  const loading = ids.some((id) => visibleProfiles[id].loading);\n\n  return { profiles: visibleProfiles, loading };\n}\n"
+      },
+      {
+        "path": "src/ProfileEditor.tsx",
+        "content": "import { useState } from \"react\";\n\nexport interface User {\n  id: string;\n  displayName: string;\n  bio: string;\n  avatarUrl: string;\n}\n\nexport interface ProfileEditorProps {\n  user: User;\n  onSave: (user: User) => Promise<void>;\n}\n\nexport function ProfileEditor({ user, onSave }: ProfileEditorProps) {\n  const [displayName, setDisplayName] = useState(user.displayName);\n  const [bio, setBio] = useState(user.bio);\n  const [saving, setSaving] = useState(false);\n  const [error, setError] = useState<string | null>(null);\n  const [loadedUserId, setLoadedUserId] = useState(user.id);\n\n  if (user.id !== loadedUserId) {\n    setLoadedUserId(user.id);\n    setDisplayName(user.displayName);\n    setBio(user.bio);\n    setSaving(false);\n    setError(null);\n  }\n\n  const hasChanges = displayName !== user.displayName || bio !== user.bio;\n\n  const handleReset = () => {\n    setDisplayName(user.displayName);\n    setBio(user.bio);\n    setError(null);\n  };\n\n  const handleSave = async () => {\n    if (!hasChanges || saving) return;\n    setSaving(true);\n    setError(null);\n    try {\n      await onSave({ ...user, displayName, bio });\n    } catch (err) {\n      setError(err instanceof Error ? err.message : \"Failed to save profile\");\n    } finally {\n      setSaving(false);\n    }\n  };\n\n  return (\n    <div className=\"profile-editor\">\n      <img src={user.avatarUrl} alt={`${user.displayName}'s avatar`} className=\"profile-editor__avatar\" />\n\n      <label className=\"profile-editor__field\">\n        <span>Display name</span>\n        <input\n          type=\"text\"\n          value={displayName}\n          onChange={(e) => setDisplayName(e.target.value)}\n          disabled={saving}\n        />\n      </label>\n\n      <label className=\"profile-editor__field\">\n        <span>Bio</span>\n        <textarea value={bio} onChange={(e) => setBio(e.target.value)} disabled={saving} />\n      </label>\n\n      <div className=\"profile-editor__status\">\n        {hasChanges ? \"Unsaved changes\" : \"No unsaved changes\"}\n      </div>\n\n      {error && <div className=\"profile-editor__error\">{error}</div>}\n\n      <div className=\"profile-editor__actions\">\n        <button type=\"button\" onClick={handleReset} disabled={!hasChanges || saving}>\n          Reset\n        </button>\n        <button type=\"button\" onClick={handleSave} disabled={!hasChanges || saving}>\n          {saving ? \"Saving...\" : \"Save\"}\n        </button>\n      </div>\n    </div>\n  );\n}\n"
+      },
+      {
+        "path": "src/index.ts",
+        "content": "export {};\n"
+      }
+    ]
+  },
+  {
+    "task": "swiftui-stopwatch",
+    "lang": "swift",
+    "condition": "jev-rewake+fixhook",
+    "rep": 1,
+    "reviewFindings": 5,
+    "ruleCoveredFindings": 0,
+    "fix": {
+      "wallMs": 75153,
+      "costUsd": 0.19974960000000003,
+      "durationMs": 74438,
+      "turns": 9
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 4,
+      "rewakes": 0,
+      "costUsd": 0.19974960000000003,
+      "durationMs": 74438,
+      "numTurns": 10,
+      "isError": false
+    },
+    "hook": {
+      "calls": 4,
+      "findingsShown": 2,
+      "highShown": 1,
+      "mediumShown": 1,
+      "errors": 0,
+      "meanLatencyMs": 282.21670800000004,
+      "editsAfterFeedback": 3
+    },
+    "original": {
+      "costUsd": 0.1716706,
+      "durationMs": 80281
+    },
+    "files": [
+      {
+        "path": "Sources/App/Stopwatch.swift",
+        "content": "import Foundation\nimport SwiftUI\n\nstruct Lap: Identifiable {\n    let id = UUID()\n    let number: Int\n    let splitTime: TimeInterval\n    let totalTime: TimeInterval\n}\n\n@MainActor\nfinal class StopwatchViewModel: ObservableObject {\n    @Published private(set) var elapsed: TimeInterval = 0\n    @Published private(set) var laps: [Lap] = []\n    @Published private(set) var isRunning = false\n\n    private let clock = ContinuousClock()\n    private var timer: Timer?\n    private var startInstant: ContinuousClock.Instant?\n    private var accumulated: TimeInterval = 0\n\n    func start() {\n        guard !isRunning else { return }\n        isRunning = true\n        startInstant = clock.now\n        timer = Timer.scheduledTimer(withTimeInterval: 0.01, repeats: true) { [weak self] _ in\n            Task { @MainActor in\n                self?.tick()\n            }\n        }\n    }\n\n    func stop() {\n        guard isRunning else { return }\n        isRunning = false\n        timer?.invalidate()\n        timer = nil\n        elapsed = currentElapsed()\n        accumulated = elapsed\n        startInstant = nil\n    }\n\n    func reset() {\n        stop()\n        elapsed = 0\n        accumulated = 0\n        laps = []\n    }\n\n    func lap() {\n        guard isRunning else { return }\n        elapsed = currentElapsed()\n        let previousTotal = laps.last?.totalTime ?? 0\n        laps.append(Lap(number: laps.count + 1, splitTime: elapsed - previousTotal, totalTime: elapsed))\n    }\n\n    private func tick() {\n        elapsed = currentElapsed()\n    }\n\n    private func currentElapsed() -> TimeInterval {\n        guard let startInstant else { return accumulated }\n        return accumulated + (clock.now - startInstant).timeInterval\n    }\n\n    deinit {\n        timer?.invalidate()\n    }\n}\n\nprivate extension Duration {\n    private static let attosecondsPerSecond: TimeInterval = 1e18\n\n    var timeInterval: TimeInterval {\n        TimeInterval(components.seconds) + TimeInterval(components.attoseconds) / Self.attosecondsPerSecond\n    }\n}\n\nenum StopwatchFormatter {\n    static func format(_ time: TimeInterval) -> String {\n        let totalHundredths = Int((time * 100).rounded())\n        let minutes = totalHundredths / 6000\n        let seconds = (totalHundredths / 100) % 60\n        let hundredths = totalHundredths % 100\n        return String(format: \"%02d:%02d.%02d\", minutes, seconds, hundredths)\n    }\n}\n\nstruct StopwatchView: View {\n    @StateObject private var viewModel = StopwatchViewModel()\n\n    var body: some View {\n        VStack(spacing: 24) {\n            Text(StopwatchFormatter.format(viewModel.elapsed))\n                .font(.system(size: 56, weight: .medium, design: .monospaced))\n                .monospacedDigit()\n\n            HStack(spacing: 16) {\n                Button(viewModel.isRunning ? \"Stop\" : \"Start\") {\n                    viewModel.isRunning ? viewModel.stop() : viewModel.start()\n                }\n                Button(\"Lap\") {\n                    viewModel.lap()\n                }\n                .disabled(!viewModel.isRunning)\n                Button(\"Reset\") {\n                    viewModel.reset()\n                }\n                .disabled(viewModel.isRunning && viewModel.elapsed == 0)\n            }\n            .buttonStyle(.bordered)\n\n            List {\n                ForEach(viewModel.laps.reversed()) { lap in\n                    HStack {\n                        Text(\"Lap \\(lap.number)\")\n                        Spacer()\n                        Text(StopwatchFormatter.format(lap.splitTime))\n                            .monospacedDigit()\n                        Text(StopwatchFormatter.format(lap.totalTime))\n                            .foregroundStyle(.secondary)\n                            .monospacedDigit()\n                    }\n                }\n            }\n        }\n        .padding()\n    }\n}\n"
+      },
+      {
+        "path": "Sources/App/App.swift",
+        "content": "import Foundation\n"
+      }
+    ]
+  },
+  {
+    "task": "swiftui-settings",
+    "lang": "swift",
+    "condition": "jev-rewake+fixhook",
+    "rep": 1,
+    "reviewFindings": 2,
+    "ruleCoveredFindings": 1,
+    "fix": {
+      "wallMs": 76582,
+      "costUsd": 0.21950360000000002,
+      "durationMs": 75851,
+      "turns": 12
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 1,
+      "rewakes": 0,
+      "costUsd": 0.21950360000000002,
+      "durationMs": 75851,
+      "numTurns": 6,
+      "isError": false
+    },
+    "hook": {
+      "calls": 1,
+      "findingsShown": 0,
+      "highShown": 0,
+      "mediumShown": 0,
+      "errors": 0,
+      "meanLatencyMs": 287.818834,
+      "editsAfterFeedback": 0
+    },
+    "original": {
+      "costUsd": 0.15092519999999998,
+      "durationMs": 61509
+    },
+    "files": [
+      {
+        "path": "Sources/App/SettingsScreen.swift",
+        "content": "import SwiftUI\n\nenum ThemeChoice: String, CaseIterable, Identifiable, Equatable {\n    case system\n    case light\n    case dark\n\n    var id: String { rawValue }\n\n    var displayName: String {\n        switch self {\n        case .system: return \"System\"\n        case .light: return \"Light\"\n        case .dark: return \"Dark\"\n        }\n    }\n}\n\n@MainActor\nfinal class SettingsStore: ObservableObject {\n    private enum Keys {\n        static let displayName = \"settings.displayName\"\n        static let theme = \"settings.theme\"\n        static let notificationsEnabled = \"settings.notificationsEnabled\"\n        static let refreshInterval = \"settings.refreshInterval\"\n    }\n\n    static let defaultRefreshInterval: TimeInterval = 60\n    static let refreshIntervalRange: ClosedRange<TimeInterval> = 15...3600\n\n    @Published var displayName: String {\n        didSet { persist { $0.set(displayName, forKey: Keys.displayName) } }\n    }\n    @Published var theme: ThemeChoice {\n        didSet { persist { $0.set(theme.rawValue, forKey: Keys.theme) } }\n    }\n    @Published var notificationsEnabled: Bool {\n        didSet { persist { $0.set(notificationsEnabled, forKey: Keys.notificationsEnabled) } }\n    }\n    @Published var refreshInterval: TimeInterval {\n        didSet { persist { $0.set(refreshInterval, forKey: Keys.refreshInterval) } }\n    }\n\n    private let defaults: UserDefaults\n    private var isApplyingExternalChange = false\n    private var observer: NSObjectProtocol?\n\n    init(defaults: UserDefaults = .standard) {\n        self.defaults = defaults\n\n        displayName = defaults.string(forKey: Keys.displayName) ?? \"\"\n        theme = ThemeChoice(rawValue: defaults.string(forKey: Keys.theme) ?? \"\") ?? .system\n        notificationsEnabled = defaults.object(forKey: Keys.notificationsEnabled) as? Bool ?? true\n        refreshInterval = Self.sanitizedRefreshInterval(\n            defaults.object(forKey: Keys.refreshInterval) as? TimeInterval\n        )\n\n        observer = NotificationCenter.default.addObserver(\n            forName: UserDefaults.didChangeNotification,\n            object: defaults,\n            queue: .main\n        ) { [weak self] _ in\n            // queue: .main guarantees this runs on the main thread, matching the\n            // store's actor isolation, even though the closure itself is nonisolated.\n            MainActor.assumeIsolated {\n                self?.reloadFromDefaults()\n            }\n        }\n    }\n\n    deinit {\n        if let observer {\n            NotificationCenter.default.removeObserver(observer)\n        }\n    }\n\n    // Only writes to UserDefaults when the change originated locally (from the UI),\n    // not when we're re-applying a value we just read back from an external change.\n    private func persist(_ write: (UserDefaults) -> Void) {\n        guard !isApplyingExternalChange else { return }\n        write(defaults)\n    }\n\n    private func reloadFromDefaults() {\n        isApplyingExternalChange = true\n        defer { isApplyingExternalChange = false }\n\n        let newDisplayName = defaults.string(forKey: Keys.displayName) ?? \"\"\n        if newDisplayName != displayName { displayName = newDisplayName }\n\n        let newTheme = ThemeChoice(rawValue: defaults.string(forKey: Keys.theme) ?? \"\") ?? .system\n        if newTheme != theme { theme = newTheme }\n\n        let newNotificationsEnabled = defaults.object(forKey: Keys.notificationsEnabled) as? Bool ?? true\n        if newNotificationsEnabled != notificationsEnabled { notificationsEnabled = newNotificationsEnabled }\n\n        let newRefreshInterval = Self.sanitizedRefreshInterval(\n            defaults.object(forKey: Keys.refreshInterval) as? TimeInterval\n        )\n        if newRefreshInterval != refreshInterval { refreshInterval = newRefreshInterval }\n    }\n\n    // Guards against a malformed or out-of-range value in UserDefaults (e.g. edited\n    // externally) producing NaN/infinity or a value outside the Stepper's bounds.\n    private static func sanitizedRefreshInterval(_ value: TimeInterval?) -> TimeInterval {\n        guard let value, value.isFinite else { return defaultRefreshInterval }\n        return min(max(value, refreshIntervalRange.lowerBound), refreshIntervalRange.upperBound)\n    }\n}\n\nstruct SettingsScreen: View {\n    @ObservedObject var store: SettingsStore\n\n    var body: some View {\n        Form {\n            Section(\"Profile\") {\n                TextField(\"Display Name\", text: $store.displayName)\n            }\n\n            Section(\"Appearance\") {\n                Picker(\"Theme\", selection: $store.theme) {\n                    ForEach(ThemeChoice.allCases) { theme in\n                        Text(theme.displayName).tag(theme)\n                    }\n                }\n            }\n\n            Section(\"Notifications\") {\n                Toggle(\"Enable Notifications\", isOn: $store.notificationsEnabled)\n            }\n\n            Section(\"Refresh\") {\n                Stepper(value: $store.refreshInterval, in: SettingsStore.refreshIntervalRange, step: 15) {\n                    Text(\"Refresh Interval: \\(Int(store.refreshInterval))s\")\n                }\n            }\n        }\n        .padding()\n        .navigationTitle(\"Settings\")\n    }\n}\n"
+      },
+      {
+        "path": "Sources/App/App.swift",
+        "content": "import Foundation\n"
+      }
+    ]
+  },
+  {
+    "task": "react-user-search",
+    "lang": "typescript",
+    "condition": "jev-rewake+fixhook",
+    "rep": 2,
+    "reviewFindings": 3,
+    "ruleCoveredFindings": 1,
+    "fix": {
+      "wallMs": 75755,
+      "costUsd": 0.20722460000000004,
+      "durationMs": 74900,
+      "turns": 11
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 3,
+      "rewakes": 0,
+      "costUsd": 0.20722460000000004,
+      "durationMs": 74900,
+      "numTurns": 7,
+      "isError": false
+    },
+    "hook": {
+      "calls": 3,
+      "findingsShown": 3,
+      "highShown": 1,
+      "mediumShown": 2,
+      "errors": 0,
+      "meanLatencyMs": 332.61876366666667,
+      "editsAfterFeedback": 2
+    },
+    "original": {
+      "costUsd": 0.12829600000000002,
+      "durationMs": 34670
+    },
+    "files": [
+      {
+        "path": "src/UserSearch.tsx",
+        "content": "import { useEffect, useMemo, useState } from \"react\";\n\ninterface User {\n  id: string;\n  name: string;\n  email: string;\n}\n\ntype SortField = \"name\" | \"email\";\n\nconst DEBOUNCE_MS = 300;\n\nfunction isUser(value: unknown): value is User {\n  if (typeof value !== \"object\" || value === null) return false;\n  const record = value as Record<string, unknown>;\n  return (\n    typeof record.id === \"string\" &&\n    typeof record.name === \"string\" &&\n    typeof record.email === \"string\"\n  );\n}\n\nfunction parseUsers(value: unknown): User[] {\n  if (!Array.isArray(value)) {\n    throw new Error(\"Malformed response: expected an array of users\");\n  }\n  if (!value.every(isUser)) {\n    throw new Error(\"Malformed response: unexpected user shape\");\n  }\n  return value;\n}\n\nfunction isSortField(value: string): value is SortField {\n  return value === \"name\" || value === \"email\";\n}\n\nexport default function UserSearch() {\n  const [query, setQuery] = useState(\"\");\n  const [debouncedQuery, setDebouncedQuery] = useState(\"\");\n  const [users, setUsers] = useState<User[]>([]);\n  const [loading, setLoading] = useState(false);\n  const [error, setError] = useState<string | null>(null);\n  const [sortField, setSortField] = useState<SortField>(\"name\");\n\n  useEffect(() => {\n    const timer = setTimeout(() => setDebouncedQuery(query), DEBOUNCE_MS);\n    return () => clearTimeout(timer);\n  }, [query]);\n\n  useEffect(() => {\n    if (!debouncedQuery) {\n      setUsers([]);\n      setError(null);\n      setLoading(false);\n      return;\n    }\n\n    const controller = new AbortController();\n    let isCurrent = true;\n    setLoading(true);\n    setError(null);\n\n    fetch(`/api/users?q=${encodeURIComponent(debouncedQuery)}`, {\n      signal: controller.signal,\n    })\n      .then((res) => {\n        if (!res.ok) {\n          throw new Error(`Request failed with status ${res.status}`);\n        }\n        return res.json();\n      })\n      .then((json: unknown) => {\n        if (!isCurrent) return;\n        setUsers(parseUsers(json));\n        setLoading(false);\n      })\n      .catch((err: unknown) => {\n        if (!isCurrent) return;\n        if (err instanceof DOMException && err.name === \"AbortError\") {\n          return;\n        }\n        setError(err instanceof Error ? err.message : \"Failed to fetch users\");\n        setUsers([]);\n        setLoading(false);\n      });\n\n    return () => {\n      isCurrent = false;\n      controller.abort();\n    };\n  }, [debouncedQuery]);\n\n  const sortedUsers = useMemo(() => {\n    return [...users].sort((a, b) => a[sortField].localeCompare(b[sortField]));\n  }, [users, sortField]);\n\n  const isDebouncePending = query !== debouncedQuery;\n\n  return (\n    <div>\n      <input\n        type=\"text\"\n        value={query}\n        onChange={(e) => setQuery(e.target.value)}\n        placeholder=\"Search users...\"\n        aria-label=\"Search users\"\n      />\n\n      <div>\n        <label>\n          Sort by:{\" \"}\n          <select\n            value={sortField}\n            onChange={(e) => {\n              if (isSortField(e.target.value)) {\n                setSortField(e.target.value);\n              }\n            }}\n          >\n            <option value=\"name\">Name</option>\n            <option value=\"email\">Email</option>\n          </select>\n        </label>\n      </div>\n\n      {(loading || isDebouncePending) && <p>Loading...</p>}\n      {error && <p role=\"alert\">Error: {error}</p>}\n      {!loading && !isDebouncePending && !error && debouncedQuery && (\n        <p>\n          {sortedUsers.length} result{sortedUsers.length === 1 ? \"\" : \"s\"}\n        </p>\n      )}\n\n      {!isDebouncePending && (\n        <ul>\n          {sortedUsers.map((user) => (\n            <li key={user.id}>\n              {user.name} ({user.email})\n            </li>\n          ))}\n        </ul>\n      )}\n    </div>\n  );\n}\n"
+      },
+      {
+        "path": "src/index.ts",
+        "content": "export {};\n"
+      }
+    ]
+  },
+  {
+    "task": "swift-legacy-bridge",
+    "lang": "swift",
+    "condition": "jev-rewake+fixhook",
+    "rep": 1,
+    "reviewFindings": 6,
+    "ruleCoveredFindings": 5,
+    "fix": {
+      "wallMs": 157481,
+      "costUsd": 0.303278,
+      "durationMs": 156775,
+      "turns": 8
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 2,
+      "rewakes": 0,
+      "costUsd": 0.303278,
+      "durationMs": 156775,
+      "numTurns": 7,
+      "isError": false
+    },
+    "hook": {
+      "calls": 2,
+      "findingsShown": 3,
+      "highShown": 1,
+      "mediumShown": 2,
+      "errors": 0,
+      "meanLatencyMs": 300.76779150000004,
+      "editsAfterFeedback": 1
+    },
+    "original": {
+      "costUsd": 0.15987259999999998,
+      "durationMs": 94743
+    },
+    "files": [
+      {
+        "path": "Sources/App/LegacyBridge.swift",
+        "content": "import Foundation\n\n// MARK: - Legacy SDK (callback-based)\n\nprivate let stubGeocodeDelay: TimeInterval = 0.1\nprivate let stubUploadStepCount = 5\nprivate let stubUploadStepDelay: TimeInterval = 0.05\n\nfinal class LegacyGeocoder {\n    func geocode(_ address: String, completion: @escaping (Result<(Double, Double), Error>) -> Void) {\n        DispatchQueue.global().asyncAfter(deadline: .now() + stubGeocodeDelay) {\n            completion(.success((37.7749, -122.4194)))\n        }\n    }\n}\n\nfinal class LegacyUploader {\n    var onProgress: ((Double) -> Void)?\n    var onFinish: ((Error?) -> Void)?\n\n    private let lock = NSLock()\n    private var isCancelled = false\n\n    func start(file: URL) {\n        for step in 1...stubUploadStepCount {\n            DispatchQueue.global().asyncAfter(deadline: .now() + Double(step) * stubUploadStepDelay) {\n                self.lock.lock()\n                let cancelled = self.isCancelled\n                self.lock.unlock()\n                guard !cancelled else { return }\n                self.onProgress?(Double(step) / Double(stubUploadStepCount))\n                if step == stubUploadStepCount {\n                    self.onFinish?(nil)\n                }\n            }\n        }\n    }\n\n    /// Stops future scheduled callbacks from firing. The legacy SDK has no real\n    /// cancellation hook, so this is best-effort: it only suppresses steps that\n    /// haven't fired yet.\n    func cancel() {\n        lock.lock()\n        isCancelled = true\n        lock.unlock()\n    }\n}\n\n// MARK: - Modern async/await bridge\n\nenum LegacyBridgeError: Error {\n    case uploadAlreadyInProgress\n}\n\n/// Delivers a single result to a `CheckedContinuation` exactly once, even if\n/// the wrapped callback API fires more than once or a cancellation handler\n/// races with attaching the continuation.\nprivate final class ContinuationBridge<T> {\n    private let lock = NSLock()\n    private var continuation: CheckedContinuation<T, Error>?\n    private var bufferedResult: Result<T, Error>?\n\n    func attach(_ continuation: CheckedContinuation<T, Error>) {\n        lock.lock()\n        if let bufferedResult {\n            lock.unlock()\n            continuation.resume(with: bufferedResult)\n            return\n        }\n        self.continuation = continuation\n        lock.unlock()\n    }\n\n    func resume(with result: Result<T, Error>) {\n        lock.lock()\n        guard bufferedResult == nil else {\n            lock.unlock()\n            return\n        }\n        bufferedResult = result\n        let pending = continuation\n        continuation = nil\n        lock.unlock()\n        pending?.resume(with: result)\n    }\n}\n\nfinal class LegacyGeocoderBridge {\n    private let geocoder = LegacyGeocoder()\n\n    func geocode(_ address: String) async throws -> (Double, Double) {\n        let bridge = ContinuationBridge<(Double, Double)>()\n        return try await withTaskCancellationHandler {\n            try await withCheckedThrowingContinuation { continuation in\n                bridge.attach(continuation)\n                geocoder.geocode(address) { result in\n                    bridge.resume(with: result)\n                }\n            }\n        } onCancel: {\n            bridge.resume(with: .failure(CancellationError()))\n        }\n    }\n}\n\nfinal class LegacyUploaderBridge {\n    private let uploader = LegacyUploader()\n\n    /// Emits progress values as the upload runs; finishes when the upload completes or fails.\n    let progress: AsyncStream<Double>\n    private let progressContinuation: AsyncStream<Double>.Continuation\n\n    private let lock = NSLock()\n    private var isUploading = false\n\n    init() {\n        (progress, progressContinuation) = AsyncStream.makeStream(of: Double.self)\n    }\n\n    private func beginUpload() throws {\n        lock.lock()\n        defer { lock.unlock() }\n        guard !isUploading else {\n            throw LegacyBridgeError.uploadAlreadyInProgress\n        }\n        isUploading = true\n    }\n\n    private func endUpload() {\n        lock.lock()\n        defer { lock.unlock() }\n        isUploading = false\n    }\n\n    func upload(file: URL) async throws {\n        try beginUpload()\n        defer { endUpload() }\n\n        let bridge = ContinuationBridge<Void>()\n        uploader.onProgress = { [progressContinuation] value in\n            progressContinuation.yield(value)\n        }\n\n        try await withTaskCancellationHandler {\n            try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in\n                bridge.attach(continuation)\n                uploader.onFinish = { [progressContinuation] error in\n                    progressContinuation.finish()\n                    let result: Result<Void, Error> = error.map { .failure($0) } ?? .success(())\n                    bridge.resume(with: result)\n                }\n                uploader.start(file: file)\n            }\n        } onCancel: {\n            uploader.cancel()\n            progressContinuation.finish()\n            bridge.resume(with: .failure(CancellationError()))\n        }\n    }\n}\n"
+      },
+      {
+        "path": "Sources/App/App.swift",
+        "content": "import Foundation\n"
+      }
+    ]
+  },
+  {
+    "task": "swiftui-chat",
+    "lang": "swift",
+    "condition": "jev-rewake+fixhook",
+    "rep": 1,
+    "reviewFindings": 4,
+    "ruleCoveredFindings": 0,
+    "fix": {
+      "wallMs": 96334,
+      "costUsd": 0.2095906,
+      "durationMs": 95276,
+      "turns": 8
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 3,
+      "rewakes": 0,
+      "costUsd": 0.2095906,
+      "durationMs": 95276,
+      "numTurns": 9,
+      "isError": false
+    },
+    "hook": {
+      "calls": 3,
+      "findingsShown": 0,
+      "highShown": 0,
+      "mediumShown": 0,
+      "errors": 1,
+      "meanLatencyMs": 267.77662499999997,
+      "editsAfterFeedback": 0
+    },
+    "original": {
+      "costUsd": 0.15074700000000002,
+      "durationMs": 66835
+    },
+    "files": [
+      {
+        "path": "Sources/App/ChatScreen.swift",
+        "content": "import Foundation\nimport SwiftUI\n\nstruct ChatMessage: Codable, Identifiable, Hashable {\n    let id: String\n    let author: String\n    let text: String\n}\n\n@MainActor\nfinal class ChatConnection: NSObject, ObservableObject {\n    @Published private(set) var messages: [ChatMessage] = []\n\n    private let url = URL(string: \"wss://chat.example.com/room\")!\n    private var session: URLSession!\n    private var task: URLSessionWebSocketTask?\n    private var reconnectDelay: TimeInterval = 1\n    private let maxReconnectDelay: TimeInterval = 30\n    private var shouldReconnect = true\n    private let maxMessages = 500\n\n    /// Bumped on every connect/stop/reconnect so callbacks and delayed reconnects\n    /// from a superseded connection attempt can recognize they're stale and no-op.\n    private var generation = 0\n\n    override init() {\n        super.init()\n        session = URLSession(configuration: .default)\n    }\n\n    func start() {\n        shouldReconnect = true\n        generation += 1\n        task?.cancel(with: .goingAway, reason: nil)\n        task = nil\n        reconnectDelay = 1\n        connect()\n    }\n\n    func stop() {\n        shouldReconnect = false\n        generation += 1\n        task?.cancel(with: .goingAway, reason: nil)\n        task = nil\n    }\n\n    @discardableResult\n    func send(text: String) -> Bool {\n        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)\n        guard !trimmed.isEmpty else { return false }\n        guard let task, task.state == .running else { return false }\n        let message = ChatMessage(id: UUID().uuidString, author: \"me\", text: trimmed)\n        guard let data = try? JSONEncoder().encode(message) else { return false }\n        let sendGeneration = generation\n        task.send(.data(data)) { [weak self] error in\n            guard error != nil else { return }\n            Task { @MainActor in\n                guard let self, self.generation == sendGeneration else { return }\n                self.handleDisconnect(generation: sendGeneration)\n            }\n        }\n        return true\n    }\n\n    private func connect() {\n        let connectGeneration = generation\n        let task = session.webSocketTask(with: url)\n        self.task = task\n        task.resume()\n        listen(on: task, generation: connectGeneration)\n    }\n\n    private func listen(on task: URLSessionWebSocketTask, generation: Int) {\n        task.receive { [weak self] result in\n            guard let self else { return }\n            Task { @MainActor in\n                guard self.generation == generation else { return }\n                switch result {\n                case .failure:\n                    self.handleDisconnect(generation: generation)\n                case .success(let message):\n                    self.reconnectDelay = 1\n                    self.handle(message)\n                    self.listen(on: task, generation: generation)\n                }\n            }\n        }\n    }\n\n    private func handle(_ message: URLSessionWebSocketTask.Message) {\n        let data: Data\n        switch message {\n        case .data(let d):\n            data = d\n        case .string(let s):\n            data = Data(s.utf8)\n        @unknown default:\n            return\n        }\n        guard let chatMessage = try? JSONDecoder().decode(ChatMessage.self, from: data) else { return }\n        messages.append(chatMessage)\n        if messages.count > maxMessages {\n            messages.removeFirst(messages.count - maxMessages)\n        }\n    }\n\n    private func handleDisconnect(generation: Int) {\n        guard self.generation == generation else { return }\n        task = nil\n        guard shouldReconnect else { return }\n        let delay = reconnectDelay\n        reconnectDelay = min(reconnectDelay * 2, maxReconnectDelay)\n        DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in\n            guard let self, self.shouldReconnect, self.generation == generation else { return }\n            self.connect()\n        }\n    }\n}\n\nstruct ChatScreen: View {\n    @StateObject private var connection = ChatConnection()\n    @State private var draft = \"\"\n\n    var body: some View {\n        VStack(spacing: 0) {\n            ScrollViewReader { proxy in\n                ScrollView {\n                    LazyVStack(alignment: .leading, spacing: 8) {\n                        ForEach(connection.messages) { message in\n                            VStack(alignment: .leading, spacing: 2) {\n                                Text(message.author)\n                                    .font(.caption)\n                                    .foregroundStyle(.secondary)\n                                Text(message.text)\n                            }\n                            .id(message.id)\n                            .padding(.horizontal)\n                        }\n                    }\n                    .padding(.vertical, 8)\n                }\n                .onChange(of: connection.messages) { messages in\n                    guard let last = messages.last else { return }\n                    withAnimation {\n                        proxy.scrollTo(last.id, anchor: .bottom)\n                    }\n                }\n            }\n\n            Divider()\n\n            HStack {\n                TextField(\"Message\", text: $draft)\n                    .textFieldStyle(.roundedBorder)\n                    .onSubmit(sendDraft)\n                Button(\"Send\", action: sendDraft)\n                    .disabled(draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)\n            }\n            .padding()\n        }\n        .onAppear { connection.start() }\n        .onDisappear { connection.stop() }\n    }\n\n    private func sendDraft() {\n        guard connection.send(text: draft) else { return }\n        draft = \"\"\n    }\n}\n"
+      },
+      {
+        "path": "Sources/App/App.swift",
+        "content": "import Foundation\n"
+      }
+    ]
+  },
+  {
+    "task": "swiftui-thumbnail-grid",
+    "lang": "swift",
+    "condition": "jev-rewake+fixhook",
+    "rep": 1,
+    "reviewFindings": 4,
+    "ruleCoveredFindings": 0,
+    "fix": {
+      "wallMs": 125191,
+      "costUsd": 0.28381860000000003,
+      "durationMs": 124291,
+      "turns": 8
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 4,
+      "rewakes": 0,
+      "costUsd": 0.28381860000000003,
+      "durationMs": 124291,
+      "numTurns": 9,
+      "isError": false
+    },
+    "hook": {
+      "calls": 4,
+      "findingsShown": 2,
+      "highShown": 0,
+      "mediumShown": 2,
+      "errors": 0,
+      "meanLatencyMs": 312.35586474999997,
+      "editsAfterFeedback": 3
+    },
+    "original": {
+      "costUsd": 0.18827600000000003,
+      "durationMs": 91029
+    },
+    "files": [
+      {
+        "path": "Sources/App/ThumbnailGrid.swift",
+        "content": "import SwiftUI\n\n#if canImport(UIKit)\nimport UIKit\ntypealias PlatformImage = UIImage\n#elseif canImport(AppKit)\nimport AppKit\ntypealias PlatformImage = NSImage\n#endif\n\nstruct Photo: Identifiable, Hashable {\n    let id = UUID()\n    let url: URL\n    let downloadDate: Date\n}\n\n/// In-memory cache shared across all thumbnails so scrolling back into\n/// view doesn't trigger a re-download. Isolated as an actor so concurrent\n/// loads from multiple thumbnails can't race on the underlying cache.\n/// In-flight downloads are tracked so concurrent misses for the same URL\n/// share one download+decode instead of each starting their own, and the\n/// decode itself runs off the main actor via a detached task.\nactor ImageCache {\n    static let shared = ImageCache()\n\n    private let cache = NSCache<NSURL, PlatformImage>()\n    private var inFlightTasks: [URL: Task<PlatformImage?, Never>] = [:]\n\n    private init() {}\n\n    func image(for url: URL) async -> PlatformImage? {\n        if let cached = cache.object(forKey: url as NSURL) {\n            return cached\n        }\n\n        if let existing = inFlightTasks[url] {\n            return await existing.value\n        }\n\n        let task = Task.detached { () -> PlatformImage? in\n            guard let (data, _) = try? await URLSession.shared.data(from: url) else {\n                return nil\n            }\n            return PlatformImage(data: data)\n        }\n        inFlightTasks[url] = task\n\n        let result = await task.value\n        inFlightTasks[url] = nil\n\n        if let result {\n            cache.setObject(result, forKey: url as NSURL)\n        }\n        return result\n    }\n}\n\nprivate struct ThumbnailView: View {\n    let url: URL\n\n    @State private var image: PlatformImage?\n    @State private var loadFailed = false\n\n    var body: some View {\n        ZStack {\n            if let image {\n                platformImage(image)\n                    .resizable()\n                    .aspectRatio(contentMode: .fill)\n            } else if loadFailed {\n                Rectangle()\n                    .fill(Color.secondary.opacity(0.2))\n                    .overlay {\n                        Button {\n                            loadFailed = false\n                            Task { await loadImage(for: url) }\n                        } label: {\n                            Image(systemName: \"arrow.clockwise\")\n                        }\n                        .buttonStyle(.plain)\n                    }\n            } else {\n                Rectangle()\n                    .fill(Color.secondary.opacity(0.2))\n                    .overlay(ProgressView())\n            }\n        }\n        .task(id: url) {\n            image = nil\n            loadFailed = false\n            await loadImage(for: url)\n        }\n    }\n\n    @ViewBuilder\n    private func platformImage(_ image: PlatformImage) -> Image {\n        #if canImport(UIKit)\n        Image(uiImage: image)\n        #else\n        Image(nsImage: image)\n        #endif\n    }\n\n    @MainActor\n    private func loadImage(for url: URL) async {\n        let result = await ImageCache.shared.image(for: url)\n\n        // The URL-keyed task may have been cancelled (e.g. url changed again)\n        // while suspended on the actor call; don't publish a stale result.\n        guard !Task.isCancelled else { return }\n\n        if let result {\n            image = result\n        } else {\n            loadFailed = true\n        }\n    }\n}\n\nstruct ThumbnailGrid: View {\n    let photos: [Photo]\n\n    private let columns = [GridItem(.adaptive(minimum: 100), spacing: 8)]\n\n    var body: some View {\n        ScrollView {\n            LazyVGrid(columns: columns, spacing: 8) {\n                ForEach(photos) { photo in\n                    VStack(alignment: .leading, spacing: 4) {\n                        ThumbnailView(url: photo.url)\n                            .frame(height: 100)\n                            .clipped()\n                            .cornerRadius(8)\n\n                        Text(photo.downloadDate, style: .relative)\n                            .font(.caption)\n                            .foregroundStyle(.secondary)\n                    }\n                }\n            }\n            .padding()\n        }\n    }\n}\n"
+      },
+      {
+        "path": "Sources/App/App.swift",
+        "content": "import Foundation\n"
+      }
+    ]
+  },
+  {
+    "task": "react-chat-room",
+    "lang": "typescript",
+    "condition": "jev-rewake+fixhook",
+    "rep": 2,
+    "reviewFindings": 3,
+    "ruleCoveredFindings": 0,
+    "fix": {
+      "wallMs": 21269,
+      "costUsd": 0.1012006,
+      "durationMs": 20484,
+      "turns": 7
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 2,
+      "rewakes": 0,
+      "costUsd": 0.1012006,
+      "durationMs": 20484,
+      "numTurns": 7,
+      "isError": false
+    },
+    "hook": {
+      "calls": 2,
+      "findingsShown": 1,
+      "highShown": 1,
+      "mediumShown": 0,
+      "errors": 0,
+      "meanLatencyMs": 289.227625,
+      "editsAfterFeedback": 1
+    },
+    "original": {
+      "costUsd": 0.12563059999999998,
+      "durationMs": 39977
+    },
+    "files": [
+      {
+        "path": "src/ChatRoom.tsx",
+        "content": "import { useEffect, useRef, useState, type FormEvent } from \"react\";\n\ninterface ChatMessage {\n  id: string;\n  author: string;\n  text: string;\n  sentAt: string;\n}\n\nfunction isChatMessage(value: unknown): value is ChatMessage {\n  if (typeof value !== \"object\" || value === null) return false;\n  const v = value as Record<string, unknown>;\n  return (\n    typeof v.id === \"string\" &&\n    typeof v.author === \"string\" &&\n    typeof v.text === \"string\" &&\n    typeof v.sentAt === \"string\" &&\n    !Number.isNaN(Date.parse(v.sentAt))\n  );\n}\n\nconst RECONNECT_DELAY_MS = 2000;\n\nexport interface ChatRoomProps {\n  roomId: string;\n}\n\nexport function ChatRoom({ roomId }: ChatRoomProps) {\n  const [messages, setMessages] = useState<ChatMessage[]>([]);\n  const [draft, setDraft] = useState(\"\");\n  const [isReconnecting, setIsReconnecting] = useState(false);\n\n  const socketRef = useRef<WebSocket | null>(null);\n  const messagesEndRef = useRef<HTMLDivElement | null>(null);\n\n  useEffect(() => {\n    setMessages([]);\n    setIsReconnecting(false);\n\n    let cancelled = false;\n    let reconnectTimer: ReturnType<typeof setTimeout> | undefined;\n    let socket: WebSocket | undefined;\n\n    const connect = () => {\n      if (cancelled) return;\n\n      socket = new WebSocket(\n        `wss://chat.example.com/rooms/${encodeURIComponent(roomId)}`,\n      );\n      socketRef.current = socket;\n\n      socket.addEventListener(\"open\", () => {\n        if (cancelled) return;\n        setIsReconnecting(false);\n      });\n\n      socket.addEventListener(\"message\", (event: MessageEvent) => {\n        if (cancelled) return;\n        try {\n          const parsed: unknown = JSON.parse(event.data as string);\n          if (isChatMessage(parsed)) {\n            setMessages((prev) => [...prev, parsed]);\n          }\n        } catch (error) {\n          console.error(\"Failed to parse chat message\", error);\n        }\n      });\n\n      socket.addEventListener(\"close\", () => {\n        if (cancelled) return;\n        setIsReconnecting(true);\n        reconnectTimer = setTimeout(connect, RECONNECT_DELAY_MS);\n      });\n\n      socket.addEventListener(\"error\", (event) => {\n        (event.target as WebSocket).close();\n      });\n    };\n\n    connect();\n\n    return () => {\n      cancelled = true;\n      if (reconnectTimer !== undefined) clearTimeout(reconnectTimer);\n      socketRef.current = null;\n      socket?.close();\n    };\n  }, [roomId]);\n\n  useEffect(() => {\n    messagesEndRef.current?.scrollIntoView({ behavior: \"smooth\" });\n  }, [messages]);\n\n  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {\n    event.preventDefault();\n    const text = draft.trim();\n    const socket = socketRef.current;\n    if (!text || !socket || socket.readyState !== WebSocket.OPEN) return;\n\n    socket.send(JSON.stringify({ text }));\n    setDraft(\"\");\n  };\n\n  return (\n    <div className=\"chat-room\">\n      {isReconnecting && (\n        <div className=\"chat-room__banner\" role=\"status\">\n          Reconnecting…\n        </div>\n      )}\n\n      <div className=\"chat-room__messages\">\n        {messages.map((message) => (\n          <div key={message.id} className=\"chat-room__message\">\n            <span className=\"chat-room__author\">{message.author}</span>\n            <span className=\"chat-room__text\">{message.text}</span>\n            <span className=\"chat-room__time\">\n              {new Date(message.sentAt).toLocaleTimeString()}\n            </span>\n          </div>\n        ))}\n        <div ref={messagesEndRef} />\n      </div>\n\n      <form className=\"chat-room__composer\" onSubmit={handleSubmit}>\n        <input\n          type=\"text\"\n          value={draft}\n          onChange={(event) => setDraft(event.target.value)}\n          placeholder=\"Type a message…\"\n        />\n        <button type=\"submit\">Send</button>\n      </form>\n    </div>\n  );\n}\n\nexport default ChatRoom;\n"
+      },
+      {
+        "path": "src/index.ts",
+        "content": "export {};\n"
+      }
+    ]
+  },
+  {
+    "task": "react-signup-form",
+    "lang": "typescript",
+    "condition": "jev-rewake+fixhook",
+    "rep": 2,
+    "reviewFindings": 3,
+    "ruleCoveredFindings": 2,
+    "fix": {
+      "wallMs": 67828,
+      "costUsd": 0.2323212,
+      "durationMs": 67093,
+      "turns": 12
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 3,
+      "rewakes": 0,
+      "costUsd": 0.2323212,
+      "durationMs": 67093,
+      "numTurns": 6,
+      "isError": false
+    },
+    "hook": {
+      "calls": 3,
+      "findingsShown": 2,
+      "highShown": 0,
+      "mediumShown": 2,
+      "errors": 0,
+      "meanLatencyMs": 291.9177223333333,
+      "editsAfterFeedback": 2
+    },
+    "original": {
+      "costUsd": 0.145719,
+      "durationMs": 45181
+    },
+    "files": [
+      {
+        "path": "src/index.ts",
+        "content": "export {};\n"
+      },
+      {
+        "path": "src/SignupForm.tsx",
+        "content": "import { useState, FormEvent, useRef } from \"react\";\n\ninterface FormState {\n  name: string;\n  email: string;\n  password: string;\n  confirmPassword: string;\n  acceptTerms: boolean;\n}\n\ntype FieldErrors = Partial<Record<keyof FormState, string>>;\n\nconst initialState: FormState = {\n  name: \"\",\n  email: \"\",\n  password: \"\",\n  confirmPassword: \"\",\n  acceptTerms: false,\n};\n\nconst EMAIL_PATTERN = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;\n\nfunction validate(form: FormState): FieldErrors {\n  const errors: FieldErrors = {};\n\n  if (!form.name.trim()) {\n    errors.name = \"Name is required.\";\n  }\n\n  if (!form.email.trim()) {\n    errors.email = \"Email is required.\";\n  } else if (!EMAIL_PATTERN.test(form.email)) {\n    errors.email = \"Enter a valid email address.\";\n  }\n\n  if (!form.password) {\n    errors.password = \"Password is required.\";\n  } else if (form.password.length < 8) {\n    errors.password = \"Password must be at least 8 characters.\";\n  }\n\n  if (!form.confirmPassword) {\n    errors.confirmPassword = \"Please confirm your password.\";\n  } else if (form.confirmPassword !== form.password) {\n    errors.confirmPassword = \"Passwords do not match.\";\n  }\n\n  if (!form.acceptTerms) {\n    errors.acceptTerms = \"You must accept the terms to continue.\";\n  }\n\n  return errors;\n}\n\ninterface SignupSuccessResponse {\n  id: string;\n}\n\ninterface SignupErrorResponse {\n  errors: Partial<Record<keyof FormState, string>>;\n}\n\nconst FORM_FIELDS: readonly (keyof FormState)[] = [\n  \"name\",\n  \"email\",\n  \"password\",\n  \"confirmPassword\",\n  \"acceptTerms\",\n];\n\nfunction isSignupErrorResponse(payload: unknown): payload is SignupErrorResponse {\n  if (typeof payload !== \"object\" || payload === null || Array.isArray(payload)) {\n    return false;\n  }\n  if (!(\"errors\" in payload)) {\n    return false;\n  }\n  const errors = (payload as { errors: unknown }).errors;\n  if (typeof errors !== \"object\" || errors === null || Array.isArray(errors)) {\n    return false;\n  }\n  return Object.entries(errors).every(\n    ([field, message]) =>\n      FORM_FIELDS.includes(field as keyof FormState) &&\n      (message === undefined || typeof message === \"string\")\n  );\n}\n\nfunction isSignupSuccessResponse(payload: unknown): payload is SignupSuccessResponse {\n  return (\n    typeof payload === \"object\" &&\n    payload !== null &&\n    \"id\" in payload &&\n    typeof (payload as { id: unknown }).id === \"string\"\n  );\n}\n\nexport default function SignupForm() {\n  const [form, setForm] = useState<FormState>(initialState);\n  const [errors, setErrors] = useState<FieldErrors>({});\n  const [submitting, setSubmitting] = useState(false);\n  const [formError, setFormError] = useState<string | null>(null);\n  const [accountId, setAccountId] = useState<string | null>(null);\n  const submittingRef = useRef(false);\n\n  function updateField<K extends keyof FormState>(field: K, value: FormState[K]) {\n    setForm((prev) => ({ ...prev, [field]: value }));\n    setErrors((prev) => ({ ...prev, [field]: undefined }));\n  }\n\n  async function handleSubmit(event: FormEvent<HTMLFormElement>) {\n    event.preventDefault();\n    if (submittingRef.current) {\n      return;\n    }\n    setFormError(null);\n    setAccountId(null);\n\n    const clientErrors = validate(form);\n    if (Object.keys(clientErrors).length > 0) {\n      setErrors(clientErrors);\n      return;\n    }\n\n    submittingRef.current = true;\n    setSubmitting(true);\n    try {\n      const response = await fetch(\"/api/signup\", {\n        method: \"POST\",\n        headers: { \"Content-Type\": \"application/json\" },\n        body: JSON.stringify({\n          name: form.name,\n          email: form.email,\n          password: form.password,\n          confirmPassword: form.confirmPassword,\n          acceptTerms: form.acceptTerms,\n        }),\n      });\n\n      const responseBody: unknown = await response.json().catch(() => null);\n\n      if (!response.ok) {\n        if (isSignupErrorResponse(responseBody)) {\n          setErrors(responseBody.errors);\n        } else {\n          setFormError(\"Sign up failed. Please try again.\");\n        }\n        return;\n      }\n\n      if (!isSignupSuccessResponse(responseBody)) {\n        setFormError(\"Sign up failed. Please try again.\");\n        return;\n      }\n\n      setAccountId(responseBody.id);\n      setForm(initialState);\n      setErrors({});\n      setFormError(null);\n    } catch {\n      setFormError(\"Sign up failed. Please check your connection and try again.\");\n    } finally {\n      submittingRef.current = false;\n      setSubmitting(false);\n    }\n  }\n\n  return (\n    <form onSubmit={handleSubmit} noValidate>\n      <h1>Create an account</h1>\n\n      {accountId && (\n        <p role=\"status\">Account created successfully! Your account id is {accountId}.</p>\n      )}\n      {formError && <p role=\"alert\">{formError}</p>}\n\n      <fieldset disabled={submitting} style={{ border: \"none\", padding: 0, margin: 0 }}>\n      <div>\n        <label htmlFor=\"name\">Name</label>\n        <input\n          id=\"name\"\n          type=\"text\"\n          value={form.name}\n          onChange={(e) => updateField(\"name\", e.target.value)}\n          aria-invalid={Boolean(errors.name)}\n          aria-describedby={errors.name ? \"name-error\" : undefined}\n        />\n        {errors.name && <p id=\"name-error\">{errors.name}</p>}\n      </div>\n\n      <div>\n        <label htmlFor=\"email\">Email</label>\n        <input\n          id=\"email\"\n          type=\"email\"\n          value={form.email}\n          onChange={(e) => updateField(\"email\", e.target.value)}\n          aria-invalid={Boolean(errors.email)}\n          aria-describedby={errors.email ? \"email-error\" : undefined}\n        />\n        {errors.email && <p id=\"email-error\">{errors.email}</p>}\n      </div>\n\n      <div>\n        <label htmlFor=\"password\">Password</label>\n        <input\n          id=\"password\"\n          type=\"password\"\n          value={form.password}\n          onChange={(e) => updateField(\"password\", e.target.value)}\n          aria-invalid={Boolean(errors.password)}\n          aria-describedby={errors.password ? \"password-error\" : undefined}\n        />\n        {errors.password && <p id=\"password-error\">{errors.password}</p>}\n      </div>\n\n      <div>\n        <label htmlFor=\"confirmPassword\">Confirm password</label>\n        <input\n          id=\"confirmPassword\"\n          type=\"password\"\n          value={form.confirmPassword}\n          onChange={(e) => updateField(\"confirmPassword\", e.target.value)}\n          aria-invalid={Boolean(errors.confirmPassword)}\n          aria-describedby={errors.confirmPassword ? \"confirmPassword-error\" : undefined}\n        />\n        {errors.confirmPassword && <p id=\"confirmPassword-error\">{errors.confirmPassword}</p>}\n      </div>\n\n      <div>\n        <label htmlFor=\"acceptTerms\">\n          <input\n            id=\"acceptTerms\"\n            type=\"checkbox\"\n            checked={form.acceptTerms}\n            onChange={(e) => updateField(\"acceptTerms\", e.target.checked)}\n            aria-invalid={Boolean(errors.acceptTerms)}\n            aria-describedby={errors.acceptTerms ? \"acceptTerms-error\" : undefined}\n          />\n          I accept the terms and conditions\n        </label>\n        {errors.acceptTerms && <p id=\"acceptTerms-error\">{errors.acceptTerms}</p>}\n      </div>\n      </fieldset>\n\n      <button type=\"submit\" disabled={submitting}>\n        {submitting ? \"Signing up...\" : \"Sign up\"}\n      </button>\n    </form>\n  );\n}\n"
+      }
+    ]
+  },
+  {
+    "task": "react-metrics-poller",
+    "lang": "typescript",
+    "condition": "jev-rewake+fixhook",
+    "rep": 2,
+    "reviewFindings": 4,
+    "ruleCoveredFindings": 1,
+    "fix": {
+      "wallMs": 60413,
+      "costUsd": 0.17861920000000003,
+      "durationMs": 59644,
+      "turns": 7
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 4,
+      "rewakes": 0,
+      "costUsd": 0.17861920000000003,
+      "durationMs": 59644,
+      "numTurns": 8,
+      "isError": false
+    },
+    "hook": {
+      "calls": 4,
+      "findingsShown": 5,
+      "highShown": 2,
+      "mediumShown": 3,
+      "errors": 0,
+      "meanLatencyMs": 321.573375,
+      "editsAfterFeedback": 3
+    },
+    "original": {
+      "costUsd": 0.1776756,
+      "durationMs": 60716
+    },
+    "files": [
+      {
+        "path": "src/index.ts",
+        "content": "export {};\n"
+      },
+      {
+        "path": "src/MetricsPanel.tsx",
+        "content": "import { useCallback, useEffect, useRef, useState } from \"react\";\n\ninterface Metric {\n  name: string;\n  value: number;\n  unit: string;\n}\n\nconst POLL_INTERVAL_MS = 10_000;\nconst TICK_INTERVAL_MS = 1_000;\n\nfunction isMetric(value: unknown): value is Metric {\n  if (typeof value !== \"object\" || value === null) return false;\n  const candidate = value as Record<string, unknown>;\n  return (\n    typeof candidate.name === \"string\" &&\n    typeof candidate.value === \"number\" &&\n    Number.isFinite(candidate.value) &&\n    typeof candidate.unit === \"string\"\n  );\n}\n\nfunction isMetricArray(data: unknown): data is Metric[] {\n  return Array.isArray(data) && data.every(isMetric);\n}\n\nfunction dedupeByName(metrics: Metric[]): Metric[] {\n  const seen = new Set<string>();\n  const result: Metric[] = [];\n  for (const metric of metrics) {\n    if (seen.has(metric.name)) continue;\n    seen.add(metric.name);\n    result.push(metric);\n  }\n  return result;\n}\n\nexport default function MetricsPanel() {\n  const [metrics, setMetrics] = useState<Metric[]>([]);\n  const [changedNames, setChangedNames] = useState<Set<string>>(new Set());\n  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);\n  const [error, setError] = useState<string | null>(null);\n  const [now, setNow] = useState(() => Date.now());\n\n  const previousValuesRef = useRef<Map<string, number>>(new Map());\n  const inFlightRef = useRef<AbortController | null>(null);\n\n  const fetchMetrics = useCallback(async () => {\n    inFlightRef.current?.abort();\n    const controller = new AbortController();\n    inFlightRef.current = controller;\n\n    try {\n      const res = await fetch(\"/api/metrics\", { signal: controller.signal });\n      if (!res.ok) throw new Error(`Request failed: ${res.status}`);\n      const data: unknown = await res.json();\n      if (inFlightRef.current !== controller) return;\n      if (!isMetricArray(data)) throw new Error(\"Unexpected metrics response shape\");\n\n      const uniqueData = dedupeByName(data);\n\n      const previousValues = previousValuesRef.current;\n      const nextChanged = new Set<string>();\n      for (const metric of uniqueData) {\n        const prev = previousValues.get(metric.name);\n        if (prev !== undefined && prev !== metric.value) {\n          nextChanged.add(metric.name);\n        }\n      }\n\n      previousValuesRef.current = new Map(uniqueData.map((m) => [m.name, m.value]));\n      setMetrics(uniqueData);\n      setChangedNames(nextChanged);\n      setLastUpdated(new Date());\n      setError(null);\n    } catch (err) {\n      if (err instanceof DOMException && err.name === \"AbortError\") return;\n      if (inFlightRef.current !== controller) return;\n      setError(err instanceof Error ? err.message : \"Failed to load metrics\");\n    }\n  }, []);\n\n  useEffect(() => {\n    let timeoutId: ReturnType<typeof setTimeout> | null = null;\n    let cancelled = false;\n\n    const stopPolling = () => {\n      if (timeoutId === null) return;\n      clearTimeout(timeoutId);\n      timeoutId = null;\n    };\n\n    const scheduleNext = () => {\n      if (cancelled || document.hidden) return;\n      timeoutId = setTimeout(runPoll, POLL_INTERVAL_MS);\n    };\n\n    const runPoll = () => {\n      fetchMetrics().then(scheduleNext);\n    };\n\n    const handleVisibilityChange = () => {\n      if (document.hidden) {\n        stopPolling();\n      } else {\n        stopPolling();\n        runPoll();\n      }\n    };\n\n    runPoll();\n\n    document.addEventListener(\"visibilitychange\", handleVisibilityChange);\n\n    return () => {\n      cancelled = true;\n      stopPolling();\n      inFlightRef.current?.abort();\n      document.removeEventListener(\"visibilitychange\", handleVisibilityChange);\n    };\n  }, [fetchMetrics]);\n\n  useEffect(() => {\n    if (!lastUpdated) return;\n    const tickId = setInterval(() => setNow(Date.now()), TICK_INTERVAL_MS);\n    return () => clearInterval(tickId);\n  }, [lastUpdated]);\n\n  const secondsAgo = lastUpdated ? Math.max(0, Math.floor((now - lastUpdated.getTime()) / 1000)) : null;\n\n  return (\n    <div className=\"metrics-panel\">\n      <header className=\"metrics-panel__header\">\n        <h2>Metrics</h2>\n        {secondsAgo !== null && (\n          <span className=\"metrics-panel__updated\">\n            Last updated {secondsAgo} second{secondsAgo === 1 ? \"\" : \"s\"} ago\n          </span>\n        )}\n      </header>\n\n      {error && <div className=\"metrics-panel__error\">{error}</div>}\n\n      <ul className=\"metrics-panel__list\">\n        {metrics.map((metric) => (\n          <li\n            key={metric.name}\n            className={\n              changedNames.has(metric.name)\n                ? \"metrics-panel__item metrics-panel__item--changed\"\n                : \"metrics-panel__item\"\n            }\n          >\n            <span className=\"metrics-panel__name\">{metric.name}</span>\n            <span className=\"metrics-panel__value\">\n              {metric.value} {metric.unit}\n            </span>\n          </li>\n        ))}\n      </ul>\n    </div>\n  );\n}\n"
+      }
+    ]
+  },
+  {
+    "task": "react-profile-editor",
+    "lang": "typescript",
+    "condition": "jev-rewake+fixhook",
+    "rep": 2,
+    "reviewFindings": 6,
+    "ruleCoveredFindings": 0,
+    "fix": {
+      "wallMs": 59083,
+      "costUsd": 0.1783158,
+      "durationMs": 58384,
+      "turns": 12
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 5,
+      "rewakes": 0,
+      "costUsd": 0.1783158,
+      "durationMs": 58384,
+      "numTurns": 11,
+      "isError": false
+    },
+    "hook": {
+      "calls": 5,
+      "findingsShown": 2,
+      "highShown": 2,
+      "mediumShown": 0,
+      "errors": 0,
+      "meanLatencyMs": 328.59395860000006,
+      "editsAfterFeedback": 3
+    },
+    "original": {
+      "costUsd": 0.1762788,
+      "durationMs": 50838
+    },
+    "files": [
+      {
+        "path": "src/useUserProfiles.ts",
+        "content": "import { useEffect, useState } from \"react\";\nimport type { UserProfile } from \"./ProfileEditor\";\n\nexport interface UseUserProfilesResult {\n  profiles: Record<string, UserProfile>;\n  errors: Record<string, string>;\n  loading: boolean;\n}\n\nfunction isUserProfile(value: unknown): value is UserProfile {\n  if (typeof value !== \"object\" || value === null) return false;\n  const candidate = value as Record<string, unknown>;\n  return (\n    typeof candidate.id === \"string\" &&\n    typeof candidate.displayName === \"string\" &&\n    typeof candidate.bio === \"string\" &&\n    typeof candidate.avatarUrl === \"string\"\n  );\n}\n\nexport function useUserProfiles(ids: string[]): UseUserProfilesResult {\n  const [profiles, setProfiles] = useState<Record<string, UserProfile>>({});\n  const [errors, setErrors] = useState<Record<string, string>>({});\n  const [loading, setLoading] = useState(ids.length > 0);\n\n  const idsKey = JSON.stringify(ids);\n\n  useEffect(() => {\n    const currentIds: string[] = JSON.parse(idsKey);\n    if (currentIds.length === 0) {\n      setProfiles({});\n      setErrors({});\n      setLoading(false);\n      return;\n    }\n\n    const controller = new AbortController();\n    setLoading(true);\n    setProfiles({});\n    setErrors({});\n\n    Promise.all(\n      currentIds.map(async (id) => {\n        try {\n          const response = await fetch(\n            `/api/users/${encodeURIComponent(id)}`,\n            { signal: controller.signal }\n          );\n          if (!response.ok) {\n            throw new Error(`Failed to load user ${id}: ${response.status}`);\n          }\n          const rawProfile: unknown = await response.json();\n          if (!isUserProfile(rawProfile)) {\n            throw new Error(`Malformed profile data for user ${id}`);\n          }\n          if (rawProfile.id !== id) {\n            throw new Error(`Received profile for wrong user (expected ${id}, got ${rawProfile.id})`);\n          }\n          setProfiles((prev) => ({ ...prev, [id]: rawProfile }));\n        } catch (err) {\n          if (controller.signal.aborted) return;\n          const message =\n            err instanceof Error ? err.message : `Failed to load user ${id}`;\n          setErrors((prev) => ({ ...prev, [id]: message }));\n        }\n      })\n    ).then(() => {\n      if (!controller.signal.aborted) {\n        setLoading(false);\n      }\n    });\n\n    return () => controller.abort();\n  }, [idsKey]);\n\n  return { profiles, errors, loading };\n}\n"
+      },
+      {
+        "path": "src/ProfileEditor.tsx",
+        "content": "import { useId, useState } from \"react\";\n\nexport interface UserProfile {\n  id: string;\n  displayName: string;\n  bio: string;\n  avatarUrl: string;\n}\n\nexport interface ProfileEditorProps {\n  user: UserProfile;\n  onSave: (user: UserProfile) => Promise<void>;\n}\n\nexport function ProfileEditor({ user, onSave }: ProfileEditorProps) {\n  const idPrefix = useId();\n  const [displayName, setDisplayName] = useState(user.displayName);\n  const [bio, setBio] = useState(user.bio);\n  const [isSaving, setIsSaving] = useState(false);\n  const [error, setError] = useState<string | null>(null);\n  const [syncedUserId, setSyncedUserId] = useState(user.id);\n\n  if (user.id !== syncedUserId) {\n    setSyncedUserId(user.id);\n    setDisplayName(user.displayName);\n    setBio(user.bio);\n    setError(null);\n  }\n\n  const hasUnsavedChanges =\n    displayName !== user.displayName || bio !== user.bio;\n\n  const handleReset = () => {\n    setDisplayName(user.displayName);\n    setBio(user.bio);\n    setError(null);\n  };\n\n  const handleSave = async () => {\n    if (isSaving) return;\n    setIsSaving(true);\n    setError(null);\n    try {\n      await onSave({ ...user, displayName, bio });\n    } catch (err) {\n      setError(err instanceof Error ? err.message : \"Failed to save profile\");\n    } finally {\n      setIsSaving(false);\n    }\n  };\n\n  return (\n    <form\n      onSubmit={(event) => {\n        event.preventDefault();\n        void handleSave();\n      }}\n    >\n      <img src={user.avatarUrl} alt={`${user.displayName}'s avatar`} />\n\n      <label htmlFor={`${idPrefix}-displayName`}>Display name</label>\n      <input\n        id={`${idPrefix}-displayName`}\n        type=\"text\"\n        value={displayName}\n        onChange={(event) => setDisplayName(event.target.value)}\n        disabled={isSaving}\n      />\n\n      <label htmlFor={`${idPrefix}-bio`}>Bio</label>\n      <textarea\n        id={`${idPrefix}-bio`}\n        value={bio}\n        onChange={(event) => setBio(event.target.value)}\n        disabled={isSaving}\n      />\n\n      <p>{hasUnsavedChanges ? \"You have unsaved changes.\" : \"All changes saved.\"}</p>\n      {error && <p role=\"alert\">{error}</p>}\n\n      <button type=\"submit\" disabled={isSaving || !hasUnsavedChanges}>\n        {isSaving ? \"Saving...\" : \"Save\"}\n      </button>\n      <button\n        type=\"button\"\n        onClick={handleReset}\n        disabled={isSaving || !hasUnsavedChanges}\n      >\n        Reset\n      </button>\n    </form>\n  );\n}\n"
+      },
+      {
+        "path": "src/index.ts",
+        "content": "export {};\n"
+      }
+    ]
+  },
+  {
+    "task": "swiftui-stopwatch",
+    "lang": "swift",
+    "condition": "jev-rewake+fixhook",
+    "rep": 2,
+    "reviewFindings": 5,
+    "ruleCoveredFindings": 0,
+    "fix": {
+      "wallMs": 53906,
+      "costUsd": 0.1459112,
+      "durationMs": 53150,
+      "turns": 7
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 1,
+      "rewakes": 0,
+      "costUsd": 0.1459112,
+      "durationMs": 53150,
+      "numTurns": 6,
+      "isError": false
+    },
+    "hook": {
+      "calls": 1,
+      "findingsShown": 0,
+      "highShown": 0,
+      "mediumShown": 0,
+      "errors": 0,
+      "meanLatencyMs": 252.62637499999997,
+      "editsAfterFeedback": 0
+    },
+    "original": {
+      "costUsd": 0.106958,
+      "durationMs": 41486
+    },
+    "files": [
+      {
+        "path": "Sources/App/Stopwatch.swift",
+        "content": "import Foundation\nimport SwiftUI\n\nstruct Lap: Identifiable {\n    let id: Int\n    let splitTime: TimeInterval\n    let totalTime: TimeInterval\n}\n\nfinal class StopwatchViewModel: ObservableObject {\n    @Published private(set) var elapsedTime: TimeInterval = 0\n    @Published private(set) var laps: [Lap] = []\n    @Published private(set) var isRunning = false\n\n    private var timer: Timer?\n    private var startUptime: TimeInterval?\n\n    deinit {\n        timer?.invalidate()\n    }\n\n    func start() {\n        guard !isRunning else { return }\n        isRunning = true\n        startUptime = ProcessInfo.processInfo.systemUptime - elapsedTime\n        timer = Timer.scheduledTimer(withTimeInterval: 0.01, repeats: true) { [weak self] _ in\n            self?.tick()\n        }\n    }\n\n    func stop() {\n        guard isRunning else { return }\n        tick()\n        isRunning = false\n        timer?.invalidate()\n        timer = nil\n    }\n\n    func reset() {\n        stop()\n        elapsedTime = 0\n        laps = []\n    }\n\n    func lap() {\n        guard isRunning else { return }\n        tick()\n        let previousTotal = laps.last?.totalTime ?? 0\n        let split = elapsedTime - previousTotal\n        laps.append(Lap(id: laps.count + 1, splitTime: split, totalTime: elapsedTime))\n    }\n\n    private func tick() {\n        guard let startUptime else { return }\n        elapsedTime = ProcessInfo.processInfo.systemUptime - startUptime\n    }\n}\n\nenum TimeFormatter {\n    static func format(_ time: TimeInterval) -> String {\n        let totalHundredths = Int((time * 100).rounded())\n        let minutes = totalHundredths / 6000\n        let seconds = (totalHundredths / 100) % 60\n        let hundredths = totalHundredths % 100\n        return String(format: \"%02d:%02d.%02d\", minutes, seconds, hundredths)\n    }\n}\n\nstruct StopwatchView: View {\n    @StateObject private var viewModel = StopwatchViewModel()\n\n    var body: some View {\n        VStack(spacing: 24) {\n            Text(TimeFormatter.format(viewModel.elapsedTime))\n                .font(.system(size: 56, weight: .medium, design: .monospaced))\n\n            HStack(spacing: 16) {\n                Button(viewModel.isRunning ? \"Stop\" : \"Start\") {\n                    viewModel.isRunning ? viewModel.stop() : viewModel.start()\n                }\n                Button(\"Lap\") {\n                    viewModel.lap()\n                }\n                .disabled(!viewModel.isRunning)\n\n                Button(\"Reset\") {\n                    viewModel.reset()\n                }\n                .disabled(!viewModel.isRunning && viewModel.elapsedTime == 0)\n            }\n            .buttonStyle(.bordered)\n\n            List(viewModel.laps.reversed()) { lap in\n                HStack {\n                    Text(\"Lap \\(lap.id)\")\n                    Spacer()\n                    Text(TimeFormatter.format(lap.splitTime))\n                        .font(.system(.body, design: .monospaced))\n                    Spacer()\n                    Text(TimeFormatter.format(lap.totalTime))\n                        .font(.system(.body, design: .monospaced))\n                        .foregroundStyle(.secondary)\n                }\n            }\n        }\n        .padding()\n    }\n}\n"
+      },
+      {
+        "path": "Sources/App/App.swift",
+        "content": "import Foundation\n"
+      }
+    ]
+  },
+  {
+    "task": "swiftui-settings",
+    "lang": "swift",
+    "condition": "jev-rewake+fixhook",
+    "rep": 2,
+    "reviewFindings": 1,
+    "ruleCoveredFindings": 0,
+    "fix": {
+      "wallMs": 27941,
+      "costUsd": 0.08195039999999999,
+      "durationMs": 27168,
+      "turns": 4
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 3,
+      "rewakes": 0,
+      "costUsd": 0.08195039999999999,
+      "durationMs": 27168,
+      "numTurns": 8,
+      "isError": false
+    },
+    "hook": {
+      "calls": 3,
+      "findingsShown": 1,
+      "highShown": 0,
+      "mediumShown": 1,
+      "errors": 0,
+      "meanLatencyMs": 264.1080973333333,
+      "editsAfterFeedback": 2
+    },
+    "original": {
+      "costUsd": 0.1784546,
+      "durationMs": 66275
+    },
+    "files": [
+      {
+        "path": "Sources/App/SettingsScreen.swift",
+        "content": "import Combine\nimport Foundation\nimport SwiftUI\n\nenum AppTheme: String, CaseIterable, Identifiable, Codable {\n    case system\n    case light\n    case dark\n\n    var id: String { rawValue }\n\n    var displayName: String {\n        switch self {\n        case .system: return \"System\"\n        case .light: return \"Light\"\n        case .dark: return \"Dark\"\n        }\n    }\n}\n\n/// Persists user preferences to UserDefaults and stays in sync if they\n/// change from elsewhere (e.g. another window, or a sync process).\n///\n/// Confined to the main actor: UserDefaults.didChangeNotification can be\n/// posted from any thread, and @Published mutations must happen on main.\n@MainActor\nfinal class SettingsStore: ObservableObject {\n    private enum Keys {\n        static let displayName = \"settings.displayName\"\n        static let theme = \"settings.theme\"\n        static let notificationsEnabled = \"settings.notificationsEnabled\"\n        static let refreshInterval = \"settings.refreshInterval\"\n    }\n\n    @Published var displayName: String {\n        didSet { persist(displayName, forKey: Keys.displayName) }\n    }\n    @Published var theme: AppTheme {\n        didSet { persist(theme.rawValue, forKey: Keys.theme) }\n    }\n    @Published var notificationsEnabled: Bool {\n        didSet { persist(notificationsEnabled, forKey: Keys.notificationsEnabled) }\n    }\n    @Published var refreshInterval: TimeInterval {\n        didSet { persist(refreshInterval, forKey: Keys.refreshInterval) }\n    }\n\n    private let defaults: UserDefaults\n    // Guards against re-writing values we just read back in from a\n    // didChangeNotification, which would otherwise recurse forever.\n    private var isApplyingExternalChange = false\n    private var cancellable: AnyCancellable?\n\n    init(defaults: UserDefaults = .standard) {\n        self.defaults = defaults\n        self.displayName = defaults.string(forKey: Keys.displayName) ?? \"\"\n        self.theme = AppTheme(rawValue: defaults.string(forKey: Keys.theme) ?? \"\") ?? .system\n        self.notificationsEnabled = defaults.object(forKey: Keys.notificationsEnabled) as? Bool ?? true\n        self.refreshInterval = defaults.object(forKey: Keys.refreshInterval) as? TimeInterval ?? 60\n\n        cancellable = NotificationCenter.default\n            .publisher(for: UserDefaults.didChangeNotification, object: defaults)\n            .receive(on: DispatchQueue.main)\n            .sink { [weak self] _ in\n                Task { @MainActor in\n                    self?.reloadFromDefaults()\n                }\n            }\n    }\n\n    private func persist<T>(_ value: T, forKey key: String) {\n        guard !isApplyingExternalChange else { return }\n        defaults.set(value, forKey: key)\n    }\n\n    private func reloadFromDefaults() {\n        isApplyingExternalChange = true\n        defer { isApplyingExternalChange = false }\n\n        let newDisplayName = defaults.string(forKey: Keys.displayName) ?? \"\"\n        if newDisplayName != displayName { displayName = newDisplayName }\n\n        let newTheme = AppTheme(rawValue: defaults.string(forKey: Keys.theme) ?? \"\") ?? .system\n        if newTheme != theme { theme = newTheme }\n\n        let newNotificationsEnabled = defaults.object(forKey: Keys.notificationsEnabled) as? Bool ?? true\n        if newNotificationsEnabled != notificationsEnabled { notificationsEnabled = newNotificationsEnabled }\n\n        let newRefreshInterval = defaults.object(forKey: Keys.refreshInterval) as? TimeInterval ?? 60\n        if newRefreshInterval != refreshInterval { refreshInterval = newRefreshInterval }\n    }\n}\n\nstruct SettingsScreen: View {\n    @ObservedObject var store: SettingsStore\n\n    private static let refreshIntervalOptions: [TimeInterval] = [15, 30, 60, 300, 900]\n\n    var body: some View {\n        Form {\n            Section(\"Profile\") {\n                TextField(\"Display Name\", text: $store.displayName)\n            }\n\n            Section(\"Appearance\") {\n                Picker(\"Theme\", selection: $store.theme) {\n                    ForEach(AppTheme.allCases) { theme in\n                        Text(theme.displayName).tag(theme)\n                    }\n                }\n            }\n\n            Section(\"Notifications\") {\n                Toggle(\"Enable Notifications\", isOn: $store.notificationsEnabled)\n            }\n\n            Section(\"Sync\") {\n                Picker(\"Refresh Interval\", selection: $store.refreshInterval) {\n                    ForEach(Self.refreshIntervalOptions, id: \\.self) { interval in\n                        Text(Self.label(for: interval)).tag(interval)\n                    }\n                }\n            }\n        }\n        .navigationTitle(\"Settings\")\n    }\n\n    private static func label(for interval: TimeInterval) -> String {\n        switch interval {\n        case 15: return \"15 seconds\"\n        case 30: return \"30 seconds\"\n        case 60: return \"1 minute\"\n        case 300: return \"5 minutes\"\n        case 900: return \"15 minutes\"\n        default: return \"\\(Int(interval))s\"\n        }\n    }\n}\n"
+      },
+      {
+        "path": "Sources/App/App.swift",
+        "content": "import Foundation\n"
+      }
+    ]
+  },
+  {
+    "task": "react-todo-board",
+    "lang": "typescript",
+    "condition": "jev-rewake+fixhook",
+    "rep": 2,
+    "reviewFindings": 4,
+    "ruleCoveredFindings": 1,
+    "fix": {
+      "wallMs": 93757,
+      "costUsd": 0.23448899999999998,
+      "durationMs": 92993,
+      "turns": 10
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 1,
+      "rewakes": 0,
+      "costUsd": 0.23448899999999998,
+      "durationMs": 92993,
+      "numTurns": 7,
+      "isError": false
+    },
+    "hook": {
+      "calls": 1,
+      "findingsShown": 0,
+      "highShown": 0,
+      "mediumShown": 0,
+      "errors": 0,
+      "meanLatencyMs": 346.21508300000005,
+      "editsAfterFeedback": 0
+    },
+    "original": {
+      "costUsd": 0.113234,
+      "durationMs": 30857
+    },
+    "files": [
+      {
+        "path": "src/TodoBoard.tsx",
+        "content": "import { useEffect, useMemo, useRef, useState } from \"react\";\n\ninterface TodoItem {\n  id: string;\n  text: string;\n  done: boolean;\n}\n\ntype Filter = \"all\" | \"active\" | \"done\";\n\nconst STORAGE_KEY = \"todo-board:items\";\n\nfunction isTodoItem(value: unknown): value is TodoItem {\n  if (typeof value !== \"object\" || value === null) return false;\n  const candidate = value as Record<string, unknown>;\n  return (\n    typeof candidate.id === \"string\" &&\n    typeof candidate.text === \"string\" &&\n    typeof candidate.done === \"boolean\"\n  );\n}\n\nfunction loadItems(): TodoItem[] {\n  try {\n    const raw = localStorage.getItem(STORAGE_KEY);\n    if (!raw) return [];\n    const parsed = JSON.parse(raw);\n    if (!Array.isArray(parsed)) return [];\n    return parsed.filter(isTodoItem);\n  } catch {\n    return [];\n  }\n}\n\nexport default function TodoBoard() {\n  const [items, setItems] = useState<TodoItem[]>([]);\n  const [hydrated, setHydrated] = useState(false);\n  const [filter, setFilter] = useState<Filter>(\"all\");\n  const [newText, setNewText] = useState(\"\");\n  const [editingId, setEditingId] = useState<string | null>(null);\n  const [editingText, setEditingText] = useState(\"\");\n  const cancelingEditRef = useRef(false);\n\n  useEffect(() => {\n    setItems(loadItems());\n    setHydrated(true);\n  }, []);\n\n  useEffect(() => {\n    if (!hydrated) return;\n    try {\n      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));\n    } catch (error) {\n      console.error(\"Failed to save todo items to storage\", error);\n    }\n  }, [items, hydrated]);\n\n  const remainingCount = useMemo(\n    () => items.filter((item) => !item.done).length,\n    [items],\n  );\n\n  const visibleItems = useMemo(() => {\n    switch (filter) {\n      case \"active\":\n        return items.filter((item) => !item.done);\n      case \"done\":\n        return items.filter((item) => item.done);\n      default:\n        return items;\n    }\n  }, [items, filter]);\n\n  function addItem() {\n    const text = newText.trim();\n    if (!text) return;\n    setItems((prev) => [\n      ...prev,\n      { id: crypto.randomUUID(), text, done: false },\n    ]);\n    setNewText(\"\");\n  }\n\n  function toggleDone(id: string) {\n    setItems((prev) =>\n      prev.map((item) =>\n        item.id === id ? { ...item, done: !item.done } : item,\n      ),\n    );\n  }\n\n  function deleteItem(id: string) {\n    setItems((prev) => prev.filter((item) => item.id !== id));\n    if (editingId === id) {\n      setEditingId(null);\n      setEditingText(\"\");\n    }\n  }\n\n  function startEditing(item: TodoItem) {\n    setEditingId(item.id);\n    setEditingText(item.text);\n  }\n\n  function commitEdit() {\n    if (editingId === null) return;\n    const text = editingText.trim();\n    setItems((prev) =>\n      prev.map((item) =>\n        item.id === editingId\n          ? { ...item, text: text || item.text }\n          : item,\n      ),\n    );\n    setEditingId(null);\n    setEditingText(\"\");\n  }\n\n  function cancelEdit() {\n    cancelingEditRef.current = true;\n    setEditingId(null);\n    setEditingText(\"\");\n  }\n\n  function handleEditBlur() {\n    if (cancelingEditRef.current) {\n      cancelingEditRef.current = false;\n      return;\n    }\n    commitEdit();\n  }\n\n  function moveItem(id: string, direction: -1 | 1) {\n    setItems((prev) => {\n      const index = prev.findIndex((item) => item.id === id);\n      const targetIndex = index + direction;\n      if (index === -1 || targetIndex < 0 || targetIndex >= prev.length) {\n        return prev;\n      }\n      const next = [...prev];\n      [next[index], next[targetIndex]] = [next[targetIndex], next[index]];\n      return next;\n    });\n  }\n\n  return (\n    <div>\n      <h1>Todo Board</h1>\n\n      <form\n        onSubmit={(e) => {\n          e.preventDefault();\n          addItem();\n        }}\n      >\n        <input\n          type=\"text\"\n          value={newText}\n          onChange={(e) => setNewText(e.target.value)}\n          placeholder=\"Add a new item\"\n        />\n        <button type=\"submit\">Add</button>\n      </form>\n\n      <div role=\"group\" aria-label=\"Filter items\">\n        {([\"all\", \"active\", \"done\"] as const).map((f) => (\n          <button\n            key={f}\n            type=\"button\"\n            aria-pressed={filter === f}\n            onClick={() => setFilter(f)}\n            disabled={filter === f}\n          >\n            {f}\n          </button>\n        ))}\n      </div>\n\n      <p>{remainingCount} item(s) remaining</p>\n\n      <ul>\n        {visibleItems.map((item) => {\n          const index = items.findIndex((i) => i.id === item.id);\n          const isEditing = editingId === item.id;\n          return (\n            <li key={item.id}>\n              <input\n                type=\"checkbox\"\n                checked={item.done}\n                onChange={() => toggleDone(item.id)}\n                aria-label={`Mark \"${item.text}\" as ${item.done ? \"active\" : \"done\"}`}\n              />\n\n              {isEditing ? (\n                <form\n                  style={{ display: \"inline\" }}\n                  onSubmit={(e) => {\n                    e.preventDefault();\n                    commitEdit();\n                  }}\n                >\n                  <input\n                    type=\"text\"\n                    value={editingText}\n                    autoFocus\n                    onChange={(e) => setEditingText(e.target.value)}\n                    onKeyDown={(e) => {\n                      if (e.key === \"Escape\") cancelEdit();\n                    }}\n                    onBlur={handleEditBlur}\n                  />\n                </form>\n              ) : (\n                <span\n                  onDoubleClick={() => startEditing(item)}\n                  style={{ textDecoration: item.done ? \"line-through\" : \"none\" }}\n                >\n                  {item.text}\n                </span>\n              )}\n\n              <button type=\"button\" onClick={() => startEditing(item)}>\n                Edit\n              </button>\n              <button\n                type=\"button\"\n                onClick={() => moveItem(item.id, -1)}\n                disabled={index <= 0}\n              >\n                Move up\n              </button>\n              <button\n                type=\"button\"\n                onClick={() => moveItem(item.id, 1)}\n                disabled={index === -1 || index >= items.length - 1}\n              >\n                Move down\n              </button>\n              <button type=\"button\" onClick={() => deleteItem(item.id)}>\n                Delete\n              </button>\n            </li>\n          );\n        })}\n      </ul>\n    </div>\n  );\n}\n"
+      },
+      {
+        "path": "src/index.ts",
+        "content": "export {};\n"
+      }
+    ]
+  },
+  {
+    "task": "swiftui-search",
+    "lang": "swift",
+    "condition": "jev-rewake+fixhook",
+    "rep": 2,
+    "reviewFindings": 3,
+    "ruleCoveredFindings": 1,
+    "fix": {
+      "wallMs": 71216,
+      "costUsd": 0.17531720000000003,
+      "durationMs": 70513,
+      "turns": 6
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 2,
+      "rewakes": 0,
+      "costUsd": 0.17531720000000003,
+      "durationMs": 70513,
+      "numTurns": 7,
+      "isError": false
+    },
+    "hook": {
+      "calls": 2,
+      "findingsShown": 1,
+      "highShown": 0,
+      "mediumShown": 1,
+      "errors": 0,
+      "meanLatencyMs": 242.3432085,
+      "editsAfterFeedback": 1
+    },
+    "original": {
+      "costUsd": 0.1633702,
+      "durationMs": 64143
+    },
+    "files": [
+      {
+        "path": "Sources/App/SearchScreen.swift",
+        "content": "import SwiftUI\n\nstruct SearchResult: Identifiable, Decodable, Equatable {\n    let id: String\n    let title: String\n    let subtitle: String\n}\n\n@MainActor\nfinal class SearchViewModel: ObservableObject {\n    @Published var query: String = \"\"\n    @Published private(set) var results: [SearchResult] = []\n    @Published private(set) var isLoading = false\n    @Published private(set) var errorMessage: String?\n\n    private let session: URLSession\n    private let debounceNanoseconds: UInt64\n    private var searchTask: Task<Void, Never>?\n    private var currentSearchID: UUID?\n\n    init(session: URLSession = .shared, debounceNanoseconds: UInt64 = 300_000_000) {\n        self.session = session\n        self.debounceNanoseconds = debounceNanoseconds\n    }\n\n    func onQueryChange() {\n        searchTask?.cancel()\n\n        let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)\n        guard !trimmed.isEmpty else {\n            currentSearchID = nil\n            results = []\n            errorMessage = nil\n            isLoading = false\n            return\n        }\n\n        // Clear stale content immediately so it isn't mistaken for the new query's results\n        // while the debounce timer is running.\n        results = []\n        errorMessage = nil\n\n        let searchID = UUID()\n        currentSearchID = searchID\n\n        searchTask = Task { [weak self, debounceNanoseconds, trimmed, searchID] in\n            try? await Task.sleep(nanoseconds: debounceNanoseconds)\n            guard !Task.isCancelled else { return }\n            guard let self else { return }\n            await self.performSearch(for: trimmed, searchID: searchID)\n        }\n    }\n\n    private func performSearch(for query: String, searchID: UUID) async {\n        // A canceled request can still reach this point mid-flight; only the current\n        // search is allowed to mutate published state so it can't clobber a newer one.\n        guard currentSearchID == searchID else { return }\n        isLoading = true\n        errorMessage = nil\n        defer {\n            if currentSearchID == searchID {\n                isLoading = false\n            }\n        }\n\n        guard var components = URLComponents(string: \"https://api.example.com/search\") else {\n            if currentSearchID == searchID {\n                errorMessage = \"Invalid search URL.\"\n            }\n            return\n        }\n        components.queryItems = [URLQueryItem(name: \"q\", value: query)]\n\n        guard let url = components.url else {\n            if currentSearchID == searchID {\n                errorMessage = \"Invalid search URL.\"\n            }\n            return\n        }\n\n        do {\n            let (data, response) = try await session.data(from: url)\n            guard currentSearchID == searchID else { return }\n\n            if let httpResponse = response as? HTTPURLResponse,\n               !(200...299).contains(httpResponse.statusCode) {\n                errorMessage = \"Server error (\\(httpResponse.statusCode)).\"\n                results = []\n                return\n            }\n\n            let decoded = try JSONDecoder().decode([SearchResult].self, from: data)\n            guard currentSearchID == searchID else { return }\n            results = decoded\n        } catch {\n            guard currentSearchID == searchID else { return }\n            errorMessage = error.localizedDescription\n            results = []\n        }\n    }\n}\n\nstruct SearchScreen: View {\n    @StateObject private var viewModel = SearchViewModel()\n\n    var body: some View {\n        VStack(spacing: 0) {\n            TextField(\"Search\", text: $viewModel.query)\n                .textFieldStyle(.roundedBorder)\n                .padding()\n                .onChange(of: viewModel.query) { _ in\n                    viewModel.onQueryChange()\n                }\n\n            Divider()\n\n            content\n        }\n        .frame(minWidth: 320, minHeight: 400)\n    }\n\n    @ViewBuilder\n    private var content: some View {\n        let trimmedQuery = viewModel.query.trimmingCharacters(in: .whitespacesAndNewlines)\n\n        if viewModel.isLoading {\n            ProgressView(\"Searching…\")\n                .frame(maxWidth: .infinity, maxHeight: .infinity)\n        } else if let errorMessage = viewModel.errorMessage {\n            VStack(spacing: 8) {\n                Image(systemName: \"exclamationmark.triangle\")\n                    .foregroundStyle(.red)\n                Text(errorMessage)\n                    .foregroundStyle(.red)\n                    .multilineTextAlignment(.center)\n            }\n            .padding()\n            .frame(maxWidth: .infinity, maxHeight: .infinity)\n        } else if trimmedQuery.isEmpty {\n            Text(\"Start typing to search.\")\n                .foregroundStyle(.secondary)\n                .frame(maxWidth: .infinity, maxHeight: .infinity)\n        } else if viewModel.results.isEmpty {\n            Text(\"No results found.\")\n                .foregroundStyle(.secondary)\n                .frame(maxWidth: .infinity, maxHeight: .infinity)\n        } else {\n            List(viewModel.results) { result in\n                VStack(alignment: .leading, spacing: 2) {\n                    Text(result.title)\n                        .font(.headline)\n                    Text(result.subtitle)\n                        .font(.subheadline)\n                        .foregroundStyle(.secondary)\n                }\n            }\n        }\n    }\n}\n"
+      },
+      {
+        "path": "Sources/App/App.swift",
+        "content": "import Foundation\n"
+      }
+    ]
+  },
+  {
+    "task": "swiftui-thumbnail-grid",
+    "lang": "swift",
+    "condition": "jev-rewake+fixhook",
+    "rep": 2,
+    "reviewFindings": 5,
+    "ruleCoveredFindings": 0,
+    "fix": {
+      "wallMs": 67331,
+      "costUsd": 0.16741799999999998,
+      "durationMs": 66521,
+      "turns": 6
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 1,
+      "rewakes": 0,
+      "costUsd": 0.16741799999999998,
+      "durationMs": 66521,
+      "numTurns": 6,
+      "isError": false
+    },
+    "hook": {
+      "calls": 1,
+      "findingsShown": 0,
+      "highShown": 0,
+      "mediumShown": 0,
+      "errors": 0,
+      "meanLatencyMs": 248.02341700000002,
+      "editsAfterFeedback": 0
+    },
+    "original": {
+      "costUsd": 0.1384268,
+      "durationMs": 62989
+    },
+    "files": [
+      {
+        "path": "Sources/App/ThumbnailGrid.swift",
+        "content": "import Foundation\nimport SwiftUI\n\n#if canImport(UIKit)\nimport UIKit\ntypealias PlatformImage = UIImage\n#elseif canImport(AppKit)\nimport AppKit\ntypealias PlatformImage = NSImage\n#endif\n\n/// A downloaded thumbnail together with the moment it finished downloading.\nstruct CachedThumbnail: @unchecked Sendable {\n    let image: PlatformImage\n    let downloadDate: Date\n}\n\n// PlatformImage (UIImage/NSImage) isn't declared Sendable by the SDK, but instances here\n// are never mutated after creation, so sharing them across the actor boundary is safe.\n\n/// Shared in-memory cache so scrolling back through the grid doesn't re-download thumbnails.\n/// Bounded to `limit` entries (evicted oldest-first) and de-duplicates concurrent downloads\n/// of the same URL.\nactor ThumbnailCache {\n    static let shared = ThumbnailCache()\n\n    private let limit = 200\n    private var storage: [URL: CachedThumbnail] = [:]\n    private var insertionOrder: [URL] = []\n    private var inFlightDownloads: [URL: Task<CachedThumbnail, Error>] = [:]\n\n    func thumbnail(for url: URL) -> CachedThumbnail? {\n        storage[url]\n    }\n\n    /// Returns the cached thumbnail for `url`, downloading it via `download` if needed.\n    /// Concurrent callers for the same uncached `url` share a single in-flight download.\n    func thumbnail(for url: URL, download: @escaping @Sendable () async throws -> CachedThumbnail) async throws -> CachedThumbnail {\n        if let cached = storage[url] {\n            return cached\n        }\n        if let existing = inFlightDownloads[url] {\n            return try await existing.value\n        }\n\n        let task = Task { try await download() }\n        inFlightDownloads[url] = task\n        defer { inFlightDownloads[url] = nil }\n\n        let result = try await task.value\n        insert(result, for: url)\n        return result\n    }\n\n    private func insert(_ thumbnail: CachedThumbnail, for url: URL) {\n        if storage[url] == nil {\n            insertionOrder.append(url)\n        }\n        storage[url] = thumbnail\n\n        while insertionOrder.count > limit {\n            let oldest = insertionOrder.removeFirst()\n            storage[oldest] = nil\n        }\n    }\n}\n\n/// A grid of photo thumbnails downloaded from `urls`, showing a placeholder while each\n/// image loads and the relative download date once it's available.\nstruct ThumbnailGrid: View {\n    let urls: [URL]\n\n    private let columns = [GridItem(.adaptive(minimum: 100, maximum: 160), spacing: 8)]\n\n    var body: some View {\n        ScrollView {\n            LazyVGrid(columns: columns, spacing: 8) {\n                ForEach(urls, id: \\.self) { url in\n                    ThumbnailCell(url: url)\n                }\n            }\n            .padding(8)\n        }\n    }\n}\n\nprivate struct ThumbnailCell: View {\n    let url: URL\n\n    @State private var thumbnail: CachedThumbnail?\n    @State private var failed = false\n\n    var body: some View {\n        VStack(spacing: 4) {\n            ZStack {\n                RoundedRectangle(cornerRadius: 8)\n                    .fill(Color.secondary.opacity(0.15))\n\n                if let thumbnail {\n                    thumbnailImage(thumbnail.image)\n                        .resizable()\n                        .aspectRatio(contentMode: .fill)\n                        .clipShape(RoundedRectangle(cornerRadius: 8))\n                } else if failed {\n                    Image(systemName: \"photo\")\n                        .foregroundStyle(.secondary)\n                } else {\n                    ProgressView()\n                }\n            }\n            .aspectRatio(1, contentMode: .fit)\n\n            if let downloadDate = thumbnail?.downloadDate {\n                Text(downloadDate, format: .relative(presentation: .named))\n                    .font(.caption2)\n                    .foregroundStyle(.secondary)\n            }\n        }\n        .task(id: url) {\n            await load()\n        }\n    }\n\n    private func thumbnailImage(_ image: PlatformImage) -> Image {\n        #if canImport(UIKit)\n        return Image(uiImage: image)\n        #elseif canImport(AppKit)\n        return Image(nsImage: image)\n        #endif\n    }\n\n    private func load() async {\n        thumbnail = nil\n        failed = false\n\n        do {\n            let result = try await ThumbnailCache.shared.thumbnail(for: url) {\n                let (data, response) = try await URLSession.shared.data(from: url)\n                guard let httpResponse = response as? HTTPURLResponse,\n                      (200..<300).contains(httpResponse.statusCode) else {\n                    throw URLError(.badServerResponse)\n                }\n                guard let image = PlatformImage(data: data) else {\n                    throw URLError(.cannotDecodeContentData)\n                }\n                return CachedThumbnail(image: image, downloadDate: Date())\n            }\n            guard !Task.isCancelled else { return }\n            thumbnail = result\n        } catch {\n            guard !Task.isCancelled else { return }\n            failed = true\n        }\n    }\n}\n"
+      },
+      {
+        "path": "Sources/App/App.swift",
+        "content": "import Foundation\n"
+      }
+    ]
+  },
+  {
+    "task": "swiftui-chat",
+    "lang": "swift",
+    "condition": "jev-rewake+fixhook",
+    "rep": 2,
+    "reviewFindings": 6,
+    "ruleCoveredFindings": 0,
+    "fix": {
+      "wallMs": 95728,
+      "costUsd": 0.19734359999999998,
+      "durationMs": 94804,
+      "turns": 7
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 2,
+      "rewakes": 0,
+      "costUsd": 0.19734359999999998,
+      "durationMs": 94804,
+      "numTurns": 8,
+      "isError": false
+    },
+    "hook": {
+      "calls": 2,
+      "findingsShown": 1,
+      "highShown": 1,
+      "mediumShown": 0,
+      "errors": 0,
+      "meanLatencyMs": 406.2996255,
+      "editsAfterFeedback": 1
+    },
+    "original": {
+      "costUsd": 0.1771624,
+      "durationMs": 67850
+    },
+    "files": [
+      {
+        "path": "Sources/App/ChatScreen.swift",
+        "content": "import Foundation\nimport SwiftUI\n\nstruct ChatMessage: Identifiable, Codable, Equatable {\n    let id: String\n    let author: String\n    let text: String\n}\n\n@MainActor\nfinal class ChatViewModel: ObservableObject {\n    @Published var messages: [ChatMessage] = []\n    @Published var draftText: String = \"\"\n\n    private let url: URL = {\n        guard let url = URL(string: \"wss://chat.example.com/room\") else {\n            preconditionFailure(\"Invalid chat room URL\")\n        }\n        return url\n    }()\n    private let session = URLSession(configuration: .default)\n    private var webSocketTask: URLSessionWebSocketTask?\n    private var reconnectTask: Task<Void, Never>?\n    private var reconnectDelay: TimeInterval = 1\n    private let maxReconnectDelay: TimeInterval = 30\n    private var isStopped = false\n    private var connectionID = 0\n\n    func start() {\n        guard webSocketTask == nil, reconnectTask == nil else { return }\n        isStopped = false\n        connect()\n    }\n\n    func stop() {\n        isStopped = true\n        connectionID += 1\n        reconnectTask?.cancel()\n        reconnectTask = nil\n        webSocketTask?.cancel(with: .goingAway, reason: nil)\n        webSocketTask = nil\n    }\n\n    private func connect() {\n        reconnectTask = nil\n        connectionID += 1\n        let id = connectionID\n        let task = session.webSocketTask(with: url)\n        webSocketTask = task\n        task.resume()\n        receiveNext(id: id, task: task)\n    }\n\n    private func receiveNext(id: Int, task: URLSessionWebSocketTask) {\n        task.receive { [weak self] result in\n            Task { @MainActor [weak self] in\n                guard let self, self.connectionID == id else { return }\n                switch result {\n                case .success(let message):\n                    self.reconnectDelay = 1\n                    self.handle(message)\n                    self.receiveNext(id: id, task: task)\n                case .failure:\n                    self.scheduleReconnect(id: id)\n                }\n            }\n        }\n    }\n\n    private func handle(_ message: URLSessionWebSocketTask.Message) {\n        let data: Data?\n        switch message {\n        case .data(let raw):\n            data = raw\n        case .string(let text):\n            data = text.data(using: .utf8)\n        @unknown default:\n            data = nil\n        }\n        guard let data, let chatMessage = try? JSONDecoder().decode(ChatMessage.self, from: data) else { return }\n        messages.append(chatMessage)\n    }\n\n    private func scheduleReconnect(id: Int) {\n        guard id == connectionID, !isStopped, reconnectTask == nil else { return }\n        webSocketTask = nil\n        let delay = reconnectDelay\n        reconnectDelay = min(reconnectDelay * 2, maxReconnectDelay)\n        reconnectTask = Task { [weak self] in\n            try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))\n            guard let self, !Task.isCancelled else { return }\n            guard self.connectionID == id, !self.isStopped else { return }\n            self.connect()\n        }\n    }\n\n    func sendDraft() {\n        let trimmed = draftText.trimmingCharacters(in: .whitespacesAndNewlines)\n        guard !trimmed.isEmpty, let task = webSocketTask else { return }\n        let id = connectionID\n        let outgoing = ChatMessage(id: UUID().uuidString, author: \"me\", text: trimmed)\n        guard let data = try? JSONEncoder().encode(outgoing) else { return }\n        messages.append(outgoing)\n        draftText = \"\"\n        task.send(.data(data)) { [weak self] error in\n            guard error != nil else { return }\n            Task { @MainActor [weak self] in\n                guard let self, self.connectionID == id else { return }\n                self.messages.removeAll { $0.id == outgoing.id }\n                if self.draftText.isEmpty {\n                    self.draftText = trimmed\n                }\n                self.scheduleReconnect(id: id)\n            }\n        }\n    }\n}\n\nstruct ChatScreen: View {\n    @StateObject private var viewModel = ChatViewModel()\n\n    var body: some View {\n        VStack(spacing: 0) {\n            ScrollViewReader { proxy in\n                ScrollView {\n                    LazyVStack(alignment: .leading, spacing: 8) {\n                        ForEach(viewModel.messages) { message in\n                            VStack(alignment: .leading, spacing: 2) {\n                                Text(message.author)\n                                    .font(.caption)\n                                    .foregroundStyle(.secondary)\n                                Text(message.text)\n                            }\n                            .id(message.id)\n                            .frame(maxWidth: .infinity, alignment: .leading)\n                        }\n                    }\n                    .padding()\n                }\n                .onChange(of: viewModel.messages) { _ in\n                    scrollToBottom(proxy: proxy)\n                }\n                .onAppear {\n                    scrollToBottom(proxy: proxy)\n                }\n            }\n\n            Divider()\n\n            HStack {\n                TextField(\"Message\", text: $viewModel.draftText)\n                    .textFieldStyle(.roundedBorder)\n                    .onSubmit { viewModel.sendDraft() }\n                Button(\"Send\") { viewModel.sendDraft() }\n                    .disabled(viewModel.draftText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)\n            }\n            .padding()\n        }\n        .onAppear { viewModel.start() }\n        .onDisappear { viewModel.stop() }\n    }\n\n    private func scrollToBottom(proxy: ScrollViewProxy) {\n        guard let lastId = viewModel.messages.last?.id else { return }\n        withAnimation {\n            proxy.scrollTo(lastId, anchor: .bottom)\n        }\n    }\n}\n"
+      },
+      {
+        "path": "Sources/App/App.swift",
+        "content": "import Foundation\n"
+      }
+    ]
+  },
+  {
+    "task": "swift-legacy-bridge",
+    "lang": "swift",
+    "condition": "jev-rewake+fixhook",
+    "rep": 2,
+    "reviewFindings": 3,
+    "ruleCoveredFindings": 2,
+    "fix": {
+      "wallMs": 125212,
+      "costUsd": 0.2592672,
+      "durationMs": 124517,
+      "turns": 7
+    },
+    "build": {
+      "ok": true
+    },
+    "transcript": {
+      "edits": 3,
+      "rewakes": 0,
+      "costUsd": 0.2592672,
+      "durationMs": 124517,
+      "numTurns": 9,
+      "isError": false
+    },
+    "hook": {
+      "calls": 3,
+      "findingsShown": 3,
+      "highShown": 1,
+      "mediumShown": 2,
+      "errors": 0,
+      "meanLatencyMs": 352.55218066666663,
+      "editsAfterFeedback": 2
+    },
+    "original": {
+      "costUsd": 0.20722219999999997,
+      "durationMs": 81052
+    },
+    "files": [
+      {
+        "path": "Sources/App/LegacyBridge.swift",
+        "content": "import Foundation\n\n// MARK: - Legacy callback-based SDK (stubs)\n\nfinal class LegacyGeocoder {\n    func geocode(_ address: String, completion: @escaping (Result<(Double, Double), Error>) -> Void) {\n        DispatchQueue.global().asyncAfter(deadline: .now() + 0.1) {\n            completion(.success((37.7749, -122.4194)))\n        }\n    }\n}\n\nfinal class LegacyUploader {\n    var onProgress: ((Double) -> Void)?\n    var onFinish: ((Error?) -> Void)?\n\n    func start(file: URL) {\n        DispatchQueue.global().async {\n            for step in 1...10 {\n                Thread.sleep(forTimeInterval: 0.01)\n                self.onProgress?(Double(step) / 10.0)\n            }\n            self.onFinish?(nil)\n        }\n    }\n}\n\n// MARK: - Modern async/await wrappers\n\n/// Resumes a `CheckedContinuation` exactly once, whichever of the legacy\n/// callback or the task-cancellation handler reaches it first. If the\n/// cancellation handler fires before the continuation has been created\n/// (the operation and `onCancel` may race), the result is buffered and\n/// delivered as soon as `setContinuation` is called.\nprivate final class CancellableContinuation<T> {\n    private let lock = NSLock()\n    private var continuation: CheckedContinuation<T, Error>?\n    private var pendingResult: Result<T, Error>?\n    private var didResume = false\n\n    func setContinuation(_ continuation: CheckedContinuation<T, Error>) {\n        lock.lock()\n        if let pendingResult {\n            self.pendingResult = nil\n            lock.unlock()\n            continuation.resume(with: pendingResult)\n            return\n        }\n        self.continuation = continuation\n        lock.unlock()\n    }\n\n    func resume(with result: Result<T, Error>) {\n        lock.lock()\n        guard !didResume else {\n            lock.unlock()\n            return\n        }\n        didResume = true\n        if let continuation {\n            self.continuation = nil\n            lock.unlock()\n            continuation.resume(with: result)\n        } else {\n            pendingResult = result\n            lock.unlock()\n        }\n    }\n}\n\nfinal class ModernGeocoder {\n    private let legacy = LegacyGeocoder()\n\n    func geocode(_ address: String) async throws -> (Double, Double) {\n        try Task.checkCancellation()\n        let box = CancellableContinuation<(Double, Double)>()\n        return try await withTaskCancellationHandler {\n            try await withCheckedThrowingContinuation { continuation in\n                box.setContinuation(continuation)\n                legacy.geocode(address) { result in\n                    box.resume(with: result)\n                }\n            }\n        } onCancel: {\n            // LegacyGeocoder exposes no cancellation hook, so the in-flight\n            // callback cannot be aborted, but the caller is released\n            // immediately instead of waiting for it to complete.\n            box.resume(with: .failure(CancellationError()))\n        }\n    }\n}\n\nfinal class ModernUploader {\n    /// Each call gets its own progress stream and completion task, so\n    /// concurrent or sequential uploads never contend for the same\n    /// continuation.\n    func upload(file: URL) -> (progress: AsyncStream<Double>, result: Task<Void, Error>) {\n        var progressContinuation: AsyncStream<Double>.Continuation!\n        let progressStream = AsyncStream<Double> { progressContinuation = $0 }\n\n        let task = Task {\n            try Task.checkCancellation()\n            let legacy = LegacyUploader()\n            let box = CancellableContinuation<Void>()\n            try await withTaskCancellationHandler {\n                try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in\n                    box.setContinuation(continuation)\n                    legacy.onProgress = { progress in\n                        progressContinuation.yield(progress)\n                    }\n                    legacy.onFinish = { error in\n                        progressContinuation.finish()\n                        if let error {\n                            box.resume(with: .failure(error))\n                        } else {\n                            box.resume(with: .success(()))\n                        }\n                    }\n                    legacy.start(file: file)\n                }\n            } onCancel: {\n                // LegacyUploader exposes no cancellation hook, so the\n                // in-flight upload cannot be aborted, but the caller and\n                // any progress observers are released immediately instead\n                // of waiting for it to complete.\n                progressContinuation.finish()\n                box.resume(with: .failure(CancellationError()))\n            }\n        }\n\n        return (progressStream, task)\n    }\n}\n"
+      },
+      {
+        "path": "Sources/App/App.swift",
+        "content": "import Foundation\n"
+      }
+    ]
+  }
+]
