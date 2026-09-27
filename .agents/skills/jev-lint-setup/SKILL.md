@@ -46,6 +46,7 @@ Then re-run the check.
 Ask these only if the request didn't already settle them:
 - **Agents:** Claude Code, Codex, or both (the default).
 - **Where:** user-wide, which is the default and writes `~/.claude/settings.json` and `~/.codex/hooks.json`. Or this repo only, with `--project <repo>`, which is Claude Code only and writes `<repo>/.claude/settings.json` to share with the team.
+- **Before or after the write:** after is the default. `--pre` (Claude Code only) checks each edit before it's applied and blocks high-confidence findings; suggest it when bad code must never land even briefly (secrets, security, watched files). The README's Install section has the trade-offs.
 - **Sync or async:** sync is the default; the agent waits about 0.3 s per edit. Async (`--async`) is Claude Code only: the check runs in the background and wakes the agent when it finds something. Use async for slow local judges or long edit bursts.
 
 Then run:

@@ -49,4 +49,18 @@ describe("install mergeHook", () => {
     expect(mergeHook(once.config, recheck, "Stop", isRecheck).action).toBe("unchanged");
     expect(once.config.hooks?.PostToolUse).toBeUndefined();
   });
+
+  test("--pre moves the hook from PostToolUse to PreToolUse and back, keeping other hooks", async () => {
+    const { removeHook } = await import("../src/install");
+    const other = { matcher: "*", hooks: [{ type: "command" as const, command: "audit", timeout: 5 }] };
+    const after = mergeHook({ hooks: { PostToolUse: [other] } }, group).config;
+    let pre = mergeHook(after, group, "PreToolUse").config;
+    pre = removeHook(pre, "PostToolUse").config;
+    expect(pre.hooks?.PostToolUse).toEqual([other]);
+    expect(pre.hooks?.PreToolUse).toEqual([group]);
+    const back = removeHook(mergeHook(pre, group, "PostToolUse").config, "PreToolUse").config;
+    expect(back.hooks?.PreToolUse).toBeUndefined();
+    expect(back.hooks?.PostToolUse).toEqual([other, group]);
+    expect(removeHook(back, "PreToolUse").removed).toBe(false);
+  });
 });

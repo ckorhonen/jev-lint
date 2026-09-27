@@ -2,7 +2,8 @@
 // Install or update the jev-lint hook for Claude Code and Codex, idempotently.
 //   bun ~/Repos/jev-lint/src/install.ts                 # check only: key, configs, skills (no writes)
 //   bun ~/Repos/jev-lint/src/install.ts --apply         # write hooks (backs up each file first)
-//   options: --no-recheck (skip the end-of-turn re-check on Stop/SubagentStop), --claude-only | --codex-only, --project <repo> (Claude hook in <repo>/.claude/settings.json),
+//   options: --pre (Claude Code: check each edit before it's applied and block high-confidence
+//            findings, instead of after the write), --no-recheck (skip the end-of-turn re-check on Stop/SubagentStop), --claude-only | --codex-only, --project <repo> (Claude hook in <repo>/.claude/settings.json),
 //            --async (Claude: background check that wakes the agent), --skills (link skills), --smoke
 //
 // An existing jev-lint entry (any command running jev-lint's src/hook.ts) is replaced in place,
@@ -111,15 +112,34 @@ function keyStatus(): string {
   return found.status === 0 ? "present (Keychain: typesafe-api-key)" : "MISSING";
 }
 
-// Main hook on PostToolUse, plus (unless disabled) the end-of-turn re-check on Stop/SubagentStop.
-function writeConfig(path: string, group: HookGroup, apply: boolean, recheck: boolean): string {
+// Drop jev-lint's command from one event (used to switch between after- and before-the-write).
+export function removeHook(
+  config: HookConfig,
+  event: string,
+  ours: (h: HookCommand) => boolean = isJevLint,
+): { config: HookConfig; removed: boolean } {
+  const groups = config.hooks?.[event];
+  if (!groups?.some((g) => g.hooks?.some(ours))) return { config, removed: false };
+  const kept = groups.map((g) => ({ ...g, hooks: g.hooks.filter((h) => !ours(h)) })).filter((g) => g.hooks.length);
+  const hooks = { ...config.hooks, [event]: kept };
+  if (!kept.length) delete hooks[event];
+  return { config: { ...config, hooks }, removed: true };
+}
+
+// Main hook on PostToolUse (or PreToolUse with --pre), plus (unless disabled) the end-of-turn re-check on Stop/SubagentStop.
+function writeConfig(path: string, group: HookGroup, apply: boolean, recheck: boolean, pre = false): string {
   const parsed: unknown = existsSync(path) ? JSON.parse(readFileSync(path, "utf8")) : {};
   if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) throw new Error(`${path} is not a JSON object; not touching it`);
   let config = parsed as HookConfig;
   const actions: string[] = [];
-  const main = mergeHook(config, group);
+  // The hook runs on exactly one of PreToolUse / PostToolUse, so switching modes moves it.
+  const [event, other] = pre ? ["PreToolUse", "PostToolUse"] : ["PostToolUse", "PreToolUse"];
+  const main = mergeHook(config, group, event);
   config = main.config;
-  actions.push(`hook ${main.action}`);
+  actions.push(`${pre ? "before-the-write " : ""}hook ${main.action}`);
+  const moved = removeHook(config, other);
+  config = moved.config;
+  if (moved.removed) actions.push(`removed from ${other}`);
   if (recheck) {
     for (const event of RECHECK_EVENTS) {
       const merged = mergeHook(config, recheckGroup(), event, isJevLintRecheck);
@@ -194,8 +214,13 @@ if (import.meta.main) {
       skills: { type: "boolean", default: false },
       smoke: { type: "boolean", default: false },
       "no-recheck": { type: "boolean", default: false },
+      pre: { type: "boolean", default: false },
     },
   });
+  if (values.pre && values.async) {
+    console.error("--pre and --async are different modes: pick one");
+    process.exit(1);
+  }
   if (values["codex-only"] && values.project) {
     console.error("Codex has no project-scoped hook config; drop --project or --codex-only");
     process.exit(1);
@@ -205,11 +230,14 @@ if (import.meta.main) {
   console.log(`TypeSafe key: ${keyStatus()}`);
   if (!values["codex-only"]) {
     const path = values.project ? join(resolve(values.project), ".claude/settings.json") : join(homedir(), ".claude/settings.json");
-    console.log(`Claude Code: ${writeConfig(path, hookGroup("claude", { async: values.async }), values.apply, !values["no-recheck"])}`);
+    console.log(
+      `Claude Code: ${writeConfig(path, hookGroup("claude", { async: values.async }), values.apply, !values["no-recheck"], values.pre)}`,
+    );
   }
   if (!values["claude-only"] && !values.project) {
     console.log(`Codex: ${writeConfig(join(homedir(), ".codex/hooks.json"), hookGroup("codex"), values.apply, !values["no-recheck"])}`);
     console.log(`Codex: ${codexFeatureStatus()}; the first run asks you to trust the hook`);
+    if (values.pre) console.log("Codex: --pre applies to Claude Code only for now; Codex keeps checking after the write");
   }
   if (values.skills) for (const line of linkSkills(values.apply)) console.log(`skill ${line}`);
   if (values.smoke) console.log(smoke());

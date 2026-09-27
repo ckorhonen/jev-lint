@@ -245,17 +245,37 @@ Or by hand:
 `--skills` links the skills into `~/.agents/skills`, `~/.claude/skills` and `~/.codex/skills`,
 so they're available in every repo.
 
-**Before the write (Claude Code):** install the same command on `PreToolUse` instead of
-`PostToolUse`. The hook then checks each edit before it's applied. A high-confidence finding
-blocks the edit, and the agent rewrites it; double-check findings pass through as hints. The
-same rule can block the same file at most twice per conversation, so a false alarm can't
-deadlock the agent. In our benchmark (below) it matched the async after-the-write mode on cost
-and did slightly better on violations, though the difference wasn't significant.
+**Before the write (Claude Code): `--pre`.** By default the hook checks each edit right after
+it's written, and the agent fixes problems on its next edit. With `--pre`, it checks each edit
+*before* it's applied instead. A high-confidence finding blocks the edit, and the agent rewrites
+it; double-check findings pass through as hints.
 
-```json
-{ "PreToolUse": [{ "matcher": "Write|Edit|MultiEdit",
-  "hooks": [{ "type": "command", "command": "JEV_LINT_MODEL=jev-1.13.0 bun ~/Repos/jev-lint/src/hook.ts", "timeout": 15 }] }] }
+```sh
+bun src/install.ts --apply --pre     # switch Claude Code to before-the-write
+bun src/install.ts --apply           # switch back to after-the-write
 ```
+
+In our benchmark it did as well as or slightly better than checking after the write (violations
+per task 1.25 vs 1.62; the difference isn't statistically significant), at the same extra cost.
+Neither mode saves the tokens spent generating the bad patch; that has already happened.
+
+When to turn it on:
+- **Bad code must never land, even briefly:** secrets, security patterns, or generated files that
+  other people or systems read.
+- **Something watches the working tree:** a dev server, file watcher or test runner would pick up
+  the bad version before the agent's fix.
+- **You'd rather the agent get it right in one edit** than write, then patch. It made slightly
+  fewer edits in our runs.
+
+When to leave it off (the default):
+- **You want the agent never to wait on the check.** Before-the-write adds about 0.3 s before
+  every write, while the async after-the-write mode doesn't block at all.
+- **Your rules are noisy.** A false alarm blocks a good edit instead of just adding a hint. The
+  same rule can block the same file at most twice per conversation, so a false alarm can't
+  deadlock the agent, but it still costs a rewrite. Tune noisy rules first (`thresholds`,
+  `skipPaths`).
+
+Codex keeps checking after the write for now: `--pre` applies to Claude Code only.
 
 **Async (Claude Code only):** to keep the agent from waiting on the check (useful with a slower
 local judge), run it in the background and let findings wake the agent:
