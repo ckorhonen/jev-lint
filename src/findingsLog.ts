@@ -26,6 +26,10 @@ export type CheckRecord = {
   flagged: { rule: string; p: number; tier: "high" | "medium" }[];
   excerpt?: string;
   error?: string; // the check failed (timeout, API error); fail-open means the agent saw nothing
+  latencyMs?: number; // time for the judge call
+  inputTokens?: number; // judge input tokens (Jev bills input only)
+  asked?: number; // rules sent to the judge after the gate
+  gatedOut?: number; // rules skipped by their `when` patterns
 };
 
 export function findingsLogPath(): string | undefined {
@@ -74,6 +78,10 @@ export function toRecords(
       changeKind: r.changeKind,
       model: r.model,
       flagged,
+      latencyMs: Math.round(r.latencyMs),
+      inputTokens: r.inputTokens,
+      asked: r.asked,
+      gatedOut: r.gatedOut,
       ...(flagged.length ? { excerpt: code.slice(0, EXCERPT_CHARS) } : {}),
     };
   });

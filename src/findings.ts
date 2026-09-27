@@ -149,6 +149,16 @@ if (import.meta.main) {
       `${records.length - failed.length} checks, ${failed.length} failed, in ${path}${values.repo ? ` for ${resolve(values.repo)}` : ""} (last ${values.days} days)`,
     );
     for (const f of failed.slice(-5)) console.log(`  failed: ${f.ts} ${f.file}: ${f.error}`);
+    const timed = records.filter((r) => typeof r.latencyMs === "number" && !r.error);
+    if (timed.length) {
+      const lat = timed.map((r) => r.latencyMs as number).sort((a, b) => a - b);
+      const tokens = timed.reduce((n, r) => n + (r.inputTokens ?? 0), 0);
+      const asked = timed.reduce((n, r) => n + (r.asked ?? 0), 0);
+      const total = asked + timed.reduce((n, r) => n + (r.gatedOut ?? 0), 0);
+      console.log(
+        `judge: median ${lat[Math.floor(lat.length / 2)]} ms, p90 ${lat[Math.floor(lat.length * 0.9)]} ms; ${tokens} input tokens (~$${((tokens * 0.042) / 1e6).toFixed(5)} at Jev list price); ${asked} of ${total} rules asked after the gate`,
+      );
+    }
     console.log("rule                                    flags  high  med  sessions  fixed  kept  unknown  suggestion");
     for (const s of summary) {
       console.log(

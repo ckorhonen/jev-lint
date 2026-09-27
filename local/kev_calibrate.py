@@ -16,7 +16,7 @@ from kev.benchmark import evaluate_records
 from kev.checkpoint import LoadOptions, read_meta, write_meta
 from kev.data import load_records
 from kev.metrics import fit_temperature
-from kev.predictors import LocalPredictor
+from kev.predictors import CONTEXT, LocalPredictor
 
 ap = argparse.ArgumentParser()
 ap.add_argument("run")
@@ -25,7 +25,9 @@ ap.add_argument("--device", default="cuda")
 a = ap.parse_args()
 
 records = load_records(Path(a.calibration))
-predictor = LocalPredictor(a.run, a.device, LoadOptions(temperature=1.0))
+# jev-lint states (code edits) run up to ~1,500 tokens; trained with --max_state 1536.
+context = {**CONTEXT, "max_state": 1536, "max_packed": max(CONTEXT.get("max_packed", 0), 4096)}
+predictor = LocalPredictor(a.run, a.device, LoadOptions(temperature=1.0), context=context)
 report, rows = evaluate_records(records, predictor, Path(a.run).parent / "calibration-report")
 T = fit_temperature(rows, aggregation="micro")
 meta = read_meta(a.run)
