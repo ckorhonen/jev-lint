@@ -23,6 +23,8 @@ That becomes the notebook entry's "Question" and "Setup". LLM judging roles
 
 ## 1. Rules (`rules/*.json`)
 
+The `jev-lint-write-rule` skill covers what makes a good rule and where evidence comes from; this section adds what built-in rules need on top.
+
 A rule is one yes/no question about `added_code` plus `true`/`false` criteria and a
 `fix` line shown to the agent.
 - **Judgeable from the snippet alone.** No other files, no multi-step reasoning, no counting (depth, occurrences) and no tracing across functions. Jev is weak at all of these; send them to ESLint/SwiftLint instead.

@@ -82,11 +82,18 @@ export function rulePathsMatch(rule: Rule, relPath: string): boolean {
   return !rule.paths?.length || rule.paths.some((glob) => matchesGlob(glob, relPath));
 }
 
+// Keyed by the patterns themselves, not the rule id: two repos can reuse an id with
+// different gates, and an edited `when` must take effect in the long-lived daemon.
 const gateCache = new Map<string, RegExp[]>();
+
+export function clearGateCache() {
+  gateCache.clear();
+}
 
 export function ruleApplies(rule: Rule, code: string): boolean {
   if (!rule.when?.length) return true;
-  let patterns = gateCache.get(rule.id);
+  const key = rule.when.join("\0");
+  let patterns = gateCache.get(key);
   if (!patterns) {
     patterns = rule.when.flatMap((source) => {
       try {
@@ -95,7 +102,7 @@ export function ruleApplies(rule: Rule, code: string): boolean {
         return []; // a broken pattern must not hide the rule; see below
       }
     });
-    gateCache.set(rule.id, patterns);
+    gateCache.set(key, patterns);
   }
   return patterns.length === 0 || patterns.some((re) => re.test(code));
 }

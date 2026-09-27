@@ -19,6 +19,11 @@ export type RepoConfig = { dir: string; packs?: string[]; disable?: string[]; sk
 
 const cache = new Map<string, RepoConfig | null>();
 
+// The long-lived daemon clears this per request so edits to .jev-lint/ apply immediately.
+export function clearRepoCache() {
+  cache.clear();
+}
+
 function isRule(value: unknown): value is Rule {
   const r = value as Rule;
   return Boolean(

@@ -68,10 +68,10 @@ covering both fixed and kept. The numbers alone don't tell you *why* the agent k
 | Evidence | Likely cause | Change |
 |---|---|---|
 | Mostly `fixed`, many sessions | agent doesn't know the convention | one line in AGENTS.md/CLAUDE.md, in the closest section, stated as the positive practice with a repo-specific pointer ("Parse API responses with the zod schemas in `src/schemas/`") |
-| Mostly `kept`, and the excerpts are correct code | false positive | add the look-alike to the rule's `false`, add the excerpt as a hard negative case, re-validate |
+| Mostly `kept`, and the excerpts are correct code | false positive | add the look-alike to the rule's `false`, add the excerpt as a hard negative case, re-validate (`jev-lint-write-rule` has the rewording guide) |
 | Mostly `kept`, only in one area or only tests | rule doesn't fit that context | `.jev-lint/config.json` `"skipPaths": {"<rule>": ["<glob for that area>"]}` (or `paths` on a repo rule), or narrow the rule's `false` |
 | Mostly `kept`, and the excerpts are real issues | agent ignores the hint | make `fix` more specific; if it still matters, add guidance |
-| Repeated fixes the hook doesn't cover, or review comments | missing rule | hand off to the `jev-lint-rules` skill (proposal → validation) |
+| Repeated fixes the hook doesn't cover, or review comments | missing rule | write it with the `jev-lint-write-rule` skill (evidence → gates → cases → validation), and show it to the user before enabling it |
 
 Built-in rules (`$JEV/rules/*.json`) are shared across repos. Change them only in the
 jev-lint repo with the `jev-lint-eval` workflow: reword on the dev split, then check the

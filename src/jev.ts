@@ -26,7 +26,8 @@ let cachedKey: string | undefined;
 export function apiKey(): string | undefined {
   if (!cachedKey && process.env.TYPESAFE_API_KEY) cachedKey = process.env.TYPESAFE_API_KEY;
   if (!cachedKey && process.platform === "darwin") {
-    const out = spawnSync("security", ["find-generic-password", "-s", KEYCHAIN_SERVICE, "-w"], { encoding: "utf8" });
+    // Bounded: a locked keychain can show an unlock prompt and block forever.
+    const out = spawnSync("security", ["find-generic-password", "-s", KEYCHAIN_SERVICE, "-w"], { encoding: "utf8", timeout: 2000 });
     if (out.status === 0 && out.stdout.trim()) cachedKey = out.stdout.trim();
   }
   return cachedKey;

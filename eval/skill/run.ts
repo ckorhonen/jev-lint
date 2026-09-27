@@ -46,6 +46,7 @@ const { values: args } = parseArgs({
     model: { type: "string", default: "sonnet" },
     tag: { type: "string", default: "default" },
     "grade-only": { type: "boolean", default: false },
+    concurrency: { type: "string", default: "3" },
   },
 });
 
@@ -71,13 +72,20 @@ type ProposedRule = {
   paths?: string[];
   source: string;
 };
-type Proposal = { read: string[]; rules: ProposedRule[]; configChanges: string[]; dropped: { idea: string; reason: string }[] };
+type Proposal = {
+  read: string[];
+  rules: ProposedRule[];
+  configChanges: string[];
+  dropped: { idea: string; reason: string }[];
+  research: { framework: string; version?: string; urls: string[] }[];
+};
 
 const PROPOSAL_SCHEMA = `{
   "read": ["repo-relative paths you read in full"],
   "rules": [{ "id": "repo-…", "language": "typescript", "question": "Does \`added_code\` …", "true": "…", "false": "…", "fix": "…",
               "when": ["regex"], "paths": ["optional globs"], "source": "file:line (or best-practices/<lang>.md#id)" }],
   "configChanges": ["linter/CI changes proposed instead of rules"],
+  "research": [{ "framework": "react", "version": "19.1", "urls": ["https://… (checked YYYY-MM-DD)"] }],
   "dropped": [{ "idea": "…", "reason": "…" }]
 }`;
 
@@ -180,13 +188,28 @@ function transcriptStats(transcript: string) {
   return { costUsd };
 }
 
-function citationValid(source: string, workDir: string): boolean {
-  const m = /^([^:#\s]+?)(?::(\d+))?(?:[-–]\d+)?$/.exec(source.trim());
-  if (!m) return source.includes("best-practices/");
-  const file = join(workDir, m[1]);
-  if (!existsSync(file)) return m[1].includes("best-practices/");
-  if (!m[2]) return true;
-  return Number(m[2]) <= readFileSync(file, "utf8").split("\n").length;
+// Sources look like "AGENTS.md:17; src/a.ts:109,134 (adapted from best-practices/generic.md …)".
+// Valid when every cited file exists at the pinned commit and every line number is in range.
+export function citationValid(source: string, workDir: string): boolean {
+  const parts = source
+    .replace(/\([^)]*\)/g, "")
+    .split(";")
+    .map((p) => p.trim())
+    .filter(Boolean);
+  if (!parts.length) return false;
+  return parts.every((part) => {
+    if (part.includes("best-practices/") || /^https?:\/\//.test(part)) return true; // menus and web sources aren't files
+    const m = /^([^\s:]+)(?::([\d,\s–-]+))?$/.exec(part);
+    if (!m) return false;
+    const file = join(workDir, m[1]);
+    if (!existsSync(file)) return false;
+    const lines = readFileSync(file, "utf8").split("\n").length;
+    const numbers = (m[2] ?? "")
+      .split(/[^\d]+/)
+      .filter(Boolean)
+      .map(Number);
+    return numbers.every((n) => n >= 1 && n <= lines);
+  });
 }
 
 function wellFormed(r: ProposedRule): boolean {
@@ -217,6 +240,7 @@ export function parseProposal(text: string): Proposal | undefined {
     rules: rules.map((r) => ({ ...r, language: r.language ?? "unknown", source: r.source ?? "" })),
     configChanges: Array.isArray(p.configChanges) ? p.configChanges : [],
     dropped: Array.isArray(p.dropped) ? p.dropped : [],
+    research: Array.isArray(p.research) ? p.research : [],
   };
 }
 
@@ -299,6 +323,8 @@ async function score(c: Case, runDir: string, workDir: string) {
     readRecall: share(opened.size, c.mustRead.length),
     unread: c.mustRead.filter((p) => !opened.has(p)),
     conventionRecall: share(checkable.filter((x) => addressed.has(x.id)).length, checkable.length),
+    // The budget caps how many conventions one proposal can reach, so also score against that ceiling.
+    recallAtBudget: share(checkable.filter((x) => addressed.has(x.id)).length, Math.min(checkable.length, BUDGET_PER_LANGUAGE)),
     missedConventions: checkable.filter((x) => !addressed.has(x.id)).map((x) => x.id),
     dupes: mapping.filter((m) => m.duplicates !== "none").map((m) => `${m.id}→${m.duplicates}`),
     ungrounded: mapping.filter((m) => !m.grounded).map((m) => m.id),
@@ -306,6 +332,10 @@ async function score(c: Case, runDir: string, workDir: string) {
     wellFormed: share(proposal.rules.filter(wellFormed).length, proposal.rules.length),
     withinBudget: [...perLanguage.values()].every((n) => n <= BUDGET_PER_LANGUAGE),
     wroteNothing: status === "",
+    // Web research: frameworks researched, and rules whose evidence is an external URL.
+    researched: proposal.research.filter((r) => r.urls?.some((u) => /^https?:\/\//.test(u))).length,
+    urlRules: proposal.rules.filter((r) => /https?:\/\//.test(r.source)).length,
+    testValidity: proposal.rules.some((r) => /test-cannot-fail|test.*(can.?not|never) fail/i.test(`${r.id} ${r.question}`)),
     ...transcriptStats(transcript),
     mapping,
   };
@@ -319,35 +349,43 @@ async function main() {
     .filter((f) => f.endsWith(".json"))
     .map((f) => JSON.parse(readFileSync(join(caseDir, f), "utf8")) as Case)
     .filter((c) => !wanted || wanted.includes(c.name));
+  const jobs = cases.flatMap((c) => Array.from({ length: Number(args.reps) }, (_, i) => ({ c, rep: i + 1 })));
   const results: unknown[] = [];
-  for (const c of cases) {
-    for (let rep = 1; rep <= Number(args.reps); rep++) {
+  const worker = async () => {
+    for (let job = jobs.shift(); job; job = jobs.shift()) {
+      const { c, rep } = job;
       const runDir = join(ROOT, "runs", args.tag as string, args.agent as string, `${c.name}-${rep}`);
       const workDir = join(runDir, "repo");
-      if (!args["grade-only"]) {
-        mkdirSync(runDir, { recursive: true });
-        checkout(c, workDir);
-        const { exitCode, wallMs } = await runAgent(workDir, runDir);
-        writeFileSync(join(runDir, "run.json"), JSON.stringify({ exitCode, wallMs }));
-        console.error(`${c.name} rep ${rep}: exit ${exitCode}, ${Math.round(wallMs / 1000)} s`);
+      try {
+        if (!args["grade-only"]) {
+          mkdirSync(runDir, { recursive: true });
+          checkout(c, workDir);
+          const { exitCode, wallMs } = await runAgent(workDir, runDir);
+          writeFileSync(join(runDir, "run.json"), JSON.stringify({ exitCode, wallMs }));
+          console.error(`${c.name} rep ${rep}: exit ${exitCode}, ${Math.round(wallMs / 1000)} s`);
+        }
+        const scored = await score(c, runDir, workDir);
+        const run = existsSync(join(runDir, "run.json")) ? JSON.parse(readFileSync(join(runDir, "run.json"), "utf8")) : {};
+        results.push({ ...scored, rep, ...run });
+      } catch (error) {
+        results.push({ case: c.name, rep, error: error instanceof Error ? error.message : String(error) });
       }
-      const scored = await score(c, runDir, workDir);
-      const run = existsSync(join(runDir, "run.json")) ? JSON.parse(readFileSync(join(runDir, "run.json"), "utf8")) : {};
-      results.push({ ...scored, rep, ...run });
     }
-  }
+  };
+  await Promise.all(Array.from({ length: Number(args.concurrency) }, worker));
+  results.sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b)));
   mkdirSync(join(ROOT, "results"), { recursive: true });
   const out = join(ROOT, "results", `${args.tag}-${args.agent}.json`);
   writeFileSync(out, JSON.stringify({ generatedAt: new Date().toISOString(), judge: `${JUDGE_MODEL}/${JUDGE_EFFORT}`, results }, null, 2));
   const pct = (x: unknown) => (typeof x === "number" ? `${Math.round(x * 100)}%`.padStart(5) : "    —");
-  console.log("case        rep rules  read  conv  dupes ungr  cite  form budget clean   cost");
+  console.log("case        rep rules  read  conv @budg dupes ungr  cite  form budget clean  web  cost");
   for (const r of results as Record<string, unknown>[]) {
     if (r.error) {
       console.log(`${String(r.case).padEnd(12)}${String(r.rep).padStart(3)}  ${r.error}`);
       continue;
     }
     console.log(
-      `${String(r.case).padEnd(12)}${String(r.rep).padStart(3)}${String(r.rules).padStart(6)}${pct(r.readRecall)} ${pct(r.conventionRecall)}${String((r.dupes as string[]).length).padStart(6)}${String((r.ungrounded as string[]).length).padStart(5)} ${pct(r.citationsValid)} ${pct(r.wellFormed)}  ${r.withinBudget ? "yes" : "NO "}   ${r.wroteNothing ? "yes" : "NO "} $${Number(r.costUsd ?? 0).toFixed(2)}`,
+      `${String(r.case).padEnd(12)}${String(r.rep).padStart(3)}${String(r.rules).padStart(6)}${pct(r.readRecall)} ${pct(r.conventionRecall)}${pct(r.recallAtBudget)}${String((r.dupes as string[]).length).padStart(6)}${String((r.ungrounded as string[]).length).padStart(5)} ${pct(r.citationsValid)} ${pct(r.wellFormed)}  ${r.withinBudget ? "yes" : "NO "}   ${r.wroteNothing ? "yes" : "NO "} ${String(r.researched ?? 0).padStart(3)}  $${Number(r.costUsd ?? 0).toFixed(2)}`,
     );
   }
   console.log(`\n${out}`);
