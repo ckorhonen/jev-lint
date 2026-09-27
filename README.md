@@ -10,6 +10,27 @@ which of your team's rules it just broke, and fixes them before anyone reviews t
 📓 **Results and method:** [experiment notebook](https://claude.ai/artifact/BUZG9LEnaiJyaJuaP7tajs)
 (source in `report/`).
 
+## Contents
+
+- [Why use it](#why-use-it)
+- [Set it up with your agent](#set-it-up-with-your-agent)
+- [What is this for?](#what-is-this-for)
+- [Our hypothesis](#our-hypothesis)
+- [What we've found so far](#what-weve-found-so-far)
+- [How it works](#how-it-works)
+- [Install](#install)
+- [Generate rules for your repo](#generate-rules-for-your-repo)
+- [Learn from what it catches](#learn-from-what-it-catches)
+- [Local models](#local-models)
+- [Rule packs](#rule-packs)
+  - [Options (environment variables on the hook command)](#options-environment-variables-on-the-hook-command)
+- [Evaluation harness](#evaluation-harness)
+- [For agents working in this repo](#for-agents-working-in-this-repo)
+- [Development](#development)
+- [License and credits](#license-and-credits)
+
+Also: [pack docs](docs/packs/) · [feedback loop](docs/feedback-loop.md) · [experiment notebook](https://claude.ai/artifact/BUZG9LEnaiJyaJuaP7tajs)
+
 ## Why use it
 
 - **Catches what linters can't.** "Don't derive state in `useEffect`", "a test must be able
@@ -42,7 +63,7 @@ which of your team's rules it just broke, and fixes them before anyone reviews t
 
 It complements linters, type checkers and code review; it doesn't replace them.
 
-### Set it up with your agent
+## Set it up with your agent
 
 Paste this into Claude Code or Codex, from the repo you want checked:
 
