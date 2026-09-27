@@ -11,7 +11,7 @@
 
 import { appendFileSync } from "node:fs";
 import { extractChanges } from "./extract";
-import { appendRecords, toRecords } from "./findingsLog";
+import { appendRecords, toErrorRecords, toRecords } from "./findingsLog";
 import { formatFeedback, type LintResult, lintChange } from "./lint";
 
 const MAX_FILES = 8;
@@ -62,7 +62,8 @@ async function main() {
   // Clean checks are logged too: a later clean check of the same file is how a finding
   // counts as fixed. Logging must never affect the agent, so errors are swallowed.
   try {
-    appendRecords(toRecords(results, changes, event));
+    const failures = settled.flatMap((s, i) => (s.status === "rejected" ? [{ change: changes[i], error: s.reason }] : []));
+    appendRecords([...toRecords(results, changes, event), ...toErrorRecords(failures, event)]);
   } catch (err) {
     if (process.env.JEV_LINT_DEBUG) process.stderr.write(`[jev-lint] findings log: ${err}\n`);
   }

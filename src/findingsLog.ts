@@ -25,6 +25,7 @@ export type CheckRecord = {
   model: string;
   flagged: { rule: string; p: number; tier: "high" | "medium" }[];
   excerpt?: string;
+  error?: string; // the check failed (timeout, API error); fail-open means the agent saw nothing
 };
 
 export function findingsLogPath(): string | undefined {
@@ -65,6 +66,30 @@ export function toRecords(
       model: r.model,
       flagged,
       ...(flagged.length ? { excerpt: code.slice(0, EXCERPT_CHARS) } : {}),
+    };
+  });
+}
+
+// Failed checks are logged too, so a silently failing hook shows up in the log instead of
+// looking like "no edits".
+export function toErrorRecords(
+  failures: { change: ChangedFile; error: unknown }[],
+  event: { session_id?: string; tool_name?: string; cwd?: string },
+): CheckRecord[] {
+  const cwd = event.cwd ?? process.cwd();
+  return failures.map(({ change, error }) => {
+    const absolute = isAbsolute(change.filePath) ? change.filePath : resolve(cwd, change.filePath);
+    const repo = repoRoot(absolute, cwd);
+    return {
+      ts: new Date().toISOString(),
+      session: event.session_id,
+      repo,
+      file: relative(repo, absolute),
+      tool: event.tool_name,
+      changeKind: change.changeKind,
+      model: "error",
+      flagged: [],
+      error: String(error).slice(0, 300),
     };
   });
 }

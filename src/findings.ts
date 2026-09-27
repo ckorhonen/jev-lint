@@ -39,7 +39,8 @@ function isCheckRecord(value: unknown): value is CheckRecord {
   return Boolean(r && typeof r.ts === "string" && typeof r.repo === "string" && typeof r.file === "string" && Array.isArray(r.flagged));
 }
 
-export function summarize(records: CheckRecord[]): RuleSummary[] {
+export function summarize(allRecords: CheckRecord[]): RuleSummary[] {
+  const records = allRecords.filter((r) => !r.error);
   const byThread = new Map<string, CheckRecord[]>();
   for (const r of records) {
     const key = `${r.session ?? "?"}|${r.repo}|${r.file}`;
@@ -139,9 +140,15 @@ if (import.meta.main) {
   const records = loadRecords(path, { repo: values.repo, days: Number(values.days) });
   const summary = summarize(records);
   if (values.json) {
-    console.log(JSON.stringify({ log: path, checks: records.length, rules: summary }, null, 2));
+    console.log(
+      JSON.stringify({ log: path, checks: records.length, failed: records.filter((r) => r.error).length, rules: summary }, null, 2),
+    );
   } else {
-    console.log(`${records.length} checks in ${path}${values.repo ? ` for ${resolve(values.repo)}` : ""} (last ${values.days} days)`);
+    const failed = records.filter((r) => r.error);
+    console.log(
+      `${records.length - failed.length} checks, ${failed.length} failed, in ${path}${values.repo ? ` for ${resolve(values.repo)}` : ""} (last ${values.days} days)`,
+    );
+    for (const f of failed.slice(-5)) console.log(`  failed: ${f.ts} ${f.file}: ${f.error}`);
     console.log("rule                                    flags  high  med  sessions  fixed  kept  unknown  suggestion");
     for (const s of summary) {
       console.log(
