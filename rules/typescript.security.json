@@ -1,15 +1,6 @@
 {
   "language": "typescript",
-  "extensions": [
-    ".ts",
-    ".tsx",
-    ".mts",
-    ".cts",
-    ".js",
-    ".jsx",
-    ".mjs",
-    ".cjs"
-  ],
+  "extensions": [".ts", ".tsx", ".mts", ".cts", ".js", ".jsx", ".mjs", ".cjs"],
   "rules": [
     {
       "id": "ts-secret-in-public-env",
@@ -17,9 +8,7 @@
       "true": "A secret credential is read through a public-prefixed env var, so the bundler inlines it into the JavaScript shipped to every visitor.",
       "false": "The public-prefixed variable is meant to be public: a publishable key (`NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `pk_…`), a Supabase/Firebase anon or client-config key, an analytics id, a Sentry DSN, a browser-restricted Maps key, a public API base URL, or a feature flag. Unprefixed server-only variables (`process.env.OPENAI_API_KEY` in a route handler or server module) do not count. Literal secret values written in the code belong to ts-no-hardcoded-secret.",
       "fix": "Move the call behind a server route or function that reads an unprefixed env var; never put secrets in NEXT_PUBLIC_/VITE_-style variables (Vite env docs, Next.js data security guide).",
-      "when": [
-        "NEXT_PUBLIC_|VITE_|REACT_APP_|EXPO_PUBLIC_|NUXT_PUBLIC_|GATSBY_|\\bPUBLIC_\\w+"
-      ]
+      "when": ["NEXT_PUBLIC_|VITE_|REACT_APP_|EXPO_PUBLIC_|NUXT_PUBLIC_|GATSBY_|\\bPUBLIC_\\w+"]
     },
     {
       "id": "ts-secret-env-fallback",
@@ -27,11 +16,7 @@
       "true": "A secret, signing key, password or credential falls back to a literal value when its env var is unset.",
       "false": "A missing secret throws or fails validation (an env schema without a default, `requireEnv('JWT_SECRET')`, `if (!secret) throw …`); fallbacks for non-secret settings (port, host, log level, public base URL, timeouts, feature flags, region); the fallback is inside a branch that is explicitly test-only. Real-looking literal secrets (e.g. `sk_live_…`) belong to ts-no-hardcoded-secret.",
       "fix": "Fail fast when the secret is missing (validate env at startup and throw) instead of falling back to a known value (CWE-1188).",
-      "when": [
-        "env[^\\n]*(\\|\\||\\?\\?)",
-        "=\\s*(process|import\\.meta|Bun|Deno)\\.env",
-        "\\.default\\("
-      ]
+      "when": ["env[^\\n]*(\\|\\||\\?\\?)", "=\\s*(process|import\\.meta|Bun|Deno)\\.env", "\\.default\\("]
     },
     {
       "id": "ts-insecure-random-secret",
@@ -39,9 +24,7 @@
       "true": "A security-sensitive value is generated with Math.random.",
       "false": "Math.random is used for something that need not be unguessable: UI or animation jitter, retry backoff jitter, sampling rates, shuffling display order, games, test or seed data, temporary DOM ids, log correlation ids; or the value comes from `crypto`, `nanoid`, `uuid`, or a library token generator.",
       "fix": "Generate secrets with crypto.randomUUID()/crypto.getRandomValues()/crypto.randomBytes(), never Math.random (MDN Math.random, CWE-338).",
-      "when": [
-        "Math\\.random"
-      ]
+      "when": ["Math\\.random"]
     },
     {
       "id": "ts-secret-compare-not-constant-time",
@@ -49,9 +32,7 @@
       "true": "A secret or signature is checked with an ordinary equality comparison against request input.",
       "false": "The comparison uses `crypto.timingSafeEqual`, `crypto.subtle.verify`, or a library verifier (`stripe.webhooks.constructEvent`, `jwt.verify`/`jwtVerify`, `bcrypt.compare`, `argon2.verify`); the compared values are not secrets (ids, roles, status strings, event types, usernames, public keys); only lengths are compared; there is no comparison of a secret.",
       "fix": "Compare secrets with crypto.timingSafeEqual on equal-length buffers or use the provider's verifier (GitHub webhook validation docs).",
-      "when": [
-        "signature|hmac|digest|token|secret|api.?key|password|passwd|x-hub|webhook"
-      ]
+      "when": ["signature|hmac|digest|token|secret|api.?key|password|passwd|x-hub|webhook"]
     },
     {
       "id": "ts-jwt-decode-without-verify",
@@ -59,9 +40,7 @@
       "true": "Server-side code trusts claims from a token whose signature was never verified.",
       "false": "The token is verified first (`jwt.verify`, jose `jwtVerify`, `verifyIdToken`, a framework auth helper such as NextAuth/Auth.js, Clerk or Auth0 SDK); decoding happens in browser code only to show the user's name or schedule a refresh while the server still verifies; the test itself created the token; there is no JWT decoding.",
       "fix": "Verify the signature (jwt.verify / jose jwtVerify) before trusting any claim (jsonwebtoken README: decode 'will not verify whether the signature is valid').",
-      "when": [
-        "decode|atob|base64|split\\(\\s*['\"]\\.['\"]"
-      ]
+      "when": ["decode|atob|base64|split\\(\\s*['\"]\\.['\"]"]
     },
     {
       "id": "ts-sql-interpolated-raw-query",
@@ -69,9 +48,7 @@
       "true": "A runtime value is spliced into SQL text that is executed.",
       "false": "Values go through parameterizing tagged templates (`sql`…${id}…``, `prisma.$queryRaw`…``, Drizzle `sql`…``, postgres.js, slonik), placeholders with a params array (`query('… WHERE id = $1', [id])`, `?`), or an ORM/query builder (`where({ id })`); only constants or identifiers checked against an allow-list are interpolated; no SQL is executed.",
       "fix": "Pass values as bound parameters or use a parameterizing tagged template; never splice them into SQL text (OWASP SQL Injection Prevention; Prisma raw-query docs).",
-      "when": [
-        "select|insert|update|delete|query|execute|exec\\(|raw"
-      ]
+      "when": ["select|insert|update|delete|query|execute|exec\\(|raw"]
     },
     {
       "id": "ts-shell-command-interpolation",
@@ -79,9 +56,7 @@
       "true": "A variable is interpolated into a command string that a shell parses.",
       "false": "`execFile`/`execFileSync`/`spawn(bin, [args])` without `shell: true`; Bun Shell `$`…${x}`` and zx `$`…`` tagged templates (they quote interpolations); a constant command; values quoted with a proper library (`shell-quote`); no command is run.",
       "fix": "Pass arguments as an array to execFile/spawn without a shell (Node child_process docs: 'Never pass unsanitized user input to this function').",
-      "when": [
-        "exec|spawn|shell|['\"]-c['\"]"
-      ]
+      "when": ["exec|spawn|shell|['\"]-c['\"]"]
     },
     {
       "id": "ts-regexp-from-input",
@@ -89,9 +64,7 @@
       "true": "Unescaped user or external text becomes part of a regular expression.",
       "false": "The string is escaped first; the pattern is a constant or built only from constants; the pattern is intentionally supplied by a trusted developer or admin setting and the code says so; the input is matched with `includes`/`indexOf`/`startsWith`/`localeCompare` instead; there is no RegExp constructor.",
       "fix": "Escape the input with RegExp.escape (or escapeRegExp), or use string methods like includes() (MDN RegExp.escape; OWASP ReDoS).",
-      "when": [
-        "RegExp\\("
-      ]
+      "when": ["RegExp\\("]
     },
     {
       "id": "ts-open-redirect",
@@ -99,9 +72,7 @@
       "true": "A redirect target comes straight from a query/body/form parameter.",
       "false": "The target is a constant or an internal route built by the code; the input is validated (starts with a single `/` and not `//` or `/\\`, or is parsed with `new URL` and its origin compared to an allow-list); an id or slug is inserted into a fixed internal path (`/users/${id}`); the auth library validates `callbackUrl` itself; there is no redirect.",
       "fix": "Redirect only to relative paths or allow-listed hosts, or map an id to a known URL (OWASP Unvalidated Redirects and Forwards Cheat Sheet).",
-      "when": [
-        "redirect|location\\.(href|assign|replace)|location\\s*=|returnTo|callbackUrl|next="
-      ]
+      "when": ["redirect|location\\.(href|assign|replace)|location\\s*=|returnTo|callbackUrl|next="]
     },
     {
       "id": "react-server-action-missing-auth",
@@ -109,9 +80,7 @@
       "true": "A mutating Server Action calls the DB or a privileged service with no session or permission check in its body.",
       "false": "The action checks the session and permission before mutating; it is wrapped by an auth-enforcing helper (`authedAction(…)`, a next-safe-action client with auth middleware); it only calls named data-access functions rather than the DB client directly (authorization may live there); it is a public, read-only action (search, contact form that only sends to the site owner with rate limiting) or only sets UI cookies such as theme or locale; the code is not a server function.",
       "fix": "Verify the session and the user's permission inside every Server Action before mutating (Next.js data security guide; react.dev 'use server').",
-      "when": [
-        "use server"
-      ]
+      "when": ["use server"]
     },
     {
       "id": "react-server-action-client-identity",
@@ -119,9 +88,7 @@
       "true": "The action trusts a client-sent user id, role, tenant or price.",
       "false": "Identity and role come from the session (`session.user.id`, `auth().userId`); client-sent ids only name the target resource and the code checks ownership against the session; amounts are recomputed on the server from product ids; the action is not a server function.",
       "fix": "Derive the user, role, tenant and amounts from the server session and database, never from Server Action arguments (react.dev: arguments are fully client-controlled).",
-      "when": [
-        "use server"
-      ]
+      "when": ["use server"]
     },
     {
       "id": "react-server-action-returns-record",
@@ -129,9 +96,7 @@
       "true": "A Server Action serializes a whole database record back to the browser.",
       "false": "It returns a small object built for the client (`{ success: true }`, `{ id, name }`, a validation-error object), a query with an explicit `select` of public fields, the result of a DTO/mapping function, nothing (redirect/revalidate only); the code is not a server function.",
       "fix": "Return only the fields the UI needs, not the database record (Next.js data security guide, 'Controlling return values').",
-      "when": [
-        "use server"
-      ]
+      "when": ["use server"]
     },
     {
       "id": "react-unsanitized-html",
@@ -139,9 +104,7 @@
       "true": "Untrusted HTML reaches the DOM unsanitized.",
       "false": "The HTML is sanitized first; it is a static string or built only from constants in the code; it is JSON-LD produced by a serializer that escapes `<`; markdown is rendered to React elements (react-markdown without `rehype-raw`) instead of an HTML string; there is no raw-HTML sink.",
       "fix": "Sanitize with DOMPurify (or render to React elements) before dangerouslySetInnerHTML (react.dev: 'Only use dangerouslySetInnerHTML with trusted and sanitized data').",
-      "when": [
-        "dangerouslySetInnerHTML|innerHTML|outerHTML|insertAdjacentHTML"
-      ]
+      "when": ["dangerouslySetInnerHTML|innerHTML|outerHTML|insertAdjacentHTML"]
     },
     {
       "id": "ts-sec-ssrf",
@@ -149,10 +112,7 @@
       "true": "A server-side request goes to a URL or host the client chose, with no allow-list or private-address check, so a caller can make the server reach internal services or `169.254.169.254` (SSRF, CWE-918).",
       "false": "The URL is a constant or comes from config/env, and request input only fills a path segment, id or query value on that fixed host (`` `https://api.github.com/users/${encodeURIComponent(login)}` ``); the parsed hostname is checked against a fixed allow-list, or the request goes through an SSRF-filtering agent or a helper the code calls for that purpose (`request-filtering-agent`, `ssrf-req-filter`, `assertPublicUrl(url)`); the code runs in the browser (`'use client'` component, React hook), where the user can only reach their own network; or no outbound request uses request input at all.",
       "fix": "Parse the URL with `new URL()`, allow only `https:` and hosts on a fixed allow-list (or resolve it and reject private/loopback/metadata addresses) and disable redirects (OWASP SSRF Prevention Cheat Sheet; API7:2023).",
-      "when": [
-        "fetch|axios|\\bgot\\b|\\bky\\b|undici|superagent|needle|https?\\.(get|request)|goto\\(",
-        "url|host|endpoint|webhook"
-      ]
+      "when": ["fetch|axios|\\bgot\\b|\\bky\\b|undici|superagent|needle|https?\\.(get|request)|goto\\(", "url|host|endpoint|webhook"]
     },
     {
       "id": "ts-sec-path-traversal",
@@ -170,9 +130,7 @@
       "true": "The raw client payload is bound onto a stored record, so a client can also set fields such as `role`, `isAdmin`, `ownerId`, `tenantId`, `balance`, `emailVerified` or `stripeCustomerId` (mass assignment, CWE-915).",
       "false": "The payload is parsed by a schema that lists the allowed fields (`UpdateProfileSchema.parse(body)`, valibot/yup/arktype, a NestJS DTO with `ValidationPipe({ whitelist: true })`) and the parsed result is written -- unless the schema is `.passthrough()`, `z.any()` or `z.record(...)`; specific fields are picked (`const { name, bio } = body`, `_.pick(body, ['name','bio'])`, `data: { name: body.name }`); the handler is visibly admin-only; the code is a seed, migration, test or client-side form state; or no client payload reaches a write.",
       "fix": "Validate the body with a schema that lists only the client-editable fields (or pick them explicitly) and write that, never the raw body (OWASP Mass Assignment Cheat Sheet; API3:2023).",
-      "when": [
-        "body|json\\(|formData|payload|input|fromEntries"
-      ]
+      "when": ["body|json\\(|formData|payload|input|fromEntries"]
     },
     {
       "id": "ts-sec-unscoped-record-lookup",
@@ -180,9 +138,7 @@
       "true": "A signed-in handler fetches or changes a record by a client-supplied id with no ownership or permission check, so any user can reach any record (IDOR/BOLA, API1:2023).",
       "false": "The query includes the user or tenant (`userId: session.user.id`, `orgId: ctx.org.id`, a `tenantDb`/RLS-scoped client); the record is checked right after loading (`if (invoice.userId !== user.id) return 404`, `ability.can(...)`, a policy/`authorize()` call); the endpoint is visibly admin-only; the resource is public by nature (published posts, product catalog); the handler loads the user's own record (`/me`, `where: { id: session.user.id }`); or the code only calls a named data-access function (authorization may live there). A missing session check altogether in a Server Action belongs to react-server-action-missing-auth; identity taken from action arguments belongs to react-server-action-client-identity.",
       "fix": "Scope the lookup to the current user or tenant (or run an object-level permission check) before returning or changing the record (OWASP API1:2023).",
-      "when": [
-        "req\\.user|session|auth\\(|getServerSession|currentUser|ctx\\.|c\\.get\\(|protectedProcedure|userId|user\\.id"
-      ]
+      "when": ["req\\.user|session|auth\\(|getServerSession|currentUser|ctx\\.|c\\.get\\(|protectedProcedure|userId|user\\.id"]
     },
     {
       "id": "ts-sec-secret-in-log",
@@ -190,9 +146,7 @@
       "true": "A credential or secret-bearing object is written to logs or telemetry, where anyone with log access can read and replay it (CWE-532).",
       "false": "Only non-secret fields are logged (user id, route, method, status, duration, error message); the secret is masked or reduced (`'[REDACTED]'`, last 4 chars, a hash/fingerprint, `hasToken: Boolean(token)`); token metadata is logged (`expiresAt`, `scope`, `kid`, token type); the logger is visibly configured to redact those paths (pino `redact: ['req.headers.authorization']`); the code is a test; or nothing secret is logged. Hardcoded literal secrets belong to ts-no-hardcoded-secret.",
       "fix": "Log identifiers, not credentials: drop or mask tokens, passwords, auth headers and whole request bodies, or configure logger redaction (OWASP Logging Cheat Sheet; CWE-532).",
-      "when": [
-        "console\\.|logger|\\blog\\.|pino|winston|bunyan|Sentry|captureMessage|setExtra|setContext|setAttribute"
-      ]
+      "when": ["console\\.|logger|\\blog\\.|pino|winston|bunyan|Sentry|captureMessage|setExtra|setContext|setAttribute"]
     },
     {
       "id": "ts-sec-cors-credentials",
@@ -200,9 +154,7 @@
       "true": "Any website (or a look-alike domain) can make credentialed cross-origin requests and read the responses with the victim's cookies (CWE-942).",
       "false": "Origins come from a fixed list or env allow-list (`origin: ['https://app.example.com']`, `allowed.has(origin)`, `process.env.CORS_ORIGINS.split(',')`); the check is anchored (`/^https:\\/\\/([a-z0-9-]+\\.)?example\\.com$/`, `url.hostname === 'example.com' || url.hostname.endsWith('.example.com')`); a wildcard or reflected origin is used without credentials on a public, token-free API; the permissive config is inside a development-only branch or allows only `localhost`; or the code does not configure CORS.",
       "fix": "Allow credentials only for an explicit list of origins compared exactly (parse and compare hostnames), never reflect arbitrary `Origin` (PortSwigger CORS; CWE-942; expressjs/cors docs).",
-      "when": [
-        "cors|Access-Control-Allow|enableCors|allowedOrigins|origin"
-      ]
+      "when": ["cors|Access-Control-Allow|enableCors|allowedOrigins|origin"]
     },
     {
       "id": "ts-sec-weak-password-hash",
@@ -210,9 +162,7 @@
       "true": "A password is stored or verified using a fast general-purpose hash, a static salt, plain text, or reversible encoding.",
       "false": "Also fine: `argon2`/`@node-rs/argon2`, `bcrypt`/`bcryptjs`, `crypto.scrypt`/`scryptSync`, `crypto.pbkdf2` with a random salt and a high iteration count, `Bun.password.hash`, or an auth provider handling passwords; hashing non-password data (cache keys, ETags, file checksums, webhook HMAC signatures, content fingerprints, gravatar emails); or test code.",
       "fix": "Hash passwords with argon2id, bcrypt or scrypt (Bun.password.hash / @node-rs/argon2) and verify with the library's constant-time check.",
-      "when": [
-        "passw|pwd|passphrase|secret|createHash|subtle\\.digest|md5|sha1|sha256|sha512"
-      ]
+      "when": ["passw|pwd|passphrase|secret|createHash|subtle\\.digest|md5|sha1|sha256|sha512"]
     }
   ]
 }

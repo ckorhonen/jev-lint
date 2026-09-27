@@ -56,9 +56,29 @@ function runClaude(text: string, cwd: string, runDir: string) {
     timeout: 180,
     asyncRewake: true,
   };
-  writeFileSync(settings, JSON.stringify(args.hook ? { hooks: { PostToolUse: [{ matcher: "Write|Edit|MultiEdit", hooks: [hook] }] } } : { hooks: {} }));
-  const cli = ["-p", text, "--model", args.model as string, "--setting-sources", "project", "--settings", settings, "--strict-mcp-config",
-    "--permission-mode", "bypassPermissions", "--output-format", "stream-json", "--verbose", "--max-budget-usd", "3", "--no-session-persistence"];
+  writeFileSync(
+    settings,
+    JSON.stringify(args.hook ? { hooks: { PostToolUse: [{ matcher: "Write|Edit|MultiEdit", hooks: [hook] }] } } : { hooks: {} }),
+  );
+  const cli = [
+    "-p",
+    text,
+    "--model",
+    args.model as string,
+    "--setting-sources",
+    "project",
+    "--settings",
+    settings,
+    "--strict-mcp-config",
+    "--permission-mode",
+    "bypassPermissions",
+    "--output-format",
+    "stream-json",
+    "--verbose",
+    "--max-budget-usd",
+    "3",
+    "--no-session-persistence",
+  ];
   const started = Date.now();
   return new Promise<{ wallMs: number; costUsd: number; durationMs: number; turns: number }>((resolve) => {
     const child = spawn("claude", cli, { cwd, stdio: ["ignore", "pipe", "pipe"] });
@@ -76,7 +96,12 @@ function runClaude(text: string, cwd: string, runDir: string) {
           if (m.type === "result") result = m;
         } catch {}
       }
-      resolve({ wallMs: Date.now() - started, costUsd: Number(result.total_cost_usd ?? 0), durationMs: Number(result.duration_ms ?? 0), turns: Number(result.num_turns ?? 0) });
+      resolve({
+        wallMs: Date.now() - started,
+        costUsd: Number(result.total_cost_usd ?? 0),
+        durationMs: Number(result.duration_ms ?? 0),
+        turns: Number(result.num_turns ?? 0),
+      });
     });
   });
 }
@@ -103,17 +128,29 @@ async function main() {
       mkdirSync(runDir, { recursive: true });
       const work = join(runDir, "work");
       cpSync(srcWork, work, { recursive: true, verbatimSymlinks: true, filter: (s) => !s.includes(".build") });
-      const fix = r.findings.length ? await runClaude(prompt(r.findings), work, runDir) : { wallMs: 0, costUsd: 0, durationMs: 0, turns: 0 };
+      const fix = r.findings.length
+        ? await runClaude(prompt(r.findings), work, runDir)
+        : { wallMs: 0, costUsd: 0, durationMs: 0, turns: 0 };
       const files = sourceFiles(work, r.lang).map((f) => ({ path: relative(work, f), content: readFileSync(f, "utf8") }));
       const result = {
-        task: r.task, lang: r.lang, condition: `${r.condition}+${suffix}`, rep: r.rep, reviewFindings: r.findings.length,
+        task: r.task,
+        lang: r.lang,
+        condition: `${r.condition}+${suffix}`,
+        rep: r.rep,
+        reviewFindings: r.findings.length,
         ruleCoveredFindings: r.findings.filter((f) => f.rule !== "none").length,
-        fix, build: { ok: true }, transcript: { ...(base?.transcript ?? {}), costUsd: fix.costUsd, durationMs: fix.durationMs },
-        hook: base?.hook ?? {}, original: { costUsd: base?.transcript?.costUsd, durationMs: base?.transcript?.durationMs }, files,
+        fix,
+        build: { ok: true },
+        transcript: { ...(base?.transcript ?? {}), costUsd: fix.costUsd, durationMs: fix.durationMs },
+        hook: base?.hook ?? {},
+        original: { costUsd: base?.transcript?.costUsd, durationMs: base?.transcript?.durationMs },
+        files,
       };
       writeFileSync(done, JSON.stringify(result, null, 2));
       results.push(result);
-      console.error(`fixed ${r.task} ${r.condition} r${r.rep}: ${r.findings.length} comments, $${fix.costUsd.toFixed(3)}, ${Math.round(fix.durationMs / 1000)}s`);
+      console.error(
+        `fixed ${r.task} ${r.condition} r${r.rep}: ${r.findings.length} comments, $${fix.costUsd.toFixed(3)}, ${Math.round(fix.durationMs / 1000)}s`,
+      );
     }
   };
   await Promise.all(Array.from({ length: Number(args.concurrency) }, worker));

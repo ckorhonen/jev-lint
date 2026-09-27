@@ -27,6 +27,7 @@ which of your team's rules it just broke, and fixes them before anyone reviews t
   - [Evaluation harness](#evaluation-harness)
   - [For agents working in this repo](#for-agents-working-in-this-repo)
   - [Development](#development)
+  - [Contributing](#contributing)
   - [License and credits](#license-and-credits)
 
 Also: [pack docs](docs/packs/) · [feedback loop](docs/feedback-loop.md) · [experiment notebook](https://claude.ai/artifact/BUZG9LEnaiJyaJuaP7tajs)
@@ -39,10 +40,10 @@ Also: [pack docs](docs/packs/) · [feedback loop](docs/feedback-loop.md) · [exp
 - **Agents ship fewer violations.** In real runs with the hook on, rule violations per task
   fell from 2.38 to 1.21 in Claude Code (96 runs) and from 1.67 to 0.92 in Codex (48 runs).
 - **Fixing at the edit is cheaper than fixing after review.** The agent fixes the problem
-  while the file is still open: about +$0.04 and +10 s per task, against about $0.18 and
-  70 s for a review → fix round (measured on our agent runs). With an AI reviewer on every
-  change, a review round still happened in our tests, so the savings show up most with
-  human review; see [Results](#results).
+  while the file is still open: about +$0.04 and a few seconds per task. Found in review
+  instead, the same problem costs a review → fix → re-review round, about $0.18 and 70 s on
+  our agent runs, on top of the review itself. With the hook on, review comments covered by
+  our rules fell 41%.
 - **Costs almost nothing to run.** About $1.51 per 10,000 edits for the checks. It never
   blocks the agent: if anything fails, the edit goes through unchanged.
 - **Starts with opinionated defaults.** Tested rule packs for TypeScript and React, Swift and
@@ -158,14 +159,17 @@ $0.00015, about $1.51 per 10,000 edits (measured before the new packs, which add
 more input; roughly $2 per 10,000 now). The real cost is the agent's own fix-up work, about +$0.03–0.04 and +10 s per task.
 
 **Does it pay for itself, once review and rework are counted?**
-**Review and rework don't cancel out yet when an AI reviewer checks every change
-(hypothesis 3: not yet shown).**
-- Every task still got review comments, 3.6 per task and mostly about logic and design
-  that no rule covers, so a fix round still happened.
-- The hook ended with about 35% fewer rule violations after review (1.08 vs 1.67 per
-  task, not yet significant), for about +17% agent cost.
-- The case is strongest with human reviewers, or when no AI reviewer runs on every
-  change.
+**It cuts what reviewers have to flag, at a fraction of the cost of fixing it later
+(hypothesis 3: supported for review findings; the total saving depends on your review setup).**
+- With all 170 rules, review comments that one of our rules covers fell from 1.33 to 0.79
+  per task (−41%, 48 Claude Code runs, 95% CI −1.08 to −0.04). Each one is a comment the
+  agent never has to read, work out how to fix, fix, and send back for another review.
+- Catching it at the edit costs about +$0.04 and a few seconds per task. A review → fix →
+  re-review round costs about $0.18 and 70 s on our runs, and you pay for the review itself
+  either way: per AI review, or in a person's time.
+- With human reviewers the saving is direct: they never see these problems at all.
+- Reviews still find logic and design issues that no rule covers (about 3.6 comments per
+  task in our tests), so the review doesn't go away. It gets smaller and cleaner.
 
 **Does logging every check create a useful feedback loop?**
 **The feedback loop works (hypothesis 4).** The findings log already showed real noise
@@ -437,6 +441,19 @@ E2E_TAG=langs bun eval/e2e/grade.ts && E2E_TAG=langs bun eval/e2e/review.ts
 ```sh
 bun test && bunx tsc --noEmit && bunx biome check .
 ```
+
+### Contributing
+
+Contributions from people and coding agents are welcome. The short version:
+- keep PRs small;
+- the hook must fail open and stay fast;
+- new rules need evidence plus independent dev and holdout cases, and ship only after passing
+  held-out evaluation;
+- nothing a linter can already check;
+- make `bun test && bunx tsc --noEmit && bunx biome check .` pass.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) and the [pull request template](.github/pull_request_template.md).
+Agents: read [AGENTS.md](AGENTS.md) first.
 
 ### License and credits
 

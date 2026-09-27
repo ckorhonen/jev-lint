@@ -147,9 +147,11 @@ function score(cases: Case[], judgments: Map<string, Judgment>, threshold: numbe
       const predicted = (j.scores[id] ?? 0) >= threshold;
       const actual = c.labels.includes(id);
       perRule[id] ??= { tp: 0, fp: 0, fn: 0 };
-      if (predicted && actual) total.tp++, perRule[id].tp++;
-      if (predicted && !actual) total.fp++, perRule[id].fp++;
-      if (!predicted && actual) total.fn++, perRule[id].fn++;
+      const outcome = predicted && actual ? "tp" : predicted ? "fp" : actual ? "fn" : undefined;
+      if (outcome) {
+        total[outcome]++;
+        perRule[id][outcome]++;
+      }
       anyFlag ||= predicted;
     }
     if (!c.labels.some((l) => ids.includes(l))) {

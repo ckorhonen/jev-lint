@@ -1,8 +1,6 @@
 {
   "language": "python",
-  "extensions": [
-    ".py"
-  ],
+  "extensions": [".py"],
   "rules": [
     {
       "id": "py-unscoped-object-lookup",
@@ -10,9 +8,7 @@
       "true": "An authenticated handler fetches a user-owned record by a client-supplied id with no ownership or permission check, so any signed-in user can read or change any record (IDOR/BOLA).",
       "false": "The query is scoped to the user or tenant (`user_id=current_user.id`, `request.user.invoices.get(...)`, `tenant_id=`), an object-level check runs on the record (`if obj.owner_id != user.id: raise`, `self.check_object_permissions`, `has_object_permission`, a policy call), the view relies on a scoped `get_queryset()`, the endpoint is admin-only by an explicit dependency or decorator, the resource is public by nature (published articles, product catalog), or the handler fetches the user's own record (`/me`).",
       "fix": "Scope the lookup to the current user or tenant (or run the object-level permission check) before returning or changing the record (OWASP API1:2023).",
-      "when": [
-        "current_user|request\\.user|get_current_user|Depends\\(|login_required|IsAuthenticated|auth"
-      ]
+      "when": ["current_user|request\\.user|get_current_user|Depends\\(|login_required|IsAuthenticated|auth"]
     },
     {
       "id": "py-secret-compare-eq",
@@ -20,9 +16,7 @@
       "true": "A secret or signature is checked with `==`/`!=`, which leaks timing information.",
       "false": "The comparison uses `hmac.compare_digest`, `secrets.compare_digest`, or a library verifier (`bcrypt.checkpw`, `argon2` `verify`, passlib `verify`, `stripe.Webhook.construct_event`, `jwt.decode`); or the values compared are not secrets (ids, status strings, usernames, content types, token *types*); or the code only checks that a secret is present (`if not token:`).",
       "fix": "Compare secrets with `hmac.compare_digest(a, b)` (Python docs, hmac).",
-      "when": [
-        "digest|signature|token|secret|api_?key|password|hmac"
-      ]
+      "when": ["digest|signature|token|secret|api_?key|password|hmac"]
     },
     {
       "id": "py-sec-ssrf",
@@ -51,9 +45,7 @@
       "true": "A client can set fields it should not control (role, ownership, tenant, billing, verification) through automatic binding (mass assignment, CWE-915).",
       "false": "The payload is a Pydantic model or DRF serializer/form with an explicit field list and the code writes its validated data (`**serializer.validated_data` inside a serializer's `create()`, `payload.model_dump(exclude_unset=True)` from a dedicated `...Update` schema); `fields = [...]` is explicit or privileged fields are `read_only_fields`; ownership is set server-side after binding; the form/serializer is used only in Django admin or for read-only output; the code is a management command, fixture, migration or test; or no request data is bound.",
       "fix": "List the editable fields explicitly (form/serializer `fields = [...]`, a dedicated Pydantic input schema) and set ownership/privilege fields server-side (Django ModelForm docs, 'Selecting the fields to use'; OWASP API3:2023).",
-      "when": [
-        "\\*\\*|setattr|__dict__|__all__|exclude\\s*=|\\.update\\(|values\\("
-      ]
+      "when": ["\\*\\*|setattr|__dict__|__all__|exclude\\s*=|\\.update\\(|values\\("]
     },
     {
       "id": "py-sec-unsafe-deserialization",
@@ -61,9 +53,7 @@
       "true": "Untrusted bytes reach a loader that can run arbitrary code during deserialization (CWE-502).",
       "false": "A safe format or mode is used (`json.loads`, `yaml.safe_load`, `yaml.load(..., Loader=yaml.SafeLoader)`, `torch.load(..., weights_only=True)` or its default in torch >= 2.6, `np.load` without `allow_pickle`, `safetensors`, `msgpack`); the data was produced by this service and stored where only it can write (its own cache backend, a model artifact built by the project's pipeline, a local checkpoint); the payload's HMAC is verified with `hmac.compare_digest` before loading; the code is a test or notebook using fixture files; or nothing is deserialized.",
       "fix": "Use JSON, `yaml.safe_load`, `safetensors` or `torch.load(weights_only=True)` for data from outside the service, or authenticate it with an HMAC before unpickling (Python pickle docs; OWASP Deserialization Cheat Sheet).",
-      "when": [
-        "pickle|dill|joblib|yaml|jsonpickle|marshal|shelve|torch\\.load|allow_pickle"
-      ]
+      "when": ["pickle|dill|joblib|yaml|jsonpickle|marshal|shelve|torch\\.load|allow_pickle"]
     },
     {
       "id": "py-sec-weak-password-hash",
@@ -71,9 +61,7 @@
       "true": "A password is stored or verified using a fast general-purpose hash, a static salt, plain text, or reversible encoding.",
       "false": "Also fine: password hashing with `argon2`/`argon2-cffi`, `bcrypt`, `scrypt` (`hashlib.scrypt`), `passlib` with argon2/bcrypt, Django's `make_password`/`check_password`, or `hashlib.pbkdf2_hmac` with a random salt and a high iteration count (hundreds of thousands); hashing non-password data (cache keys, file checksums, ETags, content fingerprints, HMAC signatures); or test code.",
       "fix": "Hash passwords with argon2id, bcrypt or scrypt (or Django's make_password) and verify with the library's constant-time check.",
-      "when": [
-        "passw|pwd|passphrase|secret|hashlib|md5|sha1|sha256|sha512"
-      ]
+      "when": ["passw|pwd|passphrase|secret|hashlib|md5|sha1|sha256|sha512"]
     }
   ]
 }
