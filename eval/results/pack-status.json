@@ -1446,7 +1446,7 @@
     "falsePositives": 0,
     "pass": false,
     "reasons": [
-      "real-code dry run: p=0.91 false alarm on a Levenshtein loop (SchoolLookup accreditation-matching.ts); C-grade evidence only"
+      "real-code dry run: p=0.91 false alarm on a string-distance (Levenshtein) loop in a private repo; C-grade evidence only"
     ]
   },
   "ts-perf-unbounded-fan-out": {

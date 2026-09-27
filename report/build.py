@@ -12,6 +12,7 @@ import base64
 import html
 import json
 import random
+import re
 import statistics as st
 import sys
 from pathlib import Path
@@ -631,6 +632,248 @@ for (label, cond, src, fixcond), p in zip(pipelines, PIPES):
     pipe_rows.append([label, f"{p['comments']:.2f} ({p['covered']:.2f})", f"${p['build_cost'] + p['fix_cost']:.3f}", cost,
                       f"{p['build_s'] + p['fix_s']:.0f} s", f"{p['before']:.2f} → {p['after']:.2f}", viol])
 
+# ---------------------------------------------------------------- Entry 7: rule packs, security, faster checks
+
+# 7.1 More rules per call. Current (pooled connection) run; the unpooled first run is kept as superseded.
+BENCH = load(RES / "bench-rule-count.json")
+BENCH_OLD = load(SNAP / "bench-rule-count-2026-09-27-unpooled-baseline.json")
+
+
+def bench(src, size, mode):
+    return next(r for r in src["summary"] if r["size"] == size and r["mode"] == mode)
+
+
+bench_targets = bench(BENCH, "targets", "targets-only")
+bench_own = st.mean(r["targets"] for r in BENCH["rows"] if r["mode"] == "targets-only")
+bench_groups = [(f"Own rules only (~{bench_own:.0f})", "targets"), ("Padded to 25", 25), ("Padded to 50", 50), ("Padded to 100", 100)]
+
+
+def bench_ms(size, mode):
+    if size == "targets":
+        return bench_targets["msP50"] if mode == "one-request" else None
+    return bench(BENCH, size, mode)["msP50"]
+
+
+chart_bench = grouped_bars(
+    bench_groups, [("One request", "one-request", "s1"), ("Split into parallel requests of 10 rules", "parallel-10", "s3")],
+    lambda g, m: bench_ms(g, m), "Median milliseconds per check by number of rules asked",
+    fmt=lambda v: f"{v:.0f}", max_v=700, ticks=(0, 175, 350, 525, 700), height=230,
+    tip_fn=lambda g, m, v: f"{m}, {g} rules: {v:.0f} ms median",
+)
+bench_rows = []
+for label, size in bench_groups:
+    for mode, mlabel in [("targets-only", "one request"), ("one-request", "one request"), ("parallel-10", "parallel, 10 per request")]:
+        if (size == "targets") != (mode == "targets-only"):
+            continue
+        r = bench(BENCH, size, mode)
+        bench_rows.append([label, mlabel, pct(r["targetF1"]), f"{r['msP50']:.0f} ms", f"{r['msP90']:.0f} ms", f"{r['tokensMean']:,.0f}", f"{r['maxAbsDrift']:.2f}"])
+bench_old_rows = []
+for size in (25, 50, 100):
+    for mode, mlabel in [("one-request", "one request"), ("parallel-10", "parallel, 10 per request")]:
+        a, b = bench(BENCH_OLD, size, mode), bench(BENCH, size, mode)
+        bench_old_rows.append([f"Padded to {size}", mlabel, f"{a['msP50']:.0f} ms", f"{b['msP50']:.0f} ms"])
+b100, p100 = bench(BENCH, 100, "one-request"), bench(BENCH, 100, "parallel-10")
+BENCH_F1_MIN = min(r["targetF1"] for r in BENCH["summary"] if r["size"] != "targets")
+BENCH_F1_MAX = max(r["targetF1"] for r in BENCH["summary"] if r["size"] != "targets")
+BENCH_DRIFT = max(r["maxAbsDrift"] for r in BENCH["summary"])
+
+# 7.2 New packs. Each rule is grouped by the pack it lives in now (21 security rules moved out of
+# practices after the holdout run; their scores come from the security holdout summary).
+PH = load(RES / "summary-packs-holdout.json")
+SH = load(RES / "summary-security-holdout.json")
+SM = load(RES / "summary-security-moved-holdout.json")
+PACK_STATUS = load(RES / "pack-status.json")
+BEFORE_PACKS = load(SNAP / "summary-2026-09-27-before-new-packs.json")
+V4 = load(RES / "summary-v4-holdout-jev.json")
+RULE_HOME = {}
+for f in sorted((ROOT / "rules").glob("*.json")):
+    parts = f.stem.split(".")
+    for r in load(f)["rules"]:
+        RULE_HOME[r["id"]] = ("hygiene" if len(parts) == 1 else parts[1], parts[0], r.get("status"))
+
+
+def per_rule(s, system, policy):
+    out = {}
+    for r in s["results"]:
+        if r["system"] == system and r["split"] == "holdout" and r["policy"] == policy:
+            out.update(r.get("perRule") or {})
+    return out
+
+
+def rule_ids(s):
+    return {k for r in s["results"] for k in (r.get("perRule") or {})}
+
+
+def passes(s, system, rid):
+    """Same bar as src/validate.ts and eval/pack-status.ts, set before these results."""
+    m, h = per_rule(s, system, "gated high+medium").get(rid), per_rule(s, system, "gated high").get(rid)
+    if not m:
+        return None
+    pah = h["tp"] / (h["tp"] + h["fp"]) if h and h["tp"] + h["fp"] else 1
+    return m["tp"] + m["fn"] >= 3 and pah >= 0.9 and m["precision"] >= 0.75 and m["recall"] >= 0.8
+
+
+NEW_CANDIDATES = sorted(rule_ids(PH) - rule_ids(BEFORE_PACKS) - rule_ids(V4))
+NEW_SECURITY = sorted(rule_ids(SH) - rule_ids(SM))
+MOVED_SECURITY = sorted(rule_ids(SM))
+pass_jev = [r for r in NEW_CANDIDATES if passes(PH, "jev", r)]
+pass_luna = [r for r in NEW_CANDIDATES if passes(PH, "llm", r)]
+sec_jev = [r for r in NEW_SECURITY if passes(SH, "jev", r)]
+sec_luna = [r for r in NEW_SECURITY if passes(SH, "llm", r)]
+moved_same = all(per_rule(SM, "jev", "gated high+medium")[r] == per_rule(PH, "jev", "gated high+medium")[r] for r in MOVED_SECURITY)
+moved_pass_same = all(passes(SM, "jev", r) == passes(PH, "jev", r) for r in MOVED_SECURITY)
+if not (moved_same and moved_pass_same):
+    raise SystemExit("moved security rules changed score; update the Entry 7 prose")
+live = {}
+for rid, (pack, _, status) in RULE_HOME.items():
+    if status != "candidate":
+        live[pack] = live.get(pack, 0) + 1
+PACK_ORDER = ["hygiene", "practices", "security", "tests", "performance"]
+
+
+def pack_f1(system, pack):
+    src = SH if pack == "security" else PH
+    tp = fp = fn = 0
+    for rid, v in per_rule(src, system, "gated high+medium").items():
+        if RULE_HOME.get(rid, (None,))[0] != pack:
+            continue
+        tp, fp, fn = tp + v["tp"], fp + v["fp"], fn + v["fn"]
+    p, r = tp / (tp + fp), tp / (tp + fn)
+    return {"f1": 2 * p * r / (p + r), "p": p, "r": r, "rules": sum(1 for rid in per_rule(src, system, "gated high+medium") if RULE_HOME.get(rid, (None,))[0] == pack)}
+
+
+PF = {(s, p): pack_f1(s, p) for s in ("jev", "llm") for p in PACK_ORDER}
+chart_packs = grouped_bars(
+    [(p.title(), p) for p in PACK_ORDER], [("Jev, both tiers (gated)", "jev", "s1"), ("GPT-6-Luna (low, gated)", "llm", "s3")],
+    lambda p, s: PF[(s, p)]["f1"], "Held-out F1 by pack, Jev vs GPT-6-Luna, all evaluated rules",
+    max_v=1.0, ticks=(0, 0.25, 0.5, 0.75, 1.0), height=230,
+    tip_fn=lambda p, s, v: f"{s} · {p}: F1 {pct(v, 1)}, precision {pct(PF[(s, p)]['p'], 1)}, recall {pct(PF[(s, p)]['r'], 1)} over {PF[(s, p)]['rules']} rules",
+)
+pack_rows = []
+for p in PACK_ORDER:
+    a, b = PF[("jev", p)], PF[("llm", p)]
+    pack_rows.append([p.title(), str(a["rules"]), str(live.get(p, 0)), f"{pct(a['p'])} / {pct(a['r'])}", pct(a["f1"], 1), f"{pct(b['p'])} / {pct(b['r'])}", pct(b["f1"], 1)])
+cand_rows = []
+for rid, (pack, lang, status) in sorted(RULE_HOME.items(), key=lambda kv: (kv[1][0], kv[0])):
+    if status != "candidate":
+        continue
+    s = PACK_STATUS[rid]
+    # Drop parentheticals: the dry-run reason names a private repo's file.
+    reasons = "; ".join(esc(re.sub(r"\s*\([^)]*\)", "", x)) for x in s["reasons"])
+    cand_rows.append([f"<code>{rid}</code>", f"{pack} · {lang}", f"{s['positives']}", pct(s["precision"]), pct(s["recall"]), reasons])
+CM = PACK_STATUS["swift-continuation-misuse"]
+CM_B1 = per_rule(load(RES / "summary-packs-holdout-b1.json"), "jev", "gated high+medium")["swift-continuation-misuse"]
+
+# 7.3 End to end with the new packs.
+GP = load(RES / "e2e-graded-packs.json")
+RP = load(RES / "e2e-review-packs.json")
+
+
+def e7(rows, cond, metric):
+    return st.mean(metric(r) for r in rows if r["condition"] == cond)
+
+
+def e7_ci(rows, metric):
+    return paired_diff(rows, "jev-rewake", metric)
+
+
+tv = lambda r: r["totalViolations"]
+covered = lambda r: sum(x["rule"] != "none" for x in r["findings"])
+allf = lambda r: len(r["findings"])
+wall = lambda r: r["wallMs"] / 1000
+cost = lambda r: r["transcript"]["costUsd"]
+E7_METRICS = [
+    ("Graded rule violations / task, all tasks", GP, tv, None, 2),
+    ("… SwiftUI tasks", GP, tv, "swift", 2),
+    ("… React tasks", GP, tv, "typescript", 2),
+    ("Reviewer findings a rule covers / task", RP, covered, None, 2),
+    ("All reviewer findings / task", RP, allf, None, 2),
+    ("Agent cost / task", GP, cost, None, "$"),
+    ("Wall time / task", GP, wall, None, "s"),
+]
+E7 = {}
+e7_rows = []
+for label, src, metric, lang, fmt in E7_METRICS:
+    rows = [r for r in src if lang is None or r["lang"] == lang]
+    a, b = e7(rows, "none", metric), e7(rows, "jev-rewake", metric)
+    d = e7_ci(rows, metric)
+    E7[label] = (a, b, d)
+    f = (lambda v: f"${v:.2f}") if fmt == "$" else (lambda v: f"{v:.0f} s") if fmt == "s" else (lambda v: f"{v:.2f}")
+    fd = (lambda v: f"{v:+.2f}") if fmt in ("$", 2) else (lambda v: f"{v:+.0f}")
+    e7_rows.append([label, f(a), f(b), f"{fd(d[0])} ({fd(d[1])} to {fd(d[2])})", f"{d[3]} / {d[4]} / {len(rows) // 2 - d[3] - d[4]}"])
+chart_e7 = grouped_bars(
+    [("All tasks", None), ("SwiftUI tasks", "swift"), ("React tasks", "typescript")],
+    [("No hook", "none", "s4"), ("Jev, async rewake, all packs", "jev-rewake", "s1")],
+    lambda lang, c: e7([r for r in GP if lang is None or r["lang"] == lang], c, tv),
+    "Graded rule violations per task in final code, all packs", fmt=lambda v: f"{v:.2f}", max_v=3, ticks=(0, 1, 2, 3), height=220,
+)
+E7_HOOK = [r for r in GP if r["condition"] == "jev-rewake"]
+E7_CALLS, E7_ERRS = sum(r["hook"]["calls"] for r in E7_HOOK), sum(r["hook"]["errors"] for r in E7_HOOK)
+E7_HIGH, E7_MED = sum(r["hook"]["highShown"] for r in E7_HOOK), sum(r["hook"]["mediumShown"] for r in E7_HOOK)
+E7_HOOK_MS = st.mean(r["hook"]["meanLatencyMs"] for r in E7_HOOK if r["hook"]["calls"])
+E5_NONE = st.mean(r["totalViolations"] for r in G5 if r["condition"] == "none")
+
+# 7.4 Fine-tuned Kev-4B. Same held-out cases as the stock gated run plus the test-validity cases;
+# F1 is pooled over rules, excluding the two test-validity rules the stock run never saw.
+KEV_FT = load(RES / "summary-local-kev-4b-ft.json")
+TEST_RULES = {"ts-test-cannot-fail", "swift-test-cannot-fail"}
+
+
+def pooled_f1(s, system, pack, lang, policy, keep):
+    r = res(s, system, pack, lang, "holdout", policy)
+    tp = fp = fn = 0
+    for rid, v in r["perRule"].items():
+        if keep(rid):
+            tp, fp, fn = tp + v["tp"], fp + v["fp"], fn + v["fn"]
+    p, rc = (tp / (tp + fp) if tp + fp else 1), (tp / (tp + fn) if tp + fn else 1)
+    return 2 * p * rc / (p + rc) if p + rc else 0
+
+
+not_test = lambda rid: rid not in TEST_RULES
+FT = {
+    g: {"ft": pooled_f1(KEV_FT, "local", g[0], g[1], "high+medium", not_test),
+        "stock": pooled_f1(kev_after, "local", g[0], g[1], "high+medium", not_test),
+        "jev": pooled_f1(summary5, "jev", g[0], g[1], "gated high+medium", not_test),
+        "tests": pooled_f1(KEV_FT, "local", g[0], g[1], "high+medium", lambda rid: rid in TEST_RULES) if g[0] == "practices" else None,
+        "p50": res(KEV_FT, "local", g[0], g[1], "holdout", "high+medium")["latency"]["p50"] / 1000}
+    for _, g in headline_groups
+}
+chart_ft = grouped_bars(
+    headline_groups, [("Kev-4B stock, gated (Entry 5)", "stock", "s3"), ("Kev-4B fine-tuned", "ft", "s2"), ("Jev, gated", "jev", "s1")],
+    lambda g, k: FT[g][k], "Held-out F1, both tiers: stock vs fine-tuned Kev-4B vs Jev (test-validity rules excluded)",
+)
+ft_rng = lambda k, packs: (min(FT[g][k] for _, g in headline_groups if g[0] in packs), max(FT[g][k] for _, g in headline_groups if g[0] in packs))
+FT_TESTS = [FT[g]["tests"] for _, g in headline_groups if g[0] == "practices"]
+FT_P50 = [FT[g]["p50"] for _, g in headline_groups]
+ft_range = lambda k, pack: "–".join(dict.fromkeys(f"{v * 100:.0f}" for v in ft_rng(k, (pack,)))) + "%"
+
+# 7.6 Onboarding skill eval. The fixtures and per-run results are private; only anonymised
+# aggregates are published. When the private result files exist, check the aggregates still match.
+SKILL = {"v1": {"runs": 10, "done": 10, "rules": 10.3, "rules_min": 4, "cov": 0.35, "cov_min": 0.18, "research": 0, "tests": 0, "cost": 3.00},
+         "v2": {"runs": 10, "done": 9, "rules": 12.3, "rules_min": 8, "cov": 0.39, "cov_min": 0.35, "research": 9, "tests": 2, "cost": 3.10}}
+SKILL_DIR = Path.home() / ".local/share/jev-lint/skill-evals/results"
+for key, fname in (("v1", "baseline-claude.json"), ("v2", "v2-claude.json")):
+    p = SKILL_DIR / fname
+    if not p.exists():
+        continue
+    rs = load(p)["results"]
+    done = [r for r in rs if r.get("rules") is not None and r.get("conventionRecall") is not None]
+    got = {"runs": len(rs), "done": len(done), "rules": round(st.mean(r["rules"] for r in done), 1), "rules_min": min(r["rules"] for r in done),
+           "cov": round(st.mean(r["conventionRecall"] for r in done), 2), "cov_min": round(min(r["conventionRecall"] for r in done), 2),
+           "research": sum((r.get("researched") or 0) > 0 for r in done), "tests": sum(bool(r.get("testValidity")) for r in done),
+           "cost": round(st.mean(r["costUsd"] for r in done), 2)}
+    if got != SKILL[key]:
+        raise SystemExit(f"skill eval aggregates changed for {key}: {got}")
+S1, S2 = SKILL["v1"], SKILL["v2"]
+skill_rows = [
+    ["Runs that finished", f"{S1['done']} of {S1['runs']}", f"{S2['done']} of {S2['runs']} (one hit the 30-minute cap)"],
+    ["Rules proposed per run, mean (min)", f"{S1['rules']:.1f} ({S1['rules_min']})", f"{S2['rules']:.1f} ({S2['rules_min']})"],
+    ["Jev-checkable conventions covered, mean (min)", f"{pct(S1['cov'])} ({pct(S1['cov_min'])})", f"{pct(S2['cov'])} ({pct(S2['cov_min'])})"],
+    ["Runs that did web research", f"{S1['research']} of {S1['done']}", f"{S2['research']} of {S2['done']}"],
+    ["Runs that proposed a test-validity rule", f"{S1['tests']} of {S1['done']}", f"{S2['tests']} of {S2['done']}"],
+    ["Agent cost per finished run", f"${S1['cost']:.2f}", f"${S2['cost']:.2f}"],
+]
+
 # ---------------------------------------------------------------- page
 
 N = lambda x: f"{x:.2f}"
@@ -682,6 +925,42 @@ ctx = dict(
     N_P_DEV=str(sum(v for k, v in summary["caseCounts"].items() if k.startswith("practices") and k.endswith("dev"))),
     N_P_HO=str(sum(v for k, v in summary["caseCounts"].items() if k.startswith("practices") and k.endswith("holdout"))),
     N_H_ALL=str(sum(v for k, v in summary["caseCounts"].items() if k.startswith("hygiene"))),
+    # Entry 7
+    CHART_BENCH=chart_bench,
+    BENCH_TABLE7=table(["Rules asked", "Mode", "Target F1", "Median", "p90", "Input tokens / check", "Largest probability shift"], bench_rows),
+    BENCH_OLD_TABLE=table(["Rules asked", "Mode", "First run, new connection per request (superseded)", "Rerun, pooled connection"], bench_old_rows),
+    BENCH_OWN=f"{bench_own:.0f}", BENCH_N=str(BENCH["cases"]),
+    BENCH_F1_RANGE=f"{BENCH_F1_MIN * 100:.0f}–{BENCH_F1_MAX * 100:.0f}%", BENCH_F1_OWN=pct(bench_targets["targetF1"]),
+    BENCH_P50_OWN=f"{bench_targets['msP50']:.0f}", BENCH_P50_100=f"{b100['msP50']:.0f}", BENCH_P50_100P=f"{p100['msP50']:.0f}",
+    BENCH_TOK_PAR=f"{(p100['tokensMean'] / b100['tokensMean'] - 1) * 100:+.0f}%", BENCH_DRIFT=f"{BENCH_DRIFT:.2f}",
+    BENCH_OLD_OWN=f"{bench(BENCH_OLD, 'targets', 'targets-only')['msP50']:.0f}", BENCH_OLD_100=f"{bench(BENCH_OLD, 100, 'one-request')['msP50']:.0f}",
+    N_CAND=str(len(NEW_CANDIDATES)), N_CAND_JEV=str(len(pass_jev)), N_CAND_LUNA=str(len(pass_luna)),
+    N_SEC=str(len(NEW_SECURITY)), N_SEC_JEV=str(len(sec_jev)), N_SEC_LUNA=str(len(sec_luna)), N_MOVED=str(len(MOVED_SECURITY)),
+    LIVE_H=str(live["hygiene"]), LIVE_P=str(live["practices"]), LIVE_S=str(live["security"]), LIVE_T=str(live["tests"]), LIVE_PF=str(live["performance"]),
+    LIVE_ALL=str(sum(live.values())), N_CANDIDATES_NOW=str(len(cand_rows)),
+    CHART_PACKS=chart_packs,
+    PACK_TABLE=table(["Pack", "Rules evaluated", "Rules live", "Jev P / R", "Jev F1", "Luna P / R", "Luna F1"], pack_rows),
+    CAND_TABLE=table(["Candidate rule", "Pack · language", "Held-out positives", "Precision (p ≥ 0.5)", "Recall (p ≥ 0.5)", "Why it's held back"], cand_rows),
+    CM_P=pct(CM["precision"]), CM_PH=pct(CM["precisionAtHigh"]), CM_R=pct(CM["recall"]), CM_FP=str(CM["falsePositives"]),
+    CM_B1_P=pct(CM_B1["precision"]), CM_B1_FP=str(CM_B1["fp"]),
+    CHART_E7=chart_e7,
+    E7_TABLE=table(["Measure", "No hook", "Jev async, all packs", "Change (95% CI)", "Better / worse / tie"], e7_rows),
+    E7_V_NONE=N(E7["Graded rule violations / task, all tasks"][0]), E7_V_JEV=N(E7["Graded rule violations / task, all tasks"][1]),
+    E7_V_PCT=f"{(E7['Graded rule violations / task, all tasks'][1] / E7['Graded rule violations / task, all tasks'][0] - 1) * 100:.0f}%".replace("-", "−"),
+    E7_COST_NONE=f"${E7['Agent cost / task'][0]:.2f}", E7_COST_JEV=f"${E7['Agent cost / task'][1]:.2f}",
+    E7_COST_PCT=f"{(E7['Agent cost / task'][1] / E7['Agent cost / task'][0] - 1) * 100:+.0f}%",
+    E7_WALL_D=f"{E7['Wall time / task'][2][0]:+.0f}",
+    E7_V_ABS=f"{abs(E7['Graded rule violations / task, all tasks'][1] / E7['Graded rule violations / task, all tasks'][0] - 1) * 100:.0f}%",
+    E7_COST_ABS=f"{(E7['Agent cost / task'][1] / E7['Agent cost / task'][0] - 1) * 100:.0f}%", E7_WALL_ABS=f"{E7['Wall time / task'][2][0]:.0f}",
+    BENCH_TOK_ABS=f"{(p100['tokensMean'] / b100['tokensMean'] - 1) * 100:.0f}%",
+    E7_CALLS=str(E7_CALLS), E7_ERRS=str(E7_ERRS), E7_HIGH=str(E7_HIGH), E7_MED=str(E7_MED), E7_HOOK_MS=f"{E7_HOOK_MS:.0f}",
+    E7_N=str(len(GP)), E5_NONE=N(E5_NONE),
+    CHART_FT=chart_ft,
+    FT_H=ft_range("ft", "hygiene"), FT_P=ft_range("ft", "practices"), FT_STOCK_H=ft_range("stock", "hygiene"), FT_STOCK_P=ft_range("stock", "practices"),
+    FT_JEV_H=ft_range("jev", "hygiene"), FT_JEV_P=ft_range("jev", "practices"),
+    FT_TESTS="–".join(f"{v * 100:.0f}" for v in sorted(FT_TESTS)) + "%", FT_P50=f"{min(FT_P50):.1f}–{max(FT_P50):.1f}",
+    FT_FA="{:.0f}–{:.0f}%".format(*(f(res(KEV_FT, "local", g[0], g[1], "holdout", "high+medium")["cleanFalseAlarmRate"] * 100 for _, g in headline_groups) for f in (min, max))),
+    SKILL_TABLE=table(["Measure (5 repos × 2 runs)", "v1 skill", "v2 skill"], skill_rows),
 )
 
 page = (ROOT / "report/notebook.html").read_text()
