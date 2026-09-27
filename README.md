@@ -153,6 +153,16 @@ With all 170 rules, a new round of 48 Claude Code runs showed the same drop: 2.7
 per task (−1.17, 95% CI −2.12 to −0.29). The starting point is higher only because there
 are more rules to check.
 
+**Does checking before the write do better than after?** Slightly, but not significantly.
+Same 12 tasks, 24 runs per condition (the before-the-write runs came a few hours after the
+others): violations per task were 2.42 with the hook off, 1.62 checking after the write (async),
+and 1.25 checking before it. That's −33% and −48%, both significant against no hook. The
+difference between the two modes (−0.38, 95% CI −1.25 to +0.42) is not significant. Both cost
+about +$0.04 per task. The before-the-write mode blocked an edit in 17 of 24 runs (0.7 blocks per
+task), never deadlocked, and every run still built. The bad patch has already been generated
+either way, so checking earlier doesn't save those tokens. What does is feedback before the agent
+plans, which is what the [feedback loop](docs/feedback-loop.md) is for.
+
 **Is it cheap enough to run on every edit?**
 **Cost per check is negligible (hypothesis 2: supported).** Each check costs roughly
 $0.00015, about $1.51 per 10,000 edits (measured before the new packs, which add about 30%
@@ -234,6 +244,18 @@ Or by hand:
 
 `--skills` links the skills into `~/.agents/skills`, `~/.claude/skills` and `~/.codex/skills`,
 so they're available in every repo.
+
+**Before the write (Claude Code):** install the same command on `PreToolUse` instead of
+`PostToolUse`. The hook then checks each edit before it's applied. A high-confidence finding
+blocks the edit, and the agent rewrites it; double-check findings pass through as hints. The
+same rule can block the same file at most twice per conversation, so a false alarm can't
+deadlock the agent. In our benchmark (below) it matched the async after-the-write mode on cost
+and did slightly better on violations, though the difference wasn't significant.
+
+```json
+{ "PreToolUse": [{ "matcher": "Write|Edit|MultiEdit",
+  "hooks": [{ "type": "command", "command": "JEV_LINT_MODEL=jev-1.13.0 bun ~/Repos/jev-lint/src/hook.ts", "timeout": 15 }] }] }
+```
 
 **Async (Claude Code only):** to keep the agent from waiting on the check (useful with a slower
 local judge), run it in the background and let findings wake the agent:

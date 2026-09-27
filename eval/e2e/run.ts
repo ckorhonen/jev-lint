@@ -30,13 +30,15 @@ const { values: args } = parseArgs({
 type Task = { id: string; lang: Lang; scaffold?: string; prompt: string };
 // Conditions: which judge, and whether the hook blocks the agent (sync) or runs in the
 // background and wakes it with findings (Claude Code `asyncRewake`; Codex has no rewake).
-type Condition = "none" | "jev" | "jev-high" | "jev-rewake" | "kev-rewake";
+type Condition = "none" | "jev" | "jev-high" | "jev-rewake" | "kev-rewake" | "jev-pre";
 const KEV_URL = process.env.KEV_URL ?? "http://127.0.0.1:8009";
 
 const HOOK_ENV: Record<Exclude<Condition, "none">, string> = {
   jev: "JEV_LINT_TIERS=high,medium",
   "jev-high": "JEV_LINT_TIERS=high",
   "jev-rewake": "JEV_LINT_MODE=rewake",
+  // Before the write: a PreToolUse hook that denies edits with high-confidence findings.
+  "jev-pre": "JEV_LINT_TIERS=high,medium",
   "kev-rewake": `JEV_LINT_MODE=rewake TYPESAFE_BASE_URL=${KEV_URL} JEV_LINT_TIMEOUT_MS=120000`,
 };
 const isRewake = (c: Condition) => c.endsWith("-rewake");
@@ -50,7 +52,8 @@ function settingsFor(condition: Condition, runDir: string) {
   const hook = isRewake(condition)
     ? { type: "command", command: hookCommand(condition, runDir), timeout: 180, asyncRewake: true }
     : { type: "command", command: hookCommand(condition, runDir), timeout: 15 };
-  return { hooks: { PostToolUse: [{ matcher: "Write|Edit|MultiEdit", hooks: [hook] }] } };
+  const event = condition === "jev-pre" ? "PreToolUse" : "PostToolUse";
+  return { hooks: { [event]: [{ matcher: "Write|Edit|MultiEdit", hooks: [hook] }] } };
 }
 
 // Codex: an isolated CODEX_HOME per run with the user's model settings, a symlink to the
@@ -184,6 +187,7 @@ function transcriptStats(runDir: string) {
   const lines = readFileSync(join(runDir, "transcript.jsonl"), "utf8").split("\n").filter(Boolean);
   let edits = 0;
   let rewakes = 0;
+  let preBlocks = 0;
   let result: Record<string, unknown> = {};
   for (const line of lines) {
     let msg: any;
@@ -204,7 +208,9 @@ function transcriptStats(runDir: string) {
       };
     }
     // Claude Code asyncRewake: findings arrive later as a message that quotes the hook's stderr.
-    if (msg.type !== "assistant" && line.includes("jev-lint:")) rewakes++;
+    if (msg.type !== "assistant" && line.includes("jev-lint:") && !line.includes("before applying it")) rewakes++;
+    // Pre-write mode: a denied edit comes back as a tool error carrying the hook's reason.
+    if (msg.type !== "assistant" && line.includes("jev-lint checked this edit before applying it")) preBlocks++;
     if (msg.type === "assistant") {
       for (const block of msg.message?.content ?? []) {
         if (block.type === "tool_use" && ["Write", "Edit", "MultiEdit"].includes(block.name)) {
@@ -216,6 +222,7 @@ function transcriptStats(runDir: string) {
   return {
     edits,
     rewakes,
+    preBlocks,
     codexTokens: result.codex_input_tokens
       ? { input: Number(result.codex_input_tokens), cached: Number(result.codex_cached_tokens), output: Number(result.codex_output_tokens) }
       : undefined,
