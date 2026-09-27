@@ -10,13 +10,23 @@ import { existsSync, readFileSync } from "node:fs";
 import { extname, join, resolve } from "node:path";
 import { parseArgs } from "node:util";
 import { askNouls } from "./jev";
-import { buildQuestions, type RuleSet } from "./lint";
+import { buildQuestions, type RuleSet, ruleApplies, rulePathsMatch } from "./lint";
 import { loadRepoDir } from "./repoRules";
 
 const BAR = { minPositives: 3, minNegatives: 2, precisionAtHigh: 0.9, recallAtMedium: 0.8, precisionAtMedium: 0.75 };
 
 type Case = { id: string; file_path: string; code: string; labels: string[] };
-type Counts = { pos: number; neg: number; tpHigh: number; fpHigh: number; tpMed: number; fpMed: number; fnMed: number };
+type Counts = {
+  pos: number;
+  neg: number;
+  gatedMisses: number;
+  pathMisses: number;
+  tpHigh: number;
+  fpHigh: number;
+  tpMed: number;
+  fpMed: number;
+  fnMed: number;
+};
 
 const { values: args, positionals } = parseArgs({ allowPositionals: true, options: { json: { type: "boolean", default: false } } });
 const dir = resolve(positionals[0] ?? ".jev-lint");
@@ -35,7 +45,8 @@ const setFor = (filePath: string): RuleSet | undefined => ruleSets.find((s) => s
 
 const counts: Record<string, Counts> = {};
 for (const set of ruleSets)
-  for (const r of set.rules) counts[r.id] = { pos: 0, neg: 0, tpHigh: 0, fpHigh: 0, tpMed: 0, fpMed: 0, fnMed: 0 };
+  for (const r of set.rules)
+    counts[r.id] = { pos: 0, neg: 0, gatedMisses: 0, pathMisses: 0, tpHigh: 0, fpHigh: 0, tpMed: 0, fpMed: 0, fnMed: 0 };
 
 let cleanCases = 0;
 let cleanFlagged = 0;
@@ -51,8 +62,20 @@ const worker = async () => {
       const p = answers[r.id]?.noul ?? 0;
       const actual = c.labels.includes(r.id);
       const k = counts[r.id];
+      // Cases' file_path is repo-relative. Out-of-scope files are never asked: a labeled
+      // positive there is a miss the rule's `paths` caused; a negative there proves nothing.
+      if (!rulePathsMatch(r, c.file_path)) {
+        if (actual) {
+          k.pos++;
+          k.fnMed++;
+          k.pathMisses++;
+        }
+        continue;
+      }
       if (actual) k.pos++;
       else k.neg++;
+      // The hook never asks a rule whose `when` gate doesn't match, so a gated-out positive is a miss.
+      if (actual && !ruleApplies(r, c.code)) k.gatedMisses++;
       if (p >= 0.8) actual ? k.tpHigh++ : k.fpHigh++;
       if (p >= 0.5) actual ? k.tpMed++ : k.fpMed++;
       if (p < 0.5 && actual) k.fnMed++;
@@ -82,6 +105,8 @@ const report = Object.entries(counts).map(([id, k]) => {
     if (precisionMed !== null && precisionMed < BAR.precisionAtMedium)
       reasons.push(`precision at p≥0.5 is ${(precisionMed * 100).toFixed(0)}%`);
     if ((recallMed ?? 0) < BAR.recallAtMedium) reasons.push(`recall at p≥0.5 is ${((recallMed ?? 0) * 100).toFixed(0)}%`);
+    if (k.pathMisses) reasons.push(`\`paths\` exclude ${k.pathMisses} positive case(s); widen them or fix the case's file_path`);
+    if (k.gatedMisses) reasons.push(`\`when\` gate skips ${k.gatedMisses} positive case(s); widen it`);
     if (reasons.length) verdict = "reword-or-drop";
   }
   return { id, ...k, precisionHigh, precisionMed, recallMed, verdict, reasons };

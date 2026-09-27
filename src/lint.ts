@@ -1,4 +1,4 @@
-import { extname, isAbsolute, resolve } from "node:path";
+import { dirname, extname, isAbsolute, relative, resolve } from "node:path";
 import swiftRules from "../rules/swift.json";
 import swiftPractices from "../rules/swift.practices.json";
 import typescriptRules from "../rules/typescript.json";
@@ -9,7 +9,9 @@ import { findRepoConfig } from "./repoRules";
 
 // `when`: optional regex sources (case-insensitive). The rule is only asked when one of
 // them matches the added code — a cheap, recall-safe gate that cuts model calls.
-export type Rule = { id: string; question: string; true: string; false: string; fix: string; when?: string[] };
+// `paths`: optional globs relative to the repo root (the directory holding .jev-lint/). The rule
+// is only asked for files matching one of them, e.g. ["src/routes/**", "**/*.tsx"].
+export type Rule = { id: string; question: string; true: string; false: string; fix: string; when?: string[]; paths?: string[] };
 export type RuleSet = { language: string; extensions: string[]; rules: Rule[] };
 export type Tier = "high" | "medium";
 export type Finding = { ruleId: string; probability: number; tier: Tier; fix: string };
@@ -51,7 +53,8 @@ const MAX_ADDED_CHARS = 24_000;
 export function ruleSetFor(filePath: string, packs?: Pack[], cwd = process.cwd()): RuleSet | undefined {
   const ext = extname(filePath).toLowerCase();
   const wantsRepo = !packs || packs.includes("repo");
-  const repo = wantsRepo ? findRepoConfig(isAbsolute(filePath) ? filePath : resolve(cwd, filePath)) : undefined;
+  const absolute = isAbsolute(filePath) ? filePath : resolve(cwd, filePath);
+  const repo = wantsRepo ? findRepoConfig(absolute) : undefined;
   const chosen = packs ?? ((repo?.packs as Pack[] | undefined) || DEFAULT_PACKS);
   const sets = chosen
     .flatMap((pack) => (pack === "repo" ? (repo?.ruleSets ?? []) : builtIn(pack)))
@@ -59,8 +62,24 @@ export function ruleSetFor(filePath: string, packs?: Pack[], cwd = process.cwd()
   // Later packs can't redefine an id already asked; repo rules should use their own prefix.
   const seen = new Set<string>();
   const merged = mergeRuleSets(sets);
-  if (merged) merged.rules = merged.rules.filter((r) => !seen.has(r.id) && seen.add(r.id));
+  const relPath = repo ? relative(dirname(repo.dir), absolute) : filePath;
+  const off = (r: Rule) =>
+    repo?.disable?.includes(r.id) || repo?.skipPaths?.[r.id]?.some((glob) => matchesGlob(glob, relPath)) || !rulePathsMatch(r, relPath);
+  if (merged) merged.rules = merged.rules.filter((r) => !off(r) && !seen.has(r.id) && seen.add(r.id));
   return merged?.rules.length ? merged : undefined;
+}
+
+// Glob match with Bun.Glob; an invalid glob never matches rather than breaking the hook.
+export function matchesGlob(glob: string, path: string): boolean {
+  try {
+    return new Bun.Glob(glob).match(path);
+  } catch {
+    return false;
+  }
+}
+
+export function rulePathsMatch(rule: Rule, relPath: string): boolean {
+  return !rule.paths?.length || rule.paths.some((glob) => matchesGlob(glob, relPath));
 }
 
 const gateCache = new Map<string, RegExp[]>();

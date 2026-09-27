@@ -1,7 +1,11 @@
 // Repo-local rule packs: the nearest `.jev-lint/` directory above an edited file.
 //
 //   .jev-lint/
-//     config.json          optional: { "packs": ["repo", "practices"] } picks packs for this repo
+//     config.json          optional: { "packs": ["repo", "practices"],       picks packs for this repo
+//                                     "disable": ["ts-no-magic-numbers"],      turns off single rules (built-in or repo)
+//                                     "skipPaths": { "ts-no-magic-numbers": ["**/*.test.ts"] } }
+//                          skipPaths globs match the file path relative to the repo (the .jev-lint parent);
+//                          a rule's own "paths" globs narrow where it applies the same way
 //     <name>.rules.json    same shape as rules/*.json: { language, extensions, rules: [...] }
 //     cases.jsonl          optional labeled examples, used by `bun src/validate.ts`
 //
@@ -11,7 +15,7 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { dirname, join, parse } from "node:path";
 import type { Rule, RuleSet } from "./lint";
 
-export type RepoConfig = { dir: string; packs?: string[]; ruleSets: RuleSet[] };
+export type RepoConfig = { dir: string; packs?: string[]; disable?: string[]; skipPaths?: Record<string, string[]>; ruleSets: RuleSet[] };
 
 const cache = new Map<string, RepoConfig | null>();
 
@@ -30,20 +34,34 @@ export function loadRepoDir(dir: string): RepoConfig {
     try {
       const parsed = JSON.parse(readFileSync(join(dir, name), "utf8")) as Partial<RuleSet>;
       if (typeof parsed.language !== "string" || !Array.isArray(parsed.extensions) || !Array.isArray(parsed.rules)) continue;
-      const rules = parsed.rules.filter(isRule).map((r) => ({ ...r, fix: r.fix ?? "" }));
+      const rules = parsed.rules
+        .filter(isRule)
+        .map((r) => ({ ...r, fix: r.fix ?? "", paths: Array.isArray(r.paths) ? r.paths.filter((g) => typeof g === "string") : undefined }));
       ruleSets.push({ language: parsed.language, extensions: parsed.extensions.map((e) => e.toLowerCase()), rules });
     } catch {
       // A malformed repo file must never break the hook; skip it.
     }
   }
   let packs: string[] | undefined;
+  let disable: string[] | undefined;
+  let skipPaths: Record<string, string[]> | undefined;
+  const strings = (v: unknown) => (Array.isArray(v) ? v.filter((x): x is string => typeof x === "string") : undefined);
   try {
-    const config = JSON.parse(readFileSync(join(dir, "config.json"), "utf8")) as { packs?: unknown };
-    if (Array.isArray(config.packs)) packs = config.packs.filter((p): p is string => typeof p === "string");
+    const config = JSON.parse(readFileSync(join(dir, "config.json"), "utf8")) as {
+      packs?: unknown;
+      disable?: unknown;
+      skipPaths?: unknown;
+    };
+    packs = strings(config.packs);
+    disable = strings(config.disable);
+    if (config.skipPaths && typeof config.skipPaths === "object") {
+      skipPaths = {};
+      for (const [rule, globs] of Object.entries(config.skipPaths)) skipPaths[rule] = strings(globs) ?? [];
+    }
   } catch {
     // config.json is optional
   }
-  return { dir, packs, ruleSets };
+  return { dir, packs, disable, skipPaths, ruleSets };
 }
 
 // Walks up from the file's directory to the filesystem root.

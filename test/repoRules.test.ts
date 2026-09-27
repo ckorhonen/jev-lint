@@ -72,4 +72,32 @@ describe("files outside the working repo are skipped", () => {
     expect(isInsideRepo("/private/tmp/claude-501/scratchpad/dbg.ts", repo)).toBe(false);
     expect(isInsideRepo(join(root, "elsewhere/x.ts"), repo)).toBe(false);
   });
+
+  test("config.json disable and skipPaths turn off single rules", () => {
+    const repo = makeRepo("h", {
+      disable: ["ts-no-explicit-any"],
+      skipPaths: { "ts-no-magic-numbers": ["**/*.test.ts"], "repo-x": ["["] },
+    });
+    const ids = (f: string) => ruleSetFor(join(repo, f))?.rules.map((r) => r.id) ?? [];
+    expect(ids("src/a.ts")).not.toContain("ts-no-explicit-any");
+    expect(ids("src/a.ts")).toContain("ts-no-magic-numbers");
+    expect(ids("src/a.test.ts")).not.toContain("ts-no-magic-numbers");
+    expect(ids("src/a.test.ts")).toContain("repo-x"); // an invalid pattern is ignored
+  });
+
+  test("a rule's paths globs narrow where it is asked", () => {
+    const dir = join(root, "i");
+    mkdirSync(join(dir, ".jev-lint"), { recursive: true });
+    const scoped = { ...rule, id: "repo-routes", paths: ["src/routes/**"] };
+    const tsx = { ...rule, id: "repo-tsx", paths: ["**/*.tsx"] };
+    writeFileSync(
+      join(dir, ".jev-lint/ts.rules.json"),
+      JSON.stringify({ language: "typescript", extensions: [".ts", ".tsx"], rules: [scoped, tsx] }),
+    );
+    writeFileSync(join(dir, ".jev-lint/config.json"), JSON.stringify({ packs: ["repo"] }));
+    const ids = (f: string) => ruleSetFor(join(dir, f))?.rules.map((r) => r.id) ?? [];
+    expect(ids("src/routes/users.ts")).toEqual(["repo-routes"]);
+    expect(ids("src/components/Button.tsx")).toEqual(["repo-tsx"]);
+    expect(ids("src/lib/a.ts")).toEqual([]);
+  });
 });

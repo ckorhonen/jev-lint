@@ -6,6 +6,22 @@ team's best practices while the agent is still working, not at code review.
 📓 **Results and method:** [experiment notebook](https://claude.ai/artifact/BUZG9LEnaiJyaJuaP7tajs)
 (source in `report/`).
 
+### Set it up with your agent
+
+Paste this into Claude Code or Codex, from the repo you want checked:
+
+```text
+Set up jev-lint for me: https://github.com/ckorhonen/jev-lint
+Clone it to ~/Repos/jev-lint if it isn't there, then follow its jev-lint-setup skill
+(.agents/skills/jev-lint-setup/SKILL.md): check my TypeSafe key, show me the dry run, install
+the hook once I confirm, and run the smoke test. Then use its jev-lint-rules skill on this
+repo: read all of our agent instructions, skills, docs and linter configs, and propose rules
+for me to approve before writing anything.
+```
+
+The agent does the rest with two scripts: `src/install.ts` installs the hook idempotently,
+with backups, and `src/inventory.ts` lists every file that says what your team values.
+
 ## What is this for?
 
 Every team has best practices and patterns, some common across the industry and some
@@ -46,6 +62,11 @@ Measured 26–27 Sep 2026. The notebook has the details and the caveats.
 - **The check itself is accurate and fast.** On held-out edits it scored 94–100% F1 (the
   balance of catching real violations and avoiding false flags). It took about 0.3 s, and
   the pattern gate means only about a third of the rules are asked for each edit.
+- **More rules don't make the check worse, but they do make it noisier.** Adding unrelated
+  rules up to 100 per request left target-rule F1 at 97–99% (99% with no padding). Median latency went from
+  319 ms to 458 ms. Splitting the rules into parallel requests was slower and used 37% more
+  tokens. So the rule budget (8–12 repo rules per language) is about false alarms and the
+  agent's attention, not Jev.
 - **Agents act on the feedback (hypothesis 1: supported).** In 96 real Claude Code runs,
   violations per task fell from 2.38 to 1.21 with the hook running in the background. In
   48 Codex runs they fell from 1.67 to 0.92. Both drops are statistically significant.
@@ -91,6 +112,17 @@ bun install
 security add-generic-password -a "$USER" -s typesafe-api-key -w   # or export TYPESAFE_API_KEY
 ```
 
+Then let the installer do the rest. It checks first and writes only with `--apply`. It backs
+up each file, and replaces only the jev-lint entry, so re-running it is safe:
+
+```sh
+bun src/install.ts --skills --smoke                 # dry run: key, configs, skill links, one real check
+bun src/install.ts --apply --skills --smoke         # Claude Code + Codex, user-wide
+#   --claude-only | --codex-only   --project <repo> (Claude, repo-scoped)   --async (Claude, background)
+```
+
+Or by hand:
+
 **Claude Code:** add to `~/.claude/settings.json` (or a repo's `.claude/settings.json`) under `hooks.PostToolUse`:
 
 ```json
@@ -105,11 +137,8 @@ security add-generic-password -a "$USER" -s typesafe-api-key -w   # or export TY
   "hooks": [{ "type": "command", "command": "JEV_LINT_MODEL=jev-1.13.0 bun ~/Repos/jev-lint/src/hook.ts", "timeout": 15 }] }
 ```
 
-To make the skills available in every repo, link them into your skill directories:
-
-```sh
-for s in jev-lint-rules jev-lint-eval; do ln -s ~/Repos/jev-lint/.agents/skills/$s ~/.claude/skills/$s; done
-```
+`--skills` links the skills into `~/.agents/skills`, `~/.claude/skills` and `~/.codex/skills`,
+so they're available in every repo.
 
 **Async (Claude Code only):** to keep the agent from waiting on the check (useful with a slower
 local judge), run it in the background and let findings wake the agent:
@@ -126,37 +155,71 @@ The hook fails open: on a timeout, an API error or an unknown file type it exits
 
 ## Generate rules for your repo
 
-After installing, run the **`jev-lint-rules`** skill
-(`.agents/skills/jev-lint-rules/`) inside any repo. It works in five steps:
-1. It reads the repo's own guidelines: `AGENTS.md`, `CLAUDE.md`, Cursor and Copilot rules, `CONTRIBUTING`, and agent skills.
-2. It keeps only the guidelines that can be judged from a snippet and that no existing linter already enforces.
-3. It writes them to `.jev-lint/<language>.rules.json`, with labeled examples in `.jev-lint/cases.jsonl`.
-4. It validates each rule against Jev:
+Run the **`jev-lint-rules`** skill inside any repo. It works in seven steps:
+1. **Read everything the team wrote down.** `bun ~/Repos/jev-lint/src/inventory.ts .` lists:
+   - agent instructions: `AGENTS.md`, `CLAUDE.md`, Cursor/Copilot rules;
+   - skills;
+   - README, CONTRIBUTING, style guides and ADRs;
+   - linter and type-checker configs, and CI.
+
+   The agent reads all of it, using subagents for big repos, and writes a short digest of
+   what the team values, with sources.
+2. **Map what's already enforced.** A rule counts as enforced only when the linter has it on
+   and CI blocks on it. Anything enforced is left to the linter.
+3. **Collect candidates** from the team's own guidance, plus opinionated best practices for
+   the repo's languages:
+   - TypeScript/React and Swift/SwiftUI come from the built-in packs;
+   - Python, Go, Rust, Kotlin, Ruby and Lua have candidate menus;
+   - anything else uses a generic menu.
+4. **Stay within budget:** 8–12 repo rules per language, each with a keyword gate.
+5. **Propose, then wait.** The agent shows the rules, their sources, the linter config
+   changes it suggests instead, and what it dropped. It writes nothing until you approve.
+6. **Write and check the rules.** It writes `.jev-lint/<language>.rules.json` and labeled
+   examples in `.jev-lint/cases.jsonl`, then validates every rule against Jev:
    ```sh
    bun ~/Repos/jev-lint/src/validate.ts .jev-lint   # keep / reword-or-drop / needs-cases per rule
    ```
-5. It keeps only rules that pass, and lists the dropped guidelines and the reasons in `.jev-lint/README.md`.
+7. **Keep only rules that pass.** It records the dropped ideas and the reasons in
+   `.jev-lint/README.md`.
 
-The hook picks up the nearest `.jev-lint/` above each edited file. A `.jev-lint/config.json`
-such as `{ "packs": ["repo", "practices"] }` chooses which packs apply in that repo. This
+The hook picks up the nearest `.jev-lint/` above each edited file. `.jev-lint/config.json`
+controls which rules apply in that repo:
+- `packs` chooses the packs, e.g. `["repo", "practices"]`;
+- `disable` turns off single rules, e.g. `["ts-no-magic-numbers"]`;
+- `skipPaths` skips a rule for some paths, as globs relative to the repo root, e.g.
+  `{"ts-unvalidated-external-data": ["src/providers/**"]}`.
+
+A repo rule can also carry `paths` globs (e.g. `["src/routes/**"]` or `["**/*.tsx"]`) so it's
+only asked where its convention holds. That's useful in multi-language repos, and for
+folder-specific rules.
+
+To see what the rules would flag on existing code before enabling them, run
+`bun ~/Repos/jev-lint/src/check.ts <files…>`. This
 repo dogfoods it: see [`.jev-lint/`](.jev-lint/).
 
 ## Learn from what it catches
 
-The hook keeps a local findings log: one line per checked file, with the rules that fired
-and a short excerpt. `src/findings.ts` classifies each finding:
-- **fixed:** the agent corrected it on a later edit of the same file;
-- **kept:** it was still flagged at the file's last check, so the agent disagreed or ignored it;
-- **unknown:** the file wasn't checked again.
+The hook keeps a local findings log: one line per checked file, with the rules that fired,
+a short excerpt, latency and tokens. For each finding it records whether the agent **fixed**
+it on a later edit, **kept** it (disagreed or ignored it), or never touched the file again.
 
 ```sh
-bun ~/Repos/jev-lint/src/findings.ts --repo . --days 30   # per-rule counts and a suggestion
+bun ~/Repos/jev-lint/src/findings.ts --repo . --days 30              # per rule, plus failed checks and judge cost
+bun ~/Repos/jev-lint/src/findings.ts --repo . --clusters             # rule × area × test/non-test
+bun ~/Repos/jev-lint/src/findings.ts --repo . --compare <rule> --at <date>   # before/after, 95% CI
 ```
 
-The **`jev-lint-learn`** skill turns this into reviewed changes for one repo:
-- AGENTS.md guidance for mistakes that keep getting made and fixed;
-- rewording or dropping rules that agents keep ignoring (usually false positives), re-validated with `src/validate.ts`;
-- new rule candidates, handed to `jev-lint-rules`.
+The **`jev-lint-learn`** skill turns this into a few changes that pay for themselves, not a
+new line for every flag:
+- **Act only on clusters with real evidence:** at least 5 decided outcomes across at least 3
+  sessions, and for "the agent keeps ignoring it", a Wilson lower bound of 30% or more.
+- **At most three changes per review.** Each is matched to its cause:
+  - guidance in AGENTS.md for mistakes that keep getting made and fixed;
+  - a rule exception for false positives;
+  - a narrower rule when it only misfires in tests or one area;
+  - a new rule, through `jev-lint-rules`.
+- **Each change is recorded as a hypothesis** with a measurable prediction, then checked later
+  with `--compare`.
 
 ## Local models
 
@@ -208,6 +271,7 @@ bun eval/e2e/run.ts --reps 2             # E2E round 1: 12 general tasks, hook o
 bun eval/e2e/run.ts --tasks-file eval/e2e/tasks.practices.json --tag practices --conditions none,jev --reps 2
 E2E_TAG=practices bun eval/e2e/grade.ts  # rule grading of the final code
 E2E_TAG=practices bun eval/e2e/review.ts # AI review, map findings to rules, replay Jev over the edits
+bun eval/bench-rules.ts                   # rules per request vs accuracy, latency, tokens; one call vs parallel
 python3 report/build.py <DepartureMono-Regular.woff2>   # rebuild the notebook
 ```
 
@@ -227,8 +291,9 @@ python3 report/build.py <DepartureMono-Regular.woff2>   # rebuild the notebook
 - [`AGENTS.md`](AGENTS.md) (and `CLAUDE.md`) cover the layout, commands and rules for changes.
 - Skills live in `.agents/skills/`, symlinked for Claude Code at `.claude/skills/`:
   - **`jev-lint-eval`** — the evaluation workflow: rules, labeled cases, offline eval, E2E rounds and notebook entries.
-  - **`jev-lint-rules`** — generate and validate `.jev-lint/` rules from a repo's guidelines.
-  - **`jev-lint-learn`** — feed the findings log back into a repo's AGENTS.md and `.jev-lint/` rules.
+  - **`jev-lint-setup`** — install and verify the hook (`src/install.ts`), then hand off to rules.
+  - **`jev-lint-rules`** — onboard a repo: read its guidance and linters, propose rules, write and validate the approved ones.
+  - **`jev-lint-learn`** — cluster the findings log, act on the few changes with evidence, measure them.
 
 ## Development
 

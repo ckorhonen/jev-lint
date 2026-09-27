@@ -8,16 +8,19 @@ https://claude.ai/artifact/BUZG9LEnaiJyaJuaP7tajs (source: `report/`).
 For evaluation work (new rules, new judges or models, new E2E rounds, notebook
 entries) use the `jev-lint-eval` skill in `.agents/skills/jev-lint-eval/`. To generate
 `.jev-lint/` rules for any repo from its guidelines, use `jev-lint-rules`; to feed the
-findings log back into a repo's instructions, use `jev-lint-learn`. All three skills are
-symlinked into `.claude/skills/`.
+findings log back into a repo's instructions, use `jev-lint-learn`. To install the hook, use `jev-lint-setup`. All four
+skills are symlinked into `.claude/skills/`.
 
 ## Layout
 
 - `src/hook.ts` — hook entry (Claude Code `Write|Edit|MultiEdit`, Codex `apply_patch`). Must fail open: never throw, never block, always exit 0.
 - `src/extract.ts` — hook payload → code the edit added (Codex: `+` lines only).
 - `src/lint.ts` — rule packs, tiers (0.8 fix / 0.5 double-check), feedback text.
-- `src/repoRules.ts` — loads repo packs from the nearest `.jev-lint/`; `src/validate.ts` validates them against labeled cases.
-- `src/findingsLog.ts` / `src/findings.ts` — per-check findings log (default `~/.local/state/jev-lint/findings.jsonl`) and its fixed/kept/unknown summary, used by the `jev-lint-learn` skill.
+- `src/repoRules.ts` — loads repo packs and `config.json` (`packs`, `disable`, `skipPaths`) from the nearest `.jev-lint/`; `src/validate.ts` validates them against labeled cases.
+- `src/findingsLog.ts` / `src/findings.ts` — per-check findings log (default `~/.local/state/jev-lint/findings.jsonl`), its fixed/kept/unknown summary, `--clusters` (rule × area × test) and `--compare` (before/after with a session bootstrap CI); used by the `jev-lint-learn` skill.
+- `src/install.ts` — idempotent hook installer for Claude Code/Codex (dry run unless `--apply`; backs up; `--skills`, `--smoke`); used by the `jev-lint-setup` skill.
+- `src/check.ts` — runs the rules over existing files (as whole-file writes) to preview what would fire in a repo.
+- `src/inventory.ts` — lists a repo's instructions, skills, docs, linter/CI configs and languages; step 1 of the `jev-lint-rules` skill.
 - `local/` — local-model experiments (Laya server, encoder benchmark, Core ML attempt); venvs and models are gitignored.
 - `src/jev.ts` — minimal TypeSafe client (any `/v1/systemone` server via `TYPESAFE_BASE_URL`); key from `TYPESAFE_API_KEY` or Keychain service `typesafe-api-key`.
 - `rules/*.json` — hygiene pack; `rules/*.practices.json` — best-practice pack; `.jev-lint/` — this repo's own dogfooded repo pack (run `bun src/validate.ts .jev-lint` after changing it).
@@ -33,6 +36,7 @@ symlinked into `.claude/skills/`.
 bun install
 bun test && bunx tsc --noEmit && bunx biome check .   # required before committing
 bun eval/run.ts --runs 3                               # offline eval (cached)
+bun eval/bench-rules.ts                                # rule count vs accuracy/latency/tokens (not cached)
 python3 report/build.py <DepartureMono-Regular.woff2>  # rebuild notebook
 ```
 
