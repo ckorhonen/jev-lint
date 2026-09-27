@@ -1,0 +1,40 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:"Departure Mono";src:url(../public/fonts/DepartureMono-Regular.woff2) format("woff2")}
+html,body{margin:0;width:1200px;height:630px;background:#050505;color:#f2f2f2;font-family:"Departure Mono";overflow:hidden}
+.c{position:absolute;width:22px;height:22px;border:2px solid #3a3a3a}
+.tl{left:28px;top:28px;border-right:0;border-bottom:0}.br{right:28px;bottom:28px;border-left:0;border-top:0}
+.tr{right:28px;top:28px;border-left:0;border-bottom:0}.bl{left:28px;bottom:28px;border-right:0;border-top:0}
+.dots{position:absolute;inset:0;background-image:radial-gradient(#1f1f1f 1.2px,transparent 1.3px);background-size:33px 33px}
+.scan{position:absolute;inset:0;background:repeating-linear-gradient(to bottom,rgba(255,255,255,.03) 0 1px,transparent 1px 3px)}
+.l{position:absolute;left:72px;top:78px;width:560px}
+h1{font-weight:400;font-size:88px;margin:0;letter-spacing:-.02em}
+h1 i{display:inline-block;width:40px;height:74px;background:#f2f2f2;vertical-align:-6px;margin-left:8px}
+.tag{font-size:30px;color:#9a9a9a;margin-top:12px;line-height:1.35}
+.stat{margin-top:44px;font-size:19px;color:#9a9a9a}
+.stat b{display:block;font-weight:400;font-size:55px;color:#f2f2f2;margin-top:6px}.stat b span{color:#46d27d}
+.url{position:absolute;left:72px;bottom:66px;font-size:26px;border:2px solid #f2f2f2;padding:10px 18px}
+.panel{position:absolute;right:66px;top:130px;width:450px;border:2px solid #ff5a4e;background:#0b0b0b;padding:22px 24px;font-size:19px;line-height:1.55;box-shadow:0 30px 80px #000}
+.panel .h{display:flex;color:#9a9a9a}.panel .h b{font-weight:400;color:#f2f2f2;margin-right:12px}.panel .h span:last-child{margin-left:auto}
+.red{color:#ff5a4e;margin-top:10px}.dim{color:#9a9a9a;padding-left:1.3em}
+.ok{position:absolute;right:66px;top:430px;width:450px;border:2px solid #46d27d;background:#0b0b0b;padding:16px 24px;font-size:19px}
+.ok .g{color:#46d27d;font-size:24px;margin-top:6px}
+</style></head><body>
+<div class="dots"></div>
+<div class="c tl"></div><div class="c tr"></div><div class="c bl"></div><div class="c br"></div>
+<div class="l">
+  <h1>jev-lint<i></i></h1>
+  <div class="tag">a fuzzy linter for<br>coding agents</div>
+  <div class="stat">rule violations per task · 96 Claude Code runs<b>2.38 → <span>1.21</span></b></div>
+</div>
+<div class="url">jevlint.dev</div>
+<div class="panel">
+  <div class="h"><b>jev-lint</b><span>PostToolUse</span><span>0.3 s</span></div>
+  <div class="red">Likely violations — fix these:</div>
+  <div>- react-effect-fetch-race</div>
+  <div class="dim">skip setState for stale responses</div>
+</div>
+<div class="ok"><div style="color:#9a9a9a;display:flex"><span style="color:#f2f2f2;margin-right:12px">jev-lint</span>after the fix<span style="margin-left:auto">0.3 s</span></div><div class="g">no findings</div></div>
+<div class="scan"></div>
+</body></html>

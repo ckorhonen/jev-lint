@@ -1,0 +1,19 @@
+{
+  // Static launch site for jevlint.dev (Workers static assets). Deploy: `wrangler deploy` from site/.
+  "name": "jevlint-site",
+  "main": "worker.js",
+  "compatibility_date": "2025-06-01",
+  "account_id": "ea76e5b24c115e61c4ca83acb28b7e4d",
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    "not_found_handling": "404-page",
+    "run_worker_first": true
+  },
+  "routes": [
+    { "pattern": "jevlint.dev", "custom_domain": true },
+    { "pattern": "www.jevlint.dev", "custom_domain": true }
+  ],
+  "workers_dev": true,
+  "observability": { "enabled": true }
+}
