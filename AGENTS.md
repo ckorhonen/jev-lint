@@ -31,6 +31,7 @@ reword a single rule, use `jev-lint-write-rule`. All five skills are symlinked i
 - `eval/skill/run.ts` — skill eval: runs `jev-lint-rules` headless (dry run) on pinned real repos and scores the proposal against gold annotations. Fixtures, gold and results are private and live outside the repo (`~/.local/share/jev-lint/skill-evals`, or `JEV_LINT_SKILL_EVALS`); never commit them or name the repos in public results.
 - `eval/e2e/` — headless Claude Code runs with/without the hook, grading, AI review mapping.
 - `eval/results/` — committed result files; `snapshots/` keeps superseded evidence; `cache/` is local only.
+- `docs/media/` — demo video (both cuts) and poster; `docs/video/` — its Remotion source, audio generator and `render.sh`.
 - `report/notebook.html` + `report/build.py` → `report/index.html` (the published notebook).
 
 ## Commands

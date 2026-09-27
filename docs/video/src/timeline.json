@@ -1,0 +1,14 @@
+{
+  "fps": 30,
+  "transition": 15,
+  "scenes": [
+    { "id": "intro", "d": 57 },
+    { "id": "problem", "d": 135 },
+    { "id": "review", "d": 135 },
+    { "id": "title", "d": 90 },
+    { "id": "demo", "d": 375 },
+    { "id": "results", "d": 215 },
+    { "id": "cost", "d": 195 },
+    { "id": "end", "d": 120 }
+  ]
+}

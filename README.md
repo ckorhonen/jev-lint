@@ -3,6 +3,10 @@
 **A fuzzy linter for coding agents.** It checks the code your agent writes against your
 team's best practices while the agent is still working, not at code review.
 
+[![jev-lint in 40 seconds: an agent writes a useEffect fetch, the hook flags a race in 0.3 s, the agent fixes it before review](docs/media/jev-lint-demo-poster.png)](docs/media/jev-lint-demo-1920x1080.mp4)
+
+▶ **[Watch the 40-second demo](docs/media/jev-lint-demo-1920x1080.mp4)** (with sound; [square cut](docs/media/jev-lint-demo-1080x1080.mp4)). The editor scene is an illustrative session; the numbers are from the notebook. Source: [`docs/video/`](docs/video/) (Remotion; `./render.sh` re-renders both cuts, music and sound effects are synthesised by `audio/generate.py`).
+
 📓 **Results and method:** [experiment notebook](https://claude.ai/artifact/BUZG9LEnaiJyaJuaP7tajs)
 (source in `report/`).
 
