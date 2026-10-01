@@ -62,7 +62,7 @@ figure{margin:14px 0 6px}
 .chart .inbar.s1-t{fill:var(--on-s1)}.chart .inbar.s2-t{fill:var(--on-s2)}.chart .inbar.s3-t{fill:var(--on-s3)}.chart .inbar.s4-t{fill:var(--on-s4)}
 .s1{fill:var(--s1)}.s2{fill:var(--s2)}.s3{fill:var(--s3)}.s4{fill:var(--s4);stroke:var(--s4-line);stroke-width:1}
 .s1-t{fill:var(--on-s1)}.s2-t{fill:var(--on-s2)}.s3-t{fill:var(--on-s3)}.s4-t{fill:var(--on-s4)}
-.ln{fill:none;stroke-width:2}.ln.s1{stroke:var(--s1)}.ln.s2{stroke:var(--s2)}
+.ln{fill:none;stroke-width:2}.ln.s1{stroke:var(--s1)}.ln.s2{stroke:var(--s2)}.ln.s3{stroke:var(--s3)}
 .pt.s1{fill:var(--s1)}.pt.s2{fill:var(--s2)}
 .legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:11.5px;color:var(--muted);margin-top:6px}
 .key{display:inline-flex;align-items:center;gap:7px}
@@ -70,6 +70,8 @@ figure{margin:14px 0 6px}
 .sw.s1{background:var(--s1)}.sw.s2{background:var(--s2)}.sw.s3{background:var(--s3)}.sw.s4{background:var(--s4);outline:1px solid var(--s4-line)}
 .sw.dash{background:repeating-linear-gradient(90deg,var(--s2) 0 4px,transparent 4px 7px);height:3px}
 .sw.marker{height:11px;width:0;border-left:1px dashed var(--muted)}
+.chart .hollow{fill:var(--bg);stroke:var(--s2);stroke-width:1.5}
+.sw.hollow{background:transparent;border:1.5px solid var(--s2);border-radius:50%;box-sizing:border-box}
 .minis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 24px;margin-top:10px}
 .mini-title{font-size:12px;color:var(--ink)}
 .caption{font-size:12px;color:var(--muted);margin-top:4px}
@@ -109,7 +111,16 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12.5px}
   <div class="eyebrow">Contents</div>
   <ol id="toc-list">
     <li><a href="#answer">Current answer</a></li>
-    <li><a href="#e7">Entry 7 · Packs, security, speed <span class="tag new">latest</span></a>
+    <li><a href="#e8">Entry 8 · Local model, accuracy and speed <span class="tag new">latest</span></a>
+      <ol>
+        <li><a href="#e8-summary">Local vs Jev</a></li>
+        <li><a href="#e8-accuracy">Retraining Kev-4B</a></li>
+        <li><a href="#e8-speed">Making it fast</a></li>
+        <li><a href="#e8-gpu">GPU priority</a></li>
+        <li><a href="#e8-learned">What we learned</a></li>
+      </ol>
+    </li>
+    <li><a href="#e7">Entry 7 · Packs, security, speed</a>
       <ol>
         <li><a href="#e7-scale">More rules, same speed</a></li>
         <li><a href="#e7-packs">New packs</a></li>
@@ -171,7 +182,7 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12.5px}
 </nav>
 
 <main>
-  <div class="eyebrow">Experiment notebook · jev-lint · updated 27 Sep 2026</div>
+  <div class="eyebrow">Experiment notebook · jev-lint · updated 1 Oct 2026</div>
   <h1>Jev as a fuzzy linter for coding agents</h1>
   <p class="lede">Can a small, fast judgment model check an agent's code after every edit, against rules no deterministic linter can express, and does the agent get better for it? This notebook logs each experiment, newest first. Older results stay here; when a newer run replaces a number, the old one is marked <span class="tag old">superseded</span>.</p>
 
@@ -180,8 +191,9 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12.5px}
   <section id="answer">
     <h2>Current answer</h2>
     <div class="verdict">
-      <p class="eyebrow">Recommendation as of Entry 7</p>
+      <p class="eyebrow">Recommendation as of Entry 8</p>
       <p><b>Adopt it, with the five default packs on, as a non-blocking background hint.</b> The hook now carries {{LIVE_ALL}} rules across seven languages. Every new rule shipped only after passing a held-out bar fixed in advance. Thanks to the gate, a check on real code still takes about 0.3 s with twice as many rules. With every pack on, it cut graded rule violations in real Claude Code runs by {{E7_V_ABS}} ({{E7_V_NONE}} → {{E7_V_JEV}} per task), for about {{E7_COST_ABS}} more agent cost. It's most worth it where review is human, or where no AI reviewer checks every change. It still doesn't replace an AI code reviewer: most review comments are about logic and design.</p>
+      <p><b>Use cloud Jev.</b> A fine-tuned local model now runs on this Mac for free and offline, at about 0.5 s per check. It's a usable fallback, but it misses more than Jev ({{E8_E22_F1R}}% held-out F1 against {{E8_JEV_F1}}%) and is slower (Entry 8).</p>
     </div>
     <details class="more"><summary>Entry 6 verdict <span class="tag old">superseded</span></summary>
       <p><b>Adopt it with both rule packs, as a non-blocking hint.</b> On best-practice rules like "don't mirror a prop into state with an effect", Jev is accurate once each rule is worded narrowly. In real agent runs it cut graded rule violations by about a third. On React tasks, it cut the review comments our rules cover from 1.42 to 0.25 per task. SwiftUI tasks had too few of those comments to show an effect. It does not replace an AI code reviewer. About three quarters of what the reviewer raised was logic and design problems that no snippet-level rule can see.</p>
@@ -202,6 +214,12 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12.5px}
       <div><b>{{LIVE_ALL}}</b><span>live rules in 5 packs and 7 languages; {{N_CAND_JEV}} of {{N_CAND}} new candidates passed held-out</span></div>
       <div><b>228 ms</b><span>median per hook call with the warm daemon on a quiet machine (was 257 ms)</span></div>
     </div>
+    <div class="facts" style="margin-top:-1px">
+      <div><b>{{E8_E22_F1R}}%</b><span>held-out F1, all packs, best local setup (Jev: {{E8_JEV_F1}}% on the same edits), Entry 8</span></div>
+      <div><b>{{E8_E22_FAR}}</b><span>clean held-out edits flagged by it (Jev: {{E8_JEV_FA}}), Entry 8</span></div>
+      <div><b>{{E8_E22_MS}} ms</b><span>its median per check on this Mac (Jev: 343 ms live), Entry 8</span></div>
+      <div><b>$0</b><span>per check, offline; needs about 20 GB of memory for three model servers, Entry 8</span></div>
+    </div>
 
     <h3>Held-out accuracy, hygiene and practices</h3>
     <p class="note">Entry 3's rule sets, TypeScript and Swift. For all five packs and seven languages, see Entry 7. <abbr title="Balances precision (share of flags that were real) and recall (share of real violations that were flagged). 100% is perfect.">F1</abbr> on edits the rules were never tuned on. Regex only applies to hygiene rules.</p>
@@ -214,8 +232,116 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12.5px}
     {{CHART_LATENCY}}
   </section>
 
+  <section class="entry" id="e8">
+    <h2>Entry 8 · A local model close to Jev's accuracy, but not its speed <span class="date">28 Sep – 1 Oct 2026</span> <span class="tag new">latest</span></h2>
+    <p><b>Question.</b> Entry 7's fine-tuned Kev-4B was promising, but it learned from two packs only and was slow. Can retraining it on every labelled edit bring it close to Jev? And can it then answer a hook check on this Mac as fast as cloud Jev?</p>
+    <p><b>How it was run.</b> As three <i>autoresearch</i> rounds: an agent tries one change at a time and keeps it only if it clears a bar written down before the first experiment. Every experiment is logged, including the ones that failed. The full log is published separately: <a href="https://claude.ai/artifact/KR469duWrevXqbGGwReSGx">autoresearch log</a>.</p>
+
+    <h3 id="e8-summary">Local vs Jev</h3>
+    {{E8_SUMMARY}}
+    <p class="caption">Accuracy is scored the same way for all three, on the same 2,089 held-out edits across all five packs. Jev's row reuses its cached Entry 7 judgments, rescored for this entry. A few rules were reworded since those judgments, and there's no committed result file for this row. Jev's times are the cloud API's live numbers, not this workload's. Its cost is an estimate: $1.51 per 10,000 edits measured before the new packs, plus about 29% more input tokens with them.</p>
+    <ul>
+      <li><b>Close to Jev on accuracy, but not equal.</b> The best local setup scores {{E8_E22_F1R}}% held-out F1 against Jev's {{E8_JEV_F1}}%. It mostly misses more (recall {{E8_E22_R}}%), and it flags {{E8_E22_FAR}} of clean edits against Jev's {{E8_JEV_FA}}.</li>
+      <li><b>Slower than Jev.</b> {{E8_E22_MS}} ms median per check against Jev's 343 ms, and {{E8_E22_P90}} ms at the 90th percentile.</li>
+      <li><b>But free and offline.</b> There's no per-check cost, and no code leaves the machine. It needs about 20 GB of memory for three model servers.</li>
+    </ul>
+
+    <h3 id="e8-accuracy">Retraining Kev-4B (rounds 1 and 2)</h3>
+    <p><b>Setup.</b> We used every labelled dev edit, for all packs and languages: 2,628 cases. A hash of each case id splits them three ways:</p>
+    <ul>
+      <li><b>train</b> (1,835 cases): the model learns from these;</li>
+      <li><b>calibration</b> (282): used only to fit the model's temperature, which sets how sharp its probabilities are;</li>
+      <li><b>TUNE</b> (511): never trained on. Every keep-or-discard decision was made here.</li>
+    </ul>
+    <p>The held-out edits (HOLDOUT, 2,089 cases) were scored only twice: for the round-1 baseline and for the final best. Labels are ours, never Jev outputs. Training ran on a DGX Spark.</p>
+    <p><b>Rules, fixed before the first experiment.</b> Each experiment changes one thing. It's kept only if TUNE F1 rises by at least 1.0 point, with at most 5% of clean edits flagged. A change meant to cut training cost may be kept if it loses at most 1.0 point. Promising results are trained again with a second random seed and judged on the mean.</p>
+    <p><b>Round 1</b> retrained Entry 7's recipe on all of that data. It scored TUNE F1 94.53, and HOLDOUT F1 {{E8_B_F1}} with {{E8_B_FA}} of clean edits flagged. Training took {{E8_TB}} h.</p>
+    <p><b>Round 2</b> ran {{E8_N2}} experiments and kept {{E8_KEPT2}}.</p>
+    {{CHART_R2}}
+    <p class="caption">TUNE F1 per experiment. Two dots joined by a line are two seeds of the same change. The incumbent drops after e04 because e04 was kept under the cost rule.</p>
+    <ul>
+      <li><b>e04: train only on the questions the hook asks.</b> Training only on the rules the gate would ask cost about 1 point (93.55, mean of two seeds). But it made training {{E8_GATE_X}}× cheaper ({{E8_TB}} h → {{E8_TG}} h), so it was kept under the cost rule. That made the rest of the round affordable.</li>
+      <li><b>e12: one extra copy of each example, under another project folder.</b> Nearly every labelled edit lives under <code>/repo/</code>. Adding one copy of each under a different folder, with the same file and rules, scored 95.48 and 95.26 on two seeds. That's +1.8 over e04, and the only clear win.</li>
+      <li><b>About half of e12's gain is just more training.</b> e12 doubles the records. A control with plain duplicates (e15) recovered about half the gain (+1.05 against +1.82). It ran with one seed, so that split is uncertain.</li>
+      <li><b>Seed noise is as large as the effects.</b> Two trainings that differed only in their random seed scored up to {{E8_SPREAD}} points apart. That's why every promising result was trained twice.</li>
+      <li><b>No gain from:</b> 1 or 3 epochs, a higher learning rate, a separate learning rate for the output head, focal loss, a Brier loss term, extra copies of the violations, extra look-alike clean edits (alone or on top of e12), two folder copies, or a lower flag threshold (0.35).</li>
+    </ul>
+    <p><b>On held-out edits, e12 beats the baseline.</b> HOLDOUT F1 rose from {{E8_B_F1}} to {{E8_E12_F1}}, and clean edits flagged fell from {{E8_B_FA}} to {{E8_E12_FA}}. It also trained in {{E8_TE12}} h instead of {{E8_TB}} h. Served on the Mac (MLX) instead of the Spark, the same model scores {{E8_E12M_F1}} with {{E8_E12M_FA}} flagged; the difference is two hygiene cases.</p>
+    <details class="more"><summary>HOLDOUT by pack: F1 (clean edits flagged)</summary>{{E8_PACKS}}</details>
+    <p class="note">From the baseline to e12, security improved most (96.0 → 97.6), while hygiene and performance dipped slightly. Each pack has between 65 and 353 held-out violations, so changes under a point are within noise.</p>
+
+    <h3 id="e8-speed">Making it fast (round 3)</h3>
+    <p><b>Setup.</b> One <i>check</i> is what the hook does for one edit: look up the rules, apply the gate, and send one request per file to the local server over a warm connection. The workload is 100 fixed checks from TUNE. A trial runs all 100. Each experiment ran 2 warm-up trials and 5 measured ones, and its result is the median of the 5 trial medians. The Mac is an M3 Max with 64 GB.</p>
+    <ul>
+      <li><b>Targets:</b> 343 ms, cloud Jev's live median, and a stretch target of 230 ms, Jev with a warm connection.</li>
+      <li><b>Accuracy gate:</b> on a fixed 400-case subset of TUNE, F1 at most 1.5 points below e12's (95.48, so at least 93.98), at most 5% of clean edits flagged, and no errors. Also, the "fix" tier (p ≥ 0.8) must stay at least as precise as all flags (p ≥ 0.5).</li>
+      <li><b>Keep rule:</b> at least 5% faster than the best so far, the gate passes, and even the slowest trial beats the best's median.</li>
+    </ul>
+    <p><b>Baseline:</b> e12 as served took {{E8_R3_BASE}} ms median per check, and {{E8_R3_BASE_P90}} ms at the 90th percentile.</p>
+    {{CHART_R3}}
+    <p class="caption">Median per check, log scale. Hover a point for its accuracy. The best-so-far line uses each kept change's own median. e22's {{E8_E22_MS}} ms comes from the interleaved run described below.</p>
+    <p><b>What worked</b>, in the order it was kept:</p>
+    <ol>
+      <li><b>Less padding (e03, 1,607 ms).</b> A batch pads every rule's text to the longest one, and 38% of the tokens were padding. Grouping rules by length removed most of it, with the same answers.</li>
+      <li><b>A rule-first model with a second opinion (e13, 734 ms).</b> Normally the model reads the code, then each rule's long text. In the <i>rule-first</i> layout, each rule's text is processed once at startup and kept. A check then only runs the code once per rule, all in one batch. That's 2.8× faster at the same model size. But the model must be trained for that layout, and it's less accurate. So a small 2B rule-first model answers first, and any rule it scores between 0.1 and 0.9 is asked again on e12. We call this a <i>cascade</i>.</li>
+      <li><b>Cheaper second asks (e16, 648 ms).</b> They usually cover 1–2 rules, so they now run in one pass instead of two.</li>
+      <li><b>A three-stage chain (e22, {{E8_E22_MS}} ms).</b> The 2B rule-first model answers first. Rules it's unsure of (0.1–0.9) go to a rule-first 4B, and rules the 4B is unsure of go to e12. Measured in 5 pairs, interleaved with e16, it was faster in all 5: {{E8_E22_MS}} ms against {{E8_E16_PAIRED}} ms.</li>
+    </ol>
+    <p><b>The best setup, e22,</b> takes {{E8_E22_MS}} ms median and {{E8_E22_P90}} ms at the 90th percentile, 77% faster than the baseline. On HOLDOUT it scores {{E8_E22_F1}} F1 (precision {{E8_E22_P}}%, recall {{E8_E22_R}}%). It flags {{E8_E22_FA}} of clean edits, and {{E8_E22_P8}}% of its "fix" findings are real. That's 0.5 points below e12 alone, with fewer false alarms but lower recall. Security drops most, from 97.6 to 93.2.</p>
+    <p><b>Neither target was met</b> by anything that passed the gate. The fastest setups all failed it:</p>
+    <ul>
+      <li><b>Rule-id 4B (e20): 245 ms, F1 72.4.</b> It reads the code once and sees each rule only as its id. Without the rule text, it can't judge the rules.</li>
+      <li><b>Rule-first 0.8B (e04): 118 ms, F1 71.7.</b></li>
+      <li><b>0.8B in the normal layout (e02): 327 ms, F1 75.6.</b> It's simply a weaker model.</li>
+    </ul>
+    <p><b>What didn't help:</b></p>
+    <ul>
+      <li><b>8-bit and 4-bit weights.</b> 8-bit was no faster, and 4-bit was slower and less accurate. On Apple's GPU, reading the prompt is limited by compute, not by loading weights.</li>
+      <li><b>Wiring memory</b>, which keeps a model's buffers from being paged out, for one server or both. No gain.</li>
+      <li><b>Running the servers at the highest scheduling priority (QoS):</b> 3.7% faster, under the 5% bar.</li>
+      <li><b>Dropping each rule's "false" criterion</b> at serve time: 18% faster, but F1 fell to 89.4 and 9% of clean edits were flagged.</li>
+      <li><b>A third training epoch</b> for the 2B student: no more accurate on the calibration split, and worse calibrated.</li>
+      <li><b>Narrower second-ask bands,</b> including one fitted on the calibration split: all failed the gate.</li>
+    </ul>
+    <p><b>The Neural Engine.</b> We converted one Kev-4B layer's matrix multiplies to Core ML. On the Neural Engine they ran at about 5 TFLOPS, slower than the GPU's ~11 (10.4 ms against 6.6 ms at 256 tokens). The probe left out the layer's DeltaNet scan, a step-by-step recurrence, because Core ML has no operation for it; it would need a chunked rewrite. So the Neural Engine isn't a way to speed up this model.</p>
+    <p><b>Where the time goes.</b> The 4B is compute-bound on the GPU at about 1,000 tokens per second. A normal-layout check is about 1,200 tokens, mostly rule text and padding; the code itself is a median of 115. Cost grows with rules asked: about 90 ms for 1 rule, 720 ms for 5, and 1.3–2.3 s for 10 or more (e16).</p>
+    <p><b>Rules changed during the round.</b> These are changes to the contract, made after some results were in:</p>
+    <ul>
+      <li><b>Extension rule (after e03).</b> When a candidate cleared the 5% bar but one trial broke the "slowest trial" check, 5 more trials ran, and the decision used all 10, allowing 1 slow trial in 10. e03, e16, e19 and e21 were judged this way.</li>
+      <li><b>A2 (after e12, post hoc).</b> At about 96% precision, the "fix tier at least as precise" clause flipped on a single pair. From e13 on, the fix tier may be up to 1.0 point less precise. e11 and e12 keep their "gate failed" result. Under A2 both would have passed, and e11 (1,080 ms) would have been kept; later setups were faster anyway.</li>
+      <li><b>A3 (after e21).</b> Back-to-back trials of the same setup swung between 544 and 925 ms within minutes. From e22 on, a candidate is measured interleaved with the incumbent in 5 pairs. e22 is e21's chain re-tested this way. Under the old rule, e21 was discarded (541 ms, with 2 of 10 trials slow).</li>
+      <li><b>The calibration clause wasn't checked by the script until e11.</b> It was fixed then, and the baseline and e03 were re-checked; both pass.</li>
+    </ul>
+    <p><b>Caveats.</b></p>
+    <ul>
+      <li><b>The Mac was busy and swapping</b>, with up to about 30 GB of swap in use, so absolute times are noisy.</li>
+      <li><b>Latency wasn't measured through the hook's real daemon.</b> It used the hook's client code in one bun process. HOLDOUT latency wasn't measured either.</li>
+      <li><b>The chain needs about 20 GB of memory</b> for its three servers. That's an estimate, not a measurement. The servers are stopped now.</li>
+      <li><b>The round stopped after {{E8_N3}} of 30 planned experiments.</b> The remaining ideas needed new multi-hour trainings on the Spark, and renders held the GPUs for about 10 hours of this round. An offline simulator on cached judgments ruled out the cheap variants first: narrower bands, a 0.8B front stage, and rule-id first stages.</li>
+      <li><b>A rule-first 4B was also trained for 3 epochs,</b> but its result isn't in the ledger.</li>
+    </ul>
+
+    <h3 id="e8-gpu">GPU priority</h3>
+    <p>Another project's render jobs share these GPUs, and a render always gets the GPU first. Before every job, a gate checked for renders and waited. It didn't always work:</p>
+    <ul>
+      <li><b>Rounds 1–2: a training run held the Spark GPU into a render.</b> The gate only ran before a job starts. A render began at 13:09 UTC on 29 Sep while e12's second seed was training, and our run kept the GPU for about 1.5 h of it. After that, every job ran with a watchdog that stops it within about a minute of a render starting.</li>
+      <li><b>Then the watchdog had a bug.</b> It matched its own command line, so it never exited. The GPU sat idle for about 4 h when it could have been used. It was fixed and self-tested.</li>
+      <li><b>Rounds 1–2 waited about 11.5 h</b> for renders in total.</li>
+      <li><b>Round 3:</b> about 595 min of logged Mac waits, and the watchdog stopped 9 Spark trainings for renders or other GPU work. Once, a queue-helper bug ran two of our own training jobs together for about 2 min before one was stopped by hand.</li>
+    </ul>
+
+    <h3 id="e8-learned">What we learned</h3>
+    <ol>
+      <li><b>Fine-tuning works with more data.</b> One Kev-4B model now covers all five packs at about 95% held-out F1. Jev still leads by 3–4 points, with fewer false alarms.</li>
+      <li><b>Data changes beat training settings.</b> The only real gain came from a simple data change: the extra copy under another folder. Every loss, learning rate and epoch change was flat or worse.</li>
+      <li><b>Speed is a model-shape problem.</b> The 4B is compute-bound. The large wins came from changing what the model reads (rule-first) and asking a bigger model only when the small one is unsure. Serving tweaks, quantization and the Neural Engine didn't help.</li>
+      <li><b>Matching Jev's speed locally needs a different architecture, not more tuning.</b> The models fast enough to beat 343 ms all lost 20 or more F1 points.</li>
+      <li><b>On a busy machine, measure interleaved.</b> Sequential trials of one setup varied by almost 2× within minutes.</li>
+    </ol>
+  </section>
+
   <section class="entry" id="e7">
-    <h2>Entry 7 · Rule packs, security, and faster checks <span class="date">27 Sep 2026</span> <span class="tag new">latest</span></h2>
+    <h2>Entry 7 · Rule packs, security, and faster checks <span class="date">27 Sep 2026</span></h2>
     <p><b>Question.</b> Until now the hook had two packs for two languages. Can it carry many more rules, in more languages, without getting slower or noisier? Does it still change what the agent writes? And can the check itself get faster?</p>
     <p><b>What changed in this entry:</b></p>
     <ul>
@@ -290,6 +416,7 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12.5px}
       <li><b>Speed: {{FT_P50}} s median per edit.</b> The machine was heavily loaded during this run, so don't read much into that.</li>
       <li><b>Against the Entry 5 bar</b> (at least 90% F1, at most 5% false alarms, at most 1 s): hygiene F1 is at the line and practice rules are below it. It flags {{FT_FA}} of clean edits, and it's still too slow. Kev-0.8B and an E2E run are next only if a larger training set lifts the practice rules.</li>
     </ul>
+    <div class="superseded">Superseded by Entry 8. Kev-4B, retrained on every labelled dev edit, scores {{E8_E12_F1}} held-out F1 with {{E8_E12_FA}} of clean edits flagged. That's pooled over all five packs, so it isn't directly comparable with the per-pack numbers above. A three-model local chain brings a check down to {{E8_E22_MS}} ms on this Mac.</div>
 
     <h3 id="e7-daemon">Faster checks</h3>
     <p><b>What changed.</b> Each hook call used to start fresh: read the API key from the Keychain, open a TLS connection to Jev, ask, and exit. Now the hook hands the check to a small background process (the <i>warm daemon</i>). It keeps one HTTPS connection and one key read, and shares them across hook calls. If the daemon isn't running, the hook checks in-process as before and starts one for next time, so it still fails open.</p>
@@ -450,6 +577,7 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12.5px}
         Then re-run the Entry 5 E2E with the fine-tuned model in the background.
       </li>
       <li><b>Status, 27 Sep (Entry 7):</b> Kev-4B done, trained on the tuning split only. Held-out F1 rose to {{FT_H}} (hygiene) and {{FT_P}} (practices), from {{FT_STOCK_H}} and {{FT_STOCK_P}}. That meets the 90% bar on hygiene only, misses the false-alarm and speed bars, and the E2E re-run is on hold.</li>
+      <li><b>Status, 1 Oct (Entry 8):</b> retrained on every labelled dev edit, Kev-4B reaches {{E8_E12_F1}} held-out F1 over all five packs, with {{E8_E12_FA}} of clean edits flagged. That meets the F1 and false-alarm bars. A fine-tuned Kev-0.8B was fast enough but far less accurate (75.6 F1 on a TUNE subset). The best local setup takes {{E8_E22_MS}} ms per check, so it meets the 1 s bar. The E2E re-run hasn't been done.</li>
     </ul>
   </section>
 
@@ -636,6 +764,7 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12.5px}
       <li><b>Keep the gate on</b> (the default). It skips about two thirds of rule checks per edit at no measured recall cost.</li>
       <li><b>In Claude Code, run it async:</b> <code>asyncRewake: true</code> with <code>JEV_LINT_MODE=rewake</code>. It's as effective as synchronous and saves about 6 s per task. Entry 7's run with every pack on used async too, and cut violations significantly. In Codex, keep it synchronous, since Codex has no rewake.</li>
       <li><b>Let each repo learn from the hook.</b> The findings log records what fired and whether the agent fixed or kept it. Run the <code>jev-lint-learn</code> skill weekly on active repos: it turns recurring fixes into AGENTS.md guidance, and repeatedly ignored flags into rule rewrites. In its first real use, it narrowed this repo's own stdout rule after a false positive.</li>
+      <li><b>Keep cloud Jev as the judge.</b> For offline or zero-cost use, the local chain from Entry 8 is a working fallback: about 0.5 s per check and {{E8_E22_F1R}}% held-out F1, against Jev's {{E8_JEV_F1}}%. Point <code>TYPESAFE_BASE_URL</code> at it. Expect more missed violations than with Jev, and about 20 GB of memory in use. <span class="note">(New in Entry 8.)</span></li>
       <li><b>Keep the AI code reviewer.</b> The hook handles the pattern-level issues cheaply before review, so review time goes to logic and design, which is where about 75% of review findings were.</li>
       <li><b>Treat rule wording like code.</b> Before adding a rule, add labeled examples and hard negatives, tune on the dev split, and accept it only if the held-out split holds up. The harness does this in one command.</li>
       <li><b>Consider the high tier only for practice rules if noise shows up in practice.</b> Their double-check band was 64% real, compared with 86% for hygiene rules.</li>
@@ -650,12 +779,15 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12.5px}
       <li><b>repoEval in real repos.</b> Run <code>src/repoEval.ts</code> on a few real repositories, to test whether a proposed rule or instruction change actually lowers violations before it's kept.</li>
       <li><b>The feedback loop on a live repo.</b> Run the weekly <code>jev-lint-learn</code> review on an active repo for a few weeks, and measure whether recurring findings fall.</li>
       <li><b>The candidate rules.</b> Add held-out violations where there are only 4–6, and reword the ones that miss on recall. Re-check <code>ts-perf-linear-lookup-in-loop</code> on more real code. Reword <code>swift-continuation-misuse</code>, which now fails the "fix" precision bar.</li>
-      <li><b>More training data for Kev.</b> Fine-tuned Kev-4B is at 84–91% held-out F1. A larger, more varied tuning set is the next lever, before trying Kev-0.8B.</li>
+      <li><b>A faster local architecture.</b> Tuning the 4B and its serving is done; it's compute-bound. To reach Jev's speed locally, try a smaller non-hybrid encoder student trained on our labels: one pass over the code and rule text, no recurrent scan, and a better fit for the Neural Engine. Keep the e22 chain as the accuracy reference.</li>
+      <li><b>Measure the local chain properly.</b> Run it through the hook's real daemon, on a quiet machine with no swapping, and time HOLDOUT checks too. Measure its actual memory use.</li>
+      <li><b>Close the local recall gap.</b> The local chain's recall is {{E8_E22_R}}% against Jev's {{E8_JEV_R}}%, and its security F1 fell from 97.6 to 93.2 along the chain. Check which rules the rule-first stages miss.</li>
+      <li><b>More training data for Kev.</b> Fine-tuned Kev-4B is at 84–91% held-out F1. A larger, more varied tuning set is the next lever, before trying Kev-0.8B. <span class="tag">done, Entry 8: {{E8_E12_F1}} over all packs; Kev-0.8B was too weak</span></li>
       <li><b>Fine-tune Kev-4B, then Kev-0.8B,</b> on our tuning-split labels, following the Entry 5 plan. Never use Jev outputs: TypeSafe's terms forbid it. <span class="tag">Kev-4B done, Entry 7</span></li>
       <li><b>A second wording pass</b> on <code>swift-continuation-misuse</code> and <code>react-effect-fetch-race</code>, the two rules the new ones crowd.</li>
       <li><b>A bigger async run</b> to settle whether async feedback reduces review comments as much as sync, and whether always-on beats review-and-fix significantly.</li>
       <li><b>Review-time check:</b> run Jev once per changed file at review time and merge its findings into the reviewer's comments. Compare that with the always-on hook on cost and final violations.</li>
-      <li><b>Neural Engine, only with a model built for it.</b> A shared-state encoder in Apple's Neural Engine layout, if a fine-tuned small model turns out accurate enough.</li>
+      <li><b>Neural Engine, only with a model built for it.</b> A shared-state encoder in Apple's Neural Engine layout, if a fine-tuned small model turns out accurate enough. <span class="tag">Entry 8: not for Kev-4B, slower than the GPU</span></li>
       <li><b>More coverage of the reviewer's categories.</b> Try rules for the misses (debounce and poll races, continuation cancellation), and check whether they stay precise. <span class="tag">done, Entry 5</span></li>
       <li><b>Bigger end-to-end runs.</b> More repeats, a weaker and a stronger agent model, and real repositories instead of scaffolds.</li>
 
@@ -674,6 +806,9 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12.5px}
       <li><b>Rule packs (Entry 7):</b> each rule is researched, with its evidence in <code>rules/sources/</code>. It gets labelled dev and held-out edits from separate authors, with hard negatives, and is reworded on dev only. It then enters the pack as a <i>candidate</i>, which the hook skips.</li>
       <li><b>Shipping bar:</b> the <code>src/validate.ts</code> bar, fixed before the new packs were measured. On held-out edits, with the gate on: precision of at least 90% at p ≥ 0.8; precision of at least 75% and recall of at least 80% at p ≥ 0.5; and at least 3 held-out violations. <code>eval/pack-status.ts</code> applies it and records per-rule numbers in <code>eval/results/pack-status.json</code>. Passing rules lose the candidate status. A rule can still be held back on real-code evidence, as <code>ts-perf-linear-lookup-in-loop</code> was.</li>
       <li><b>Kev fine-tune (Entry 7):</b> a LoRA on Kev-4B, trained on 541 tuning-split records. The temperature was fitted on 85 held-back tuning records. The held-out split was never exported.</li>
+      <li><b>Kev retraining (Entry 8):</b> Kev-4B warm-started from <code>jaredpalmer/kev-4b</code>, LoRA, 2 epochs, learning rate 2e-5, 2,000 replay records from Kev's own data, bf16 backbone weights, on a DGX Spark (GB10). Splits by <code>sha256(case id) % 100</code>: TUNE 0–19, calibration 20–31, train 32–99. Scoring is <code>local/autoresearch/score.ts</code>: the case's own pack, shipped rules only, gated, flagged at p ≥ 0.5, and only rules in the case's label scope. The ledgers and per-experiment notes are in <code>local/autoresearch/</code>; the ledgers themselves aren't committed, so <code>report/build.py</code> keeps a copy of the numbers and checks it against them when they exist.</li>
+      <li><b>Latency (Entry 8):</b> 100 fixed TUNE checks per trial with the hook's client code in one bun process, 2 warm-up and 5 measured trials, decided on the median of the trial medians. From e22 on, interleaved A/B in 5 pairs. Kev servers on MLX (bf16) on an M3 Max with 64 GB. Trials that overlapped a render were discarded and rerun.</li>
+      <li><b>Jev on Entry 8's scoring:</b> Jev's cached Entry 7 judgments for the 2,089 held-out edits, rescored with <code>score.ts</code>'s scoring. Most were judged before a few later rule rewordings.</li>
       <li><b>Skill eval (Entry 7):</b> 5 private repos with hand-written convention lists, 2 headless Claude Code runs per repo and version, a 30-minute cap per run. Luna (low) judged, by majority of 3 votes. Only anonymised totals are published.</li>
       <li><b>Caveats:</b>
         <ul>
@@ -681,6 +816,7 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12.5px}
           <li>Luna is both the competitor and the grader, so shared blind spots could favour it.</li>
           <li>The end-to-end samples are small: 24 runs per condition.</li>
           <li>Several Entry 7 timings (the real-file rule-set comparison and the daemon) were measured by hand under varying machine load, and have no committed result file.</li>
+          <li>Entry 8's latencies were measured on a busy, swapping Mac, and its round-3 contract changed three times during the round (see Entry 8).</li>
         </ul>
       </li>
     </ul>
@@ -696,6 +832,14 @@ python3 report/build.py path/to/DepartureMono-Regular.woff2 # rebuild this page<
   <section id="log">
     <h2>Changelog</h2>
     <ul>
+      <li><b>1 Oct 2026, Entry 8.</b>
+        <ul>
+          <li>Kev-4B retrained on all labelled dev edits, then 15 single-change experiments (2 kept). Best: e12, the extra copy under another folder.</li>
+          <li>A latency round on this Mac: 23 experiments, best a three-model chain at {{E8_E22_MS}} ms per check. The 343 ms and 230 ms targets weren't met.</li>
+          <li>Jev rescored on Entry 8's scoring for a like-for-like comparison.</li>
+          <li>The Current answer gained a local-model note and tiles. Entry 7's fine-tune numbers and the "more training data" next step are marked superseded or done.</li>
+        </ul>
+      </li>
       <li><b>27 Sep 2026, Entry 7.</b>
         <ul>
           <li>Rule packs by language (<code>rules/&lt;lang&gt;.&lt;pack&gt;.json</code>): tests and performance packs, and Python, Ruby, Kotlin, Rust and Bazel. 120 researched rules, of which {{N_CAND_JEV}} of {{N_CAND}} passed held-out, plus a security pack of 33 ({{N_SEC}} new, {{N_MOVED}} moved). {{LIVE_ALL}} live rules and {{N_CANDIDATES_NOW}} candidates.</li>

@@ -186,13 +186,15 @@ more input; roughly $2 per 10,000 now). The real cost is the agent's own fix-up 
 (debug scripts, domain constants), which led to a fix the same day.
 
 **Could it run locally, for free?**
-**Local models aren't there yet (hypothesis 5: open).**
-- The best zero-shot local model, Kev-4B, scored 70–75% F1 and took about 1.4 s per edit
-  on an M3 Max.
-- The Neural Engine couldn't be used through the current model exports.
-- A Kev-4B fine-tuned on our own labels closed much of the gap: 84–91% F1 on held-out edits,
-  against 70–75% before and 94–100% for Jev. It still flags 8–11% of clean edits, which is
-  too noisy to ship.
+**Yes, as a fallback. Cloud Jev is still more accurate and faster.**
+- A Kev-4B fine-tuned on our own labels scores 95.2% F1 on 2,089 held-out edits and flags
+  2.0% of clean edits. Jev scores 98.1% and flags 0.8% on the same edits.
+- A three-model local chain on an M3 Max checks an edit in about 460 ms (median) at 94.5% F1.
+  Jev takes about 343 ms. More tuning didn't close that gap; matching Jev's speed would need
+  a faster model architecture.
+- The Neural Engine couldn't be used: the model's core layer has no Core ML equivalent yet.
+- Running locally costs nothing per edit and works offline, but needs roughly 20 GB of
+  memory (an estimate) for the three local model servers.
 
 See the [experiment notebook](https://claude.ai/artifact/BUZG9LEnaiJyaJuaP7tajs) for the
 full method and every caveat.

@@ -874,6 +874,220 @@ skill_rows = [
     ["Agent cost per finished run", f"${S1['cost']:.2f}", f"${S2['cost']:.2f}"],
 ]
 
+# ---------------------------------------------------------------- Entry 8: local model, accuracy and speed
+
+# The autoresearch ledgers and score files live in local/autoresearch/.autoresearch and
+# round3/.autoresearch, which are not committed. The numbers the page needs are copied here;
+# when the ledgers exist, they are re-read and must match, so the page can't drift from them.
+AR = ROOT / "local/autoresearch"
+# Round 2: (id, TUNE F1 per seed, decision, TUNE clean false alarms %, training seconds)
+R2 = [("r1-baseline", (94.53,), "keep", 2.99, 11963), ("e01-thr-global", (94.19,), "discard", 4.32, None),
+      ("e02-epochs1", (92.81, 91.7), "discard", 3.32, 6022), ("e03-replay500", (93.65,), "discard", 3.32, 10727),
+      ("e04-gate-train", (93.42, 93.68), "keep (cost)", 3.32, 5107), ("e05-epochs3", (93.79,), "discard", 3.99, 7628),
+      ("e06-pos2", (93.91,), "discard", 3.65, 6668), ("e07-lr5e5", (93.63,), "discard", 2.33, 5122),
+      ("e08-focal", (93.01,), "discard", 3.32, 5114), ("e09-hardneg2", (94.58, 93.48), "discard", 3.65, 5561),
+      ("e10-headlr", (92.98,), "discard", 3.32, 5136), ("e11-brier", (93.68,), "discard", 3.32, 5158),
+      ("e12-paths", (95.48, 95.26), "keep", 3.32, 8254), ("e13-paths2", (93.97,), "discard", 3.99, 11437),
+      ("e14-paths-hardneg2", (94.12,), "discard", 3.32, None), ("e15-dup-control", (94.6,), "discard", 3.65, None)]
+# Round 3: (id, median of trial medians ms, p90 ms, subset F1, subset clean false alarms %, decision)
+R3 = [("r3-baseline", 1986.8, 6223.7, 95.48, 3.28, "keep"), ("e01-wired", 1977.2, 5723.9, 95.48, 3.28, "discard"),
+      ("e02-kev08", 326.8, 895.8, 75.64, 12.7, "checks_failed"), ("e03-rows", 1606.5, 3503.05, 95.48, 3.28, "keep"),
+      ("e04-kev08-rf", None, None, None, None, "crash"), ("e04-kev08-rf-r", 118.3, 343.5, 71.72, 13.11, "checks_failed"),
+      ("e05-q8", 1615.6, 3433.9, 95.48, 3.28, "discard"), ("e06-nofalse", 1312.3, 2629.9, 89.37, 9.02, "checks_failed"),
+      ("e07-ane-probe", None, None, None, None, "discard"), ("e08-q4", 1880.2, 3965.4, 93.26, 4.1, "checks_failed"),
+      ("e09-rows35", 1798.8, 4179.2, 95.48, 3.28, "discard"), ("e10-kev4b-rf", 828.1, 2813.5, 93.45, 3.69, "checks_failed"),
+      ("e11-rf-cascade", 1079.7, 3082.2, 95.43, 2.87, "checks_failed"), ("e12-rf-cascade19", 1273.0, 3248.1, 96.3, 2.46, "checks_failed"),
+      ("e13-rf2b-cascade", 734.4, 1914.1, 94.29, 3.28, "keep"), ("e14-fb-rf4b", 545.6, 1587.9, 92.75, 3.28, "checks_failed"),
+      ("e15-band28", 533.8, 1553.9, 91.69, 4.51, "checks_failed"), ("e16-onepass", 647.7, 1786.45, 94.29, 3.28, "keep"),
+      ("e17-calband", 550.9, 1879.4, 92.96, 4.92, "checks_failed"), ("e18-wired-cascade", 636.4, 1603.9, 94.29, 3.28, "discard"),
+      ("e19-qos", 623.7, 1713.85, 94.29, 3.28, "discard"), ("e20-kev4b-ri", 245.3, 390.8, 72.39, 9.84, "checks_failed"),
+      ("e21-chain3", 540.5, 1699.5, 94.52, 2.87, "discard"), ("e22-chain3-ab", 459.7, 1541.8, 94.52, 2.87, "keep"),
+      ("e23-kev2b-rf-ep3", None, None, None, None, "discard")]
+E22_PAIRED_INCUMBENT = (528.2, 668.4, 554.0, 573.0, 915.8)  # e16, measured interleaved with e22 (amendment A3)
+# HOLDOUT (all 2,089 held-out edits, all five packs), scored by local/autoresearch/score.ts:
+# score file -> (tp, fp, fn, clean, clean flagged, {pack: (F1 %, clean FA %)}, precision at p >= 0.8 or None)
+HO = {
+    "r1-baseline": (819, 40, 56, 1314, 31, {"hygiene": (94.5, 3.8), "practices": (93.9, 3.2), "security": (96.0, 0.6), "tests": (92.9, 3.7), "performance": (98.5, 0.7)}, None),
+    "e12-paths": (825, 34, 50, 1314, 26, {"hygiene": (93.9, 1.9), "practices": (94.8, 2.5), "security": (97.6, 0.3), "tests": (93.4, 3.3), "performance": (97.7, 1.4)}, None),
+    "mac-e12-paths": (824, 35, 51, 1314, 27, {"hygiene": (93.4, 3.8), "practices": (94.7, 2.5), "security": (97.6, 0.3), "tests": (93.4, 3.3), "performance": (97.7, 1.4)}, None),
+    "r3-e16-onepass": (804, 27, 71, 1314, 22, None, 97.2),
+    "r3-e22-chain3-ab": (809, 28, 66, 1314, 20, {"hygiene": (96.0, 3.8), "practices": (94.1, 1.7), "security": (93.2, 1.2), "tests": (94.3, 1.7), "performance": (98.5, 0.7)}, 96.8),
+}
+# Jev on the same 2,089 held-out edits, scored the same way (score.ts's scoreCases: the case's own
+# pack, shipped rules, gated, p >= 0.5, in-scope rules only), from Jev's cached Entry 7 judgments in
+# eval/results/cache. Computed by hand for Entry 8; there is no committed result file.
+JEV_HO = (861, 19, 14, 1314, 11, {"hygiene": (100.0, 0.0), "practices": (97.5, 1.3), "security": (98.5, 0.3), "tests": (97.9, 0.7), "performance": (98.5, 1.4)}, None)
+
+
+def _ar_check():
+    led2, led3, sc = AR / ".autoresearch/results.jsonl", AR / "round3/.autoresearch/results.jsonl", AR / ".autoresearch/scores"
+    if not (led2.exists() and led3.exists()):
+        return
+    got2 = []
+    for line in led2.read_text().splitlines():
+        r = json.loads(line)
+        got2.append((r["id"], tuple(r["measured_trials"]), r.get("label") or r["disposition"], round(r["secondary_metrics"]["clean_fa"], 2), r.get("train_s")))
+    got3 = []
+    for line in led3.read_text().splitlines():
+        r = json.loads(line)
+        a, tr = r.get("accuracy") or {}, r.get("measured_trials") or []
+        got3.append((r["id"], round(st.median(tr), 1) if tr else None, r.get("secondary_metrics", {}).get("p90_ms"), a.get("f1"), a.get("clean_fa"), r["disposition"]))
+        if r["id"] == "e22-chain3-ab" and tuple(r["paired_incumbent_trials"]) != E22_PAIRED_INCUMBENT:
+            raise SystemExit("Entry 8: e22's paired incumbent trials changed; update E22_PAIRED_INCUMBENT")
+    if got2 != R2:
+        raise SystemExit(f"Entry 8: round-2 ledger changed: {got2}")
+    if got3 != R3:
+        raise SystemExit(f"Entry 8: round-3 ledger changed: {got3}")
+    for name, want in HO.items():
+        d = load(sc / f"{name}.holdout.json")
+        t = d["total"]
+        packs = {p: (round(v["f1"] * 100, 1), round(v["cleanFA"] * 100, 1)) for p, v in d["byPack"].items()} if want[5] else None
+        p8 = round(d["precisionAt08"] * 100, 1) if "precisionAt08" in d else None
+        if (t["tp"], t["fp"], t["fn"], t["clean"], t["cleanFlagged"], packs, p8) != want:
+            raise SystemExit(f"Entry 8: HOLDOUT score file {name} changed")
+
+
+_ar_check()
+
+
+def ho(row):
+    tp, fp, fn, clean, cf = row[:5]
+    p, r = tp / (tp + fp), tp / (tp + fn)
+    return {"f1": 2 * p * r / (p + r), "p": p, "r": r, "fa": cf / clean, "pos": tp + fn, "packs": row[5], "p8": row[6]}
+
+
+H = {k: ho(v) for k, v in HO.items()}
+HJ = ho(JEV_HO)
+f1s = lambda v: f"{v * 100:.2f}"
+
+
+def r2_chart():
+    """Round 2: TUNE F1 per experiment (each seed a dot), the incumbent and the +1.0 keep bar."""
+    w, h, left, right, top, bottom = 680, 270, 44, 10, 16, 40
+    lo, hi = 91.5, 96.5
+    pw, ph = w - left - right, h - top - bottom
+    gw = pw / len(R2)
+    X = lambda i: left + gw * (i + 0.5)
+    Y = lambda v: top + ph * (1 - (v - lo) / (hi - lo))
+    out = [f'<svg viewBox="0 0 {w} {h}" role="img" aria-label="Round 2: TUNE F1 per experiment, with the incumbent and the keep bar" class="chart">']
+    for v in (92, 93, 94, 95, 96):
+        out.append(f'<line x1="{left}" x2="{w - right}" y1="{Y(v):.1f}" y2="{Y(v):.1f}" class="grid"/>')
+        out.append(f'<text x="{left - 6}" y="{Y(v) + 4:.1f}" class="tick" text-anchor="end">{v}</text>')
+    # Incumbent before each experiment: the baseline until e04 is kept (cost rule), then e04 until e12.
+    inc = []
+    cur = None
+    for rid, seeds, dec, _, _ in R2:
+        inc.append(cur)
+        if dec.startswith("keep"):
+            cur = round(st.mean(seeds), 2)
+    segs = []
+    for i, v in enumerate(inc):
+        if v is None:
+            continue
+        if segs and segs[-1][2] == v:
+            segs[-1][1] = i
+        else:
+            segs.append([i, i, v])
+    for a, b, v in segs:
+        x0, x1 = X(a) - gw / 2 + 2, X(b) + gw / 2 - 2
+        out.append(f'<line x1="{x0:.1f}" x2="{x1:.1f}" y1="{Y(v):.1f}" y2="{Y(v):.1f}" class="ln s2" stroke-width="1.5"><title>Incumbent: {v:.2f}</title></line>')
+        out.append(f'<line x1="{x0:.1f}" x2="{x1:.1f}" y1="{Y(v + 1):.1f}" y2="{Y(v + 1):.1f}" class="marker"><title>Keep bar: {v + 1:.2f}</title></line>')
+    for i, (rid, seeds, dec, fa, _) in enumerate(R2):
+        cls = "s1" if dec.startswith("keep") else "s3"
+        short = "base" if rid == "r1-baseline" else rid.split("-")[0]
+        if len(seeds) > 1:
+            out.append(f'<line x1="{X(i):.1f}" x2="{X(i):.1f}" y1="{Y(max(seeds)):.1f}" y2="{Y(min(seeds)):.1f}" class="ln {cls}" stroke-width="1.5"/>')
+        for s in seeds:
+            out.append(f'<circle cx="{X(i):.1f}" cy="{Y(s):.1f}" r="3.6" class="pt {cls}"><title>{rid}: TUNE F1 {s:.2f}{" (seeds " + " / ".join(f"{x:.2f}" for x in seeds) + ")" if len(seeds) > 1 else ""}, {dec}</title></circle>')
+        if dec.startswith("keep"):
+            out.append(f'<text x="{X(i):.1f}" y="{Y(max(seeds)) - 8:.1f}" class="val" text-anchor="middle">{st.mean(seeds):.2f}</text>')
+        out.append(f'<text x="{X(i):.1f}" y="{h - 22}" class="tick" text-anchor="middle">{short}</text>')
+    out.append(f'<text x="{left + pw / 2:.1f}" y="{h - 4}" class="tick" text-anchor="middle">experiment, in the order run</text>')
+    out.append("</svg>")
+    legend = ('<span class="key"><i class="sw s1"></i>Kept</span><span class="key"><i class="sw s3"></i>Discarded</span>'
+              '<span class="key"><i class="sw s2" style="height:2px"></i>Incumbent</span><span class="key"><i class="sw dash"></i>Keep bar (incumbent + 1.0)</span>')
+    return f'<figure>{"".join(out)}<div class="legend">{legend}</div></figure>'
+
+
+R3_TIMED = [r for r in R3 if r[1] is not None]
+R3_GATE_FAIL = {"e02-kev08", "e04-kev08-rf-r", "e06-nofalse", "e08-q4", "e10-kev4b-rf", "e11-rf-cascade", "e12-rf-cascade19",
+                "e14-fb-rf4b", "e15-band28", "e17-calband", "e20-kev4b-ri"}
+if {r[0] for r in R3 if r[5] == "checks_failed"} != R3_GATE_FAIL:
+    raise SystemExit("Entry 8: gate-failed set changed")
+
+
+def ms(v):
+    """Milliseconds, rounded half up like the ledger notes (1,606.5 -> 1,607)."""
+    return f"{int(v + 0.5):,}"
+
+
+def r3_chart():
+    """Round 3: median ms per check per experiment on a log scale, best so far, and the two targets."""
+    import math
+    w, h, left, right, top, bottom = 680, 290, 52, 10, 14, 40
+    lo, hi = 100, 2500
+    pw, ph = w - left - right, h - top - bottom
+    gw = pw / len(R3_TIMED)
+    X = lambda i: left + gw * (i + 0.5)
+    Y = lambda v: top + ph * (1 - (math.log10(v) - math.log10(lo)) / (math.log10(hi) - math.log10(lo)))
+    out = [f'<svg viewBox="0 0 {w} {h}" role="img" aria-label="Round 3: median milliseconds per check per experiment, log scale, with the 343 and 230 ms targets" class="chart">']
+    for v in (100, 200, 500, 1000, 2000):
+        out.append(f'<line x1="{left}" x2="{w - right}" y1="{Y(v):.1f}" y2="{Y(v):.1f}" class="grid"/>')
+        out.append(f'<text x="{left - 6}" y="{Y(v) + 4:.1f}" class="tick" text-anchor="end">{v:,}</text>')
+    out.append(f'<text x="{left - 6}" y="{top - 2}" class="tick" text-anchor="end">ms</text>')
+    for v, lab in ((343, "343 ms: cloud Jev, live"), (230, "230 ms: Jev, warm connection")):
+        out.append(f'<line x1="{left}" x2="{w - right}" y1="{Y(v):.1f}" y2="{Y(v):.1f}" class="marker"/>')
+        out.append(f'<text x="{left + 4}" y="{Y(v) - 4:.1f}" class="tick">{lab}</text>')
+    best, pts = None, []
+    for i, (rid, med, p90, f1v, fa, dec) in enumerate(R3_TIMED):
+        if dec == "keep":
+            best = med
+        pts.append((i, best))
+    step = []
+    for i, b in pts:
+        step.append(f"{X(i) - gw / 2:.1f},{Y(b):.1f} {X(i) + gw / 2:.1f},{Y(b):.1f}")
+    out.append(f'<polyline points="{" ".join(step)}" class="ln s2" stroke-width="1.5"/>')
+    for i, (rid, med, p90, f1v, fa, dec) in enumerate(R3_TIMED):
+        short = "0" if rid == "r3-baseline" else str(int(rid.split("-")[0][1:]))
+        gate = "gate failed" if rid in R3_GATE_FAIL else "gate passed"
+        tip = f"{rid}: median {ms(med)} ms, p90 {ms(p90)} ms; subset F1 {f1v:.2f}, clean FA {fa:.1f}%; {gate}; {dec.replace('checks_failed', 'not kept')}"
+        if rid in R3_GATE_FAIL:
+            out.append(f'<circle cx="{X(i):.1f}" cy="{Y(med):.1f}" r="3.6" class="hollow"><title>{esc(tip)}</title></circle>')
+        else:
+            cls = "s1" if dec == "keep" else "s3"
+            out.append(f'<circle cx="{X(i):.1f}" cy="{Y(med):.1f}" r="3.8" class="pt {cls}"><title>{esc(tip)}</title></circle>')
+        if dec == "keep" or rid in ("e04-kev08-rf-r", "e20-kev4b-ri"):
+            out.append(f'<text x="{X(i):.1f}" y="{Y(med) + 16:.1f}" class="val" text-anchor="middle">{ms(med)}</text>')
+        out.append(f'<text x="{X(i):.1f}" y="{h - 22}" class="tick" text-anchor="middle">{short}</text>')
+    out.append(f'<text x="{left + pw / 2:.1f}" y="{h - 4}" class="tick" text-anchor="middle">experiment number, in the order run (0 = baseline; e07 and e23 had no timing)</text>')
+    out.append("</svg>")
+    legend = ('<span class="key"><i class="sw s1"></i>Kept</span><span class="key"><i class="sw s3"></i>Passed the gate, not fast enough</span>'
+              '<span class="key"><i class="sw hollow"></i>Failed the accuracy gate</span><span class="key"><i class="sw s2" style="height:2px"></i>Best so far</span>'
+              '<span class="key"><i class="sw marker"></i>Targets</span>')
+    return f'<figure>{"".join(out)}<div class="legend">{legend}</div></figure>'
+
+
+r3 = {r[0]: r for r in R3}
+E22, E16P = r3["e22-chain3-ab"], st.median(E22_PAIRED_INCUMBENT)
+E8_TRAIN_H = {k: v / 3600 for k, _, _, _, v in R2 if v}
+seed_spread = max(max(s) - min(s) for _, s, _, _, _ in R2 if len(s) > 1)
+HE22, HE12, HE12M, HB = H["r3-e22-chain3-ab"], H["e12-paths"], H["mac-e12-paths"], H["r1-baseline"]
+PACK_ORDER8 = ["hygiene", "practices", "security", "tests", "performance"]
+cell = lambda d, p: f"{d['packs'][p][0]:.1f} ({d['packs'][p][1]:.1f}%)"
+e8_pack_rows = [[p.title(), cell(HB, p), cell(HE12, p), cell(HE12M, p), cell(HE22, p), cell(HJ, p)] for p in PACK_ORDER8]
+e8_pack_rows.append(["All packs", f"{f1s(HB['f1'])} ({pct(HB['fa'], 2)})", f"{f1s(HE12['f1'])} ({pct(HE12['fa'], 2)})", f"{f1s(HE12M['f1'])} ({pct(HE12M['fa'], 2)})",
+                     f"{f1s(HE22['f1'])} ({pct(HE22['fa'], 2)})", f"{f1s(HJ['f1'])} ({pct(HJ['fa'], 2)})"])
+e8_summary_rows = [
+    ["Held-out F1, all packs (precision / recall)", f"{HJ['f1'] * 100:.1f}% ({HJ['p'] * 100:.1f} / {HJ['r'] * 100:.1f})",
+     f"{HE22['f1'] * 100:.1f}% ({HE22['p'] * 100:.1f} / {HE22['r'] * 100:.1f})", f"{HE12M['f1'] * 100:.1f}% ({HE12M['p'] * 100:.1f} / {HE12M['r'] * 100:.1f})"],
+    ["Clean held-out edits flagged", pct(HJ["fa"], 1), pct(HE22["fa"], 1), pct(HE12M["fa"], 1)],
+    ["Median per check", "343 ms live; about 230 ms with a warm connection", f"{ms(E22[1])} ms", f"{ms(r3['r3-baseline'][1])} ms"],
+    ["90th percentile per check", "not measured on this workload", f"{ms(E22[2])} ms", f"{ms(r3['r3-baseline'][2])} ms"],
+    ["Cost per 10,000 edits", "about $2 (estimate)", "$0", "$0"],
+    ["Memory on the Mac", "none", "about 20 GB, three model servers (estimate)", "about 8 GB, one server"],
+    ["Works offline", "No", "Yes", "Yes"],
+]
+
 # ---------------------------------------------------------------- page
 
 N = lambda x: f"{x:.2f}"
@@ -961,6 +1175,21 @@ ctx = dict(
     FT_TESTS="–".join(f"{v * 100:.0f}" for v in sorted(FT_TESTS)) + "%", FT_P50=f"{min(FT_P50):.1f}–{max(FT_P50):.1f}",
     FT_FA="{:.0f}–{:.0f}%".format(*(f(res(KEV_FT, "local", g[0], g[1], "holdout", "high+medium")["cleanFalseAlarmRate"] * 100 for _, g in headline_groups) for f in (min, max))),
     SKILL_TABLE=table(["Measure (5 repos × 2 runs)", "v1 skill", "v2 skill"], skill_rows),
+    # Entry 8
+    CHART_R2=r2_chart(), CHART_R3=r3_chart(),
+    E8_SUMMARY=table(["", "Cloud Jev", "Local chain (e22)", "Local e12 alone"], e8_summary_rows),
+    E8_PACKS=table(["Pack", "Round-1 baseline", "e12 (Spark)", "e12 (Mac)", "e22 chain (Mac)", "Jev"], e8_pack_rows),
+    E8_POS=str(HB["pos"]),
+    E8_B_F1=f1s(HB["f1"]), E8_B_FA=pct(HB["fa"], 2), E8_E12_F1=f1s(HE12["f1"]), E8_E12_FA=pct(HE12["fa"], 2),
+    E8_E12M_F1=f1s(HE12M["f1"]), E8_E12M_FA=pct(HE12M["fa"], 2),
+    E8_E22_F1=f1s(HE22["f1"]), E8_E22_FA=pct(HE22["fa"], 2), E8_E22_P8=f"{HE22['p8']:.1f}", E8_E22_P=f"{HE22['p'] * 100:.1f}", E8_E22_R=f"{HE22['r'] * 100:.1f}",
+    E8_JEV_F1=f"{HJ['f1'] * 100:.1f}", E8_E22_F1R=f"{HE22['f1'] * 100:.1f}", E8_E22_FAR=pct(HE22["fa"], 1), E8_JEV_R=f"{HJ['r'] * 100:.1f}", E8_JEV_FA=pct(HJ["fa"], 1),
+    E8_N2=str(len(R2) - 1), E8_KEPT2=str(sum(1 for r in R2[1:] if r[2].startswith("keep"))), E8_SPREAD=f"{seed_spread:.1f}",
+    E8_TB=f"{E8_TRAIN_H['r1-baseline']:.1f}", E8_TG=f"{E8_TRAIN_H['e04-gate-train']:.1f}", E8_TE12=f"{E8_TRAIN_H['e12-paths']:.1f}",
+    E8_GATE_X=f"{E8_TRAIN_H['r1-baseline'] / E8_TRAIN_H['e04-gate-train']:.1f}",
+    E8_R3_BASE=ms(r3["r3-baseline"][1]), E8_R3_BASE_P90=ms(r3["r3-baseline"][2]),
+    E8_E22_MS=ms(E22[1]), E8_E22_P90=ms(E22[2]), E8_E16_PAIRED=ms(E16P),
+    E8_N3=str(sum(1 for r in R3 if r[0] not in ("r3-baseline", "e04-kev08-rf"))),
 )
 
 page = (ROOT / "report/notebook.html").read_text()
