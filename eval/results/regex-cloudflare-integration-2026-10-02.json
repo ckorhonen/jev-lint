@@ -1,0 +1,442 @@
+{
+  "generatedAt": "2026-10-02T13:10:00.662Z",
+  "gateStats": {
+    "practices.bazel": {
+      "cases": 58,
+      "rules": 6,
+      "asked": 89
+    },
+    "tests.bazel": {
+      "cases": 26,
+      "rules": 2,
+      "asked": 22
+    },
+    "performance.kotlin": {
+      "cases": 17,
+      "rules": 1,
+      "asked": 13
+    },
+    "practices.kotlin": {
+      "cases": 84,
+      "rules": 10,
+      "asked": 175
+    },
+    "tests.kotlin": {
+      "cases": 74,
+      "rules": 7,
+      "asked": 369
+    },
+    "performance.python": {
+      "cases": 54,
+      "rules": 4,
+      "asked": 114
+    },
+    "practices.python": {
+      "cases": 73,
+      "rules": 6,
+      "asked": 80
+    },
+    "security.python": {
+      "cases": 131,
+      "rules": 7,
+      "asked": 151
+    },
+    "tests.python": {
+      "cases": 104,
+      "rules": 10,
+      "asked": 657
+    },
+    "performance.ruby": {
+      "cases": 17,
+      "rules": 1,
+      "asked": 11
+    },
+    "practices.ruby": {
+      "cases": 74,
+      "rules": 4,
+      "asked": 46
+    },
+    "security.ruby": {
+      "cases": 74,
+      "rules": 4,
+      "asked": 79
+    },
+    "tests.ruby": {
+      "cases": 27,
+      "rules": 2,
+      "asked": 31
+    },
+    "performance.rust": {
+      "cases": 17,
+      "rules": 1,
+      "asked": 12
+    },
+    "practices.rust": {
+      "cases": 68,
+      "rules": 6,
+      "asked": 73
+    },
+    "security.rust": {
+      "cases": 68,
+      "rules": 2,
+      "asked": 38
+    },
+    "tests.rust": {
+      "cases": 16,
+      "rules": 1,
+      "asked": 15
+    },
+    "hygiene.swift": {
+      "cases": 66,
+      "rules": 13,
+      "asked": 265
+    },
+    "performance.swift": {
+      "cases": 34,
+      "rules": 2,
+      "asked": 27
+    },
+    "practices.swift": {
+      "cases": 163,
+      "rules": 19,
+      "asked": 670
+    },
+    "tests.swift": {
+      "cases": 109,
+      "rules": 8,
+      "asked": 525
+    },
+    "hygiene.typescript": {
+      "cases": 66,
+      "rules": 11,
+      "asked": 238
+    },
+    "performance.typescript": {
+      "cases": 64,
+      "rules": 5,
+      "asked": 79
+    },
+    "practices.typescript": {
+      "cases": 252,
+      "rules": 17,
+      "asked": 1047
+    },
+    "security.typescript": {
+      "cases": 231,
+      "rules": 20,
+      "asked": 580
+    },
+    "tests.typescript": {
+      "cases": 122,
+      "rules": 9,
+      "asked": 773
+    }
+  },
+  "llmModel": "gpt-6-luna",
+  "models": {
+    "jev": "jev-1.13.0",
+    "clef": "@cf/cloudflare/clef",
+    "clef-flash": "@cf/cloudflare/clef-flash"
+  },
+  "thresholds": {
+    "HIGH": 0.8,
+    "MEDIUM": 0.5
+  },
+  "caseCounts": {
+    "practices.bazel.holdout": 58,
+    "tests.bazel.holdout": 26,
+    "performance.kotlin.holdout": 17,
+    "practices.kotlin.holdout": 84,
+    "tests.kotlin.holdout": 74,
+    "performance.python.holdout": 54,
+    "practices.python.holdout": 73,
+    "security.python.holdout": 131,
+    "tests.python.holdout": 104,
+    "performance.ruby.holdout": 17,
+    "practices.ruby.holdout": 74,
+    "security.ruby.holdout": 74,
+    "tests.ruby.holdout": 27,
+    "performance.rust.holdout": 17,
+    "practices.rust.holdout": 68,
+    "security.rust.holdout": 68,
+    "tests.rust.holdout": 16,
+    "hygiene.swift.holdout": 66,
+    "performance.swift.holdout": 34,
+    "practices.swift.holdout": 163,
+    "tests.swift.holdout": 109,
+    "hygiene.typescript.holdout": 66,
+    "performance.typescript.holdout": 64,
+    "practices.typescript.holdout": 252,
+    "security.typescript.holdout": 231,
+    "tests.typescript.holdout": 122
+  },
+  "errors": {
+    "regex": 0
+  },
+  "results": [
+    {
+      "system": "regex",
+      "pack": "hygiene",
+      "lang": "swift",
+      "split": "holdout",
+      "policy": "high",
+      "threshold": 1,
+      "tp": 27,
+      "fp": 1,
+      "fn": 27,
+      "precision": 0.9642857142857143,
+      "recall": 0.5,
+      "f1": 0.6585365853658536,
+      "cleanCases": 24,
+      "cleanFalseAlarmRate": 0.041666666666666664,
+      "perRule": {
+        "swift-no-force-unwrap": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "swift-no-force-try": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "swift-no-force-cast": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "swift-no-debug-print": {
+          "tp": 4,
+          "fp": 1,
+          "fn": 0,
+          "precision": 0.8,
+          "recall": 1,
+          "f1": 0.888888888888889
+        },
+        "swift-no-empty-catch": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "swift-no-restating-comment": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 4,
+          "precision": 1,
+          "recall": 0,
+          "f1": 0
+        },
+        "swift-no-vague-names": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 5,
+          "precision": 1,
+          "recall": 0,
+          "f1": 0
+        },
+        "swift-no-magic-numbers": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 4,
+          "precision": 1,
+          "recall": 0,
+          "f1": 0
+        },
+        "swift-no-commented-out-code": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 4,
+          "precision": 1,
+          "recall": 0,
+          "f1": 0
+        },
+        "swift-no-bare-todo": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "swift-no-hardcoded-secret": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 1,
+          "precision": 1,
+          "recall": 0.75,
+          "f1": 0.8571428571428571
+        },
+        "swift-ui-off-main": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 5,
+          "precision": 1,
+          "recall": 0,
+          "f1": 0
+        },
+        "swift-prefer-guard": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 4,
+          "precision": 1,
+          "recall": 0,
+          "f1": 0
+        }
+      },
+      "regexCoveredRules": {
+        "tp": 27,
+        "fp": 1,
+        "fn": 1,
+        "precision": 0.9642857142857143,
+        "recall": 0.9642857142857143,
+        "f1": 0.9642857142857143
+      },
+      "latency": {
+        "p50": 0.05113900000000626,
+        "p90": 0.1985039999999998,
+        "n": 66,
+        "tokens": {
+          "input": 0,
+          "output": 0
+        }
+      }
+    },
+    {
+      "system": "regex",
+      "pack": "hygiene",
+      "lang": "typescript",
+      "split": "holdout",
+      "policy": "high",
+      "threshold": 1,
+      "tp": 25,
+      "fp": 1,
+      "fn": 22,
+      "precision": 0.9615384615384616,
+      "recall": 0.5319148936170213,
+      "f1": 0.684931506849315,
+      "cleanCases": 29,
+      "cleanFalseAlarmRate": 0.034482758620689655,
+      "perRule": {
+        "ts-no-explicit-any": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 1,
+          "precision": 1,
+          "recall": 0.75,
+          "f1": 0.8571428571428571
+        },
+        "ts-no-non-null-assertion": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-no-empty-catch": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-no-debug-console": {
+          "tp": 4,
+          "fp": 1,
+          "fn": 0,
+          "precision": 0.8,
+          "recall": 1,
+          "f1": 0.888888888888889
+        },
+        "ts-no-restating-comment": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 6,
+          "precision": 1,
+          "recall": 0,
+          "f1": 0
+        },
+        "ts-no-vague-names": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 4,
+          "precision": 1,
+          "recall": 0,
+          "f1": 0
+        },
+        "ts-no-magic-numbers": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 5,
+          "precision": 1,
+          "recall": 0,
+          "f1": 0
+        },
+        "ts-no-commented-out-code": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 4,
+          "precision": 1,
+          "recall": 0,
+          "f1": 0
+        },
+        "ts-no-bare-todo": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "ts-no-hardcoded-secret": {
+          "tp": 2,
+          "fp": 0,
+          "fn": 2,
+          "precision": 1,
+          "recall": 0.5,
+          "f1": 0.6666666666666666
+        },
+        "ts-no-ts-ignore": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        }
+      },
+      "regexCoveredRules": {
+        "tp": 25,
+        "fp": 1,
+        "fn": 3,
+        "precision": 0.9615384615384616,
+        "recall": 0.8928571428571429,
+        "f1": 0.9259259259259259
+      },
+      "latency": {
+        "p50": 0.02731600000001322,
+        "p90": 0.12948699999999747,
+        "n": 66,
+        "tokens": {
+          "input": 0,
+          "output": 0
+        }
+      }
+    }
+  ],
+  "sweeps": [],
+  "bands": []
+}

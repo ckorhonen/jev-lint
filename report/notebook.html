@@ -111,7 +111,8 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12.5px}
   <div class="eyebrow">Contents</div>
   <ol id="toc-list">
     <li><a href="#answer">Current answer</a></li>
-    <li><a href="#e8">Entry 8 · Local model, accuracy and speed <span class="tag new">latest</span></a>
+    <li><a href="#e9">Entry 9 · Optional Cloudflare Clef <span class="tag new">latest</span></a></li>
+    <li><a href="#e8">Entry 8 · Local model, accuracy and speed</a>
       <ol>
         <li><a href="#e8-summary">Local vs Jev</a></li>
         <li><a href="#e8-accuracy">Retraining Kev-4B</a></li>
@@ -191,10 +192,11 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12.5px}
   <section id="answer">
     <h2>Current answer</h2>
     <div class="verdict">
-      <p class="eyebrow">Recommendation as of Entry 8</p>
+      <p class="eyebrow">Recommendation as of Entry 9</p>
       <p><b>Adopt it, with the five default packs on, as a non-blocking background hint.</b> The hook now carries {{LIVE_ALL}} rules across seven languages. Every new rule shipped only after passing a held-out bar fixed in advance. Thanks to the gate, a check on real code still takes about 0.3 s with twice as many rules. With every pack on, it cut graded rule violations in real Claude Code runs by {{E7_V_ABS}} ({{E7_V_NONE}} → {{E7_V_JEV}} per task), for about {{E7_COST_ABS}} more agent cost. It's most worth it where review is human, or where no AI reviewer checks every change. It still doesn't replace an AI code reviewer: most review comments are about logic and design.</p>
       <p><b>Use cloud Jev.</b> A fine-tuned local model now runs on this Mac for free and offline, at about 0.5 s per check. It's a usable fallback, but it misses more than Jev ({{E8_E22_F1R}}% held-out F1 against {{E8_JEV_F1}}%) and is slower (Entry 8).</p>
     </div>
+    <p><b>Cloudflare Clef is optional and experimental.</b> Its integration is tested, but the live comparison is pending credentials (Entry 9). Earlier Jev measurements do not establish Clef accuracy, speed or cost.</p>
     <details class="more"><summary>Entry 6 verdict <span class="tag old">superseded</span></summary>
       <p><b>Adopt it with both rule packs, as a non-blocking hint.</b> On best-practice rules like "don't mirror a prop into state with an effect", Jev is accurate once each rule is worded narrowly. In real agent runs it cut graded rule violations by about a third. On React tasks, it cut the review comments our rules cover from 1.42 to 0.25 per task. SwiftUI tasks had too few of those comments to show an effect. It does not replace an AI code reviewer. About three quarters of what the reviewer raised was logic and design problems that no snippet-level rule can see.</p>
     </details>
@@ -230,6 +232,20 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12.5px}
     <h3>Speed</h3>
     <p class="note">Median seconds per check on the held-out edits. Jev also costs less ($0.76 vs $2.41 per 10,000 single-pack checks for Luna), but at these prices cost is not the deciding factor; the extra second or more per edit is.</p>
     {{CHART_LATENCY}}
+  </section>
+
+  <section class="entry" id="e9">
+    <p class="eyebrow">2 Oct 2026 · Entry 9</p>
+    <h2>Optional Cloudflare Clef: integration ready, comparison pending</h2>
+    <h3>Question</h3>
+    <p>Can Clef or Clef-flash replace Jev for our snippet-level rules without increasing false alarms or unacceptable latency?</p>
+    <h3>Setup</h3>
+    <p>Compare <code>jev-1.13.0</code>, <code>@cf/cloudflare/clef</code> and <code>@cf/cloudflare/clef-flash</code> on the existing 2,089 holdout edits, across all packs and languages, with three repeats and fixed 0.8 / 0.5 thresholds. No rule wording or thresholds were tuned. Hosted judges ask all rules; masked gated scores do not measure gated latency.</p>
+    <h3>What we learned</h3>
+    <p>The Workers AI adapter supports both models, credential isolation, response validation, 64-question batches and one shared timeout. Main hooks and end-of-turn rechecks persist the same provider settings. Protocol regression tests pass.</p>
+    <p><b>No live Clef/Jev comparison was measured.</b> The attempted run stopped at credential preflight: neither provider's credentials are configured in this environment. No hosted scores or speed/cost claims are inferred from mocks.</p>
+    <p>The credential-free regex baseline completed with zero errors: hygiene holdout F1 was 66% for Swift and 68% for TypeScript. That checks the harness, not the Cloudflare model. Earlier results remain unchanged.</p>
+    <p><a href="https://github.com/ckorhonen/jev-lint/blob/main/docs/cloudflare-eval.md">Full setup, exact regex results, caveats and reproduction command</a>. TypeSafe remains the default; Clef is an opt-in experimental alternative.</p>
   </section>
 
   <section class="entry" id="e8">
@@ -757,6 +773,7 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12.5px}
 
   <section id="rec">
     <h2>Recommendation</h2>
+    <p>Entry 9 adds optional Cloudflare Clef support. Keep Jev as the measured default until the hosted comparison is completed.</p>
     <ol>
       <li><b>Install the hook with the default packs on</b>: hygiene, practices, security, tests and performance ({{LIVE_ALL}} rules). Candidates stay off until they pass. Use it in Claude Code and Codex, as a non-blocking hint with thresholds 0.8 / 0.5, and pin <code>JEV_LINT_MODEL=jev-1.13.0</code>. <span class="note">(Until Entry 7 this said "both packs"; the new packs cost almost no time on real code.)</span></li>
       <li><b>Match the setup to your review process.</b> It's best value with human review, or where no AI reviewer checks every change. There, run the hook async and always on. If an AI reviewer plus a fix round already run on every task, the hook is marginal (Entry 6). Consider a review-time Jev check instead, which is cheaper and untested.</li>
@@ -832,6 +849,7 @@ python3 report/build.py path/to/DepartureMono-Regular.woff2 # rebuild this page<
   <section id="log">
     <h2>Changelog</h2>
     <ul>
+      <li><b>2 Oct 2026, Entry 9.</b> Added optional Clef/Clef-flash integration and comparison harness. Live comparison blocked by missing credentials; regex holdout completed. No prior evidence replaced.</li>
       <li><b>1 Oct 2026, Entry 8.</b>
         <ul>
           <li>Kev-4B retrained on all labelled dev edits, then 15 single-change experiments (2 kept). Best: e12, the extra copy under another folder.</li>

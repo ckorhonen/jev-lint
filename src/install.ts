@@ -25,11 +25,28 @@ import {
 import { homedir, tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { parseArgs } from "node:util";
-import { keyFilePath } from "./jev";
+import { cloudflareKey, judgeModel, judgeProvider, keyFilePath } from "./jev";
 
 const REPO = resolve(import.meta.dir, "..");
 const HOOK = join(REPO, "src/hook.ts");
 const MODEL = "jev-1.13.0";
+const installedModel = () => process.env.JEV_LINT_MODEL ?? (judgeProvider() === "cloudflare" ? judgeModel() : MODEL);
+const shellQuote = (value: string) => `'${value.replaceAll("'", "'\\''")}'`;
+
+// Persist non-secret provider settings for both hooks. Credentials stay in the
+// agent environment or a private token file, never in hook configuration.
+export function judgeCommandEnv(): string {
+  const provider = judgeProvider();
+  const model = installedModel();
+  if (provider === "typesafe") return `JEV_LINT_PROVIDER=typesafe JEV_LINT_MODEL=${model === MODEL ? MODEL : shellQuote(model)}`;
+  if (model !== "clef" && model !== "clef-flash") throw new Error("Cloudflare model must be clef or clef-flash");
+  const account = process.env.CLOUDFLARE_ACCOUNT_ID;
+  if (!account || !/^[a-f0-9]{32}$/i.test(account)) throw new Error("CLOUDFLARE_ACCOUNT_ID must be a 32-character account ID");
+  const tokenFile = process.env.CLOUDFLARE_API_TOKEN_FILE;
+  return `JEV_LINT_PROVIDER=cloudflare JEV_LINT_MODEL=${shellQuote(model)} CLOUDFLARE_ACCOUNT_ID=${shellQuote(account)}${
+    tokenFile ? ` CLOUDFLARE_API_TOKEN_FILE=${shellQuote(resolve(tokenFile))}` : ""
+  }`;
+}
 const SYNC_TIMEOUT_S = 15; // the agent waits on a synchronous check
 const ASYNC_TIMEOUT_S = 180; // a background check can take longer (slow local judges)
 const SMOKE_TIMEOUT_MS = 30_000;
@@ -41,7 +58,7 @@ type HookConfig = { hooks?: Record<string, HookGroup[] | undefined> } & Record<s
 export function hookGroup(agent: "claude" | "codex", opts: { async?: boolean; bun?: string } = {}): HookGroup {
   const bun = opts.bun ?? Bun.which("bun") ?? process.execPath; // the PATH shim survives bun upgrades
   const rewake = agent === "claude" && opts.async;
-  const command = `${rewake ? "JEV_LINT_MODE=rewake " : ""}JEV_LINT_MODEL=${MODEL} ${bun} ${HOOK}`;
+  const command = `${rewake ? "JEV_LINT_MODE=rewake " : ""}${judgeCommandEnv()} ${bun} ${HOOK}`;
   return {
     matcher: agent === "claude" ? "Write|Edit|MultiEdit" : "Edit|Write|apply_patch",
     hooks: [
@@ -65,7 +82,7 @@ export const RECHECK_EVENTS = ["Stop", "SubagentStop"] as const;
 // End-of-turn re-check for the learning loop (see src/recheck.ts): no matcher, since Stop events have no tool.
 export function recheckGroup(opts: { bun?: string } = {}): HookGroup {
   const bun = opts.bun ?? Bun.which("bun") ?? process.execPath;
-  return { hooks: [{ type: "command", command: `JEV_LINT_MODEL=${MODEL} ${bun} ${RECHECK}`, timeout: RECHECK_TIMEOUT_S }] };
+  return { hooks: [{ type: "command", command: `${judgeCommandEnv()} ${bun} ${RECHECK}`, timeout: RECHECK_TIMEOUT_S }] };
 }
 
 // Which bun binary runs the hook doesn't matter (Homebrew vs ~/.bun), so it isn't a change.
@@ -193,7 +210,7 @@ function smoke(): string {
   const run = spawnSync(process.execPath, [HOOK], {
     input: JSON.stringify(event),
     cwd: dir,
-    env: { ...process.env, JEV_LINT_FINDINGS_LOG: "off", JEV_LINT_MODEL: MODEL },
+    env: { ...process.env, JEV_LINT_FINDINGS_LOG: "off", JEV_LINT_MODEL: installedModel() },
     encoding: "utf8",
     timeout: SMOKE_TIMEOUT_MS,
   });
@@ -227,7 +244,11 @@ if (import.meta.main) {
   }
   console.log(`jev-lint at ${REPO}`);
   console.log(`bun: ${process.execPath}`);
-  console.log(`TypeSafe key: ${keyStatus()}`);
+  console.log(
+    judgeProvider() === "cloudflare"
+      ? `Cloudflare token: ${cloudflareKey() ? "present" : "MISSING"} (must be available to the agent at runtime)`
+      : `TypeSafe key: ${keyStatus()}`,
+  );
   if (!values["codex-only"]) {
     const path = values.project ? join(resolve(values.project), ".claude/settings.json") : join(homedir(), ".claude/settings.json");
     console.log(

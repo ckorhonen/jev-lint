@@ -4,6 +4,7 @@
 //   regex — deterministic patterns for the rules a classic linter could express
 
 import { extractChanges } from "../src/extract";
+import type { JudgeOptions } from "../src/jev";
 import { lintChange, type Pack, type RuleSet, ruleSetFor } from "../src/lint";
 
 export type Case = {
@@ -25,6 +26,7 @@ export type Judgment = {
   inputTokens: number;
   outputTokens: number;
   error?: string;
+  models?: string[]; // actual provider response model ids, when available
 };
 
 function changesFor(c: Case) {
@@ -49,12 +51,26 @@ export function caseCode(c: Case): string {
     .join("\n");
 }
 
-export async function judgeJev(c: Case, baseUrl?: string, gate = false): Promise<Judgment> {
+export const judgeClef = (c: Case) => judgeJev(c, undefined, false, { provider: "cloudflare", model: "clef" });
+export const judgeClefFlash = (c: Case) => judgeJev(c, undefined, false, { provider: "cloudflare", model: "clef-flash" });
+
+export async function judgeJev(c: Case, baseUrl?: string, gate = false, options: JudgeOptions = {}): Promise<Judgment> {
   const scores: Record<string, number> = {};
   let latencyMs = 0;
   let inputTokens = 0;
   const results = await Promise.all(
-    changesFor(c).map((ch) => lintChange(ch, { timeoutMs: 120_000, retries: 4, packs: [c.pack], baseUrl, gate })),
+    changesFor(c).map((ch) =>
+      lintChange(ch, {
+        timeoutMs: 120_000,
+        retries: 4,
+        packs: [c.pack],
+        baseUrl,
+        gate,
+        provider: "typesafe",
+        model: process.env.JEV_LINT_MODEL ?? "jev-1.13.0",
+        ...options,
+      }),
+    ),
   );
   for (const r of results) {
     if (!r) continue;
@@ -62,7 +78,13 @@ export async function judgeJev(c: Case, baseUrl?: string, gate = false): Promise
     latencyMs = Math.max(latencyMs, r.latencyMs); // files in one patch are judged in parallel
     inputTokens += r.inputTokens;
   }
-  return { scores, latencyMs, inputTokens, outputTokens: 0 };
+  return {
+    scores,
+    latencyMs,
+    inputTokens,
+    outputTokens: 0,
+    models: [...new Set(results.flatMap((r) => (r && r.model !== "gated" ? [r.model] : [])))],
+  };
 }
 
 export const LLM_MODEL = process.env.BASELINE_MODEL ?? "gpt-6-luna";

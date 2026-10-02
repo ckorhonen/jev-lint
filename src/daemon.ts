@@ -33,7 +33,7 @@ const version = codeVersion();
 
 const { isChangedFile, runChecks } = await import("./checks");
 const { daemonSocketPath } = await import("./daemonClient");
-const { apiKey } = await import("./jev");
+const { apiKey, judgeProvider } = await import("./jev");
 const { clearGateCache } = await import("./lint");
 const { clearRepoCache } = await import("./repoRules");
 
@@ -122,7 +122,7 @@ function main() {
         clearGateCache();
         const cwd = typeof body.cwd === "string" ? body.cwd : undefined;
         const settled = await runChecks(body.changes, { timeoutMs: body.timeoutMs, cwd });
-        if (settled.some((s) => !s.ok && /TypeSafe (401|403)/.test(s.error))) drain();
+        if (settled.some((s) => !s.ok && /(?:TypeSafe|Cloudflare) (401|403)/.test(s.error))) drain();
         return Response.json(settled);
       } catch (error) {
         return new Response(String(error), { status: 500 });
@@ -135,8 +135,11 @@ function main() {
   chmodSync(socket, 0o600);
   const inode = statSync(socket).ino;
 
-  apiKey(); // resolve once, after binding, so a slow Keychain can't leave the socket missing
-  const warm = () => fetch(BASE_URL, { method: "GET", signal: AbortSignal.timeout(5000) }).catch(() => undefined);
+  if (judgeProvider() === "typesafe") apiKey(); // Cloudflare must not read the TypeSafe Keychain
+  const warm = () =>
+    judgeProvider() === "typesafe"
+      ? fetch(BASE_URL, { method: "GET", signal: AbortSignal.timeout(5000) }).catch(() => undefined)
+      : undefined;
   void warm();
   const timer = setInterval(() => {
     const idle = Date.now() - lastActivity;

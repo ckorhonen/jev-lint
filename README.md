@@ -23,6 +23,7 @@ which of your team's rules it just broke, and fixes them before anyone reviews t
   - [Learn from what it catches](#learn-from-what-it-catches)
   - [Rule packs](#rule-packs)
     - [Options (environment variables on the hook command)](#options-environment-variables-on-the-hook-command)
+  - [Cloudflare Clef (optional)](#cloudflare-clef-optional)
   - [Local models](#local-models)
   - [Evaluation harness](#evaluation-harness)
   - [For agents working in this repo](#for-agents-working-in-this-repo)
@@ -95,7 +96,7 @@ jev-lint moves that check to the moment the file is written. In plain terms:
 
 1. A **hook** — a small script that Claude Code or Codex runs automatically right after
    a file edit — sends the code the agent just added to [TypeSafe Jev](https://docs.typesafe.ai),
-   a fast judgment model built for exactly this.
+   a fast judgment model built for exactly this. [Cloudflare Clef](#cloudflare-clef-optional) is an optional alternative.
 2. Jev answers yes or no for each rule, in about 0.3 seconds.
 3. If a rule looks broken, the agent hears about it right away and fixes it while the
    file is still open, with no review round trip.
@@ -210,7 +211,8 @@ evaluation harness, and how the repo itself is developed.
 Most people should use [Set it up with your agent](#set-it-up-with-your-agent) above. This
 section is the manual reference.
 
-Requires [bun](https://bun.sh) and a TypeSafe API key.
+Requires [bun](https://bun.sh) and a TypeSafe API key for the default mode, or
+[Cloudflare Workers AI credentials](#cloudflare-clef-optional) for optional Clef mode.
 
 ```sh
 git clone https://github.com/ckorhonen/jev-lint ~/Repos/jev-lint && cd ~/Repos/jev-lint
@@ -290,7 +292,7 @@ Codex supports `async` hooks but not rewake, so keep Codex synchronous. Codex ne
 `[features] hooks = true` in `config.toml` and, the first time, trusting the hook (or `--dangerously-bypass-hook-trust` in automation).
 
 The hook fails open: on a timeout, an API error or an unknown file type it exits 0 silently.
-**Privacy:** the added code of every edit to a matching file is sent to TypeSafe.
+**Privacy:** the added code of every edit to a matching file is sent to the selected provider: TypeSafe by default, Cloudflare in Clef mode, or your configured local server.
 
 ### Generate rules for your repo
 
@@ -421,7 +423,11 @@ Two rules were removed because the model is weak at counting and tracing; use a 
 | `JEV_LINT_GATE` | on | `off` asks every rule. By default a rule is only asked when its `when` patterns match the added code (about a third of rules per edit) |
 | `JEV_LINT_HIGH` / `JEV_LINT_MEDIUM` | `0.8` / `0.5` | Tier thresholds |
 | `JEV_LINT_MODE` | `context` | `block` sends findings as `decision: "block"`; `rewake` is for Claude Code async hooks (see below) |
-| `JEV_LINT_MODEL` | `jev-latest` | Pin `jev-1.13.0` so model updates can't shift thresholds |
+| `JEV_LINT_PROVIDER` | `typesafe` | `cloudflare` opts into Workers AI Clef; see setup below |
+| `JEV_LINT_MODEL` | `jev-latest` (TypeSafe), `clef` (Cloudflare) | Pin `jev-1.13.0` for TypeSafe; Cloudflare accepts `clef` or `clef-flash` |
+| `CLOUDFLARE_ACCOUNT_ID` | unset | Required in Cloudflare mode: your 32-character account ID |
+| `CLOUDFLARE_API_TOKEN` | unset | Workers AI token, read only in Cloudflare mode; never written to hook configs |
+| `CLOUDFLARE_API_TOKEN_FILE` | unset | Alternative token file; must have no group/other permissions (use mode 600). Environment token takes priority |
 | `JEV_LINT_TIMEOUT_MS` | `8000` | Per-call timeout |
 | `JEV_LINT_LOG` | unset | Debug: append every raw judgment to a JSONL file |
 | `JEV_LINT_FINDINGS_LOG` | `~/.local/state/jev-lint/findings.jsonl` | Findings log used by `jev-lint-learn`; `off` disables it |
@@ -429,6 +435,85 @@ Two rules were removed because the model is weak at counting and tracing; use a 
 | `JEV_LINT_RECHECK` | `on` | `off` disables the end-of-turn re-check (`src/recheck.ts`) that gives each finding a fixed/kept outcome |
 | `JEV_LINT_DAEMON` | `on` | `off` checks in the hook process every time. When `on`, the first check starts a small background process that keeps the API connection open and reads the key once; later checks go through it (about 100 ms faster each). It is local only (a user-only Unix socket), exits after 30 idle minutes (`JEV_LINT_DAEMON_IDLE_MS`) or when jev-lint's code changes, and the hook falls back to checking in process if it is unavailable. |
 | `JEV_LINT_DEBUG` | unset | Print errors to stderr |
+
+### Cloudflare Clef (optional)
+
+[Clef](https://developers.cloudflare.com/workers-ai/models/clef/) and
+[Clef-flash](https://developers.cloudflare.com/workers-ai/models/clef-flash/) are
+Cloudflare decision models served by Workers AI. Opt in with
+`JEV_LINT_PROVIDER=cloudflare`; TypeSafe Jev remains the default. This is an
+experimental alternative: the Jev accuracy, latency and cost results above do
+**not** establish Clef's performance on these rules. See the
+[comparison plan and current status](docs/cloudflare-eval.md).
+
+1. Find your Cloudflare account ID and create an API token using the Workers AI token template (or **Workers AI → Read** and **Workers AI → Edit**
+   permissions) for that account ([REST setup](https://developers.cloudflare.com/workers-ai/get-started/rest-api/)).
+2. Make the token available to the agent as `CLOUDFLARE_API_TOKEN`, or store it in
+   a private file. A file is useful when the agent is launched outside your shell:
+
+   ```sh
+   mkdir -p ~/.config/jev-lint
+   (umask 077; cat > ~/.config/jev-lint/cloudflare-token)  # paste token, then Ctrl-D
+   chmod 600 ~/.config/jev-lint/cloudflare-token
+   export CLOUDFLARE_API_TOKEN_FILE="$HOME/.config/jev-lint/cloudflare-token"
+   ```
+
+3. Select the provider and run the installer from the checkout:
+
+   ```sh
+   export JEV_LINT_PROVIDER=cloudflare
+   export CLOUDFLARE_ACCOUNT_ID=your_32_character_account_id
+   export JEV_LINT_MODEL=clef             # or clef-flash
+   bun src/install.ts --skills --smoke   # inspect the dry run and real check
+   bun src/install.ts --apply --skills --smoke
+   ```
+
+The installer records the provider, model, account ID and optional absolute token
+file path in both the edit hook and the end-of-turn recheck. It never writes the
+token into hook configs. An environment token must also be present in the running
+agent's environment; exporting it only for installation does not persist it.
+No TypeSafe key is required in this mode. Existing `--pre`, `--async`, pack,
+threshold and rule options work as before. `check.ts` and `validate.ts` also honor
+the selected provider.
+
+The hook posts to
+`https://api.cloudflare.com/client/v4/accounts/<account>/ai/run/@cf/cloudflare/<model>`.
+It sends the same added code and Noul questions as Jev, unwraps the Workers AI
+response, and keeps the existing 0.8 / 0.5 tiers. More than 64 questions are split
+into batches under one timeout, with token usage summed. Missing credentials,
+timeouts, API failures and malformed answers fail open; errors appear in the
+findings log (or on stderr with `JEV_LINT_DEBUG=1`). Provider/account/model/token
+changes get separate daemon sockets. There is no automatic fallback to TypeSafe.
+`TYPESAFE_BASE_URL` configures only the TypeSafe/local path, not Workers AI.
+
+**Privacy and billing:** Cloudflare receives the added code and rule questions.
+Workers AI usage is billed to your account at its current model rates; the Jev
+cost estimates on this page do not apply. Findings record the returned model and
+input tokens, and the summary excludes other models from its Jev cost estimate.
+Cloudflare's `clef` and `clef-flash` names are service model IDs, not immutable
+version pins; record the date and returned model when comparing runs.
+
+To switch installed hooks back to Jev:
+
+```sh
+JEV_LINT_PROVIDER=typesafe JEV_LINT_MODEL=jev-1.13.0 bun src/install.ts --apply --smoke
+```
+
+To compare the hosted models on the same existing holdout cases, configure **both**
+providers' credentials, then run (use a fresh output filename for each experiment):
+
+```sh
+JEV_LINT_MODEL=jev-1.13.0 bun eval/run.ts --systems jev,clef,clef-flash \
+  --splits holdout --runs 3 --out cloudflare-comparison-2026-10-02.json
+```
+
+The named eval judges select their own provider; `JEV_LINT_MODEL` pins the Jev
+baseline, while `clef` and `clef-flash` select their respective Cloudflare models.
+Compare precision, recall, F1, clean-edit false alarms, latency, tokens and errors
+per pack/language. Each provider has separate caches keyed by model, rule text and
+payload. The harness asks every rule and derives gated scores by masking: those
+latencies are **ungated**, not production-hook timings. Existing results are not
+overwritten. See [docs/cloudflare-eval.md](docs/cloudflare-eval.md) for limitations.
 
 ### Local models
 
