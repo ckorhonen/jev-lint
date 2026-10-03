@@ -49,7 +49,8 @@ Also: [pack docs](docs/packs/) · [feedback loop](docs/feedback-loop.md) · [exp
   blocks the agent: if anything fails, the edit goes through unchanged.
 - **Starts with opinionated defaults.** Tested rule packs for TypeScript and React, Swift and
   SwiftUI, Kotlin, Rust, Python, Ruby and Bazel, plus cross-language packs for security,
-  test hygiene (tests that can't fail, flaky tests) and performance (170 rules). Every
+  test hygiene (tests that can't fail, flaky tests, tests that lock in the implementation)
+  and performance (177 rules). Every
   rule passed an evaluation on held-out examples before it was switched on. See
   [the pack docs](docs/packs/) for a good and bad example of each.
 - **Your rules, not just ours.** The packs are only defaults: turn any pack or rule off, scope
@@ -112,7 +113,7 @@ jev-lint is four pieces:
 
 - **Rule packs, as defaults, plus your own rules.** Tested packs for TypeScript/React,
   Swift/SwiftUI, Kotlin, Rust, Python, Ruby and Bazel, plus cross-language security,
-  test-hygiene and performance packs (170 rules in total). Turn any pack or rule off, or
+  test-hygiene and performance packs (177 rules in total). Turn any pack or rule off, or
   add your own team rules in `.jev-lint/`. See [Rule packs](#rule-packs) for the full pack
   table and how to configure them.
 - **An onboarding skill.** `jev-lint-rules` reads your agent instructions, docs, skills and
@@ -402,6 +403,21 @@ numbers.
 | [`tests`](docs/packs/tests.md) | 42 | bazel, kotlin, python, ruby, rust, swift, typescript | Tests that can't fail; flaky tests (real clock, unseeded randomness, real network, fixed sleeps, order-dependent assertions, shared state); tests bent to pass; tests that lock in the implementation (assert internal calls, mock the codebase's own modules, whole-output snapshots, hand-typed fake API responses) |
 | [`performance`](docs/packs/performance.md) | 13 | kotlin, python, ruby, rust, swift, typescript | N+1 queries and per-item writes, sync I/O on request paths, unbounded queries, independent calls awaited one by one, unbounded fan-out |
 | `repo` | yours | any | Your team's rules in `.jev-lint/*.rules.json`, written with the `jev-lint-rules` and `jev-lint-write-rule` skills |
+
+**New in October 2026: test rules for implementation lock-in.** The "unit tests are bloat"
+debate is really about tests that pin the implementation instead of the behaviour. Seven new
+rules in the `tests` pack (TypeScript and Python) catch the concrete patterns: tests whose
+only assertions are which internal functions were called (`*-test-asserts-internal-calls`),
+tests that mock the codebase's own modules instead of an external boundary
+(`*-test-mocks-own-module`), tests whose only assertion is a whole-output snapshot
+(`ts-test-snapshot-lock-in`), and tests that fake an external API or database response with a
+hand-typed literal that schema drift will never break (`*-test-untyped-fake-response`). All
+seven passed the held-out bar at 100% precision; the fake-response rule fires only at the
+fix tier because the habit is common. Two "test re-implements the logic" rules stay
+candidates after a real-code false alarm. Details and the real-code dry run are in
+[notebook Entry 10](https://claude.ai/artifact/BUZG9LEnaiJyaJuaP7tajs); examples in
+[docs/packs/tests.md](docs/packs/tests.md). If one argues with your team's habits, disable it
+in `.jev-lint/config.json` rather than lowering its threshold.
 
 Three style rules, `ts-no-magic-numbers`, `ts-no-vague-names` and `ts-unvalidated-external-data`
 (plus `swift-no-magic-numbers`), are skipped in test files (`*.test.*`, `__tests__/`, `test/`,
