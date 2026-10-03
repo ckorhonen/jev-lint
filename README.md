@@ -293,6 +293,10 @@ When to leave it off (the default):
 
 Codex keeps checking after the write for now: `--pre` applies to Claude Code only.
 
+Codex **cloud** tasks don't run command hooks (OpenAI's hooks docs: command hooks are
+unsupported under cloud orchestration), so jev-lint can't check edits made there. Cloud agents
+are the main reason a review-time check on the pull request is on the roadmap.
+
 **Async (Claude Code only):** to keep the agent from waiting on the check (useful with a slower
 local judge), run it in the background and let findings wake the agent:
 
