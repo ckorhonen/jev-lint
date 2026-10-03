@@ -84,6 +84,7 @@ async function main() {
         ? await runChecks(changes, { timeoutMs: remaining, cwd })
         : changes.map(() => ({ ok: false as const, error: "no time left after daemon failure" }));
   }
+  if (process.env.JEV_LINT_DEBUG) for (const s of settled) if (!s.ok) process.stderr.write(`[jev-lint] check failed: ${s.error}\n`);
   const results = settled
     .flatMap((s) => (s.ok && s.value ? [s.value] : []))
     .map((r): LintResult => ({ ...r, findings: r.findings.filter((f) => tiers.has(f.tier)) }));

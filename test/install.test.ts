@@ -1,8 +1,16 @@
 import { describe, expect, test } from "bun:test";
-import { hookGroup, mergeHook } from "../src/install";
+import { hookGroup, isJevLint, mergeHook } from "../src/install";
 
 describe("install mergeHook", () => {
   const group = hookGroup("claude", { bun: "/usr/bin/bun" });
+
+  test("recognises its hook by this checkout's path or by the jev-lint name, not any hook.ts", () => {
+    expect(isJevLint(group.hooks[0])).toBe(true);
+    expect(
+      isJevLint({ type: "command", command: "JEV_LINT_MODEL=jev-1.13.0 /usr/bin/bun /home/u/Repos/jev-lint/src/hook.ts", timeout: 15 }),
+    ).toBe(true);
+    expect(isJevLint({ type: "command", command: "/usr/bin/bun /home/u/tools/other-linter/src/hook.ts", timeout: 15 })).toBe(false);
+  });
 
   test("adds the hook next to unrelated hooks", () => {
     const other = { matcher: "*", hooks: [{ type: "command" as const, command: "other", timeout: 5 }] };

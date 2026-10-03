@@ -434,7 +434,7 @@ Two rules were removed because the model is weak at counting and tracing; use a 
 | `TYPESAFE_BASE_URL` | `https://api.typesafe.ai` | Any `/v1/systemone` server, e.g. a local Kev or Laya (no key needed) |
 | `JEV_LINT_RECHECK` | `on` | `off` disables the end-of-turn re-check (`src/recheck.ts`) that gives each finding a fixed/kept outcome |
 | `JEV_LINT_DAEMON` | `on` | `off` checks in the hook process every time. When `on`, the first check starts a small background process that keeps the API connection open and reads the key once; later checks go through it (about 100 ms faster each). It is local only (a user-only Unix socket), exits after 30 idle minutes (`JEV_LINT_DAEMON_IDLE_MS`) or when jev-lint's code changes, and the hook falls back to checking in process if it is unavailable. |
-| `JEV_LINT_DEBUG` | unset | Print errors to stderr |
+| `JEV_LINT_DEBUG` | unset | Print errors to stderr, including why each failed check failed (e.g. `Cloudflare 401`) |
 
 ### Cloudflare Clef (optional)
 

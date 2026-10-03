@@ -73,9 +73,12 @@ export function hookGroup(agent: "claude" | "codex", opts: { async?: boolean; bu
   };
 }
 
-const isJevLint = (h: HookCommand) => /jev-lint\/src\/hook\.ts/.test(h.command);
-const isJevLintRecheck = (h: HookCommand) => /jev-lint\/src\/recheck\.ts/.test(h.command);
 const RECHECK = join(REPO, "src/recheck.ts");
+// Ours if it runs this checkout's script, or one from a checkout named jev-lint (an older
+// install elsewhere). A clone under another name must still be recognised, or every re-run
+// would add a second hook.
+export const isJevLint = (h: HookCommand) => h.command.includes(HOOK) || /jev-lint\/src\/hook\.ts/.test(h.command);
+const isJevLintRecheck = (h: HookCommand) => h.command.includes(RECHECK) || /jev-lint\/src\/recheck\.ts/.test(h.command);
 const RECHECK_TIMEOUT_S = 20;
 export const RECHECK_EVENTS = ["Stop", "SubagentStop"] as const;
 
