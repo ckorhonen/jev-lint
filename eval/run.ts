@@ -16,6 +16,7 @@ import {
   type Case,
   caseCode,
   type Judgment,
+  jevModel,
   judgeClef,
   judgeClefFlash,
   judgeJev,
@@ -102,7 +103,7 @@ function cacheDir(system: SystemName, run: number, pack: BuiltInPack, lang: stri
     system === "llm"
       ? LLM_MODEL
       : system === "jev"
-        ? (process.env.JEV_LINT_MODEL ?? "jev-latest")
+        ? (jevModel() ?? "jev-latest")
         : system === "local"
           ? LOCAL_NAME
           : system === "clef" || system === "clef-flash"
@@ -363,7 +364,7 @@ async function main() {
         generatedAt: new Date().toISOString(),
         gateStats,
         llmModel: LLM_MODEL,
-        models: { jev: process.env.JEV_LINT_MODEL ?? "jev-latest", clef: "@cf/cloudflare/clef", "clef-flash": "@cf/cloudflare/clef-flash" },
+        models: { jev: jevModel() ?? "jev-latest", clef: "@cf/cloudflare/clef", "clef-flash": "@cf/cloudflare/clef-flash" },
         thresholds: { HIGH, MEDIUM },
         caseCounts,
         errors,
