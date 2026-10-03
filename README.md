@@ -231,6 +231,17 @@ bun src/install.ts --apply --skills --smoke         # Claude Code + Codex, user-
 #   --claude-only | --codex-only   --project <repo> (Claude, repo-scoped)   --async (Claude, background)
 ```
 
+**Upgrading.** One command pulls this checkout, installs dependencies and re-applies the hooks
+in whatever mode they're in (`--pre`, `--async`, re-check on or off are read back from your
+config), for both Claude Code and Codex:
+
+```sh
+bun ~/Repos/jev-lint/src/install.ts --upgrade
+```
+
+The warm daemon notices the code change and restarts itself on the next check. Running
+agents pick up the new hook on their next edit; nothing needs restarting.
+
 Or by hand:
 
 **Claude Code:** add to `~/.claude/settings.json` (or a repo's `.claude/settings.json`) under `hooks.PostToolUse`:

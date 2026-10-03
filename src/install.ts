@@ -5,6 +5,8 @@
 //   options: --pre (Claude Code: check each edit before it's applied and block high-confidence
 //            findings, instead of after the write), --no-recheck (skip the end-of-turn re-check on Stop/SubagentStop), --claude-only | --codex-only, --project <repo> (Claude hook in <repo>/.claude/settings.json),
 //            --async (Claude: background check that wakes the agent), --skills (link skills), --smoke
+//            --upgrade: git pull this checkout, bun install, then re-apply the hooks in the mode
+//            they are currently installed in (pre/async/re-check detected from the config)
 //
 // An existing jev-lint entry (any command running jev-lint's src/hook.ts) is replaced in place,
 // never duplicated. Other hooks are left untouched.
@@ -146,6 +148,39 @@ export function removeHook(
   return { config: { ...config, hooks }, removed: true };
 }
 
+// How jev-lint is installed in a config right now, so --upgrade can re-apply without the user
+// restating --pre / --async / --no-recheck. Pure, so it is unit-tested.
+export function installedMode(config: HookConfig): { installed: boolean; pre: boolean; async: boolean; recheck: boolean } {
+  const hooksIn = (event: string) => (config.hooks?.[event] ?? []).flatMap((g) => g.hooks ?? []).filter(isJevLint);
+  const post = hooksIn("PostToolUse");
+  const pre = hooksIn("PreToolUse");
+  const main = [...pre, ...post];
+  return {
+    installed: main.length > 0,
+    pre: pre.length > 0,
+    async: main.some((h) => h.asyncRewake || /JEV_LINT_MODE=rewake/.test(h.command)),
+    recheck: RECHECK_EVENTS.some((e) => (config.hooks?.[e] ?? []).some((g) => g.hooks?.some(isJevLintRecheck))),
+  };
+}
+
+function readConfig(path: string): HookConfig {
+  if (!existsSync(path)) return {};
+  const parsed: unknown = JSON.parse(readFileSync(path, "utf8"));
+  return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? (parsed as HookConfig) : {};
+}
+
+// --upgrade: bring this checkout up to date, then re-apply whatever is installed.
+function upgradeCheckout(): string {
+  const git = (...a: string[]) => spawnSync("git", ["-C", REPO, ...a], { encoding: "utf8" });
+  const before = git("rev-parse", "--short", "HEAD").stdout.trim();
+  const pull = git("pull", "--ff-only", "--quiet");
+  if (pull.status !== 0) throw new Error(`git pull failed: ${pull.stderr.trim() || "not a fast-forward; resolve the checkout by hand"}`);
+  const after = git("rev-parse", "--short", "HEAD").stdout.trim();
+  const install = spawnSync(process.execPath, ["install", "--silent"], { cwd: REPO, encoding: "utf8" });
+  if (install.status !== 0) throw new Error(`bun install failed: ${install.stderr.trim()}`);
+  return before === after ? `already at ${after}` : `${before} → ${after}`;
+}
+
 // Main hook on PostToolUse (or PreToolUse with --pre), plus (unless disabled) the end-of-turn re-check on Stop/SubagentStop.
 function writeConfig(path: string, group: HookGroup, apply: boolean, recheck: boolean, pre = false): string {
   const parsed: unknown = existsSync(path) ? JSON.parse(readFileSync(path, "utf8")) : {};
@@ -235,8 +270,31 @@ if (import.meta.main) {
       smoke: { type: "boolean", default: false },
       "no-recheck": { type: "boolean", default: false },
       pre: { type: "boolean", default: false },
+      upgrade: { type: "boolean", default: false },
     },
   });
+  if (values.upgrade) {
+    // Pull first, so the modes below are detected and re-applied with the new code.
+    console.log(`upgrade: ${upgradeCheckout()}`);
+    const claudePath = values.project ? join(resolve(values.project), ".claude/settings.json") : join(homedir(), ".claude/settings.json");
+    const mode = installedMode(readConfig(claudePath));
+    const codexMode = installedMode(readConfig(join(homedir(), ".codex/hooks.json")));
+    if (!mode.installed && !codexMode.installed) {
+      console.error("upgrade: jev-lint is not installed here; run without --upgrade (and with --apply) to install");
+      process.exit(1);
+    }
+    values.apply = true;
+    if (!values.pre && !values.async) {
+      values.pre = mode.pre;
+      values.async = mode.async;
+    }
+    if (!values["no-recheck"]) values["no-recheck"] = !(mode.recheck || codexMode.recheck);
+    if (!mode.installed) values["codex-only"] = true;
+    if (!codexMode.installed) values["claude-only"] = true;
+    console.log(
+      `upgrade: re-applying (${values.pre ? "before-the-write" : values.async ? "async" : "after-the-write"}${values["no-recheck"] ? ", no re-check" : ", with re-check"})`,
+    );
+  }
   if (values.pre && values.async) {
     console.error("--pre and --async are different modes: pick one");
     process.exit(1);

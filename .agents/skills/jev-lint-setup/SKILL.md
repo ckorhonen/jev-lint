@@ -32,6 +32,13 @@ The same installer commands below persist the provider for edit and recheck hook
 No TypeSafe key is needed. Report Cloudflare as the recipient of code in this mode,
 and do not claim Jev's measured accuracy, latency or cost for Clef.
 
+## 1b. Updating an existing install
+
+If jev-lint is already installed and the user asks to update or upgrade it, run
+`bun "$JEV/src/install.ts" --upgrade`. It pulls the checkout, runs `bun install`, and re-applies
+the hooks in their current mode. Report the commit range it printed and the smoke result if you
+add `--smoke`. Then stop; the steps below are for a first install.
+
 ## 2. Check before changing anything
 
 ```sh

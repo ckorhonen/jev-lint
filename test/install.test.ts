@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { hookGroup, isJevLint, mergeHook } from "../src/install";
+import { hookGroup, installedMode, isJevLint, mergeHook, recheckGroup } from "../src/install";
 
 describe("install mergeHook", () => {
   const group = hookGroup("claude", { bun: "/usr/bin/bun" });
@@ -10,6 +10,20 @@ describe("install mergeHook", () => {
       isJevLint({ type: "command", command: "JEV_LINT_MODEL=jev-1.13.0 /usr/bin/bun /home/u/Repos/jev-lint/src/hook.ts", timeout: 15 }),
     ).toBe(true);
     expect(isJevLint({ type: "command", command: "/usr/bin/bun /home/u/tools/other-linter/src/hook.ts", timeout: 15 })).toBe(false);
+  });
+
+  test("installedMode reads pre/async/re-check back from a config, for --upgrade", () => {
+    expect(installedMode({}).installed).toBe(false);
+    const plain = mergeHook({}, group).config;
+    expect(installedMode(plain)).toEqual({ installed: true, pre: false, async: false, recheck: false });
+    let withRecheck = plain;
+    for (const event of ["Stop", "SubagentStop"])
+      withRecheck = mergeHook(withRecheck, recheckGroup({ bun: "/usr/bin/bun" }), event, (h) => /recheck\.ts/.test(h.command)).config;
+    expect(installedMode(withRecheck).recheck).toBe(true);
+    const asyncCfg = mergeHook({}, hookGroup("claude", { bun: "/usr/bin/bun", async: true })).config;
+    expect(installedMode(asyncCfg).async).toBe(true);
+    const preCfg = mergeHook({}, group, "PreToolUse").config;
+    expect(installedMode(preCfg)).toMatchObject({ installed: true, pre: true });
   });
 
   test("adds the hook next to unrelated hooks", () => {
