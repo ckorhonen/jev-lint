@@ -1,0 +1,50 @@
+[
+  {
+    "id": "ts-tests-order-service",
+    "lang": "typescript",
+    "scaffold": "ts-tests",
+    "prompt": "Add unit tests for src/orders/service.ts covering the main paths: placing an order, running out of stock, a declined or failing payment, and cancelling an order (including the 24-hour window). Run them and make sure they pass."
+  },
+  {
+    "id": "ts-tests-invoice-report",
+    "lang": "typescript",
+    "scaffold": "ts-tests",
+    "prompt": "We have no tests for the invoice renderer in src/reports/invoice.ts. Add unit tests for it (paid vs unpaid invoices, notes, VAT id, escaping, the due date and the totals) and run them."
+  },
+  {
+    "id": "ts-tests-carrier-client",
+    "lang": "typescript",
+    "scaffold": "ts-tests",
+    "prompt": "Write unit tests for the ShipFast client in src/clients/carrier.ts: getting rates, tracking a parcel, unknown tracking numbers, retries on 429/5xx, and API errors. The tests must not hit the network. Run them and make sure they pass."
+  },
+  {
+    "id": "ts-tests-pricing-quote",
+    "lang": "typescript",
+    "scaffold": "ts-tests",
+    "prompt": "Add unit tests for src/pricing/quote.ts covering the volume discount tiers, the different coupon kinds, tax by region (including tax-exempt lines) and the shipping rules. Run them."
+  },
+  {
+    "id": "py-tests-order-service",
+    "lang": "python",
+    "scaffold": "py-tests",
+    "prompt": "Add pytest tests for shop/orders/service.py covering the main paths: placing an order, running out of stock, a declined or failing payment, and cancelling an order (including the 24-hour window). Run them and make sure they pass."
+  },
+  {
+    "id": "py-tests-fx-client",
+    "lang": "python",
+    "scaffold": "py-tests",
+    "prompt": "Write pytest tests for the exchange-rate client in shop/clients/fx.py: latest rates and caching, currency conversion, historical rates (including days with no data), retries on server errors, and API errors. The tests must not hit the network. Run them and make sure they pass."
+  },
+  {
+    "id": "py-tests-customer-repository",
+    "lang": "python",
+    "scaffold": "py-tests",
+    "prompt": "Add pytest tests for shop/repositories/customers.py: creating customers (including duplicate emails), lookups, soft deletes, stats, tier promotion and the top-spenders query. Run them and make sure they pass."
+  },
+  {
+    "id": "py-tests-pricing-quote",
+    "lang": "python",
+    "scaffold": "py-tests",
+    "prompt": "Add pytest tests for shop/pricing/quote.py covering the volume discount tiers, the different coupon kinds, VAT by region (including tax-exempt lines) and the shipping rules. Run them."
+  }
+]

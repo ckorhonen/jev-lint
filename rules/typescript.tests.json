@@ -116,7 +116,8 @@
       "when": ["\\b(it|test)(\\.\\w+)?\\s*\\(", "describe\\s*\\("],
       "thresholds": {
         "medium": null
-      }
+      },
+      "status": "candidate"
     }
   ]
 }

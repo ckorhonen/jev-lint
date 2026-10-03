@@ -115,7 +115,8 @@
       "when": ["\\bdef test_", "class Test\\w*\\(", "@pytest\\."],
       "thresholds": {
         "medium": null
-      }
+      },
+      "status": "candidate"
     }
   ]
 }

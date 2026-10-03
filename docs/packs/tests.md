@@ -830,7 +830,7 @@ def test_uses_slug_as_key(slugify):
 
 Holdout: precision 88%, recall 100% (7 violations in the holdout set). Sources: [pure.tudelft.nl](https://pure.tudelft.nl/ws/files/94079936/Spadini2019_Article_MockObjectsForTestingJavaSyste.pdf), [docs.python.org](https://docs.python.org/3/library/unittest.mock-examples.html)
 
-### `py-test-untyped-fake-response`
+### `py-test-untyped-fake-response` _(candidate)_
 
 Does the new code add a pytest `def test_...` or `unittest` `test_...` method that stubs the response of an external system — an HTTP call (`requests`, `httpx`, `responses`, `respx`, `aiohttp`), API client, database query or SDK — with a hand-written inline `dict`/`list` literal (`return_value={...}`, `json={...}`, `side_effect=[{...}]`) that is neither built by a typed factory or model (a `TypedDict`, `dataclass`, pydantic model, `Model(...)` constructor) nor loaded from a recorded or shared fixture (`conftest` fixture, JSON file, cassette)?
 
@@ -1732,7 +1732,7 @@ describe("parseExpression", () => {
 
 Holdout: precision 100%, recall 100% (6 violations in the holdout set). Sources: [jestjs.io](https://jestjs.io/docs/snapshot-testing), [homepages.dcc.ufmg.br](https://homepages.dcc.ufmg.br/~mtov/pub/2023-jss-snapshot.pdf)
 
-### `ts-test-untyped-fake-response`
+### `ts-test-untyped-fake-response` _(candidate)_
 
 Does the new code add a test (`it`/`test` in vitest, jest, bun:test or node:test) that stubs the response of an external system — an HTTP/fetch call, API client, database query or SDK — with a hand-written inline object or array literal (`mockResolvedValue({...})`, `mockReturnValue([...])`, `msw`/`nock` reply bodies, `fetch` mocks returning `Response.json({...})`) that is neither typed against the response type (`satisfies`/`: ApiResponse`, a typed factory) nor loaded from a recorded or shared fixture?
 

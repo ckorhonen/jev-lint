@@ -1,0 +1,3597 @@
+{
+ "note": "Per-run analysis for the tests E2E round (2026-10-03). primary = grade.ts verdicts (all packs, gpt-6-luna low, from its cache) restricted to the test files the agent wrote; focused = the same files regraded with only the tests pack (JEV_LINT_PACKS=tests, JEV_LINT_CANDIDATES=on). tests = vitest/pytest rerun on the final work dir. hookByRule = findings shown by the hook during the run (jev-log.jsonl).",
+ "primary": [
+  {
+   "task": "ts-tests-invoice-report",
+   "lang": "typescript",
+   "condition": "jev",
+   "rep": 1,
+   "exitCode": 0,
+   "isError": false,
+   "costUsd": 0.12967480000000003,
+   "edits": 1,
+   "testFiles": [
+    "src/reports/invoice.test.ts"
+   ],
+   "testLines": 117,
+   "e10": 0,
+   "e10orig4": 0,
+   "liveTests": 0,
+   "allTestsWithCand": 0,
+   "perRule": {},
+   "allRulesAllFiles": 17,
+   "hook": {
+    "calls": 1,
+    "findingsShown": 0,
+    "highShown": 0,
+    "mediumShown": 0,
+    "errors": 0,
+    "meanLatencyMs": 394.201708,
+    "editsAfterFeedback": 0
+   },
+   "hookByRule": {},
+   "tests": {
+    "exitCode": 0,
+    "green": true,
+    "passed": 15,
+    "failed": 0,
+    "stray": []
+   }
+  },
+  {
+   "task": "ts-tests-invoice-report",
+   "lang": "typescript",
+   "condition": "none",
+   "rep": 1,
+   "exitCode": 0,
+   "isError": false,
+   "costUsd": 0.14868920000000002,
+   "edits": 1,
+   "testFiles": [
+    "src/reports/invoice.test.ts"
+   ],
+   "testLines": 141,
+   "e10": 0,
+   "e10orig4": 0,
+   "liveTests": 0,
+   "allTestsWithCand": 0,
+   "perRule": {},
+   "allRulesAllFiles": 12,
+   "hook": {
+    "calls": 0,
+    "findingsShown": 0,
+    "highShown": 0,
+    "mediumShown": 0,
+    "errors": 0,
+    "meanLatencyMs": 0,
+    "editsAfterFeedback": 0
+   },
+   "hookByRule": {},
+   "tests": {
+    "exitCode": 0,
+    "green": true,
+    "passed": 17,
+    "failed": 0,
+    "stray": []
+   }
+  },
+  {
+   "task": "ts-tests-carrier-client",
+   "lang": "typescript",
+   "condition": "none",
+   "rep": 1,
+   "exitCode": 0,
+   "isError": false,
+   "costUsd": 0.12392800000000001,
+   "edits": 1,
+   "testFiles": [
+    "src/clients/carrier.test.ts"
+   ],
+   "testLines": 190,
+   "e10": 0,
+   "e10orig4": 0,
+   "liveTests": 0,
+   "allTestsWithCand": 0,
+   "perRule": {},
+   "allRulesAllFiles": 14,
+   "hook": {
+    "calls": 0,
+    "findingsShown": 0,
+    "highShown": 0,
+    "mediumShown": 0,
+    "errors": 0,
+    "meanLatencyMs": 0,
+    "editsAfterFeedback": 0
+   },
+   "hookByRule": {},
+   "tests": {
+    "exitCode": 0,
+    "green": true,
+    "passed": 25,
+    "failed": 0,
+    "stray": []
+   }
+  },
+  {
+   "task": "ts-tests-order-service",
+   "lang": "typescript",
+   "condition": "none",
+   "rep": 1,
+   "exitCode": 0,
+   "isError": false,
+   "costUsd": 0.2666522,
+   "edits": 2,
+   "testFiles": [
+    "src/orders/service.test.ts"
+   ],
+   "testLines": 195,
+   "e10": 0,
+   "e10orig4": 0,
+   "liveTests": 0,
+   "allTestsWithCand": 0,
+   "perRule": {},
+   "allRulesAllFiles": 15,
+   "hook": {
+    "calls": 0,
+    "findingsShown": 0,
+    "highShown": 0,
+    "mediumShown": 0,
+    "errors": 0,
+    "meanLatencyMs": 0,
+    "editsAfterFeedback": 0
+   },
+   "hookByRule": {},
+   "tests": {
+    "exitCode": 0,
+    "green": true,
+    "passed": 14,
+    "failed": 0,
+    "stray": []
+   }
+  },
+  {
+   "task": "ts-tests-carrier-client",
+   "lang": "typescript",
+   "condition": "jev",
+   "rep": 1,
+   "exitCode": 0,
+   "isError": false,
+   "costUsd": 0.14892099999999997,
+   "edits": 1,
+   "testFiles": [
+    "src/clients/carrier.test.ts"
+   ],
+   "testLines": 203,
+   "e10": 0,
+   "e10orig4": 0,
+   "liveTests": 0,
+   "allTestsWithCand": 0,
+   "perRule": {},
+   "allRulesAllFiles": 13,
+   "hook": {
+    "calls": 1,
+    "findingsShown": 1,
+    "highShown": 1,
+    "mediumShown": 0,
+    "errors": 0,
+    "meanLatencyMs": 232.38591599999927,
+    "editsAfterFeedback": 0
+   },
+   "hookByRule": {
+    "ts-test-untyped-fake-response": {
+     "high": 1,
+     "medium": 0
+    }
+   },
+   "tests": {
+    "exitCode": 0,
+    "green": true,
+    "passed": 21,
+    "failed": 0,
+    "stray": []
+   }
+  },
+  {
+   "task": "ts-tests-order-service",
+   "lang": "typescript",
+   "condition": "jev",
+   "rep": 1,
+   "exitCode": 0,
+   "isError": false,
+   "costUsd": 0.30274100000000004,
+   "edits": 2,
+   "testFiles": [
+    "src/orders/service.test.ts"
+   ],
+   "testLines": 137,
+   "e10": 1,
+   "e10orig4": 1,
+   "liveTests": 1,
+   "allTestsWithCand": 1,
+   "perRule": {
+    "ts-test-untyped-fake-response": 1
+   },
+   "allRulesAllFiles": 14,
+   "hook": {
+    "calls": 2,
+    "findingsShown": 0,
+    "highShown": 0,
+    "mediumShown": 0,
+    "errors": 0,
+    "meanLatencyMs": 210.99004150000474,
+    "editsAfterFeedback": 0
+   },
+   "hookByRule": {},
+   "tests": {
+    "exitCode": 0,
+    "green": true,
+    "passed": 12,
+    "failed": 0,
+    "stray": []
+   }
+  },
+  {
+   "task": "ts-tests-pricing-quote",
+   "lang": "typescript",
+   "condition": "none",
+   "rep": 1,
+   "exitCode": 0,
+   "isError": false,
+   "costUsd": 0.12056620000000001,
+   "edits": 1,
+   "testFiles": [
+    "src/pricing/quote.test.ts"
+   ],
+   "testLines": 210,
+   "e10": 0,
+   "e10orig4": 0,
+   "liveTests": 0,
+   "allTestsWithCand": 0,
+   "perRule": {},
+   "allRulesAllFiles": 41,
+   "hook": {
+    "calls": 0,
+    "findingsShown": 0,
+    "highShown": 0,
+    "mediumShown": 0,
+    "errors": 0,
+    "meanLatencyMs": 0,
+    "editsAfterFeedback": 0
+   },
+   "hookByRule": {},
+   "tests": {
+    "exitCode": 0,
+    "green": true,
+    "passed": 48,
+    "failed": 0,
+    "stray": []
+   }
+  },
+  {
+   "task": "py-tests-order-service",
+   "lang": "python",
+   "condition": "none",
+   "rep": 1,
+   "exitCode": 0,
+   "isError": false,
+   "costUsd": 0.11486759999999999,
+   "edits": 1,
+   "testFiles": [
+    "tests/test_order_service.py"
+   ],
+   "testLines": 232,
+   "e10": 0,
+   "e10orig4": 0,
+   "liveTests": 0,
+   "allTestsWithCand": 0,
+   "perRule": {},
+   "allRulesAllFiles": 0,
+   "hook": {
+    "calls": 0,
+    "findingsShown": 0,
+    "highShown": 0,
+    "mediumShown": 0,
+    "errors": 0,
+    "meanLatencyMs": 0,
+    "editsAfterFeedback": 0
+   },
+   "hookByRule": {},
+   "tests": {
+    "exitCode": 0,
+    "green": true,
+    "passed": 18,
+    "failed": 0,
+    "stray": []
+   }
+  },
+  {
+   "task": "ts-tests-pricing-quote",
+   "lang": "typescript",
+   "condition": "jev",
+   "rep": 1,
+   "exitCode": 0,
+   "isError": false,
+   "costUsd": 0.13838899999999998,
+   "edits": 1,
+   "testFiles": [
+    "src/pricing/quote.test.ts"
+   ],
+   "testLines": 258,
+   "e10": 0,
+   "e10orig4": 0,
+   "liveTests": 0,
+   "allTestsWithCand": 0,
+   "perRule": {},
+   "allRulesAllFiles": 19,
+   "hook": {
+    "calls": 1,
+    "findingsShown": 0,
+    "highShown": 0,
+    "mediumShown": 0,
+    "errors": 0,
+    "meanLatencyMs": 212.32912500000384,
+    "editsAfterFeedback": 0
+   },
+   "hookByRule": {},
+   "tests": {
+    "exitCode": 0,
+    "green": true,
+    "passed": 49,
+    "failed": 0,
+    "stray": []
+   }
+  },
+  {
+   "task": "py-tests-order-service",
+   "lang": "python",
+   "condition": "jev",
+   "rep": 1,
+   "exitCode": 0,
+   "isError": false,
+   "costUsd": 0.11968179999999999,
+   "edits": 1,
+   "testFiles": [
+    "tests/test_order_service.py"
+   ],
+   "testLines": 252,
+   "e10": 0,
+   "e10orig4": 0,
+   "liveTests": 0,
+   "allTestsWithCand": 0,
+   "perRule": {},
+   "allRulesAllFiles": 0,
+   "hook": {
+    "calls": 1,
+    "findingsShown": 0,
+    "highShown": 0,
+    "mediumShown": 0,
+    "errors": 0,
+    "meanLatencyMs": 284.7327079999959,
+    "editsAfterFeedback": 0
+   },
+   "hookByRule": {},
+   "tests": {
+    "exitCode": 0,
+    "green": true,
+    "passed": 21,
+    "failed": 0,
+    "stray": []
+   }
+  },
+  {
+   "task": "py-tests-fx-client",
+   "lang": "python",
+   "condition": "jev",
+   "rep": 1,
+   "exitCode": 0,
+   "isError": false,
+   "costUsd": 0.10827,
+   "edits": 1,
+   "testFiles": [
+    "tests/test_fx.py"
+   ],
+   "testLines": 284,
+   "e10": 0,
+   "e10orig4": 0,
+   "liveTests": 0,
+   "allTestsWithCand": 0,
+   "perRule": {},
+   "allRulesAllFiles": 0,
+   "hook": {
+    "calls": 1,
+    "findingsShown": 0,
+    "highShown": 0,
+    "mediumShown": 0,
+    "errors": 0,
+    "meanLatencyMs": 248.09741600000416,
+    "editsAfterFeedback": 0
+   },
+   "hookByRule": {},
+   "tests": {
+    "exitCode": 0,
+    "green": true,
+    "passed": 24,
+    "failed": 0,
+    "stray": []
+   }
+  },
+  {
+   "task": "py-tests-fx-client",
+   "lang": "python",
+   "condition": "none",
+   "rep": 1,
+   "exitCode": 0,
+   "isError": false,
+   "costUsd": 0.1267768,
+   "edits": 1,
+   "testFiles": [
+    "tests/test_fx_client.py"
+   ],
+   "testLines": 272,
+   "e10": 0,
+   "e10orig4": 0,
+   "liveTests": 0,
+   "allTestsWithCand": 0,
+   "perRule": {},
+   "allRulesAllFiles": 0,
+   "hook": {
+    "calls": 0,
+    "findingsShown": 0,
+    "highShown": 0,
+    "mediumShown": 0,
+    "errors": 0,
+    "meanLatencyMs": 0,
+    "editsAfterFeedback": 0
+   },
+   "hookByRule": {},
+   "tests": {
+    "exitCode": 0,
+    "green": true,
+    "passed": 25,
+    "failed": 0,
+    "stray": []
+   }
+  },
+  {
+   "task": "py-tests-customer-repository",
+   "lang": "python",
+   "condition": "none",
+   "rep": 1,
+   "exitCode": 0,
+   "isError": false,
+   "costUsd": 0.1419548,
+   "edits": 2,
+   "testFiles": [
+    "tests/conftest.py",
+    "tests/test_customer_repository.py"
+   ],
+   "testLines": 317,
+   "e10": 0,
+   "e10orig4": 0,
+   "liveTests": 0,
+   "allTestsWithCand": 0,
+   "perRule": {},
+   "allRulesAllFiles": 0,
+   "hook": {
+    "calls": 0,
+    "findingsShown": 0,
+    "highShown": 0,
+    "mediumShown": 0,
+    "errors": 0,
+    "meanLatencyMs": 0,
+    "editsAfterFeedback": 0
+   },
+   "hookByRule": {},
+   "tests": {
+    "exitCode": 0,
+    "green": true,
+    "passed": 40,
+    "failed": 0,
+    "stray": []
+   }
+  },
+  {
+   "task": "py-tests-customer-repository",
+   "lang": "python",
+   "condition": "jev",
+   "rep": 1,
+   "exitCode": 0,
+   "isError": false,
+   "costUsd": 0.1279228,
+   "edits": 1,
+   "testFiles": [
+    "tests/test_customer_repository.py"
+   ],
+   "testLines": 290,
+   "e10": 0,
+   "e10orig4": 0,
+   "liveTests": 0,
+   "allTestsWithCand": 0,
+   "perRule": {},
+   "allRulesAllFiles": 0,
+   "hook": {
+    "calls": 1,
+    "findingsShown": 0,
+    "highShown": 0,
+    "mediumShown": 0,
+    "errors": 0,
+    "meanLatencyMs": 210.22837499997695,
+    "editsAfterFeedback": 0
+   },
+   "hookByRule": {},
+   "tests": {
+    "exitCode": 0,
+    "green": true,
+    "passed": 37,
+    "failed": 0,
+    "stray": []
+   }
+  },
+  {
+   "task": "py-tests-pricing-quote",
+   "lang": "python",
+   "condition": "none",
+   "rep": 1,
+   "exitCode": 0,
+   "isError": false,
+   "costUsd": 0.12673079999999998,
+   "edits": 1,
+   "testFiles": [
+    "tests/test_quote.py"
+   ],
+   "testLines": 245,
+   "e10": 0,
+   "e10orig4": 0,
+   "liveTests": 0,
+   "allTestsWithCand": 0,
+   "perRule": {},
+   "allRulesAllFiles": 0,
+   "hook": {
+    "calls": 0,
+    "findingsShown": 0,
+    "highShown": 0,
+    "mediumShown": 0,
+    "errors": 0,
+    "meanLatencyMs": 0,
+    "editsAfterFeedback": 0
+   },
+   "hookByRule": {},
+   "tests": {
+    "exitCode": 0,
+    "green": true,
+    "passed": 45,
+    "failed": 0,
+    "stray": []
+   }
+  },
+  {
+   "task": "py-tests-pricing-quote",
+   "lang": "python",
+   "condition": "jev",
+   "rep": 1,
+   "exitCode": 0,
+   "isError": false,
+   "costUsd": 0.1397368,
+   "edits": 2,
+   "testFiles": [
+    "tests/test_quote.py"
+   ],
+   "testLines": 235,
+   "e10": 0,
+   "e10orig4": 0,
+   "liveTests": 0,
+   "allTestsWithCand": 0,
+   "perRule": {},
+   "allRulesAllFiles": 0,
+   "hook": {
+    "calls": 2,
+    "findingsShown": 1,
+    "highShown": 0,
+    "mediumShown": 1,
+    "errors": 0,
+    "meanLatencyMs": 235.1281244999991,
+    "editsAfterFeedback": 1
+   },
+   "hookByRule": {
+    "py-test-reimplements-logic": {
+     "high": 0,
+     "medium": 1
+    }
+   },
+   "tests": {
+    "exitCode": 0,
+    "green": true,
+    "passed": 47,
+    "failed": 0,
+    "stray": []
+   }
+  },
+  {
+   "task": "ts-tests-order-service",
+   "lang": "typescript",
+   "condition": "none",
+   "rep": 2,
+   "exitCode": 0,
+   "isError": false,
+   "costUsd": 0.1224326,
+   "edits": 1,
+   "testFiles": [
+    "src/orders/service.test.ts"
+   ],
+   "testLines": 182,
+   "e10": 0,
+   "e10orig4": 0,
+   "liveTests": 0,
+   "allTestsWithCand": 0,
+   "perRule": {},
+   "allRulesAllFiles": 18,
+   "hook": {
+    "calls": 0,
+    "findingsShown": 0,
+    "highShown": 0,
+    "mediumShown": 0,
+    "errors": 0,
+    "meanLatencyMs": 0,
+    "editsAfterFeedback": 0
+   },
+   "hookByRule": {},
+   "tests": {
+    "exitCode": 0,
+    "green": true,
+    "passed": 17,
+    "failed": 0,
+    "stray": []
+   }
+  },
+  {
+   "task": "ts-tests-invoice-report",
+   "lang": "typescript",
+   "condition": "none",
+   "rep": 2,
+   "exitCode": 0,
+   "isError": false,
+   "costUsd": 0.0913938,
+   "edits": 1,
+   "testFiles": [
+    "src/reports/invoice.test.ts"
+   ],
+   "testLines": 143,
+   "e10": 0,
+   "e10orig4": 0,
+   "liveTests": 0,
+   "allTestsWithCand": 0,
+   "perRule": {},
+   "allRulesAllFiles": 18,
+   "hook": {
+    "calls": 0,
+    "findingsShown": 0,
+    "highShown": 0,
+    "mediumShown": 0,
+    "errors": 0,
+    "meanLatencyMs": 0,
+    "editsAfterFeedback": 0
+   },
+   "hookByRule": {},
+   "tests": {
+    "exitCode": 0,
+    "green": true,
+    "passed": 22,
+    "failed": 0,
+    "stray": []
+   }
+  },
+  {
+   "task": "ts-tests-order-service",
+   "lang": "typescript",
+   "condition": "jev",
+   "rep": 2,
+   "exitCode": 0,
+   "isError": false,
+   "costUsd": 0.12413700000000001,
+   "edits": 1,
+   "testFiles": [
+    "src/orders/service.test.ts"
+   ],
+   "testLines": 196,
+   "e10": 0,
+   "e10orig4": 0,
+   "liveTests": 0,
+   "allTestsWithCand": 0,
+   "perRule": {},
+   "allRulesAllFiles": 20,
+   "hook": {
+    "calls": 1,
+    "findingsShown": 0,
+    "highShown": 0,
+    "mediumShown": 0,
+    "errors": 0,
+    "meanLatencyMs": 277.4618330000085,
+    "editsAfterFeedback": 0
+   },
+   "hookByRule": {},
+   "tests": {
+    "exitCode": 0,
+    "green": true,
+    "passed": 19,
+    "failed": 0,
+    "stray": []
+   }
+  },
+  {
+   "task": "ts-tests-invoice-report",
+   "lang": "typescript",
+   "condition": "jev",
+   "rep": 2,
+   "exitCode": 0,
+   "isError": false,
+   "costUsd": 0.1003848,
+   "edits": 1,
+   "testFiles": [
+    "src/reports/invoice.test.ts"
+   ],
+   "testLines": 149,
+   "e10": 0,
+   "e10orig4": 0,
+   "liveTests": 0,
+   "allTestsWithCand": 0,
+   "perRule": {},
+   "allRulesAllFiles": 18,
+   "hook": {
+    "calls": 1,
+    "findingsShown": 0,
+    "highShown": 0,
+    "mediumShown": 0,
+    "errors": 0,
+    "meanLatencyMs": 221.4115420000162,
+    "editsAfterFeedback": 0
+   },
+   "hookByRule": {},
+   "tests": {
+    "exitCode": 0,
+    "green": true,
+    "passed": 22,
+    "failed": 0,
+    "stray": []
+   }
+  },
+  {
+   "task": "ts-tests-carrier-client",
+   "lang": "typescript",
+   "condition": "none",
+   "rep": 2,
+   "exitCode": 0,
+   "isError": false,
+   "costUsd": 0.12002119999999998,
+   "edits": 1,
+   "testFiles": [
+    "src/clients/carrier.test.ts"
+   ],
+   "testLines": 184,
+   "e10": 0,
+   "e10orig4": 0,
+   "liveTests": 0,
+   "allTestsWithCand": 0,
+   "perRule": {},
+   "allRulesAllFiles": 22,
+   "hook": {
+    "calls": 0,
+    "findingsShown": 0,
+    "highShown": 0,
+    "mediumShown": 0,
+    "errors": 0,
+    "meanLatencyMs": 0,
+    "editsAfterFeedback": 0
+   },
+   "hookByRule": {},
+   "tests": {
+    "exitCode": 0,
+    "green": true,
+    "passed": 22,
+    "failed": 0,
+    "stray": []
+   }
+  },
+  {
+   "task": "ts-tests-carrier-client",
+   "lang": "typescript",
+   "condition": "jev",
+   "rep": 2,
+   "exitCode": 0,
+   "isError": false,
+   "costUsd": 0.1460756,
+   "edits": 1,
+   "testFiles": [
+    "src/clients/carrier.test.ts"
+   ],
+   "testLines": 213,
+   "e10": 0,
+   "e10orig4": 0,
+   "liveTests": 0,
+   "allTestsWithCand": 0,
+   "perRule": {},
+   "allRulesAllFiles": 19,
+   "hook": {
+    "calls": 1,
+    "findingsShown": 1,
+    "highShown": 1,
+    "mediumShown": 0,
+    "errors": 0,
+    "meanLatencyMs": 283.0150839999842,
+    "editsAfterFeedback": 0
+   },
+   "hookByRule": {
+    "ts-test-untyped-fake-response": {
+     "high": 1,
+     "medium": 0
+    }
+   },
+   "tests": {
+    "exitCode": 0,
+    "green": true,
+    "passed": 25,
+    "failed": 0,
+    "stray": []
+   }
+  },
+  {
+   "task": "ts-tests-pricing-quote",
+   "lang": "typescript",
+   "condition": "jev",
+   "rep": 2,
+   "exitCode": 0,
+   "isError": false,
+   "costUsd": 0.1195298,
+   "edits": 1,
+   "testFiles": [
+    "src/pricing/quote.test.ts"
+   ],
+   "testLines": 202,
+   "e10": 0,
+   "e10orig4": 0,
+   "liveTests": 0,
+   "allTestsWithCand": 0,
+   "perRule": {},
+   "allRulesAllFiles": 18,
+   "hook": {
+    "calls": 1,
+    "findingsShown": 0,
+    "highShown": 0,
+    "mediumShown": 0,
+    "errors": 0,
+    "meanLatencyMs": 208.92262499997742,
+    "editsAfterFeedback": 0
+   },
+   "hookByRule": {},
+   "tests": {
+    "exitCode": 0,
+    "green": true,
+    "passed": 46,
+    "failed": 0,
+    "stray": []
+   }
+  },
+  {
+   "task": "ts-tests-pricing-quote",
+   "lang": "typescript",
+   "condition": "none",
+   "rep": 2,
+   "exitCode": 0,
+   "isError": false,
+   "costUsd": 0.12535179999999999,
+   "edits": 1,
+   "testFiles": [
+    "src/pricing/quote.test.ts"
+   ],
+   "testLines": 201,
+   "e10": 1,
+   "e10orig4": 0,
+   "liveTests": 1,
+   "allTestsWithCand": 1,
+   "perRule": {
+    "ts-test-reimplements-logic": 1
+   },
+   "allRulesAllFiles": 20,
+   "hook": {
+    "calls": 0,
+    "findingsShown": 0,
+    "highShown": 0,
+    "mediumShown": 0,
+    "errors": 0,
+    "meanLatencyMs": 0,
+    "editsAfterFeedback": 0
+   },
+   "hookByRule": {},
+   "tests": {
+    "exitCode": 0,
+    "green": true,
+    "passed": 47,
+    "failed": 0,
+    "stray": []
+   }
+  },
+  {
+   "task": "py-tests-order-service",
+   "lang": "python",
+   "condition": "none",
+   "rep": 2,
+   "exitCode": 0,
+   "isError": false,
+   "costUsd": 0.12138159999999999,
+   "edits": 1,
+   "testFiles": [
+    "tests/test_order_service.py"
+   ],
+   "testLines": 256,
+   "e10": 0,
+   "e10orig4": 0,
+   "liveTests": 0,
+   "allTestsWithCand": 0,
+   "perRule": {},
+   "allRulesAllFiles": 0,
+   "hook": {
+    "calls": 0,
+    "findingsShown": 0,
+    "highShown": 0,
+    "mediumShown": 0,
+    "errors": 0,
+    "meanLatencyMs": 0,
+    "editsAfterFeedback": 0
+   },
+   "hookByRule": {},
+   "tests": {
+    "exitCode": 0,
+    "green": true,
+    "passed": 21,
+    "failed": 0,
+    "stray": []
+   }
+  },
+  {
+   "task": "py-tests-order-service",
+   "lang": "python",
+   "condition": "jev",
+   "rep": 2,
+   "exitCode": 0,
+   "isError": false,
+   "costUsd": 0.1184362,
+   "edits": 1,
+   "testFiles": [
+    "tests/test_order_service.py"
+   ],
+   "testLines": 250,
+   "e10": 0,
+   "e10orig4": 0,
+   "liveTests": 0,
+   "allTestsWithCand": 0,
+   "perRule": {},
+   "allRulesAllFiles": 0,
+   "hook": {
+    "calls": 1,
+    "findingsShown": 0,
+    "highShown": 0,
+    "mediumShown": 0,
+    "errors": 0,
+    "meanLatencyMs": 201.26487500002258,
+    "editsAfterFeedback": 0
+   },
+   "hookByRule": {},
+   "tests": {
+    "exitCode": 0,
+    "green": true,
+    "passed": 21,
+    "failed": 0,
+    "stray": []
+   }
+  },
+  {
+   "task": "py-tests-fx-client",
+   "lang": "python",
+   "condition": "jev",
+   "rep": 2,
+   "exitCode": 0,
+   "isError": false,
+   "costUsd": 0.10832939999999999,
+   "edits": 1,
+   "testFiles": [
+    "tests/test_fx_client.py"
+   ],
+   "testLines": 262,
+   "e10": 0,
+   "e10orig4": 0,
+   "liveTests": 0,
+   "allTestsWithCand": 0,
+   "perRule": {},
+   "allRulesAllFiles": 0,
+   "hook": {
+    "calls": 1,
+    "findingsShown": 0,
+    "highShown": 0,
+    "mediumShown": 0,
+    "errors": 0,
+    "meanLatencyMs": 196.45749999996042,
+    "editsAfterFeedback": 0
+   },
+   "hookByRule": {},
+   "tests": {
+    "exitCode": 0,
+    "green": true,
+    "passed": 26,
+    "failed": 0,
+    "stray": []
+   }
+  },
+  {
+   "task": "py-tests-fx-client",
+   "lang": "python",
+   "condition": "none",
+   "rep": 2,
+   "exitCode": 0,
+   "isError": false,
+   "costUsd": 0.128087,
+   "edits": 2,
+   "testFiles": [
+    "tests/test_fx_client.py"
+   ],
+   "testLines": 242,
+   "e10": 0,
+   "e10orig4": 0,
+   "liveTests": 0,
+   "allTestsWithCand": 0,
+   "perRule": {},
+   "allRulesAllFiles": 0,
+   "hook": {
+    "calls": 0,
+    "findingsShown": 0,
+    "highShown": 0,
+    "mediumShown": 0,
+    "errors": 0,
+    "meanLatencyMs": 0,
+    "editsAfterFeedback": 0
+   },
+   "hookByRule": {},
+   "tests": {
+    "exitCode": 0,
+    "green": true,
+    "passed": 25,
+    "failed": 0,
+    "stray": []
+   }
+  },
+  {
+   "task": "py-tests-customer-repository",
+   "lang": "python",
+   "condition": "jev",
+   "rep": 2,
+   "exitCode": 0,
+   "isError": false,
+   "costUsd": 0.14356560000000002,
+   "edits": 2,
+   "testFiles": [
+    "tests/conftest.py",
+    "tests/test_customer_repository.py"
+   ],
+   "testLines": 331,
+   "e10": 0,
+   "e10orig4": 0,
+   "liveTests": 0,
+   "allTestsWithCand": 0,
+   "perRule": {},
+   "allRulesAllFiles": 0,
+   "hook": {
+    "calls": 2,
+    "findingsShown": 0,
+    "highShown": 0,
+    "mediumShown": 0,
+    "errors": 0,
+    "meanLatencyMs": 249.42512500000885,
+    "editsAfterFeedback": 0
+   },
+   "hookByRule": {},
+   "tests": {
+    "exitCode": 0,
+    "green": true,
+    "passed": 37,
+    "failed": 0,
+    "stray": []
+   }
+  },
+  {
+   "task": "py-tests-customer-repository",
+   "lang": "python",
+   "condition": "none",
+   "rep": 2,
+   "exitCode": 0,
+   "isError": false,
+   "costUsd": 0.14348339999999998,
+   "edits": 2,
+   "testFiles": [
+    "tests/conftest.py",
+    "tests/test_customer_repository.py"
+   ],
+   "testLines": 266,
+   "e10": 0,
+   "e10orig4": 0,
+   "liveTests": 0,
+   "allTestsWithCand": 0,
+   "perRule": {},
+   "allRulesAllFiles": 0,
+   "hook": {
+    "calls": 0,
+    "findingsShown": 0,
+    "highShown": 0,
+    "mediumShown": 0,
+    "errors": 0,
+    "meanLatencyMs": 0,
+    "editsAfterFeedback": 0
+   },
+   "hookByRule": {},
+   "tests": {
+    "exitCode": 0,
+    "green": true,
+    "passed": 40,
+    "failed": 0,
+    "stray": []
+   }
+  },
+  {
+   "task": "py-tests-pricing-quote",
+   "lang": "python",
+   "condition": "jev",
+   "rep": 2,
+   "exitCode": 0,
+   "isError": false,
+   "costUsd": 0.12387919999999998,
+   "edits": 1,
+   "testFiles": [
+    "tests/test_quote.py"
+   ],
+   "testLines": 256,
+   "e10": 0,
+   "e10orig4": 0,
+   "liveTests": 0,
+   "allTestsWithCand": 0,
+   "perRule": {},
+   "allRulesAllFiles": 0,
+   "hook": {
+    "calls": 1,
+    "findingsShown": 0,
+    "highShown": 0,
+    "mediumShown": 0,
+    "errors": 0,
+    "meanLatencyMs": 185.34887499996694,
+    "editsAfterFeedback": 0
+   },
+   "hookByRule": {},
+   "tests": {
+    "exitCode": 0,
+    "green": true,
+    "passed": 48,
+    "failed": 0,
+    "stray": []
+   }
+  },
+  {
+   "task": "py-tests-pricing-quote",
+   "lang": "python",
+   "condition": "none",
+   "rep": 2,
+   "exitCode": 0,
+   "isError": false,
+   "costUsd": 0.1505262,
+   "edits": 2,
+   "testFiles": [
+    "tests/test_quote.py"
+   ],
+   "testLines": 271,
+   "e10": 0,
+   "e10orig4": 0,
+   "liveTests": 0,
+   "allTestsWithCand": 0,
+   "perRule": {},
+   "allRulesAllFiles": 0,
+   "hook": {
+    "calls": 0,
+    "findingsShown": 0,
+    "highShown": 0,
+    "mediumShown": 0,
+    "errors": 0,
+    "meanLatencyMs": 0,
+    "editsAfterFeedback": 0
+   },
+   "hookByRule": {},
+   "tests": {
+    "exitCode": 0,
+    "green": true,
+    "passed": 49,
+    "failed": 0,
+    "stray": []
+   }
+  }
+ ],
+ "focused": [
+  {
+   "task": "ts-tests-invoice-report",
+   "lang": "typescript",
+   "condition": "jev",
+   "rep": 1,
+   "exitCode": 0,
+   "isError": false,
+   "costUsd": 0.12967480000000003,
+   "edits": 1,
+   "testFiles": [
+    "src/reports/invoice.test.ts"
+   ],
+   "testLines": 117,
+   "e10": 0,
+   "e10orig4": 0,
+   "liveTests": 0,
+   "allTestsWithCand": 0,
+   "perRule": {},
+   "allRulesAllFiles": 17,
+   "hook": {
+    "calls": 1,
+    "findingsShown": 0,
+    "highShown": 0,
+    "mediumShown": 0,
+    "errors": 0,
+    "meanLatencyMs": 394.201708,
+    "editsAfterFeedback": 0
+   },
+   "hookByRule": {},
+   "tests": {
+    "exitCode": 0,
+    "green": true,
+    "passed": 15,
+    "failed": 0,
+    "stray": []
+   }
+  },
+  {
+   "task": "ts-tests-invoice-report",
+   "lang": "typescript",
+   "condition": "none",
+   "rep": 1,
+   "exitCode": 0,
+   "isError": false,
+   "costUsd": 0.14868920000000002,
+   "edits": 1,
+   "testFiles": [
+    "src/reports/invoice.test.ts"
+   ],
+   "testLines": 141,
+   "e10": 0,
+   "e10orig4": 0,
+   "liveTests": 0,
+   "allTestsWithCand": 0,
+   "perRule": {},
+   "allRulesAllFiles": 12,
+   "hook": {
+    "calls": 0,
+    "findingsShown": 0,
+    "highShown": 0,
+    "mediumShown": 0,
+    "errors": 0,
+    "meanLatencyMs": 0,
+    "editsAfterFeedback": 0
+   },
+   "hookByRule": {},
+   "tests": {
+    "exitCode": 0,
+    "green": true,
+    "passed": 17,
+    "failed": 0,
+    "stray": []
+   }
+  },
+  {
+   "task": "ts-tests-carrier-client",
+   "lang": "typescript",
+   "condition": "none",
+   "rep": 1,
+   "exitCode": 0,
+   "isError": false,
+   "costUsd": 0.12392800000000001,
+   "edits": 1,
+   "testFiles": [
+    "src/clients/carrier.test.ts"
+   ],
+   "testLines": 190,
+   "e10": 3,
+   "e10orig4": 3,
+   "liveTests": 3,
+   "allTestsWithCand": 3,
+   "perRule": {
+    "ts-test-untyped-fake-response": 3
+   },
+   "allRulesAllFiles": 14,
+   "hook": {
+    "calls": 0,
+    "findingsShown": 0,
+    "highShown": 0,
+    "mediumShown": 0,
+    "errors": 0,
+    "meanLatencyMs": 0,
+    "editsAfterFeedback": 0
+   },
+   "hookByRule": {},
+   "tests": {
+    "exitCode": 0,
+    "green": true,
+    "passed": 25,
+    "failed": 0,
+    "stray": []
+   }
+  },
+  {
+   "task": "ts-tests-order-service",
+   "lang": "typescript",
+   "condition": "none",
+   "rep": 1,
+   "exitCode": 0,
+   "isError": false,
+   "costUsd": 0.2666522,
+   "edits": 2,
+   "testFiles": [
+    "src/orders/service.test.ts"
+   ],
+   "testLines": 195,
+   "e10": 0,
+   "e10orig4": 0,
+   "liveTests": 0,
+   "allTestsWithCand": 0,
+   "perRule": {},
+   "allRulesAllFiles": 15,
+   "hook": {
+    "calls": 0,
+    "findingsShown": 0,
+    "highShown": 0,
+    "mediumShown": 0,
+    "errors": 0,
+    "meanLatencyMs": 0,
+    "editsAfterFeedback": 0
+   },
+   "hookByRule": {},
+   "tests": {
+    "exitCode": 0,
+    "green": true,
+    "passed": 14,
+    "failed": 0,
+    "stray": []
+   }
+  },
+  {
+   "task": "ts-tests-carrier-client",
+   "lang": "typescript",
+   "condition": "jev",
+   "rep": 1,
+   "exitCode": 0,
+   "isError": false,
+   "costUsd": 0.14892099999999997,
+   "edits": 1,
+   "testFiles": [
+    "src/clients/carrier.test.ts"
+   ],
+   "testLines": 203,
+   "e10": 0,
+   "e10orig4": 0,
+   "liveTests": 0,
+   "allTestsWithCand": 0,
+   "perRule": {},
+   "allRulesAllFiles": 13,
+   "hook": {
+    "calls": 1,
+    "findingsShown": 1,
+    "highShown": 1,
+    "mediumShown": 0,
+    "errors": 0,
+    "meanLatencyMs": 232.38591599999927,
+    "editsAfterFeedback": 0
+   },
+   "hookByRule": {
+    "ts-test-untyped-fake-response": {
+     "high": 1,
+     "medium": 0
+    }
+   },
+   "tests": {
+    "exitCode": 0,
+    "green": true,
+    "passed": 21,
+    "failed": 0,
+    "stray": []
+   }
+  },
+  {
+   "task": "ts-tests-order-service",
+   "lang": "typescript",
+   "condition": "jev",
+   "rep": 1,
+   "exitCode": 0,
+   "isError": false,
+   "costUsd": 0.30274100000000004,
+   "edits": 2,
+   "testFiles": [
+    "src/orders/service.test.ts"
+   ],
+   "testLines": 137,
+   "e10": 6,
+   "e10orig4": 6,
+   "liveTests": 6,
+   "allTestsWithCand": 6,
+   "perRule": {
+    "ts-test-untyped-fake-response": 6
+   },
+   "allRulesAllFiles": 14,
+   "hook": {
+    "calls": 2,
+    "findingsShown": 0,
+    "highShown": 0,
+    "mediumShown": 0,
+    "errors": 0,
+    "meanLatencyMs": 210.99004150000474,
+    "editsAfterFeedback": 0
+   },
+   "hookByRule": {},
+   "tests": {
+    "exitCode": 0,
+    "green": true,
+    "passed": 12,
+    "failed": 0,
+    "stray": []
+   }
+  },
+  {
+   "task": "ts-tests-pricing-quote",
+   "lang": "typescript",
+   "condition": "none",
+   "rep": 1,
+   "exitCode": 0,
+   "isError": false,
+   "costUsd": 0.12056620000000001,
+   "edits": 1,
+   "testFiles": [
+    "src/pricing/quote.test.ts"
+   ],
+   "testLines": 210,
+   "e10": 6,
+   "e10orig4": 0,
+   "liveTests": 6,
+   "allTestsWithCand": 6,
+   "perRule": {
+    "ts-test-reimplements-logic": 6
+   },
+   "allRulesAllFiles": 41,
+   "hook": {
+    "calls": 0,
+    "findingsShown": 0,
+    "highShown": 0,
+    "mediumShown": 0,
+    "errors": 0,
+    "meanLatencyMs": 0,
+    "editsAfterFeedback": 0
+   },
+   "hookByRule": {},
+   "tests": {
+    "exitCode": 0,
+    "green": true,
+    "passed": 48,
+    "failed": 0,
+    "stray": []
+   }
+  },
+  {
+   "task": "py-tests-order-service",
+   "lang": "python",
+   "condition": "none",
+   "rep": 1,
+   "exitCode": 0,
+   "isError": false,
+   "costUsd": 0.11486759999999999,
+   "edits": 1,
+   "testFiles": [
+    "tests/test_order_service.py"
+   ],
+   "testLines": 232,
+   "e10": 0,
+   "e10orig4": 0,
+   "liveTests": 0,
+   "allTestsWithCand": 0,
+   "perRule": {},
+   "allRulesAllFiles": 0,
+   "hook": {
+    "calls": 0,
+    "findingsShown": 0,
+    "highShown": 0,
+    "mediumShown": 0,
+    "errors": 0,
+    "meanLatencyMs": 0,
+    "editsAfterFeedback": 0
+   },
+   "hookByRule": {},
+   "tests": {
+    "exitCode": 0,
+    "green": true,
+    "passed": 18,
+    "failed": 0,
+    "stray": []
+   }
+  },
+  {
+   "task": "ts-tests-pricing-quote",
+   "lang": "typescript",
+   "condition": "jev",
+   "rep": 1,
+   "exitCode": 0,
+   "isError": false,
+   "costUsd": 0.13838899999999998,
+   "edits": 1,
+   "testFiles": [
+    "src/pricing/quote.test.ts"
+   ],
+   "testLines": 258,
+   "e10": 0,
+   "e10orig4": 0,
+   "liveTests": 0,
+   "allTestsWithCand": 0,
+   "perRule": {},
+   "allRulesAllFiles": 19,
+   "hook": {
+    "calls": 1,
+    "findingsShown": 0,
+    "highShown": 0,
+    "mediumShown": 0,
+    "errors": 0,
+    "meanLatencyMs": 212.32912500000384,
+    "editsAfterFeedback": 0
+   },
+   "hookByRule": {},
+   "tests": {
+    "exitCode": 0,
+    "green": true,
+    "passed": 49,
+    "failed": 0,
+    "stray": []
+   }
+  },
+  {
+   "task": "py-tests-order-service",
+   "lang": "python",
+   "condition": "jev",
+   "rep": 1,
+   "exitCode": 0,
+   "isError": false,
+   "costUsd": 0.11968179999999999,
+   "edits": 1,
+   "testFiles": [
+    "tests/test_order_service.py"
+   ],
+   "testLines": 252,
+   "e10": 0,
+   "e10orig4": 0,
+   "liveTests": 0,
+   "allTestsWithCand": 0,
+   "perRule": {},
+   "allRulesAllFiles": 0,
+   "hook": {
+    "calls": 1,
+    "findingsShown": 0,
+    "highShown": 0,
+    "mediumShown": 0,
+    "errors": 0,
+    "meanLatencyMs": 284.7327079999959,
+    "editsAfterFeedback": 0
+   },
+   "hookByRule": {},
+   "tests": {
+    "exitCode": 0,
+    "green": true,
+    "passed": 21,
+    "failed": 0,
+    "stray": []
+   }
+  },
+  {
+   "task": "py-tests-fx-client",
+   "lang": "python",
+   "condition": "jev",
+   "rep": 1,
+   "exitCode": 0,
+   "isError": false,
+   "costUsd": 0.10827,
+   "edits": 1,
+   "testFiles": [
+    "tests/test_fx.py"
+   ],
+   "testLines": 284,
+   "e10": 2,
+   "e10orig4": 2,
+   "liveTests": 2,
+   "allTestsWithCand": 2,
+   "perRule": {
+    "py-test-untyped-fake-response": 2
+   },
+   "allRulesAllFiles": 0,
+   "hook": {
+    "calls": 1,
+    "findingsShown": 0,
+    "highShown": 0,
+    "mediumShown": 0,
+    "errors": 0,
+    "meanLatencyMs": 248.09741600000416,
+    "editsAfterFeedback": 0
+   },
+   "hookByRule": {},
+   "tests": {
+    "exitCode": 0,
+    "green": true,
+    "passed": 24,
+    "failed": 0,
+    "stray": []
+   }
+  },
+  {
+   "task": "py-tests-fx-client",
+   "lang": "python",
+   "condition": "none",
+   "rep": 1,
+   "exitCode": 0,
+   "isError": false,
+   "costUsd": 0.1267768,
+   "edits": 1,
+   "testFiles": [
+    "tests/test_fx_client.py"
+   ],
+   "testLines": 272,
+   "e10": 0,
+   "e10orig4": 0,
+   "liveTests": 0,
+   "allTestsWithCand": 0,
+   "perRule": {},
+   "allRulesAllFiles": 0,
+   "hook": {
+    "calls": 0,
+    "findingsShown": 0,
+    "highShown": 0,
+    "mediumShown": 0,
+    "errors": 0,
+    "meanLatencyMs": 0,
+    "editsAfterFeedback": 0
+   },
+   "hookByRule": {},
+   "tests": {
+    "exitCode": 0,
+    "green": true,
+    "passed": 25,
+    "failed": 0,
+    "stray": []
+   }
+  },
+  {
+   "task": "py-tests-customer-repository",
+   "lang": "python",
+   "condition": "none",
+   "rep": 1,
+   "exitCode": 0,
+   "isError": false,
+   "costUsd": 0.1419548,
+   "edits": 2,
+   "testFiles": [
+    "tests/conftest.py",
+    "tests/test_customer_repository.py"
+   ],
+   "testLines": 317,
+   "e10": 0,
+   "e10orig4": 0,
+   "liveTests": 0,
+   "allTestsWithCand": 0,
+   "perRule": {},
+   "allRulesAllFiles": 0,
+   "hook": {
+    "calls": 0,
+    "findingsShown": 0,
+    "highShown": 0,
+    "mediumShown": 0,
+    "errors": 0,
+    "meanLatencyMs": 0,
+    "editsAfterFeedback": 0
+   },
+   "hookByRule": {},
+   "tests": {
+    "exitCode": 0,
+    "green": true,
+    "passed": 40,
+    "failed": 0,
+    "stray": []
+   }
+  },
+  {
+   "task": "py-tests-customer-repository",
+   "lang": "python",
+   "condition": "jev",
+   "rep": 1,
+   "exitCode": 0,
+   "isError": false,
+   "costUsd": 0.1279228,
+   "edits": 1,
+   "testFiles": [
+    "tests/test_customer_repository.py"
+   ],
+   "testLines": 290,
+   "e10": 0,
+   "e10orig4": 0,
+   "liveTests": 0,
+   "allTestsWithCand": 0,
+   "perRule": {},
+   "allRulesAllFiles": 0,
+   "hook": {
+    "calls": 1,
+    "findingsShown": 0,
+    "highShown": 0,
+    "mediumShown": 0,
+    "errors": 0,
+    "meanLatencyMs": 210.22837499997695,
+    "editsAfterFeedback": 0
+   },
+   "hookByRule": {},
+   "tests": {
+    "exitCode": 0,
+    "green": true,
+    "passed": 37,
+    "failed": 0,
+    "stray": []
+   }
+  },
+  {
+   "task": "py-tests-pricing-quote",
+   "lang": "python",
+   "condition": "none",
+   "rep": 1,
+   "exitCode": 0,
+   "isError": false,
+   "costUsd": 0.12673079999999998,
+   "edits": 1,
+   "testFiles": [
+    "tests/test_quote.py"
+   ],
+   "testLines": 245,
+   "e10": 0,
+   "e10orig4": 0,
+   "liveTests": 0,
+   "allTestsWithCand": 0,
+   "perRule": {},
+   "allRulesAllFiles": 0,
+   "hook": {
+    "calls": 0,
+    "findingsShown": 0,
+    "highShown": 0,
+    "mediumShown": 0,
+    "errors": 0,
+    "meanLatencyMs": 0,
+    "editsAfterFeedback": 0
+   },
+   "hookByRule": {},
+   "tests": {
+    "exitCode": 0,
+    "green": true,
+    "passed": 45,
+    "failed": 0,
+    "stray": []
+   }
+  },
+  {
+   "task": "py-tests-pricing-quote",
+   "lang": "python",
+   "condition": "jev",
+   "rep": 1,
+   "exitCode": 0,
+   "isError": false,
+   "costUsd": 0.1397368,
+   "edits": 2,
+   "testFiles": [
+    "tests/test_quote.py"
+   ],
+   "testLines": 235,
+   "e10": 0,
+   "e10orig4": 0,
+   "liveTests": 0,
+   "allTestsWithCand": 0,
+   "perRule": {},
+   "allRulesAllFiles": 0,
+   "hook": {
+    "calls": 2,
+    "findingsShown": 1,
+    "highShown": 0,
+    "mediumShown": 1,
+    "errors": 0,
+    "meanLatencyMs": 235.1281244999991,
+    "editsAfterFeedback": 1
+   },
+   "hookByRule": {
+    "py-test-reimplements-logic": {
+     "high": 0,
+     "medium": 1
+    }
+   },
+   "tests": {
+    "exitCode": 0,
+    "green": true,
+    "passed": 47,
+    "failed": 0,
+    "stray": []
+   }
+  },
+  {
+   "task": "ts-tests-order-service",
+   "lang": "typescript",
+   "condition": "none",
+   "rep": 2,
+   "exitCode": 0,
+   "isError": false,
+   "costUsd": 0.1224326,
+   "edits": 1,
+   "testFiles": [
+    "src/orders/service.test.ts"
+   ],
+   "testLines": 182,
+   "e10": 2,
+   "e10orig4": 2,
+   "liveTests": 2,
+   "allTestsWithCand": 2,
+   "perRule": {
+    "ts-test-untyped-fake-response": 2
+   },
+   "allRulesAllFiles": 18,
+   "hook": {
+    "calls": 0,
+    "findingsShown": 0,
+    "highShown": 0,
+    "mediumShown": 0,
+    "errors": 0,
+    "meanLatencyMs": 0,
+    "editsAfterFeedback": 0
+   },
+   "hookByRule": {},
+   "tests": {
+    "exitCode": 0,
+    "green": true,
+    "passed": 17,
+    "failed": 0,
+    "stray": []
+   }
+  },
+  {
+   "task": "ts-tests-invoice-report",
+   "lang": "typescript",
+   "condition": "none",
+   "rep": 2,
+   "exitCode": 0,
+   "isError": false,
+   "costUsd": 0.0913938,
+   "edits": 1,
+   "testFiles": [
+    "src/reports/invoice.test.ts"
+   ],
+   "testLines": 143,
+   "e10": 0,
+   "e10orig4": 0,
+   "liveTests": 0,
+   "allTestsWithCand": 0,
+   "perRule": {},
+   "allRulesAllFiles": 18,
+   "hook": {
+    "calls": 0,
+    "findingsShown": 0,
+    "highShown": 0,
+    "mediumShown": 0,
+    "errors": 0,
+    "meanLatencyMs": 0,
+    "editsAfterFeedback": 0
+   },
+   "hookByRule": {},
+   "tests": {
+    "exitCode": 0,
+    "green": true,
+    "passed": 22,
+    "failed": 0,
+    "stray": []
+   }
+  },
+  {
+   "task": "ts-tests-order-service",
+   "lang": "typescript",
+   "condition": "jev",
+   "rep": 2,
+   "exitCode": 0,
+   "isError": false,
+   "costUsd": 0.12413700000000001,
+   "edits": 1,
+   "testFiles": [
+    "src/orders/service.test.ts"
+   ],
+   "testLines": 196,
+   "e10": 1,
+   "e10orig4": 1,
+   "liveTests": 1,
+   "allTestsWithCand": 1,
+   "perRule": {
+    "ts-test-untyped-fake-response": 1
+   },
+   "allRulesAllFiles": 20,
+   "hook": {
+    "calls": 1,
+    "findingsShown": 0,
+    "highShown": 0,
+    "mediumShown": 0,
+    "errors": 0,
+    "meanLatencyMs": 277.4618330000085,
+    "editsAfterFeedback": 0
+   },
+   "hookByRule": {},
+   "tests": {
+    "exitCode": 0,
+    "green": true,
+    "passed": 19,
+    "failed": 0,
+    "stray": []
+   }
+  },
+  {
+   "task": "ts-tests-invoice-report",
+   "lang": "typescript",
+   "condition": "jev",
+   "rep": 2,
+   "exitCode": 0,
+   "isError": false,
+   "costUsd": 0.1003848,
+   "edits": 1,
+   "testFiles": [
+    "src/reports/invoice.test.ts"
+   ],
+   "testLines": 149,
+   "e10": 0,
+   "e10orig4": 0,
+   "liveTests": 0,
+   "allTestsWithCand": 0,
+   "perRule": {},
+   "allRulesAllFiles": 18,
+   "hook": {
+    "calls": 1,
+    "findingsShown": 0,
+    "highShown": 0,
+    "mediumShown": 0,
+    "errors": 0,
+    "meanLatencyMs": 221.4115420000162,
+    "editsAfterFeedback": 0
+   },
+   "hookByRule": {},
+   "tests": {
+    "exitCode": 0,
+    "green": true,
+    "passed": 22,
+    "failed": 0,
+    "stray": []
+   }
+  },
+  {
+   "task": "ts-tests-carrier-client",
+   "lang": "typescript",
+   "condition": "none",
+   "rep": 2,
+   "exitCode": 0,
+   "isError": false,
+   "costUsd": 0.12002119999999998,
+   "edits": 1,
+   "testFiles": [
+    "src/clients/carrier.test.ts"
+   ],
+   "testLines": 184,
+   "e10": 0,
+   "e10orig4": 0,
+   "liveTests": 0,
+   "allTestsWithCand": 0,
+   "perRule": {},
+   "allRulesAllFiles": 22,
+   "hook": {
+    "calls": 0,
+    "findingsShown": 0,
+    "highShown": 0,
+    "mediumShown": 0,
+    "errors": 0,
+    "meanLatencyMs": 0,
+    "editsAfterFeedback": 0
+   },
+   "hookByRule": {},
+   "tests": {
+    "exitCode": 0,
+    "green": true,
+    "passed": 22,
+    "failed": 0,
+    "stray": []
+   }
+  },
+  {
+   "task": "ts-tests-carrier-client",
+   "lang": "typescript",
+   "condition": "jev",
+   "rep": 2,
+   "exitCode": 0,
+   "isError": false,
+   "costUsd": 0.1460756,
+   "edits": 1,
+   "testFiles": [
+    "src/clients/carrier.test.ts"
+   ],
+   "testLines": 213,
+   "e10": 0,
+   "e10orig4": 0,
+   "liveTests": 0,
+   "allTestsWithCand": 0,
+   "perRule": {},
+   "allRulesAllFiles": 19,
+   "hook": {
+    "calls": 1,
+    "findingsShown": 1,
+    "highShown": 1,
+    "mediumShown": 0,
+    "errors": 0,
+    "meanLatencyMs": 283.0150839999842,
+    "editsAfterFeedback": 0
+   },
+   "hookByRule": {
+    "ts-test-untyped-fake-response": {
+     "high": 1,
+     "medium": 0
+    }
+   },
+   "tests": {
+    "exitCode": 0,
+    "green": true,
+    "passed": 25,
+    "failed": 0,
+    "stray": []
+   }
+  },
+  {
+   "task": "ts-tests-pricing-quote",
+   "lang": "typescript",
+   "condition": "jev",
+   "rep": 2,
+   "exitCode": 0,
+   "isError": false,
+   "costUsd": 0.1195298,
+   "edits": 1,
+   "testFiles": [
+    "src/pricing/quote.test.ts"
+   ],
+   "testLines": 202,
+   "e10": 0,
+   "e10orig4": 0,
+   "liveTests": 0,
+   "allTestsWithCand": 0,
+   "perRule": {},
+   "allRulesAllFiles": 18,
+   "hook": {
+    "calls": 1,
+    "findingsShown": 0,
+    "highShown": 0,
+    "mediumShown": 0,
+    "errors": 0,
+    "meanLatencyMs": 208.92262499997742,
+    "editsAfterFeedback": 0
+   },
+   "hookByRule": {},
+   "tests": {
+    "exitCode": 0,
+    "green": true,
+    "passed": 46,
+    "failed": 0,
+    "stray": []
+   }
+  },
+  {
+   "task": "ts-tests-pricing-quote",
+   "lang": "typescript",
+   "condition": "none",
+   "rep": 2,
+   "exitCode": 0,
+   "isError": false,
+   "costUsd": 0.12535179999999999,
+   "edits": 1,
+   "testFiles": [
+    "src/pricing/quote.test.ts"
+   ],
+   "testLines": 201,
+   "e10": 1,
+   "e10orig4": 0,
+   "liveTests": 1,
+   "allTestsWithCand": 1,
+   "perRule": {
+    "ts-test-reimplements-logic": 1
+   },
+   "allRulesAllFiles": 20,
+   "hook": {
+    "calls": 0,
+    "findingsShown": 0,
+    "highShown": 0,
+    "mediumShown": 0,
+    "errors": 0,
+    "meanLatencyMs": 0,
+    "editsAfterFeedback": 0
+   },
+   "hookByRule": {},
+   "tests": {
+    "exitCode": 0,
+    "green": true,
+    "passed": 47,
+    "failed": 0,
+    "stray": []
+   }
+  },
+  {
+   "task": "py-tests-order-service",
+   "lang": "python",
+   "condition": "none",
+   "rep": 2,
+   "exitCode": 0,
+   "isError": false,
+   "costUsd": 0.12138159999999999,
+   "edits": 1,
+   "testFiles": [
+    "tests/test_order_service.py"
+   ],
+   "testLines": 256,
+   "e10": 0,
+   "e10orig4": 0,
+   "liveTests": 0,
+   "allTestsWithCand": 0,
+   "perRule": {},
+   "allRulesAllFiles": 0,
+   "hook": {
+    "calls": 0,
+    "findingsShown": 0,
+    "highShown": 0,
+    "mediumShown": 0,
+    "errors": 0,
+    "meanLatencyMs": 0,
+    "editsAfterFeedback": 0
+   },
+   "hookByRule": {},
+   "tests": {
+    "exitCode": 0,
+    "green": true,
+    "passed": 21,
+    "failed": 0,
+    "stray": []
+   }
+  },
+  {
+   "task": "py-tests-order-service",
+   "lang": "python",
+   "condition": "jev",
+   "rep": 2,
+   "exitCode": 0,
+   "isError": false,
+   "costUsd": 0.1184362,
+   "edits": 1,
+   "testFiles": [
+    "tests/test_order_service.py"
+   ],
+   "testLines": 250,
+   "e10": 0,
+   "e10orig4": 0,
+   "liveTests": 0,
+   "allTestsWithCand": 0,
+   "perRule": {},
+   "allRulesAllFiles": 0,
+   "hook": {
+    "calls": 1,
+    "findingsShown": 0,
+    "highShown": 0,
+    "mediumShown": 0,
+    "errors": 0,
+    "meanLatencyMs": 201.26487500002258,
+    "editsAfterFeedback": 0
+   },
+   "hookByRule": {},
+   "tests": {
+    "exitCode": 0,
+    "green": true,
+    "passed": 21,
+    "failed": 0,
+    "stray": []
+   }
+  },
+  {
+   "task": "py-tests-fx-client",
+   "lang": "python",
+   "condition": "jev",
+   "rep": 2,
+   "exitCode": 0,
+   "isError": false,
+   "costUsd": 0.10832939999999999,
+   "edits": 1,
+   "testFiles": [
+    "tests/test_fx_client.py"
+   ],
+   "testLines": 262,
+   "e10": 3,
+   "e10orig4": 3,
+   "liveTests": 3,
+   "allTestsWithCand": 3,
+   "perRule": {
+    "py-test-untyped-fake-response": 3
+   },
+   "allRulesAllFiles": 0,
+   "hook": {
+    "calls": 1,
+    "findingsShown": 0,
+    "highShown": 0,
+    "mediumShown": 0,
+    "errors": 0,
+    "meanLatencyMs": 196.45749999996042,
+    "editsAfterFeedback": 0
+   },
+   "hookByRule": {},
+   "tests": {
+    "exitCode": 0,
+    "green": true,
+    "passed": 26,
+    "failed": 0,
+    "stray": []
+   }
+  },
+  {
+   "task": "py-tests-fx-client",
+   "lang": "python",
+   "condition": "none",
+   "rep": 2,
+   "exitCode": 0,
+   "isError": false,
+   "costUsd": 0.128087,
+   "edits": 2,
+   "testFiles": [
+    "tests/test_fx_client.py"
+   ],
+   "testLines": 242,
+   "e10": 0,
+   "e10orig4": 0,
+   "liveTests": 0,
+   "allTestsWithCand": 0,
+   "perRule": {},
+   "allRulesAllFiles": 0,
+   "hook": {
+    "calls": 0,
+    "findingsShown": 0,
+    "highShown": 0,
+    "mediumShown": 0,
+    "errors": 0,
+    "meanLatencyMs": 0,
+    "editsAfterFeedback": 0
+   },
+   "hookByRule": {},
+   "tests": {
+    "exitCode": 0,
+    "green": true,
+    "passed": 25,
+    "failed": 0,
+    "stray": []
+   }
+  },
+  {
+   "task": "py-tests-customer-repository",
+   "lang": "python",
+   "condition": "jev",
+   "rep": 2,
+   "exitCode": 0,
+   "isError": false,
+   "costUsd": 0.14356560000000002,
+   "edits": 2,
+   "testFiles": [
+    "tests/conftest.py",
+    "tests/test_customer_repository.py"
+   ],
+   "testLines": 331,
+   "e10": 0,
+   "e10orig4": 0,
+   "liveTests": 0,
+   "allTestsWithCand": 0,
+   "perRule": {},
+   "allRulesAllFiles": 0,
+   "hook": {
+    "calls": 2,
+    "findingsShown": 0,
+    "highShown": 0,
+    "mediumShown": 0,
+    "errors": 0,
+    "meanLatencyMs": 249.42512500000885,
+    "editsAfterFeedback": 0
+   },
+   "hookByRule": {},
+   "tests": {
+    "exitCode": 0,
+    "green": true,
+    "passed": 37,
+    "failed": 0,
+    "stray": []
+   }
+  },
+  {
+   "task": "py-tests-customer-repository",
+   "lang": "python",
+   "condition": "none",
+   "rep": 2,
+   "exitCode": 0,
+   "isError": false,
+   "costUsd": 0.14348339999999998,
+   "edits": 2,
+   "testFiles": [
+    "tests/conftest.py",
+    "tests/test_customer_repository.py"
+   ],
+   "testLines": 266,
+   "e10": 0,
+   "e10orig4": 0,
+   "liveTests": 0,
+   "allTestsWithCand": 0,
+   "perRule": {},
+   "allRulesAllFiles": 0,
+   "hook": {
+    "calls": 0,
+    "findingsShown": 0,
+    "highShown": 0,
+    "mediumShown": 0,
+    "errors": 0,
+    "meanLatencyMs": 0,
+    "editsAfterFeedback": 0
+   },
+   "hookByRule": {},
+   "tests": {
+    "exitCode": 0,
+    "green": true,
+    "passed": 40,
+    "failed": 0,
+    "stray": []
+   }
+  },
+  {
+   "task": "py-tests-pricing-quote",
+   "lang": "python",
+   "condition": "jev",
+   "rep": 2,
+   "exitCode": 0,
+   "isError": false,
+   "costUsd": 0.12387919999999998,
+   "edits": 1,
+   "testFiles": [
+    "tests/test_quote.py"
+   ],
+   "testLines": 256,
+   "e10": 0,
+   "e10orig4": 0,
+   "liveTests": 0,
+   "allTestsWithCand": 0,
+   "perRule": {},
+   "allRulesAllFiles": 0,
+   "hook": {
+    "calls": 1,
+    "findingsShown": 0,
+    "highShown": 0,
+    "mediumShown": 0,
+    "errors": 0,
+    "meanLatencyMs": 185.34887499996694,
+    "editsAfterFeedback": 0
+   },
+   "hookByRule": {},
+   "tests": {
+    "exitCode": 0,
+    "green": true,
+    "passed": 48,
+    "failed": 0,
+    "stray": []
+   }
+  },
+  {
+   "task": "py-tests-pricing-quote",
+   "lang": "python",
+   "condition": "none",
+   "rep": 2,
+   "exitCode": 0,
+   "isError": false,
+   "costUsd": 0.1505262,
+   "edits": 2,
+   "testFiles": [
+    "tests/test_quote.py"
+   ],
+   "testLines": 271,
+   "e10": 0,
+   "e10orig4": 0,
+   "liveTests": 0,
+   "allTestsWithCand": 0,
+   "perRule": {},
+   "allRulesAllFiles": 0,
+   "hook": {
+    "calls": 0,
+    "findingsShown": 0,
+    "highShown": 0,
+    "mediumShown": 0,
+    "errors": 0,
+    "meanLatencyMs": 0,
+    "editsAfterFeedback": 0
+   },
+   "hookByRule": {},
+   "tests": {
+    "exitCode": 0,
+    "green": true,
+    "passed": 49,
+    "failed": 0,
+    "stray": []
+   }
+  }
+ ],
+ "stats": {
+  "primary": {
+   "e10": {
+    "all": {
+     "pairs": 16,
+     "none_total": 1,
+     "jev_total": 1,
+     "mean_diff": 0.0,
+     "ci95": [
+      -0.1875,
+      0.1875
+     ],
+     "better": 1,
+     "worse": 1,
+     "tie": 14
+    },
+    "typescript": {
+     "pairs": 8,
+     "none_total": 1,
+     "jev_total": 1,
+     "mean_diff": 0.0,
+     "ci95": [
+      -0.375,
+      0.375
+     ],
+     "better": 1,
+     "worse": 1,
+     "tie": 6
+    },
+    "python": {
+     "pairs": 8,
+     "none_total": 0,
+     "jev_total": 0,
+     "mean_diff": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "better": 0,
+     "worse": 0,
+     "tie": 8
+    }
+   },
+   "e10orig4": {
+    "all": {
+     "pairs": 16,
+     "none_total": 0,
+     "jev_total": 1,
+     "mean_diff": 0.0625,
+     "ci95": [
+      0.0,
+      0.1875
+     ],
+     "better": 0,
+     "worse": 1,
+     "tie": 15
+    },
+    "typescript": {
+     "pairs": 8,
+     "none_total": 0,
+     "jev_total": 1,
+     "mean_diff": 0.125,
+     "ci95": [
+      0.0,
+      0.375
+     ],
+     "better": 0,
+     "worse": 1,
+     "tie": 7
+    },
+    "python": {
+     "pairs": 8,
+     "none_total": 0,
+     "jev_total": 0,
+     "mean_diff": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "better": 0,
+     "worse": 0,
+     "tie": 8
+    }
+   },
+   "liveTests": {
+    "all": {
+     "pairs": 16,
+     "none_total": 1,
+     "jev_total": 1,
+     "mean_diff": 0.0,
+     "ci95": [
+      -0.1875,
+      0.1875
+     ],
+     "better": 1,
+     "worse": 1,
+     "tie": 14
+    },
+    "typescript": {
+     "pairs": 8,
+     "none_total": 1,
+     "jev_total": 1,
+     "mean_diff": 0.0,
+     "ci95": [
+      -0.375,
+      0.375
+     ],
+     "better": 1,
+     "worse": 1,
+     "tie": 6
+    },
+    "python": {
+     "pairs": 8,
+     "none_total": 0,
+     "jev_total": 0,
+     "mean_diff": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "better": 0,
+     "worse": 0,
+     "tie": 8
+    }
+   },
+   "allTestsWithCand": {
+    "all": {
+     "pairs": 16,
+     "none_total": 1,
+     "jev_total": 1,
+     "mean_diff": 0.0,
+     "ci95": [
+      -0.1875,
+      0.1875
+     ],
+     "better": 1,
+     "worse": 1,
+     "tie": 14
+    },
+    "typescript": {
+     "pairs": 8,
+     "none_total": 1,
+     "jev_total": 1,
+     "mean_diff": 0.0,
+     "ci95": [
+      -0.375,
+      0.375
+     ],
+     "better": 1,
+     "worse": 1,
+     "tie": 6
+    },
+    "python": {
+     "pairs": 8,
+     "none_total": 0,
+     "jev_total": 0,
+     "mean_diff": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "better": 0,
+     "worse": 0,
+     "tie": 8
+    }
+   },
+   "allRulesAllFiles": {
+    "all": {
+     "pairs": 16,
+     "none_total": 160,
+     "jev_total": 138,
+     "mean_diff": -1.375,
+     "ci95": [
+      -4.5,
+      0.625
+     ],
+     "better": 5,
+     "worse": 2,
+     "tie": 9
+    },
+    "typescript": {
+     "pairs": 8,
+     "none_total": 160,
+     "jev_total": 138,
+     "mean_diff": -2.75,
+     "ci95": [
+      -8.75,
+      1.375
+     ],
+     "better": 5,
+     "worse": 2,
+     "tie": 1
+    },
+    "python": {
+     "pairs": 8,
+     "none_total": 0,
+     "jev_total": 0,
+     "mean_diff": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "better": 0,
+     "worse": 0,
+     "tie": 8
+    }
+   },
+   "perTask": {
+    "ts-tests-invoice-report": {
+     "jev-r1": {
+      "e10": 0,
+      "liveTests": 0,
+      "green": true,
+      "passed": 15,
+      "failed": 0,
+      "testLines": 117,
+      "hookFindings": 0
+     },
+     "none-r1": {
+      "e10": 0,
+      "liveTests": 0,
+      "green": true,
+      "passed": 17,
+      "failed": 0,
+      "testLines": 141,
+      "hookFindings": 0
+     },
+     "none-r2": {
+      "e10": 0,
+      "liveTests": 0,
+      "green": true,
+      "passed": 22,
+      "failed": 0,
+      "testLines": 143,
+      "hookFindings": 0
+     },
+     "jev-r2": {
+      "e10": 0,
+      "liveTests": 0,
+      "green": true,
+      "passed": 22,
+      "failed": 0,
+      "testLines": 149,
+      "hookFindings": 0
+     }
+    },
+    "ts-tests-carrier-client": {
+     "none-r1": {
+      "e10": 0,
+      "liveTests": 0,
+      "green": true,
+      "passed": 25,
+      "failed": 0,
+      "testLines": 190,
+      "hookFindings": 0
+     },
+     "jev-r1": {
+      "e10": 0,
+      "liveTests": 0,
+      "green": true,
+      "passed": 21,
+      "failed": 0,
+      "testLines": 203,
+      "hookFindings": 1
+     },
+     "none-r2": {
+      "e10": 0,
+      "liveTests": 0,
+      "green": true,
+      "passed": 22,
+      "failed": 0,
+      "testLines": 184,
+      "hookFindings": 0
+     },
+     "jev-r2": {
+      "e10": 0,
+      "liveTests": 0,
+      "green": true,
+      "passed": 25,
+      "failed": 0,
+      "testLines": 213,
+      "hookFindings": 1
+     }
+    },
+    "ts-tests-order-service": {
+     "none-r1": {
+      "e10": 0,
+      "liveTests": 0,
+      "green": true,
+      "passed": 14,
+      "failed": 0,
+      "testLines": 195,
+      "hookFindings": 0
+     },
+     "jev-r1": {
+      "e10": 1,
+      "liveTests": 1,
+      "green": true,
+      "passed": 12,
+      "failed": 0,
+      "testLines": 137,
+      "hookFindings": 0
+     },
+     "none-r2": {
+      "e10": 0,
+      "liveTests": 0,
+      "green": true,
+      "passed": 17,
+      "failed": 0,
+      "testLines": 182,
+      "hookFindings": 0
+     },
+     "jev-r2": {
+      "e10": 0,
+      "liveTests": 0,
+      "green": true,
+      "passed": 19,
+      "failed": 0,
+      "testLines": 196,
+      "hookFindings": 0
+     }
+    },
+    "ts-tests-pricing-quote": {
+     "none-r1": {
+      "e10": 0,
+      "liveTests": 0,
+      "green": true,
+      "passed": 48,
+      "failed": 0,
+      "testLines": 210,
+      "hookFindings": 0
+     },
+     "jev-r1": {
+      "e10": 0,
+      "liveTests": 0,
+      "green": true,
+      "passed": 49,
+      "failed": 0,
+      "testLines": 258,
+      "hookFindings": 0
+     },
+     "jev-r2": {
+      "e10": 0,
+      "liveTests": 0,
+      "green": true,
+      "passed": 46,
+      "failed": 0,
+      "testLines": 202,
+      "hookFindings": 0
+     },
+     "none-r2": {
+      "e10": 1,
+      "liveTests": 1,
+      "green": true,
+      "passed": 47,
+      "failed": 0,
+      "testLines": 201,
+      "hookFindings": 0
+     }
+    },
+    "py-tests-order-service": {
+     "none-r1": {
+      "e10": 0,
+      "liveTests": 0,
+      "green": true,
+      "passed": 18,
+      "failed": 0,
+      "testLines": 232,
+      "hookFindings": 0
+     },
+     "jev-r1": {
+      "e10": 0,
+      "liveTests": 0,
+      "green": true,
+      "passed": 21,
+      "failed": 0,
+      "testLines": 252,
+      "hookFindings": 0
+     },
+     "none-r2": {
+      "e10": 0,
+      "liveTests": 0,
+      "green": true,
+      "passed": 21,
+      "failed": 0,
+      "testLines": 256,
+      "hookFindings": 0
+     },
+     "jev-r2": {
+      "e10": 0,
+      "liveTests": 0,
+      "green": true,
+      "passed": 21,
+      "failed": 0,
+      "testLines": 250,
+      "hookFindings": 0
+     }
+    },
+    "py-tests-fx-client": {
+     "jev-r1": {
+      "e10": 0,
+      "liveTests": 0,
+      "green": true,
+      "passed": 24,
+      "failed": 0,
+      "testLines": 284,
+      "hookFindings": 0
+     },
+     "none-r1": {
+      "e10": 0,
+      "liveTests": 0,
+      "green": true,
+      "passed": 25,
+      "failed": 0,
+      "testLines": 272,
+      "hookFindings": 0
+     },
+     "jev-r2": {
+      "e10": 0,
+      "liveTests": 0,
+      "green": true,
+      "passed": 26,
+      "failed": 0,
+      "testLines": 262,
+      "hookFindings": 0
+     },
+     "none-r2": {
+      "e10": 0,
+      "liveTests": 0,
+      "green": true,
+      "passed": 25,
+      "failed": 0,
+      "testLines": 242,
+      "hookFindings": 0
+     }
+    },
+    "py-tests-customer-repository": {
+     "none-r1": {
+      "e10": 0,
+      "liveTests": 0,
+      "green": true,
+      "passed": 40,
+      "failed": 0,
+      "testLines": 317,
+      "hookFindings": 0
+     },
+     "jev-r1": {
+      "e10": 0,
+      "liveTests": 0,
+      "green": true,
+      "passed": 37,
+      "failed": 0,
+      "testLines": 290,
+      "hookFindings": 0
+     },
+     "jev-r2": {
+      "e10": 0,
+      "liveTests": 0,
+      "green": true,
+      "passed": 37,
+      "failed": 0,
+      "testLines": 331,
+      "hookFindings": 0
+     },
+     "none-r2": {
+      "e10": 0,
+      "liveTests": 0,
+      "green": true,
+      "passed": 40,
+      "failed": 0,
+      "testLines": 266,
+      "hookFindings": 0
+     }
+    },
+    "py-tests-pricing-quote": {
+     "none-r1": {
+      "e10": 0,
+      "liveTests": 0,
+      "green": true,
+      "passed": 45,
+      "failed": 0,
+      "testLines": 245,
+      "hookFindings": 0
+     },
+     "jev-r1": {
+      "e10": 0,
+      "liveTests": 0,
+      "green": true,
+      "passed": 47,
+      "failed": 0,
+      "testLines": 235,
+      "hookFindings": 1
+     },
+     "jev-r2": {
+      "e10": 0,
+      "liveTests": 0,
+      "green": true,
+      "passed": 48,
+      "failed": 0,
+      "testLines": 256,
+      "hookFindings": 0
+     },
+     "none-r2": {
+      "e10": 0,
+      "liveTests": 0,
+      "green": true,
+      "passed": 49,
+      "failed": 0,
+      "testLines": 271,
+      "hookFindings": 0
+     }
+    }
+   },
+   "graderPerRule": {
+    "ts-test-untyped-fake-response": {
+     "jev": 1
+    },
+    "ts-test-reimplements-logic": {
+     "none": 1
+    }
+   },
+   "graderCandidates": {},
+   "hookPerRule": {
+    "ts-test-untyped-fake-response": {
+     "high": 2,
+     "medium": 0,
+     "runs": 2
+    },
+    "py-test-reimplements-logic": {
+     "high": 0,
+     "medium": 1,
+     "runs": 1
+    }
+   },
+   "byCondition": {
+    "jev|typescript": {
+     "runs": 8.0,
+     "green": 8.0,
+     "isError": 0.0,
+     "cost": 1.2098530000000003,
+     "hookCalls": 9.0,
+     "hookFindings": 2.0,
+     "hookErrors": 0.0,
+     "testLines": 1475.0,
+     "stray": 0.0
+    },
+    "none|typescript": {
+     "runs": 8.0,
+     "green": 8.0,
+     "isError": 0.0,
+     "cost": 1.119035,
+     "hookCalls": 0.0,
+     "hookFindings": 0.0,
+     "hookErrors": 0.0,
+     "testLines": 1446.0,
+     "stray": 0.0
+    },
+    "none|python": {
+     "runs": 8.0,
+     "green": 8.0,
+     "isError": 0.0,
+     "cost": 1.0538082,
+     "hookCalls": 0.0,
+     "hookFindings": 0.0,
+     "hookErrors": 0.0,
+     "testLines": 2101.0,
+     "stray": 0.0
+    },
+    "jev|python": {
+     "runs": 8.0,
+     "green": 8.0,
+     "isError": 0.0,
+     "cost": 0.9898218000000001,
+     "hookCalls": 10.0,
+     "hookFindings": 1.0,
+     "hookErrors": 0.0,
+     "testLines": 2160.0,
+     "stray": 0.0
+    }
+   }
+  },
+  "focused": {
+   "e10": {
+    "all": {
+     "pairs": 16,
+     "none_total": 12,
+     "jev_total": 12,
+     "mean_diff": 0.0,
+     "ci95": [
+      -1.25,
+      1.1875
+     ],
+     "better": 4,
+     "worse": 3,
+     "tie": 9
+    },
+    "typescript": {
+     "pairs": 8,
+     "none_total": 12,
+     "jev_total": 7,
+     "mean_diff": -0.625,
+     "ci95": [
+      -2.75,
+      1.75
+     ],
+     "better": 4,
+     "worse": 1,
+     "tie": 3
+    },
+    "python": {
+     "pairs": 8,
+     "none_total": 0,
+     "jev_total": 5,
+     "mean_diff": 0.625,
+     "ci95": [
+      0.0,
+      1.5
+     ],
+     "better": 0,
+     "worse": 2,
+     "tie": 6
+    }
+   },
+   "e10orig4": {
+    "all": {
+     "pairs": 16,
+     "none_total": 5,
+     "jev_total": 12,
+     "mean_diff": 0.4375,
+     "ci95": [
+      -0.375,
+      1.4375
+     ],
+     "better": 2,
+     "worse": 3,
+     "tie": 11
+    },
+    "typescript": {
+     "pairs": 8,
+     "none_total": 5,
+     "jev_total": 7,
+     "mean_diff": 0.25,
+     "ci95": [
+      -1.125,
+      2.125
+     ],
+     "better": 2,
+     "worse": 1,
+     "tie": 5
+    },
+    "python": {
+     "pairs": 8,
+     "none_total": 0,
+     "jev_total": 5,
+     "mean_diff": 0.625,
+     "ci95": [
+      0.0,
+      1.5
+     ],
+     "better": 0,
+     "worse": 2,
+     "tie": 6
+    }
+   },
+   "liveTests": {
+    "all": {
+     "pairs": 16,
+     "none_total": 12,
+     "jev_total": 12,
+     "mean_diff": 0.0,
+     "ci95": [
+      -1.25,
+      1.1875
+     ],
+     "better": 4,
+     "worse": 3,
+     "tie": 9
+    },
+    "typescript": {
+     "pairs": 8,
+     "none_total": 12,
+     "jev_total": 7,
+     "mean_diff": -0.625,
+     "ci95": [
+      -2.75,
+      1.75
+     ],
+     "better": 4,
+     "worse": 1,
+     "tie": 3
+    },
+    "python": {
+     "pairs": 8,
+     "none_total": 0,
+     "jev_total": 5,
+     "mean_diff": 0.625,
+     "ci95": [
+      0.0,
+      1.5
+     ],
+     "better": 0,
+     "worse": 2,
+     "tie": 6
+    }
+   },
+   "allTestsWithCand": {
+    "all": {
+     "pairs": 16,
+     "none_total": 12,
+     "jev_total": 12,
+     "mean_diff": 0.0,
+     "ci95": [
+      -1.25,
+      1.1875
+     ],
+     "better": 4,
+     "worse": 3,
+     "tie": 9
+    },
+    "typescript": {
+     "pairs": 8,
+     "none_total": 12,
+     "jev_total": 7,
+     "mean_diff": -0.625,
+     "ci95": [
+      -2.75,
+      1.75
+     ],
+     "better": 4,
+     "worse": 1,
+     "tie": 3
+    },
+    "python": {
+     "pairs": 8,
+     "none_total": 0,
+     "jev_total": 5,
+     "mean_diff": 0.625,
+     "ci95": [
+      0.0,
+      1.5
+     ],
+     "better": 0,
+     "worse": 2,
+     "tie": 6
+    }
+   },
+   "allRulesAllFiles": {
+    "all": {
+     "pairs": 16,
+     "none_total": 160,
+     "jev_total": 138,
+     "mean_diff": -1.375,
+     "ci95": [
+      -4.5,
+      0.625
+     ],
+     "better": 5,
+     "worse": 2,
+     "tie": 9
+    },
+    "typescript": {
+     "pairs": 8,
+     "none_total": 160,
+     "jev_total": 138,
+     "mean_diff": -2.75,
+     "ci95": [
+      -8.75,
+      1.375
+     ],
+     "better": 5,
+     "worse": 2,
+     "tie": 1
+    },
+    "python": {
+     "pairs": 8,
+     "none_total": 0,
+     "jev_total": 0,
+     "mean_diff": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "better": 0,
+     "worse": 0,
+     "tie": 8
+    }
+   },
+   "perTask": {
+    "ts-tests-invoice-report": {
+     "jev-r1": {
+      "e10": 0,
+      "liveTests": 0,
+      "green": true,
+      "passed": 15,
+      "failed": 0,
+      "testLines": 117,
+      "hookFindings": 0
+     },
+     "none-r1": {
+      "e10": 0,
+      "liveTests": 0,
+      "green": true,
+      "passed": 17,
+      "failed": 0,
+      "testLines": 141,
+      "hookFindings": 0
+     },
+     "none-r2": {
+      "e10": 0,
+      "liveTests": 0,
+      "green": true,
+      "passed": 22,
+      "failed": 0,
+      "testLines": 143,
+      "hookFindings": 0
+     },
+     "jev-r2": {
+      "e10": 0,
+      "liveTests": 0,
+      "green": true,
+      "passed": 22,
+      "failed": 0,
+      "testLines": 149,
+      "hookFindings": 0
+     }
+    },
+    "ts-tests-carrier-client": {
+     "none-r1": {
+      "e10": 3,
+      "liveTests": 3,
+      "green": true,
+      "passed": 25,
+      "failed": 0,
+      "testLines": 190,
+      "hookFindings": 0
+     },
+     "jev-r1": {
+      "e10": 0,
+      "liveTests": 0,
+      "green": true,
+      "passed": 21,
+      "failed": 0,
+      "testLines": 203,
+      "hookFindings": 1
+     },
+     "none-r2": {
+      "e10": 0,
+      "liveTests": 0,
+      "green": true,
+      "passed": 22,
+      "failed": 0,
+      "testLines": 184,
+      "hookFindings": 0
+     },
+     "jev-r2": {
+      "e10": 0,
+      "liveTests": 0,
+      "green": true,
+      "passed": 25,
+      "failed": 0,
+      "testLines": 213,
+      "hookFindings": 1
+     }
+    },
+    "ts-tests-order-service": {
+     "none-r1": {
+      "e10": 0,
+      "liveTests": 0,
+      "green": true,
+      "passed": 14,
+      "failed": 0,
+      "testLines": 195,
+      "hookFindings": 0
+     },
+     "jev-r1": {
+      "e10": 6,
+      "liveTests": 6,
+      "green": true,
+      "passed": 12,
+      "failed": 0,
+      "testLines": 137,
+      "hookFindings": 0
+     },
+     "none-r2": {
+      "e10": 2,
+      "liveTests": 2,
+      "green": true,
+      "passed": 17,
+      "failed": 0,
+      "testLines": 182,
+      "hookFindings": 0
+     },
+     "jev-r2": {
+      "e10": 1,
+      "liveTests": 1,
+      "green": true,
+      "passed": 19,
+      "failed": 0,
+      "testLines": 196,
+      "hookFindings": 0
+     }
+    },
+    "ts-tests-pricing-quote": {
+     "none-r1": {
+      "e10": 6,
+      "liveTests": 6,
+      "green": true,
+      "passed": 48,
+      "failed": 0,
+      "testLines": 210,
+      "hookFindings": 0
+     },
+     "jev-r1": {
+      "e10": 0,
+      "liveTests": 0,
+      "green": true,
+      "passed": 49,
+      "failed": 0,
+      "testLines": 258,
+      "hookFindings": 0
+     },
+     "jev-r2": {
+      "e10": 0,
+      "liveTests": 0,
+      "green": true,
+      "passed": 46,
+      "failed": 0,
+      "testLines": 202,
+      "hookFindings": 0
+     },
+     "none-r2": {
+      "e10": 1,
+      "liveTests": 1,
+      "green": true,
+      "passed": 47,
+      "failed": 0,
+      "testLines": 201,
+      "hookFindings": 0
+     }
+    },
+    "py-tests-order-service": {
+     "none-r1": {
+      "e10": 0,
+      "liveTests": 0,
+      "green": true,
+      "passed": 18,
+      "failed": 0,
+      "testLines": 232,
+      "hookFindings": 0
+     },
+     "jev-r1": {
+      "e10": 0,
+      "liveTests": 0,
+      "green": true,
+      "passed": 21,
+      "failed": 0,
+      "testLines": 252,
+      "hookFindings": 0
+     },
+     "none-r2": {
+      "e10": 0,
+      "liveTests": 0,
+      "green": true,
+      "passed": 21,
+      "failed": 0,
+      "testLines": 256,
+      "hookFindings": 0
+     },
+     "jev-r2": {
+      "e10": 0,
+      "liveTests": 0,
+      "green": true,
+      "passed": 21,
+      "failed": 0,
+      "testLines": 250,
+      "hookFindings": 0
+     }
+    },
+    "py-tests-fx-client": {
+     "jev-r1": {
+      "e10": 2,
+      "liveTests": 2,
+      "green": true,
+      "passed": 24,
+      "failed": 0,
+      "testLines": 284,
+      "hookFindings": 0
+     },
+     "none-r1": {
+      "e10": 0,
+      "liveTests": 0,
+      "green": true,
+      "passed": 25,
+      "failed": 0,
+      "testLines": 272,
+      "hookFindings": 0
+     },
+     "jev-r2": {
+      "e10": 3,
+      "liveTests": 3,
+      "green": true,
+      "passed": 26,
+      "failed": 0,
+      "testLines": 262,
+      "hookFindings": 0
+     },
+     "none-r2": {
+      "e10": 0,
+      "liveTests": 0,
+      "green": true,
+      "passed": 25,
+      "failed": 0,
+      "testLines": 242,
+      "hookFindings": 0
+     }
+    },
+    "py-tests-customer-repository": {
+     "none-r1": {
+      "e10": 0,
+      "liveTests": 0,
+      "green": true,
+      "passed": 40,
+      "failed": 0,
+      "testLines": 317,
+      "hookFindings": 0
+     },
+     "jev-r1": {
+      "e10": 0,
+      "liveTests": 0,
+      "green": true,
+      "passed": 37,
+      "failed": 0,
+      "testLines": 290,
+      "hookFindings": 0
+     },
+     "jev-r2": {
+      "e10": 0,
+      "liveTests": 0,
+      "green": true,
+      "passed": 37,
+      "failed": 0,
+      "testLines": 331,
+      "hookFindings": 0
+     },
+     "none-r2": {
+      "e10": 0,
+      "liveTests": 0,
+      "green": true,
+      "passed": 40,
+      "failed": 0,
+      "testLines": 266,
+      "hookFindings": 0
+     }
+    },
+    "py-tests-pricing-quote": {
+     "none-r1": {
+      "e10": 0,
+      "liveTests": 0,
+      "green": true,
+      "passed": 45,
+      "failed": 0,
+      "testLines": 245,
+      "hookFindings": 0
+     },
+     "jev-r1": {
+      "e10": 0,
+      "liveTests": 0,
+      "green": true,
+      "passed": 47,
+      "failed": 0,
+      "testLines": 235,
+      "hookFindings": 1
+     },
+     "jev-r2": {
+      "e10": 0,
+      "liveTests": 0,
+      "green": true,
+      "passed": 48,
+      "failed": 0,
+      "testLines": 256,
+      "hookFindings": 0
+     },
+     "none-r2": {
+      "e10": 0,
+      "liveTests": 0,
+      "green": true,
+      "passed": 49,
+      "failed": 0,
+      "testLines": 271,
+      "hookFindings": 0
+     }
+    }
+   },
+   "graderPerRule": {
+    "ts-test-untyped-fake-response": {
+     "none": 5,
+     "jev": 7
+    },
+    "ts-test-reimplements-logic": {
+     "none": 7
+    },
+    "py-test-untyped-fake-response": {
+     "jev": 5
+    }
+   },
+   "graderCandidates": {},
+   "hookPerRule": {
+    "ts-test-untyped-fake-response": {
+     "high": 2,
+     "medium": 0,
+     "runs": 2
+    },
+    "py-test-reimplements-logic": {
+     "high": 0,
+     "medium": 1,
+     "runs": 1
+    }
+   },
+   "byCondition": {
+    "jev|typescript": {
+     "runs": 8.0,
+     "green": 8.0,
+     "isError": 0.0,
+     "cost": 1.2098530000000003,
+     "hookCalls": 9.0,
+     "hookFindings": 2.0,
+     "hookErrors": 0.0,
+     "testLines": 1475.0,
+     "stray": 0.0
+    },
+    "none|typescript": {
+     "runs": 8.0,
+     "green": 8.0,
+     "isError": 0.0,
+     "cost": 1.119035,
+     "hookCalls": 0.0,
+     "hookFindings": 0.0,
+     "hookErrors": 0.0,
+     "testLines": 1446.0,
+     "stray": 0.0
+    },
+    "none|python": {
+     "runs": 8.0,
+     "green": 8.0,
+     "isError": 0.0,
+     "cost": 1.0538082,
+     "hookCalls": 0.0,
+     "hookFindings": 0.0,
+     "hookErrors": 0.0,
+     "testLines": 2101.0,
+     "stray": 0.0
+    },
+    "jev|python": {
+     "runs": 8.0,
+     "green": 8.0,
+     "isError": 0.0,
+     "cost": 0.9898218000000001,
+     "hookCalls": 10.0,
+     "hookFindings": 1.0,
+     "hookErrors": 0.0,
+     "testLines": 2160.0,
+     "stray": 0.0
+    }
+   }
+  }
+ }
+}

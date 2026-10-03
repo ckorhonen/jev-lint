@@ -1,6 +1,20 @@
 {
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
-  "files": { "includes": ["src/**", "eval/**/*.ts", "test/**", "rules/**", "scripts/**"] },
-  "formatter": { "indentStyle": "space", "lineWidth": 140 },
-  "linter": { "rules": { "suspicious": { "noExplicitAny": "warn" }, "style": { "noNonNullAssertion": "warn" } } }
+  "files": {
+    "includes": ["src/**", "eval/**/*.ts", "test/**", "rules/**", "scripts/**", "!!eval/e2e/scaffold"]
+  },
+  "formatter": {
+    "indentStyle": "space",
+    "lineWidth": 140
+  },
+  "linter": {
+    "rules": {
+      "suspicious": {
+        "noExplicitAny": "warn"
+      },
+      "style": {
+        "noNonNullAssertion": "warn"
+      }
+    }
+  }
 }
