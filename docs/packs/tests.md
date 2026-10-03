@@ -782,9 +782,9 @@ def test_tax_is_applied_per_line(mocker):
 
 Holdout: precision 100%, recall 100% (7 violations in the holdout set). Sources: [homes.cs.washington.edu](https://homes.cs.washington.edu/~rjust/publ/mocking_reflection_testing_icst_2017.pdf), [arxiv.org](https://arxiv.org/abs/2503.19284)
 
-### `py-test-reimplements-logic` _(candidate)_
+### `py-test-reimplements-logic`
 
-Does the new code add a pytest `def test_...` or `unittest` `test_...` method that computes its expected value by redoing the same calculation or transformation as the code under test (the same formula, comprehension, sum/sorted/join, string formatting or date arithmetic applied to the same input, often in a local `expected` variable or a loop over cases), then asserts the function's output equals it?
+Does the new code add a pytest `def test_...` or `unittest` `test_...` method that computes its expected value by redoing the same calculation or transformation as the code under test (the same formula, comprehension, sum/sorted/join, string formatting or date arithmetic applied to the same input, often in a local `expected` variable or a loop over cases), then asserts the function's output equals it (A second, independent implementation used as an oracle is not this pattern; see `false`.)?
 
 **Catches:** The expected value in at least one added test is derived from the input with the same logic the implementation uses, so the test duplicates the implementation and passes even when both are wrong.
 
@@ -792,29 +792,18 @@ Does the new code add a pytest `def test_...` or `unittest` `test_...` method th
 
 **Fix:** Assert against a literal or golden value worked out independently of the implementation, not against a re-computation of it.
 
-**Bad** (`test_cart_total.py`):
+**Bad** (`test_tax.py`):
 
 ```python
-from decimal import Decimal
-
-from cart.total import cart_total
-
-SAMPLES = [
-    [("A", 2, Decimal("12.00"))],
-    [("A", 1, Decimal("12.00")), ("B", 4, Decimal("3.50"))],
-    [],
-]
-
-
-def test_cart_total_sums_price_times_quantity():
-    for lines in SAMPLES:
-        expected = sum(qty * unit for _, qty, unit in lines)
-        assert cart_total(lines) == expected
+def test_price_with_tax_rounds_to_cents():
+    subtotal = 84.99
+    rate = 0.0825
+    assert price_with_tax(subtotal, region="TX") == round(subtotal * (1 + rate), 2)
 ```
 
-**Not flagged:** Expected values are literals, hand-written fixtures, golden files, values from an independent source (a different algorithm, an inverse operation, a known reference), or property checks (sorted, length, round-trip). Setup code that builds the input, `pytest.mark.parametrize` tables of literal input/expected pairs, and helper calls that are not the logic under test do not count. Non-test code does not count.
+**Not flagged:** Expected values are literals, hand-written fixtures, golden files, values from an independent source (a different algorithm, an inverse operation, a known reference), or property checks (sorted, length, round-trip). Differential tests do not count: comparing two implementations of the same computation (a naive, reference or sequential version against an optimized, batched or parallel one; two runs with the same seed; the same formula written with a different library as the oracle) asserts agreement, not a re-computation of the implementation under test. Setup code that builds the input, `pytest.mark.parametrize` tables of literal input/expected pairs, and helper calls that are not the logic under test do not count. Non-test code does not count.
 
-Holdout: precision 100%, recall 100% (7 violations in the holdout set). Sources: [docs.python.org](https://docs.python.org/3/library/unittest.mock-examples.html)
+Holdout: precision 100%, recall 100% (16 violations in the holdout set). Sources: [docs.python.org](https://docs.python.org/3/library/unittest.mock-examples.html)
 
 ### `py-test-mocks-own-module`
 
@@ -1658,9 +1647,9 @@ it("runs validation before submitting", () => {
 
 Holdout: precision 100%, recall 100% (7 violations in the holdout set). Sources: [homes.cs.washington.edu](https://homes.cs.washington.edu/~rjust/publ/mocking_reflection_testing_icst_2017.pdf), [arxiv.org](https://arxiv.org/abs/2503.19284)
 
-### `ts-test-reimplements-logic` _(candidate)_
+### `ts-test-reimplements-logic`
 
-Does the new code add a test (`it`/`test` in vitest, jest, bun:test or node:test) that computes its expected value by redoing the same calculation or transformation as the code under test (the same formula, reduce, map/filter chain, string formatting or date arithmetic applied to the same input, often in a local `expected` variable or a loop over cases), then asserts the function's output equals it?
+Does the new code add a test (`it`/`test` in vitest, jest, bun:test or node:test) that computes its expected value by redoing the same calculation or transformation as the code under test (the same formula, reduce, map/filter chain, string formatting or date arithmetic applied to the same input, often in a local `expected` variable or a loop over cases), then asserts the function's output equals it (A second, independent implementation used as an oracle is not this pattern; see `false`.)?
 
 **Catches:** The expected value in at least one added test is derived from the input with the same logic the implementation uses, so the test duplicates the implementation and passes even when both are wrong.
 
@@ -1668,30 +1657,20 @@ Does the new code add a test (`it`/`test` in vitest, jest, bun:test or node:test
 
 **Fix:** Assert against a literal or golden value worked out independently of the implementation, not against a re-computation of it.
 
-**Bad** (`slugify.test.ts`):
+**Bad** (`normalize.test.ts`):
 
 ```ts
-import { slugify } from "../slugify";
+describe("normalizeEmail", () => {
+  const raw = "  Grace.Hopper@Example.COM ";
 
-describe("slugify", () => {
-  const inputs = ["Hello World", "  Déjà Vu  ", "Rock & Roll!!", "already-a-slug"];
-
-  test.each(inputs)("slugifies %s", (input) => {
-    const expected = input
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .toLowerCase()
-      .trim()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-|-$/g, "");
-    expect(slugify(input)).toBe(expected);
+  test("trims and lowercases", () => {
+    expect(normalizeEmail(raw)).toBe(raw.trim().toLowerCase());
   });
-});
 ```
 
-**Not flagged:** Expected values are literals, hand-written fixtures, golden files, values from an independent source (a different algorithm, an inverse operation, a known reference), or property checks (sorted, length, round-trip). Setup code that builds the input, simple loops over literal input/expected pairs, and helper calls that are not the logic under test do not count. Non-test code does not count.
+**Not flagged:** Expected values are literals, hand-written fixtures, golden files, values from an independent source (a different algorithm, an inverse operation, a known reference), or property checks (sorted, length, round-trip). Differential tests do not count: comparing two implementations of the same computation (a naive, reference or sequential version against an optimized, batched or parallel one; two runs with the same seed; the same formula written with a different library as the oracle) asserts agreement, not a re-computation of the implementation under test. Setup code that builds the input, simple loops over literal input/expected pairs, and helper calls that are not the logic under test do not count. Non-test code does not count.
 
-Holdout: precision 100%, recall 100% (6 violations in the holdout set). Sources: [docs.python.org](https://docs.python.org/3/library/unittest.mock-examples.html)
+Holdout: precision 100%, recall 100% (15 violations in the holdout set). Sources: [docs.python.org](https://docs.python.org/3/library/unittest.mock-examples.html)
 
 ### `ts-test-mocks-own-module`
 

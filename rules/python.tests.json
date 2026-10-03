@@ -92,12 +92,11 @@
     },
     {
       "id": "py-test-reimplements-logic",
-      "question": "Does `added_code` add a pytest `def test_...` or `unittest` `test_...` method that computes its expected value by redoing the same calculation or transformation as the code under test (the same formula, comprehension, sum/sorted/join, string formatting or date arithmetic applied to the same input, often in a local `expected` variable or a loop over cases), then asserts the function's output equals it?",
+      "question": "Does `added_code` add a pytest `def test_...` or `unittest` `test_...` method that computes its expected value by redoing the same calculation or transformation as the code under test (the same formula, comprehension, sum/sorted/join, string formatting or date arithmetic applied to the same input, often in a local `expected` variable or a loop over cases), then asserts the function's output equals it (A second, independent implementation used as an oracle is not this pattern; see `false`.)?",
       "true": "The expected value in at least one added test is derived from the input with the same logic the implementation uses, so the test duplicates the implementation and passes even when both are wrong.",
-      "false": "Expected values are literals, hand-written fixtures, golden files, values from an independent source (a different algorithm, an inverse operation, a known reference), or property checks (sorted, length, round-trip). Setup code that builds the input, `pytest.mark.parametrize` tables of literal input/expected pairs, and helper calls that are not the logic under test do not count. Non-test code does not count.",
+      "false": "Expected values are literals, hand-written fixtures, golden files, values from an independent source (a different algorithm, an inverse operation, a known reference), or property checks (sorted, length, round-trip). Differential tests do not count: comparing two implementations of the same computation (a naive, reference or sequential version against an optimized, batched or parallel one; two runs with the same seed; the same formula written with a different library as the oracle) asserts agreement, not a re-computation of the implementation under test. Setup code that builds the input, `pytest.mark.parametrize` tables of literal input/expected pairs, and helper calls that are not the logic under test do not count. Non-test code does not count.",
       "fix": "Assert against a literal or golden value worked out independently of the implementation, not against a re-computation of it.",
-      "when": ["\\bdef test_", "class Test\\w*\\(", "@pytest\\."],
-      "status": "candidate"
+      "when": ["\\bdef test_", "class Test\\w*\\(", "@pytest\\."]
     },
     {
       "id": "py-test-mocks-own-module",

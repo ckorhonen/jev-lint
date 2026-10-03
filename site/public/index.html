@@ -393,7 +393,7 @@ footer a{color:var(--dim);display:inline-flex;align-items:center;min-height:44px
     <div class="strip" role="list">
       <div role="listitem"><div class="n"><span data-count="2.38" data-dec="2">2.38</span> <span class="dim">→</span> <span class="green" data-count="1.21" data-dec="2">1.21</span></div><div class="l">rule violations per task, Claude Code (96 runs)</div></div>
       <div role="listitem"><div class="n">~<span data-count="0.3" data-dec="1">0.3</span> s</div><div class="l">per check, while the agent works</div></div>
-      <div role="listitem"><div class="n"><span data-count="177" data-dec="0">177</span></div><div class="l">tested rules in 5 packs, plus yours</div></div>
+      <div role="listitem"><div class="n"><span data-count="179" data-dec="0">179</span></div><div class="l">tested rules in 5 packs, plus yours</div></div>
       <div role="listitem"><div class="n">~$<span data-count="2" data-dec="0">2</span></div><div class="l">per 10,000 edits checked</div></div>
     </div>
   </div>
@@ -542,16 +542,16 @@ footer a{color:var(--dim);display:inline-flex;align-items:center;min-height:44px
   <div class="wrap">
     <p class="lead">What it checks on day one.</p>
     <h2 id="h-rules">Opinionated out of the box.</h2>
-    <div class="hundred"><span class="n" data-count="177" data-dec="0">177</span><span class="l">tested rules in 5 packs, each switched on only after passing a held-out evaluation written by a separate author.</span></div>
+    <div class="hundred"><span class="n" data-count="179" data-dec="0">179</span><span class="l">tested rules in 5 packs, each switched on only after passing a held-out evaluation written by a separate author.</span></div>
     <div class="packs anim" data-anim>
       <div class="pack"><a href="https://github.com/ckorhonen/jev-lint/blob/main/docs/packs/hygiene.md"><div class="pn">hygiene</div><div class="pd">any, force-unwraps, empty catch, secrets</div></a><div class="pbar"><div class="bar-fill" style="width:calc(24 / 65 * 78%)"></div><span class="v">24</span></div></div>
       <div class="pack"><a href="https://github.com/ckorhonen/jev-lint/blob/main/docs/packs/practices.md"><div class="pn">practices</div><div class="pd">React effects, SwiftUI state, idioms</div></a><div class="pbar"><div class="bar-fill" style="width:78%;transition-delay:.08s"></div><span class="v">65</span></div></div>
       <div class="pack"><a href="https://github.com/ckorhonen/jev-lint/blob/main/docs/packs/security.md"><div class="pn">security</div><div class="pd">SSRF, path traversal, mass assignment</div></a><div class="pbar"><div class="bar-fill" style="width:calc(33 / 65 * 78%);transition-delay:.16s"></div><span class="v">33</span></div></div>
-      <div class="pack"><a href="https://github.com/ckorhonen/jev-lint/blob/main/docs/packs/tests.md"><div class="pn">tests <span class="new-tag">new rules</span></div><div class="pd">tests that can't fail, flaky tests, tests that lock in the implementation</div></a><div class="pbar"><div class="bar-fill" style="width:calc(42 / 65 * 78%);transition-delay:.24s"></div><span class="v">42</span></div></div>
+      <div class="pack"><a href="https://github.com/ckorhonen/jev-lint/blob/main/docs/packs/tests.md"><div class="pn">tests <span class="new-tag">new rules</span></div><div class="pd">tests that can't fail, flaky tests, tests that lock in the implementation</div></a><div class="pbar"><div class="bar-fill" style="width:calc(44 / 65 * 78%);transition-delay:.24s"></div><span class="v">44</span></div></div>
       <div class="pack"><a href="https://github.com/ckorhonen/jev-lint/blob/main/docs/packs/performance.md"><div class="pn">performance</div><div class="pd">N+1, sequential awaits, unbounded fan-out</div></a><div class="pbar"><div class="bar-fill" style="width:calc(13 / 65 * 78%);transition-delay:.32s"></div><span class="v">13</span></div></div>
     </div>
     <div class="chips" aria-label="Languages"><span>TypeScript / React</span><span>Swift / SwiftUI</span><span>Kotlin</span><span>Rust</span><span>Python</span><span>Ruby</span><span>Bazel</span></div>
-    <p class="src">On held-out edits each pack scored 91–100% precision per language, and flagged 0–4% of clean edits. 110 of 117 new candidate rules passed; 12 of 12 new security rules passed; 7 of 9 test rules for implementation lock-in and over-mocking passed in October. The rest stay candidates the hook doesn't ask. <a href="https://github.com/ckorhonen/jev-lint/tree/main/docs/packs">Every rule, with a good and a bad example →</a></p>
+    <p class="src">On held-out edits each pack scored 91–100% precision per language, and flagged 0–4% of clean edits. 110 of 117 new candidate rules passed; 12 of 12 new security rules passed; 9 of 9 test rules for implementation lock-in and over-mocking passed in October (two on a second attempt after a real-code false alarm). The rest stay candidates the hook doesn't ask. <a href="https://github.com/ckorhonen/jev-lint/tree/main/docs/packs">Every rule, with a good and a bad example →</a></p>
 
     <div class="example">
       <div class="snippet">

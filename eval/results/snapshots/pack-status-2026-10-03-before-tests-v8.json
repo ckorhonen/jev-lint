@@ -1633,7 +1633,7 @@
     "precision": 1,
     "recall": 1,
     "precisionAtHigh": 1,
-    "positives": 16,
+    "positives": 7,
     "falsePositives": 0,
     "pass": true,
     "reasons": []
@@ -1669,7 +1669,7 @@
     "precision": 1,
     "recall": 1,
     "precisionAtHigh": 1,
-    "positives": 15,
+    "positives": 6,
     "falsePositives": 0,
     "pass": true,
     "reasons": []
