@@ -7,8 +7,8 @@ that teaches the wrong pattern, or a rule that nags about code that's actually f
 ## For humans: how it works
 
 1. **Every check is logged, locally.** Each time the hook checks an edit, it appends one line
-   to `~/.local/state/jev-lint/findings.jsonl`: the repo, the file, which rules fired, and a
-   short excerpt. Nothing leaves your machine (except the check itself, which goes to Jev).
+   to `~/.local/state/jev-lint/findings.jsonl`: the repo, the file, which rules fired, and the
+   few lines around where each rule's trigger pattern first matched. Nothing leaves your machine (except the check itself, which goes to Jev).
 2. **Each finding gets an outcome.** If the agent's next edit to that file clears the flag, it
    counts as **fixed**: the agent made the mistake and corrected it. If the flag is still
    there at the end, it counts as **kept**: the agent disagreed or ignored it, so the rule may
@@ -145,6 +145,35 @@ violations per run for each side, the difference, a 95% confidence interval and 
 Each agent run costs roughly what one small task costs you normally (cents, a minute or two),
 so `--reps 3` over three tasks is 18 runs. Save the result files under
 `.jev-lint/evals/results/` and link them in the report.
+
+## Is it worth fixing? the value audit
+
+"Fixed" says the agent changed the code, not that the change mattered. The value audit asks an
+LLM (`gpt-6-luna`, reasoning effort low) about every fixed or kept finding: would a competent
+reviewer have asked for this change?
+
+```sh
+bun ~/Repos/jev-lint/src/valueAudit.ts --days 30 [--repo .] [--json] [--dry-run]
+```
+
+Each finding gets `bug`, `security` or `review-comment` (a reviewer would have asked for it),
+`style` (taste) or `noise` (the flag looks wrong), with a confidence and a short reason. The
+table shows, per rule and split by fixed/kept, the share of each. Answers are cached under
+`eval/results/cache/value-audit/`, so a rerun only pays for new findings; `--dry-run` counts
+what would be graded without calling the API. It needs `OPENAI_API_KEY` (environment or `.env`).
+
+How to read it:
+- **A rule whose fixes are mostly `noise` or `style`** costs agent turns for nothing: narrow it
+  or raise its threshold before adding guidance for it.
+- **A rule whose kept findings are mostly review-worthy** is being ignored when it's right:
+  make its `fix` more specific.
+- **It's one model's opinion of a small excerpt,** not a reviewer's. Use it to pick which
+  clusters to read by hand, not as a verdict on its own.
+- **Check the excerpt kinds.** Records logged before 2026-10-03 store the first 400 chars of
+  the checked code (for a whole-file write, the imports), so their verdicts lean on the rule
+  text and file path. Newer records store the window around the rule's first trigger match;
+  for rules with very broad triggers (`ts-no-magic-numbers` gates on any digit) that window
+  can still miss the flagged line.
 
 ## Related
 

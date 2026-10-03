@@ -32,7 +32,9 @@ export type RuleSummary = {
   kept: number;
   unknown: number;
   suggestion: "add-guidance" | "review-rule" | "watch";
-  excerpts: { file: string; outcome: "fixed" | "kept" | "unknown"; p: number; excerpt: string }[];
+  // `line` is set when the excerpt is the window around the rule's `when` match (records from
+  // 2026-10-03 on); without it the excerpt is the start of the checked code.
+  excerpts: { file: string; outcome: "fixed" | "kept" | "unknown"; p: number; excerpt: string; line?: number }[];
 };
 
 // Thresholds for a suggestion: enough evidence across sessions, not one noisy afternoon.
@@ -107,7 +109,7 @@ export function summarize(allRecords: CheckRecord[]): RuleSummary[] {
       const outcome = index === checks.length - 1 ? "unknown" : last.flagged.some((f) => f.rule === rule) ? "kept" : "fixed";
       s[outcome]++;
       const hit = checks[index].flagged.find((f) => f.rule === rule);
-      s.excerpts.push({ file: checks[index].file, outcome, p: hit?.p ?? 0, excerpt: checks[index].excerpt ?? "" });
+      s.excerpts.push({ file: checks[index].file, outcome, p: hit?.p ?? 0, ...excerptOf(checks[index], rule) });
     }
   }
 
@@ -142,8 +144,27 @@ export function areaOf(repo: string, file: string): { area: string; test: boolea
   return { area: dir === "." ? "(root)" : dir.split("/").slice(0, 2).join("/"), test: TEST_FILE.test(rel) };
 }
 
+// The code behind one flag: the rule's own window when the record has one, else the record's
+// excerpt (for older records, the first 400 chars of the checked code).
+export function excerptOf(record: CheckRecord, rule: string): { excerpt: string; line?: number } {
+  const lines = record.flagged.find((f) => f.rule === rule)?.lines;
+  return typeof lines?.text === "string" ? { excerpt: lines.text, line: lines.start } : { excerpt: record.excerpt ?? "" };
+}
+
 // One finding = the first flag of a rule in a (thread, file) pair, with its outcome.
-type Finding = { rule: string; session: string; repo: string; file: string; ts: string; outcome: "fixed" | "kept" | "unknown" };
+export type Finding = {
+  rule: string;
+  session: string;
+  thread: string;
+  repo: string;
+  file: string;
+  ts: string;
+  changeKind: CheckRecord["changeKind"];
+  p: number;
+  outcome: "fixed" | "kept" | "unknown";
+  excerpt: string;
+  line?: number; // set when the excerpt is the window around the rule's `when` match
+};
 
 export function findingsOf(allRecords: CheckRecord[]): Finding[] {
   const byThread = new Map<string, CheckRecord[]>();
@@ -161,7 +182,18 @@ export function findingsOf(allRecords: CheckRecord[]): Finding[] {
         if (seen.has(f.rule)) continue;
         seen.add(f.rule);
         const outcome = i === checks.length - 1 ? "unknown" : last.flagged.some((g) => g.rule === f.rule) ? "kept" : "fixed";
-        out.push({ rule: f.rule, session: c.session ?? "?", repo: c.repo, file: c.file, ts: c.ts, outcome });
+        out.push({
+          rule: f.rule,
+          session: c.session ?? "?",
+          thread: threadOf(c),
+          repo: c.repo,
+          file: c.file,
+          ts: c.ts,
+          changeKind: c.changeKind,
+          p: f.p,
+          outcome,
+          ...excerptOf(c, f.rule),
+        });
       }
     });
   }

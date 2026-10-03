@@ -3,20 +3,31 @@
 // and the jev-lint-learn skill).
 //
 // One JSON line per checked file:
-//   {ts, session, agent?, repo, file, tool, changeKind, model, flagged: [{rule, p, tier}], excerpt?}
+//   {ts, session, agent?, repo, file, tool, changeKind, model, flagged: [{rule, p, tier, lines?}], excerpt?}
 // `session` is the hook's session_id. Claude Code and Codex both give subagents the root
 // conversation's session_id and add `agent_id` (Codex: the subagent's own thread id), so
 // `agent` is what tells a subagent's edits apart from its parent's.
-// `excerpt` (first 400 chars of the checked code) is kept only when something was flagged.
+// `flagged[i].lines` ({start, text}) is the window around the first line of the checked code
+// that matches one of the rule's `when` patterns: 3 lines before, 6 after, at most 400 chars.
+// `start` is 1-based within the checked code (the whole file for a Write, the added lines for
+// an Edit or a Codex patch). It is absent when the rule has no `when` or none matched.
+// `excerpt` is kept only when something was flagged: the window of the first flagged rule that
+// has one, otherwise the first 400 chars. Records written before 2026-10-03 have no `lines`
+// and their `excerpt` is always the first 400 chars (for a whole-file write, the imports).
 // Default path: ~/.local/state/jev-lint/findings.jsonl. JEV_LINT_FINDINGS_LOG=off disables it.
 
 import { appendFileSync, existsSync, mkdirSync } from "node:fs";
 import { homedir } from "node:os";
 import { dirname, isAbsolute, join, parse, relative, resolve } from "node:path";
 import type { ChangedFile } from "./extract";
-import type { LintResult } from "./lint";
+import { firstGateMatch, type LintResult, type Tier } from "./lint";
 
 const EXCERPT_CHARS = 400;
+const LINES_BEFORE = 3;
+const LINES_AFTER = 6;
+
+export type FlaggedLines = { start: number; text: string };
+export type Flagged = { rule: string; p: number; tier: Tier; lines?: FlaggedLines };
 
 export type CheckRecord = {
   ts: string;
@@ -27,7 +38,7 @@ export type CheckRecord = {
   tool?: string;
   changeKind: ChangedFile["changeKind"];
   model: string;
-  flagged: { rule: string; p: number; tier: "high" | "medium" }[];
+  flagged: Flagged[];
   excerpt?: string;
   error?: string; // the check failed (timeout, API error); fail-open means the agent saw nothing
   latencyMs?: number; // time for the judge call
@@ -75,8 +86,12 @@ export function toRecords(results: LintResult[], changes: ChangedFile[], event: 
   return results.map((r) => {
     const absolute = isAbsolute(r.filePath) ? r.filePath : resolve(cwd, r.filePath);
     const repo = repoRoot(absolute, cwd);
-    const flagged = r.findings.map((f) => ({ rule: f.ruleId, p: Number(f.probability.toFixed(3)), tier: f.tier }));
     const code = changes.find((c) => c.filePath === r.filePath)?.addedCode ?? "";
+    const flagged: Flagged[] = r.findings.map((f) => {
+      const lines = flaggedLines(code, f.when);
+      return { rule: f.ruleId, p: Number(f.probability.toFixed(3)), tier: f.tier, ...(lines ? { lines } : {}) };
+    });
+    const excerpt = flagged.find((f) => f.lines)?.lines?.text ?? code.slice(0, EXCERPT_CHARS);
     return {
       ts: new Date().toISOString(),
       session: event.session_id,
@@ -91,9 +106,24 @@ export function toRecords(results: LintResult[], changes: ChangedFile[], event: 
       inputTokens: r.inputTokens,
       asked: r.asked,
       gatedOut: r.gatedOut,
-      ...(flagged.length ? { excerpt: code.slice(0, EXCERPT_CHARS) } : {}),
+      ...(flagged.length ? { excerpt } : {}),
     };
   });
+}
+
+// The lines that most plausibly triggered a rule: a window around the first `when` match.
+// Lines before the match are dropped first when the window is over the character cap, so the
+// matched line itself survives.
+export function flaggedLines(code: string, when: string[] | undefined): FlaggedLines | undefined {
+  const at = firstGateMatch(when, code);
+  if (at === undefined) return undefined;
+  const all = code.split("\n");
+  const hit = code.slice(0, at).split("\n").length - 1; // 0-based line of the match
+  const tail = all.slice(hit, hit + LINES_AFTER + 1).join("\n");
+  let first = Math.max(0, hit - LINES_BEFORE);
+  while (first < hit && all.slice(first, hit).join("\n").length + 1 + tail.length > EXCERPT_CHARS) first++;
+  const text = [...all.slice(first, hit), tail].join("\n").slice(0, EXCERPT_CHARS);
+  return { start: first + 1, text };
 }
 
 // Failed checks are logged too, so a silently failing hook shows up in the log instead of

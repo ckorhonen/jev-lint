@@ -7,7 +7,11 @@ description: Analyze the jev-lint hook's findings log for one repo and make a fe
 
 The hook appends one line per checked file to `~/.local/state/jev-lint/findings.jsonl`
 (`JEV_LINT_FINDINGS_LOG` overrides it). Each line holds the repo, file, session, the rules
-flagged with their tier, an excerpt, and the latency and tokens.
+flagged with their tier, the flagged lines, and the latency and tokens. Since 2026-10-03 each
+flagged rule carries `lines: {start, text}`: a window (3 lines before, 6 after, ≤400 chars)
+around the first line matching the rule's `when` patterns. Older records only have `excerpt`,
+the first 400 chars of the checked code, which for a whole-file write is usually the imports
+and says little about the flag.
 
 **The goal is a few changes that remove a recurring cost.** Don't add a line of guidance
 for every flag. Each instruction you add dilutes the others, and each rule change risks new
@@ -69,6 +73,8 @@ interesting.
 
 **Read the excerpts** (`--json` includes them) of every cluster you act on. Read at least 5,
 covering both fixed and kept. The numbers alone don't tell you *why* the agent kept a flag.
+An excerpt with a `line` is the window around the rule's match; one without is the start of
+the file, so open the file itself before judging that flag.
 
 ## 4. Choose the change that fits the cause
 

@@ -21,6 +21,7 @@ reword a single rule, use `jev-lint-write-rule`. All five skills are symlinked i
 - `src/lint.ts` — rule packs, tiers (0.8 fix / 0.5 double-check), feedback text.
 - `src/repoRules.ts` — loads repo packs and `config.json` (`packs`, `disable`, `skipPaths`) from the nearest `.jev-lint/`; `src/validate.ts` validates them against labeled cases.
 - `src/findingsLog.ts` / `src/findings.ts` — per-check findings log (default `~/.local/state/jev-lint/findings.jsonl`), its fixed/kept/unknown summary, `--clusters` (rule × area × test) and `--compare` (before/after with a session bootstrap CI); used by the `jev-lint-learn` skill.
+- `src/valueAudit.ts` — grades each fixed/kept finding with `gpt-6-luna` (bug / security / review-comment / style / noise); answers cached in `eval/results/cache/value-audit/`.
 - `src/install.ts` — idempotent hook installer for Claude Code/Codex (dry run unless `--apply`; backs up; `--skills`, `--smoke`); used by the `jev-lint-setup` skill.
 - `src/repoEval.ts` — proves an instruction/skill change in a target repo: runs `.jev-lint/evals/*.json` tasks with a headless agent (hook off) on the base commit and on the working tree, scores the new code with Jev, reports the paired difference with a bootstrap CI. See `docs/feedback-loop.md`.
 - `src/check.ts` — runs the rules over existing files (as whole-file writes) to preview what would fire in a repo.

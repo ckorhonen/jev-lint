@@ -1,0 +1,2685 @@
+{
+  "log": "/Users/ckorhonen/.local/state/jev-lint/findings.jsonl",
+  "days": 30,
+  "model": "gpt-6-luna",
+  "effort": "low",
+  "tokens": {
+    "input": 0,
+    "output": 0,
+    "cached": 85
+  },
+  "rules": [
+    {
+      "rule": "ts-no-magic-numbers",
+      "all": {
+        "n": 21,
+        "worthy": 12,
+        "style": 0,
+        "noise": 9,
+        "verdicts": {
+          "bug": 0,
+          "security": 0,
+          "review-comment": 12,
+          "style": 0,
+          "noise": 9
+        }
+      },
+      "fixed": {
+        "n": 14,
+        "worthy": 10,
+        "style": 0,
+        "noise": 4,
+        "verdicts": {
+          "bug": 0,
+          "security": 0,
+          "review-comment": 10,
+          "style": 0,
+          "noise": 4
+        }
+      },
+      "kept": {
+        "n": 7,
+        "worthy": 2,
+        "style": 0,
+        "noise": 5,
+        "verdicts": {
+          "bug": 0,
+          "security": 0,
+          "review-comment": 2,
+          "style": 0,
+          "noise": 5
+        }
+      }
+    },
+    {
+      "rule": "ts-unvalidated-external-data",
+      "all": {
+        "n": 18,
+        "worthy": 11,
+        "style": 0,
+        "noise": 7,
+        "verdicts": {
+          "bug": 0,
+          "security": 0,
+          "review-comment": 11,
+          "style": 0,
+          "noise": 7
+        }
+      },
+      "fixed": {
+        "n": 10,
+        "worthy": 6,
+        "style": 0,
+        "noise": 4,
+        "verdicts": {
+          "bug": 0,
+          "security": 0,
+          "review-comment": 6,
+          "style": 0,
+          "noise": 4
+        }
+      },
+      "kept": {
+        "n": 8,
+        "worthy": 5,
+        "style": 0,
+        "noise": 3,
+        "verdicts": {
+          "bug": 0,
+          "security": 0,
+          "review-comment": 5,
+          "style": 0,
+          "noise": 3
+        }
+      }
+    },
+    {
+      "rule": "ts-no-empty-catch",
+      "all": {
+        "n": 10,
+        "worthy": 7,
+        "style": 0,
+        "noise": 3,
+        "verdicts": {
+          "bug": 0,
+          "security": 0,
+          "review-comment": 7,
+          "style": 0,
+          "noise": 3
+        }
+      },
+      "fixed": {
+        "n": 1,
+        "worthy": 1,
+        "style": 0,
+        "noise": 0,
+        "verdicts": {
+          "bug": 0,
+          "security": 0,
+          "review-comment": 1,
+          "style": 0,
+          "noise": 0
+        }
+      },
+      "kept": {
+        "n": 9,
+        "worthy": 6,
+        "style": 0,
+        "noise": 3,
+        "verdicts": {
+          "bug": 0,
+          "security": 0,
+          "review-comment": 6,
+          "style": 0,
+          "noise": 3
+        }
+      }
+    },
+    {
+      "rule": "ts-no-vague-names",
+      "all": {
+        "n": 10,
+        "worthy": 5,
+        "style": 0,
+        "noise": 5,
+        "verdicts": {
+          "bug": 0,
+          "security": 0,
+          "review-comment": 5,
+          "style": 0,
+          "noise": 5
+        }
+      },
+      "fixed": {
+        "n": 5,
+        "worthy": 4,
+        "style": 0,
+        "noise": 1,
+        "verdicts": {
+          "bug": 0,
+          "security": 0,
+          "review-comment": 4,
+          "style": 0,
+          "noise": 1
+        }
+      },
+      "kept": {
+        "n": 5,
+        "worthy": 1,
+        "style": 0,
+        "noise": 4,
+        "verdicts": {
+          "bug": 0,
+          "security": 0,
+          "review-comment": 1,
+          "style": 0,
+          "noise": 4
+        }
+      }
+    },
+    {
+      "rule": "ts-sequential-await-loop",
+      "all": {
+        "n": 9,
+        "worthy": 8,
+        "style": 0,
+        "noise": 1,
+        "verdicts": {
+          "bug": 0,
+          "security": 0,
+          "review-comment": 8,
+          "style": 0,
+          "noise": 1
+        }
+      },
+      "fixed": {
+        "n": 4,
+        "worthy": 4,
+        "style": 0,
+        "noise": 0,
+        "verdicts": {
+          "bug": 0,
+          "security": 0,
+          "review-comment": 4,
+          "style": 0,
+          "noise": 0
+        }
+      },
+      "kept": {
+        "n": 5,
+        "worthy": 4,
+        "style": 0,
+        "noise": 1,
+        "verdicts": {
+          "bug": 0,
+          "security": 0,
+          "review-comment": 4,
+          "style": 0,
+          "noise": 1
+        }
+      }
+    },
+    {
+      "rule": "ts-shell-command-interpolation",
+      "all": {
+        "n": 3,
+        "worthy": 3,
+        "style": 0,
+        "noise": 0,
+        "verdicts": {
+          "bug": 0,
+          "security": 3,
+          "review-comment": 0,
+          "style": 0,
+          "noise": 0
+        }
+      },
+      "fixed": {
+        "n": 2,
+        "worthy": 2,
+        "style": 0,
+        "noise": 0,
+        "verdicts": {
+          "bug": 0,
+          "security": 2,
+          "review-comment": 0,
+          "style": 0,
+          "noise": 0
+        }
+      },
+      "kept": {
+        "n": 1,
+        "worthy": 1,
+        "style": 0,
+        "noise": 0,
+        "verdicts": {
+          "bug": 0,
+          "security": 1,
+          "review-comment": 0,
+          "style": 0,
+          "noise": 0
+        }
+      }
+    },
+    {
+      "rule": "ts-boolean-trap",
+      "all": {
+        "n": 2,
+        "worthy": 0,
+        "style": 0,
+        "noise": 2,
+        "verdicts": {
+          "bug": 0,
+          "security": 0,
+          "review-comment": 0,
+          "style": 0,
+          "noise": 2
+        }
+      },
+      "fixed": {
+        "n": 2,
+        "worthy": 0,
+        "style": 0,
+        "noise": 2,
+        "verdicts": {
+          "bug": 0,
+          "security": 0,
+          "review-comment": 0,
+          "style": 0,
+          "noise": 2
+        }
+      },
+      "kept": {
+        "n": 0,
+        "worthy": 0,
+        "style": 0,
+        "noise": 0,
+        "verdicts": {
+          "bug": 0,
+          "security": 0,
+          "review-comment": 0,
+          "style": 0,
+          "noise": 0
+        }
+      }
+    },
+    {
+      "rule": "ts-no-explicit-any",
+      "all": {
+        "n": 2,
+        "worthy": 1,
+        "style": 0,
+        "noise": 1,
+        "verdicts": {
+          "bug": 0,
+          "security": 0,
+          "review-comment": 1,
+          "style": 0,
+          "noise": 1
+        }
+      },
+      "fixed": {
+        "n": 1,
+        "worthy": 1,
+        "style": 0,
+        "noise": 0,
+        "verdicts": {
+          "bug": 0,
+          "security": 0,
+          "review-comment": 1,
+          "style": 0,
+          "noise": 0
+        }
+      },
+      "kept": {
+        "n": 1,
+        "worthy": 0,
+        "style": 0,
+        "noise": 1,
+        "verdicts": {
+          "bug": 0,
+          "security": 0,
+          "review-comment": 0,
+          "style": 0,
+          "noise": 1
+        }
+      }
+    },
+    {
+      "rule": "ts-no-non-null-assertion",
+      "all": {
+        "n": 2,
+        "worthy": 1,
+        "style": 1,
+        "noise": 0,
+        "verdicts": {
+          "bug": 0,
+          "security": 0,
+          "review-comment": 1,
+          "style": 1,
+          "noise": 0
+        }
+      },
+      "fixed": {
+        "n": 1,
+        "worthy": 0,
+        "style": 1,
+        "noise": 0,
+        "verdicts": {
+          "bug": 0,
+          "security": 0,
+          "review-comment": 0,
+          "style": 1,
+          "noise": 0
+        }
+      },
+      "kept": {
+        "n": 1,
+        "worthy": 1,
+        "style": 0,
+        "noise": 0,
+        "verdicts": {
+          "bug": 0,
+          "security": 0,
+          "review-comment": 1,
+          "style": 0,
+          "noise": 0
+        }
+      }
+    },
+    {
+      "rule": "repo-hook-stdout-noise",
+      "all": {
+        "n": 1,
+        "worthy": 0,
+        "style": 0,
+        "noise": 1,
+        "verdicts": {
+          "bug": 0,
+          "security": 0,
+          "review-comment": 0,
+          "style": 0,
+          "noise": 1
+        }
+      },
+      "fixed": {
+        "n": 1,
+        "worthy": 0,
+        "style": 0,
+        "noise": 1,
+        "verdicts": {
+          "bug": 0,
+          "security": 0,
+          "review-comment": 0,
+          "style": 0,
+          "noise": 1
+        }
+      },
+      "kept": {
+        "n": 0,
+        "worthy": 0,
+        "style": 0,
+        "noise": 0,
+        "verdicts": {
+          "bug": 0,
+          "security": 0,
+          "review-comment": 0,
+          "style": 0,
+          "noise": 0
+        }
+      }
+    },
+    {
+      "rule": "repo-judge-model-luna",
+      "all": {
+        "n": 1,
+        "worthy": 1,
+        "style": 0,
+        "noise": 0,
+        "verdicts": {
+          "bug": 1,
+          "security": 0,
+          "review-comment": 0,
+          "style": 0,
+          "noise": 0
+        }
+      },
+      "fixed": {
+        "n": 0,
+        "worthy": 0,
+        "style": 0,
+        "noise": 0,
+        "verdicts": {
+          "bug": 0,
+          "security": 0,
+          "review-comment": 0,
+          "style": 0,
+          "noise": 0
+        }
+      },
+      "kept": {
+        "n": 1,
+        "worthy": 1,
+        "style": 0,
+        "noise": 0,
+        "verdicts": {
+          "bug": 1,
+          "security": 0,
+          "review-comment": 0,
+          "style": 0,
+          "noise": 0
+        }
+      }
+    },
+    {
+      "rule": "ts-no-debug-console",
+      "all": {
+        "n": 1,
+        "worthy": 1,
+        "style": 0,
+        "noise": 0,
+        "verdicts": {
+          "bug": 0,
+          "security": 0,
+          "review-comment": 1,
+          "style": 0,
+          "noise": 0
+        }
+      },
+      "fixed": {
+        "n": 1,
+        "worthy": 1,
+        "style": 0,
+        "noise": 0,
+        "verdicts": {
+          "bug": 0,
+          "security": 0,
+          "review-comment": 1,
+          "style": 0,
+          "noise": 0
+        }
+      },
+      "kept": {
+        "n": 0,
+        "worthy": 0,
+        "style": 0,
+        "noise": 0,
+        "verdicts": {
+          "bug": 0,
+          "security": 0,
+          "review-comment": 0,
+          "style": 0,
+          "noise": 0
+        }
+      }
+    },
+    {
+      "rule": "ts-no-hardcoded-secret",
+      "all": {
+        "n": 1,
+        "worthy": 0,
+        "style": 0,
+        "noise": 1,
+        "verdicts": {
+          "bug": 0,
+          "security": 0,
+          "review-comment": 0,
+          "style": 0,
+          "noise": 1
+        }
+      },
+      "fixed": {
+        "n": 1,
+        "worthy": 0,
+        "style": 0,
+        "noise": 1,
+        "verdicts": {
+          "bug": 0,
+          "security": 0,
+          "review-comment": 0,
+          "style": 0,
+          "noise": 1
+        }
+      },
+      "kept": {
+        "n": 0,
+        "worthy": 0,
+        "style": 0,
+        "noise": 0,
+        "verdicts": {
+          "bug": 0,
+          "security": 0,
+          "review-comment": 0,
+          "style": 0,
+          "noise": 0
+        }
+      }
+    },
+    {
+      "rule": "ts-perf-query-per-item",
+      "all": {
+        "n": 1,
+        "worthy": 1,
+        "style": 0,
+        "noise": 0,
+        "verdicts": {
+          "bug": 0,
+          "security": 0,
+          "review-comment": 1,
+          "style": 0,
+          "noise": 0
+        }
+      },
+      "fixed": {
+        "n": 0,
+        "worthy": 0,
+        "style": 0,
+        "noise": 0,
+        "verdicts": {
+          "bug": 0,
+          "security": 0,
+          "review-comment": 0,
+          "style": 0,
+          "noise": 0
+        }
+      },
+      "kept": {
+        "n": 1,
+        "worthy": 1,
+        "style": 0,
+        "noise": 0,
+        "verdicts": {
+          "bug": 0,
+          "security": 0,
+          "review-comment": 1,
+          "style": 0,
+          "noise": 0
+        }
+      }
+    },
+    {
+      "rule": "ts-regexp-from-input",
+      "all": {
+        "n": 1,
+        "worthy": 0,
+        "style": 0,
+        "noise": 1,
+        "verdicts": {
+          "bug": 0,
+          "security": 0,
+          "review-comment": 0,
+          "style": 0,
+          "noise": 1
+        }
+      },
+      "fixed": {
+        "n": 0,
+        "worthy": 0,
+        "style": 0,
+        "noise": 0,
+        "verdicts": {
+          "bug": 0,
+          "security": 0,
+          "review-comment": 0,
+          "style": 0,
+          "noise": 0
+        }
+      },
+      "kept": {
+        "n": 1,
+        "worthy": 0,
+        "style": 0,
+        "noise": 1,
+        "verdicts": {
+          "bug": 0,
+          "security": 0,
+          "review-comment": 0,
+          "style": 0,
+          "noise": 1
+        }
+      }
+    },
+    {
+      "rule": "ts-test-fixed-sleep",
+      "all": {
+        "n": 1,
+        "worthy": 1,
+        "style": 0,
+        "noise": 0,
+        "verdicts": {
+          "bug": 0,
+          "security": 0,
+          "review-comment": 1,
+          "style": 0,
+          "noise": 0
+        }
+      },
+      "fixed": {
+        "n": 1,
+        "worthy": 1,
+        "style": 0,
+        "noise": 0,
+        "verdicts": {
+          "bug": 0,
+          "security": 0,
+          "review-comment": 1,
+          "style": 0,
+          "noise": 0
+        }
+      },
+      "kept": {
+        "n": 0,
+        "worthy": 0,
+        "style": 0,
+        "noise": 0,
+        "verdicts": {
+          "bug": 0,
+          "security": 0,
+          "review-comment": 0,
+          "style": 0,
+          "noise": 0
+        }
+      }
+    },
+    {
+      "rule": "ts-test-shared-mutable-state",
+      "all": {
+        "n": 1,
+        "worthy": 0,
+        "style": 0,
+        "noise": 1,
+        "verdicts": {
+          "bug": 0,
+          "security": 0,
+          "review-comment": 0,
+          "style": 0,
+          "noise": 1
+        }
+      },
+      "fixed": {
+        "n": 0,
+        "worthy": 0,
+        "style": 0,
+        "noise": 0,
+        "verdicts": {
+          "bug": 0,
+          "security": 0,
+          "review-comment": 0,
+          "style": 0,
+          "noise": 0
+        }
+      },
+      "kept": {
+        "n": 1,
+        "worthy": 0,
+        "style": 0,
+        "noise": 1,
+        "verdicts": {
+          "bug": 0,
+          "security": 0,
+          "review-comment": 0,
+          "style": 0,
+          "noise": 1
+        }
+      }
+    }
+  ],
+  "total": {
+    "rule": "TOTAL",
+    "all": {
+      "n": 85,
+      "worthy": 52,
+      "style": 1,
+      "noise": 32,
+      "verdicts": {
+        "bug": 1,
+        "security": 3,
+        "review-comment": 48,
+        "style": 1,
+        "noise": 32
+      }
+    },
+    "fixed": {
+      "n": 44,
+      "worthy": 30,
+      "style": 1,
+      "noise": 13,
+      "verdicts": {
+        "bug": 0,
+        "security": 2,
+        "review-comment": 28,
+        "style": 1,
+        "noise": 13
+      }
+    },
+    "kept": {
+      "n": 41,
+      "worthy": 22,
+      "style": 0,
+      "noise": 19,
+      "verdicts": {
+        "bug": 1,
+        "security": 1,
+        "review-comment": 20,
+        "style": 0,
+        "noise": 19
+      }
+    }
+  },
+  "byExcerpt": {
+    "flagged-lines": {
+      "rule": "flagged-lines",
+      "all": {
+        "n": 1,
+        "worthy": 0,
+        "style": 0,
+        "noise": 1,
+        "verdicts": {
+          "bug": 0,
+          "security": 0,
+          "review-comment": 0,
+          "style": 0,
+          "noise": 1
+        }
+      },
+      "fixed": {
+        "n": 1,
+        "worthy": 0,
+        "style": 0,
+        "noise": 1,
+        "verdicts": {
+          "bug": 0,
+          "security": 0,
+          "review-comment": 0,
+          "style": 0,
+          "noise": 1
+        }
+      },
+      "kept": {
+        "n": 0,
+        "worthy": 0,
+        "style": 0,
+        "noise": 0,
+        "verdicts": {
+          "bug": 0,
+          "security": 0,
+          "review-comment": 0,
+          "style": 0,
+          "noise": 0
+        }
+      }
+    },
+    "file-header": {
+      "rule": "file-header",
+      "all": {
+        "n": 65,
+        "worthy": 44,
+        "style": 1,
+        "noise": 20,
+        "verdicts": {
+          "bug": 1,
+          "security": 3,
+          "review-comment": 40,
+          "style": 1,
+          "noise": 20
+        }
+      },
+      "fixed": {
+        "n": 29,
+        "worthy": 24,
+        "style": 1,
+        "noise": 4,
+        "verdicts": {
+          "bug": 0,
+          "security": 2,
+          "review-comment": 22,
+          "style": 1,
+          "noise": 4
+        }
+      },
+      "kept": {
+        "n": 36,
+        "worthy": 20,
+        "style": 0,
+        "noise": 16,
+        "verdicts": {
+          "bug": 1,
+          "security": 1,
+          "review-comment": 18,
+          "style": 0,
+          "noise": 16
+        }
+      }
+    },
+    "edit-start": {
+      "rule": "edit-start",
+      "all": {
+        "n": 19,
+        "worthy": 8,
+        "style": 0,
+        "noise": 11,
+        "verdicts": {
+          "bug": 0,
+          "security": 0,
+          "review-comment": 8,
+          "style": 0,
+          "noise": 11
+        }
+      },
+      "fixed": {
+        "n": 14,
+        "worthy": 6,
+        "style": 0,
+        "noise": 8,
+        "verdicts": {
+          "bug": 0,
+          "security": 0,
+          "review-comment": 6,
+          "style": 0,
+          "noise": 8
+        }
+      },
+      "kept": {
+        "n": 5,
+        "worthy": 2,
+        "style": 0,
+        "noise": 3,
+        "verdicts": {
+          "bug": 0,
+          "security": 0,
+          "review-comment": 2,
+          "style": 0,
+          "noise": 3
+        }
+      }
+    }
+  },
+  "graded": [
+    {
+      "rule": "ts-unvalidated-external-data",
+      "session": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "thread": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "repo": "/Users/ckorhonen/Repos/jev-lint",
+      "file": "src/findings.ts",
+      "ts": "2026-09-26T23:20:09.039Z",
+      "changeKind": "write",
+      "p": 0.94,
+      "outcome": "fixed",
+      "excerpt": "#!/usr/bin/env bun\n// Summarize the hook's findings log so it can be fed back into a repo's instructions.\n//   bun ~/Repos/jev-lint/src/findings.ts [--repo <path>] [--days 30] [--json]\n//\n// For every finding (session, file, rule) the outcome is:\n//   fixed   — a later check of the same file in the same session no longer flags the rule\n//   kept    — the file was checked again and the rule was sti",
+      "excerptKind": "file-header",
+      "grade": {
+        "verdict": "noise",
+        "confidence": 0.98,
+        "reason": "The excerpt provides no evidence of raw external-data parsing; the finding-log utility’s file path and outcome cannot establish this rule’s specific violation."
+      },
+      "inputTokens": 595,
+      "outputTokens": 51,
+      "cached": true
+    },
+    {
+      "rule": "repo-hook-stdout-noise",
+      "session": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "thread": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "repo": "/Users/ckorhonen/Repos/jev-lint",
+      "file": "src/findings.ts",
+      "ts": "2026-09-26T23:20:09.039Z",
+      "changeKind": "write",
+      "p": 0.93,
+      "outcome": "fixed",
+      "excerpt": "#!/usr/bin/env bun\n// Summarize the hook's findings log so it can be fed back into a repo's instructions.\n//   bun ~/Repos/jev-lint/src/findings.ts [--repo <path>] [--days 30] [--json]\n//\n// For every finding (session, file, rule) the outcome is:\n//   fixed   — a later check of the same file in the same session no longer flags the rule\n//   kept    — the file was checked again and the rule was sti",
+      "excerptKind": "file-header",
+      "grade": {
+        "verdict": "noise",
+        "confidence": 0.99,
+        "reason": "`src/findings.ts` is a command-line reporting tool, not one of the specified hook runtime files; stdout output is expected."
+      },
+      "inputTokens": 612,
+      "outputTokens": 50,
+      "cached": true
+    },
+    {
+      "rule": "ts-no-magic-numbers",
+      "session": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "thread": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "repo": "/Users/ckorhonen/Repos/jev-lint",
+      "file": "src/findings.ts",
+      "ts": "2026-09-26T23:20:09.039Z",
+      "changeKind": "write",
+      "p": 0.64,
+      "outcome": "kept",
+      "excerpt": "#!/usr/bin/env bun\n// Summarize the hook's findings log so it can be fed back into a repo's instructions.\n//   bun ~/Repos/jev-lint/src/findings.ts [--repo <path>] [--days 30] [--json]\n//\n// For every finding (session, file, rule) the outcome is:\n//   fixed   — a later check of the same file in the same session no longer flags the rule\n//   kept    — the file was checked again and the rule was sti",
+      "excerptKind": "file-header",
+      "grade": {
+        "verdict": "noise",
+        "confidence": 0.89,
+        "reason": "The excerpt contains no flagged logic, and this summarization script likely uses numbers such as day ranges or character limits that are clear from context; no specific violation is supported."
+      },
+      "inputTokens": 538,
+      "outputTokens": 57,
+      "cached": true
+    },
+    {
+      "rule": "ts-no-empty-catch",
+      "session": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "thread": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "repo": "/Users/ckorhonen/Repos/jev-lint",
+      "file": "src/findings.ts",
+      "ts": "2026-09-26T23:20:09.039Z",
+      "changeKind": "write",
+      "p": 0.5,
+      "outcome": "kept",
+      "excerpt": "#!/usr/bin/env bun\n// Summarize the hook's findings log so it can be fed back into a repo's instructions.\n//   bun ~/Repos/jev-lint/src/findings.ts [--repo <path>] [--days 30] [--json]\n//\n// For every finding (session, file, rule) the outcome is:\n//   fixed   — a later check of the same file in the same session no longer flags the rule\n//   kept    — the file was checked again and the rule was sti",
+      "excerptKind": "file-header",
+      "grade": {
+        "verdict": "review-comment",
+        "confidence": 0.67,
+        "reason": "An empty catch in a findings-processing script can hide malformed input or operational failures; a reviewer would likely ask for explicit handling or documentation."
+      },
+      "inputTokens": 508,
+      "outputTokens": 283,
+      "cached": true
+    },
+    {
+      "rule": "ts-no-vague-names",
+      "session": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "thread": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "repo": "/Users/ckorhonen/Repos/jev-lint",
+      "file": "test/findings.test.ts",
+      "ts": "2026-09-26T23:20:48.985Z",
+      "changeKind": "write",
+      "p": 0.58,
+      "outcome": "fixed",
+      "excerpt": "import { describe, expect, test } from \"bun:test\";\nimport { summarize } from \"../src/findings\";\nimport type { CheckRecord } from \"../src/findingsLog\";\n\nlet clock = 0;\nfunction check(session: string, file: string, rules: string[], tier: \"high\" | \"medium\" = \"high\"): CheckRecord {\n  clock += 1000;\n  return {\n    ts: new Date(Date.UTC(2026, 8, 26) + clock).toISOString(),\n    session,\n    repo: \"/repo\"",
+      "excerptKind": "file-header",
+      "grade": {
+        "verdict": "noise",
+        "confidence": 0.64,
+        "reason": "The visible names are meaningful: `clock` tracks time, and `check` corresponds to the `CheckRecord` fixture. No vague name is evident."
+      },
+      "inputTokens": 524,
+      "outputTokens": 471,
+      "cached": true
+    },
+    {
+      "rule": "ts-no-explicit-any",
+      "session": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "thread": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "repo": "/Users/ckorhonen/Repos/jev-lint",
+      "file": "eval/e2e/remediate.ts",
+      "ts": "2026-09-27T02:04:31.940Z",
+      "changeKind": "write",
+      "p": 0.96,
+      "outcome": "kept",
+      "excerpt": "// \"Is the hook worth it, if a code reviewer would catch the issue anyway?\"\n//   E2E_TAG=entry5 E2E_ROOT=<runs dir> bun eval/e2e/remediate.ts --conditions none,jev,jev-rewake\n//\n// For each finished E2E run, the AI reviewer's findings (all of them, as a real review would\n// send them) go back to the agent in a copy of its work directory: one fix round with Claude\n// Code headless, no hook. We reco",
+      "excerptKind": "file-header",
+      "grade": {
+        "verdict": "noise",
+        "confidence": 0.99,
+        "reason": "The excerpt contains no `any` type, and the whole-file excerpt omits the flagged code; the flag’s probability alone does not establish a violation."
+      },
+      "inputTokens": 524,
+      "outputTokens": 54,
+      "cached": true
+    },
+    {
+      "rule": "ts-no-empty-catch",
+      "session": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "thread": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "repo": "/Users/ckorhonen/Repos/jev-lint",
+      "file": "eval/e2e/remediate.ts",
+      "ts": "2026-09-27T02:04:31.940Z",
+      "changeKind": "write",
+      "p": 0.91,
+      "outcome": "kept",
+      "excerpt": "// \"Is the hook worth it, if a code reviewer would catch the issue anyway?\"\n//   E2E_TAG=entry5 E2E_ROOT=<runs dir> bun eval/e2e/remediate.ts --conditions none,jev,jev-rewake\n//\n// For each finished E2E run, the AI reviewer's findings (all of them, as a real review would\n// send them) go back to the agent in a copy of its work directory: one fix round with Claude\n// Code headless, no hook. We reco",
+      "excerptKind": "file-header",
+      "grade": {
+        "verdict": "noise",
+        "confidence": 0.99,
+        "reason": "The provided excerpt does not show any catch handler, and the file’s E2E orchestration purpose alone does not support inferring a silently swallowed error."
+      },
+      "inputTokens": 517,
+      "outputTokens": 54,
+      "cached": true
+    },
+    {
+      "rule": "ts-unvalidated-external-data",
+      "session": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "thread": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "repo": "/Users/ckorhonen/Repos/jev-lint",
+      "file": "eval/e2e/remediate.ts",
+      "ts": "2026-09-27T02:04:31.940Z",
+      "changeKind": "write",
+      "p": 0.91,
+      "outcome": "kept",
+      "excerpt": "// \"Is the hook worth it, if a code reviewer would catch the issue anyway?\"\n//   E2E_TAG=entry5 E2E_ROOT=<runs dir> bun eval/e2e/remediate.ts --conditions none,jev,jev-rewake\n//\n// For each finished E2E run, the AI reviewer's findings (all of them, as a real review would\n// send them) go back to the agent in a copy of its work directory: one fix round with Claude\n// Code headless, no hook. We reco",
+      "excerptKind": "file-header",
+      "grade": {
+        "verdict": "review-comment",
+        "confidence": 0.65,
+        "reason": "An E2E harness may parse persisted run data into typed structures; without runtime validation, a reviewer would reasonably request validation, though the excerpt omits the flagged code."
+      },
+      "inputTokens": 608,
+      "outputTokens": 287,
+      "cached": true
+    },
+    {
+      "rule": "ts-no-magic-numbers",
+      "session": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "thread": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "repo": "/Users/ckorhonen/Repos/jev-lint",
+      "file": "eval/e2e/remediate.ts",
+      "ts": "2026-09-27T02:04:31.940Z",
+      "changeKind": "write",
+      "p": 0.72,
+      "outcome": "fixed",
+      "excerpt": "// \"Is the hook worth it, if a code reviewer would catch the issue anyway?\"\n//   E2E_TAG=entry5 E2E_ROOT=<runs dir> bun eval/e2e/remediate.ts --conditions none,jev,jev-rewake\n//\n// For each finished E2E run, the AI reviewer's findings (all of them, as a real review would\n// send them) go back to the agent in a copy of its work directory: one fix round with Claude\n// Code headless, no hook. We reco",
+      "excerptKind": "file-header",
+      "grade": {
+        "verdict": "review-comment",
+        "confidence": 0.56,
+        "reason": "An E2E orchestration script may contain meaningful limits or timeouts; if unexplained, naming them would improve clarity, though the excerpt does not show the flagged literal."
+      },
+      "inputTokens": 543,
+      "outputTokens": 243,
+      "cached": true
+    },
+    {
+      "rule": "repo-judge-model-luna",
+      "session": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "thread": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "repo": "/Users/ckorhonen/Repos/jev-lint",
+      "file": "eval/e2e/remediate.ts",
+      "ts": "2026-09-27T02:04:31.940Z",
+      "changeKind": "write",
+      "p": 0.71,
+      "outcome": "kept",
+      "excerpt": "// \"Is the hook worth it, if a code reviewer would catch the issue anyway?\"\n//   E2E_TAG=entry5 E2E_ROOT=<runs dir> bun eval/e2e/remediate.ts --conditions none,jev,jev-rewake\n//\n// For each finished E2E run, the AI reviewer's findings (all of them, as a real review would\n// send them) go back to the agent in a copy of its work directory: one fix round with Claude\n// Code headless, no hook. We reco",
+      "excerptKind": "file-header",
+      "grade": {
+        "verdict": "bug",
+        "confidence": 0.72,
+        "reason": "This remediation workflow sends AI reviewer findings back to an agent, so a non-gpt-6-luna default for that reviewer would violate the judging-model requirement."
+      },
+      "inputTokens": 555,
+      "outputTokens": 412,
+      "cached": true
+    },
+    {
+      "rule": "ts-no-magic-numbers",
+      "session": "09cbf7c7-740f-412c-8972-6c4c15fa6272",
+      "thread": "09cbf7c7-740f-412c-8972-6c4c15fa6272",
+      "repo": "/Users/ckorhonen/Repos/creative-studio/.claude/worktrees/agent-af54b334ea6e0243b",
+      "file": "src/media/grade.ts",
+      "ts": "2026-09-27T09:57:02.529Z",
+      "changeKind": "write",
+      "p": 0.79,
+      "outcome": "kept",
+      "excerpt": "import { z } from \"zod\";\nimport { round, runBytes, safePath } from \"./proc\";\n\n/**\n * Deterministic colour matching for the edit. Clips are analysed as small RGB thumbnails\n * (exact 256-bin histograms, no sampling randomness); corrections are bounded per-channel\n * gain + shared gamma curves (+ optional lift) and a saturation factor, emitted as ffmpeg\n * `curves`/`eq` filters built only from valid",
+      "excerptKind": "file-header",
+      "grade": {
+        "verdict": "review-comment",
+        "confidence": 0.63,
+        "reason": "Color-grading logic likely contains tuning thresholds or bounds whose intent would benefit from named constants; a reviewer could reasonably request that clarification."
+      },
+      "inputTokens": 528,
+      "outputTokens": 272,
+      "cached": true
+    },
+    {
+      "rule": "ts-no-vague-names",
+      "session": "09cbf7c7-740f-412c-8972-6c4c15fa6272",
+      "thread": "09cbf7c7-740f-412c-8972-6c4c15fa6272",
+      "repo": "/Users/ckorhonen/Repos/creative-studio/.claude/worktrees/agent-af54b334ea6e0243b",
+      "file": "src/media/grade.ts",
+      "ts": "2026-09-27T09:57:54.525Z",
+      "changeKind": "edit",
+      "p": 0.56,
+      "outcome": "fixed",
+      "excerpt": "  const xs = new Set<number>();\n  // Exact knee where the gain reaches full scale, so the monotone spline has no overshoot.\n  // ffmpeg rejects key points closer than ~1/255, so grid points near the knee are dropped.\n  const knee = gain > 1 ? round(1 / gain, 4) : null;\n  for (let i = 0; i <= CURVE_POINTS; i++) {\n    const x = round(i / CURVE_POINTS, 4);\n    if (knee === null || i === CURVE_POINTS ",
+      "excerptKind": "edit-start",
+      "grade": {
+        "verdict": "review-comment",
+        "confidence": 0.73,
+        "reason": "`xs` does not reveal what the set contains; a reviewer could ask for a more descriptive name such as `xValues`."
+      },
+      "inputTokens": 512,
+      "outputTokens": 234,
+      "cached": true
+    },
+    {
+      "rule": "ts-sequential-await-loop",
+      "session": "09cbf7c7-740f-412c-8972-6c4c15fa6272",
+      "thread": "09cbf7c7-740f-412c-8972-6c4c15fa6272",
+      "repo": "/Users/ckorhonen/Repos/creative-studio/.claude/worktrees/agent-af54b334ea6e0243b",
+      "file": "src/media/edit.ts",
+      "ts": "2026-09-27T10:00:04.214Z",
+      "changeKind": "edit",
+      "p": 0.62,
+      "outcome": "fixed",
+      "excerpt": "      if (v.audio && !pr.audio) throw new Error(`clip ${c.id}: clip audio requested but source has no audio`);\n      if (v.overlay) {\n        const ovPath = safePath(v.overlay.path, { mustExist: true });\n        const op = await probe(ovPath);\n        if (!op.width || !op.height) throw new Error(`clip ${c.id}: overlay has no video stream`);\n        clips.push({ ...c, path, overlay: { path: ovPath ",
+      "excerptKind": "edit-start",
+      "grade": {
+        "verdict": "review-comment",
+        "confidence": 0.77,
+        "reason": "The per-clip `probe` appears independent, so awaiting it inside a clip loop likely serializes work that could run concurrently; no sequencing reason is shown."
+      },
+      "inputTokens": 512,
+      "outputTokens": 157,
+      "cached": true
+    },
+    {
+      "rule": "ts-no-vague-names",
+      "session": "09cbf7c7-740f-412c-8972-6c4c15fa6272",
+      "thread": "09cbf7c7-740f-412c-8972-6c4c15fa6272",
+      "repo": "/Users/ckorhonen/Repos/creative-studio/.claude/worktrees/agent-af54b334ea6e0243b",
+      "file": "tests/media/grade-captions.test.ts",
+      "ts": "2026-09-27T10:06:04.672Z",
+      "changeKind": "write",
+      "p": 0.62,
+      "outcome": "fixed",
+      "excerpt": "import { afterAll, beforeAll, describe, expect, test } from \"bun:test\";\nimport { readFileSync } from \"node:fs\";\nimport { join } from \"node:path\";\nimport {\n  captionEdlClip,\n  parseNameRole,\n  renderCaptionClip,\n  renderTitleMotion,\n} from \"../../src/media/captions\";\nimport { applyColorMatch, assembleEdl, decodedAudioSeconds } from \"../../src/media/edit\";\nimport { Edl, type EdlInput, timeline } fro",
+      "excerptKind": "file-header",
+      "grade": {
+        "verdict": "review-comment",
+        "confidence": 0.68,
+        "reason": "A vague name in a test obscures what the value represents; a reviewer would reasonably ask for a descriptive replacement."
+      },
+      "inputTokens": 520,
+      "outputTokens": 185,
+      "cached": true
+    },
+    {
+      "rule": "ts-no-magic-numbers",
+      "session": "09cbf7c7-740f-412c-8972-6c4c15fa6272",
+      "thread": "09cbf7c7-740f-412c-8972-6c4c15fa6272",
+      "repo": "/Users/ckorhonen/Repos/creative-studio/.claude/worktrees/agent-af54b334ea6e0243b",
+      "file": "tests/media/grade-captions.test.ts",
+      "ts": "2026-09-27T10:06:04.672Z",
+      "changeKind": "write",
+      "p": 0.6,
+      "outcome": "kept",
+      "excerpt": "import { afterAll, beforeAll, describe, expect, test } from \"bun:test\";\nimport { readFileSync } from \"node:fs\";\nimport { join } from \"node:path\";\nimport {\n  captionEdlClip,\n  parseNameRole,\n  renderCaptionClip,\n  renderTitleMotion,\n} from \"../../src/media/captions\";\nimport { applyColorMatch, assembleEdl, decodedAudioSeconds } from \"../../src/media/edit\";\nimport { Edl, type EdlInput, timeline } fro",
+      "excerptKind": "file-header",
+      "grade": {
+        "verdict": "noise",
+        "confidence": 0.66,
+        "reason": "The excerpt contains only imports, and the test-file context provides no basis to identify an unexplained numeric literal worth extracting."
+      },
+      "inputTokens": 542,
+      "outputTokens": 47,
+      "cached": true
+    },
+    {
+      "rule": "ts-sequential-await-loop",
+      "session": "09cbf7c7-740f-412c-8972-6c4c15fa6272",
+      "thread": "09cbf7c7-740f-412c-8972-6c4c15fa6272",
+      "repo": "/Users/ckorhonen/Repos/creative-studio/.claude/worktrees/agent-af54b334ea6e0243b",
+      "file": "tests/media/grade-captions.test.ts",
+      "ts": "2026-09-27T10:06:04.672Z",
+      "changeKind": "write",
+      "p": 0.52,
+      "outcome": "fixed",
+      "excerpt": "import { afterAll, beforeAll, describe, expect, test } from \"bun:test\";\nimport { readFileSync } from \"node:fs\";\nimport { join } from \"node:path\";\nimport {\n  captionEdlClip,\n  parseNameRole,\n  renderCaptionClip,\n  renderTitleMotion,\n} from \"../../src/media/captions\";\nimport { applyColorMatch, assembleEdl, decodedAudioSeconds } from \"../../src/media/edit\";\nimport { Edl, type EdlInput, timeline } fro",
+      "excerptKind": "file-header",
+      "grade": {
+        "verdict": "review-comment",
+        "confidence": 0.58,
+        "reason": "If the test loop performs independent async work, parallelizing it could reduce runtime; a reviewer could reasonably request this, though test isolation or resource limits may justify sequencing."
+      },
+      "inputTokens": 536,
+      "outputTokens": 434,
+      "cached": true
+    },
+    {
+      "rule": "ts-no-magic-numbers",
+      "session": "01a0dde8-ef40-7202-b96b-03fab19c519d",
+      "thread": "01a0dde8-ef40-7202-b96b-03fab19c519d",
+      "repo": "/Users/ckorhonen/.codex/worktrees/9a36/solemate",
+      "file": "apps/tools/inbox/laser-preview.mjs",
+      "ts": "2026-09-27T13:29:57.650Z",
+      "changeKind": "patch",
+      "p": 0.87,
+      "outcome": "fixed",
+      "excerpt": "    artworkClearance: 0.5,\n\n  function transformArtwork(artwork, { x, y, scale, angle }) {\n    const cosine = Math.cos(angle);\n    const sine = Math.sin(angle);\n    const map = ([pointX, pointY]) => [\n      x + scale * (cosine * pointX - sine * pointY),\n      y + scale * (sine * pointX + cosine * pointY),\n    ];\n    return {\n      polygons: artwork.polygons.map((polygon) => ({\n        ...polygon,\n",
+      "excerptKind": "edit-start",
+      "grade": {
+        "verdict": "noise",
+        "confidence": 0.91,
+        "reason": "The visible numeric literal, 0.5, is a plausible self-explanatory artwork clearance ratio; the transform uses no unexplained numeric literals."
+      },
+      "inputTokens": 527,
+      "outputTokens": 53,
+      "cached": true
+    },
+    {
+      "rule": "ts-boolean-trap",
+      "session": "01a0dde8-ef40-7202-b96b-03fab19c519d",
+      "thread": "01a0dde8-ef40-7202-b96b-03fab19c519d",
+      "repo": "/Users/ckorhonen/.codex/worktrees/9a36/solemate",
+      "file": "apps/tools/inbox/index.js",
+      "ts": "2026-09-27T13:31:16.086Z",
+      "changeKind": "patch",
+      "p": 0.83,
+      "outcome": "fixed",
+      "excerpt": "      const bilateralStatuses = [\"left\", \"right\"].map(watertightStatusFor);\n      const canGenerateBoth = Boolean(bundle) && bilateralStatuses.some((item) => item.status !== \"generating\") && bilateralStatuses.every((item) => item.status !== \"generating\" && watertightCanGeneratePreview(bundle, item));\n      const regenerateBoth = bilateralStatuses.every((item) => item.status === \"ready\");\n        '",
+      "excerptKind": "edit-start",
+      "grade": {
+        "verdict": "noise",
+        "confidence": 0.96,
+        "reason": "The excerpt shows no function with multiple boolean positional parameters; the boolean expressions are computed values, not positional flags."
+      },
+      "inputTokens": 466,
+      "outputTokens": 45,
+      "cached": true
+    },
+    {
+      "rule": "ts-no-empty-catch",
+      "session": "01a0dde8-ef40-7202-b96b-03fab19c519d",
+      "thread": "01a0dde8-ef40-7202-b96b-03fab19c519d",
+      "repo": "/Users/ckorhonen/.codex/worktrees/9a36/solemate",
+      "file": "apps/tools/inbox/index.js",
+      "ts": "2026-09-27T13:32:41.273Z",
+      "changeKind": "patch",
+      "p": 0.99,
+      "outcome": "fixed",
+      "excerpt": "      weightedLoadPrefetches: {},\n    function prefetchWeightedLoad(id, foot, navigationEpoch) {\n      if (cachedWeightedLoad(id, foot) || state.activePhase !== \"scan\") return;\n      const key = weightedLoadCacheKey(id, foot);\n      if (state.weightedLoadPrefetches?.[key]) return;\n      const request = { bundleId: id, foot, navigationEpoch };\n      state.weightedLoadPrefetches = { ...state.weighte",
+      "excerptKind": "edit-start",
+      "grade": {
+        "verdict": "review-comment",
+        "confidence": 0.82,
+        "reason": "The prefetch may be best-effort, but silently discarding its failures hides unexpected errors; a reviewer would likely ask for logging or explicit handling."
+      },
+      "inputTokens": 483,
+      "outputTokens": 383,
+      "cached": true
+    },
+    {
+      "rule": "ts-no-magic-numbers",
+      "session": "01a0dde8-ef40-7202-b96b-03fab19c519d",
+      "thread": "01a0dde8-ef40-7202-b96b-03fab19c519d",
+      "repo": "/Users/ckorhonen/.codex/worktrees/9a36/solemate",
+      "file": "apps/tools/inbox/index.js",
+      "ts": "2026-09-27T15:59:02.403Z",
+      "changeKind": "patch",
+      "p": 0.55,
+      "outcome": "fixed",
+      "excerpt": "    .synchronized-burst-canvas { display:block; width:100%; max-height:48vh; object-fit:contain; image-rendering:auto; background:#252a30; }\n    .synchronized-burst-comparison-stage { position:relative; margin:8px auto 0; background:#252a30; }\n    .synchronized-burst-comparison-stage > canvas { display:block; width:100%; height:100%; max-height:none; }\n    .synchronized-burst-divider { position:ab",
+      "excerptKind": "edit-start",
+      "grade": {
+        "verdict": "noise",
+        "confidence": 0.88,
+        "reason": "The visible numbers are CSS layout dimensions, not numeric literals in logic; their values are ordinary styling choices."
+      },
+      "inputTokens": 520,
+      "outputTokens": 163,
+      "cached": true
+    },
+    {
+      "rule": "ts-no-magic-numbers",
+      "session": "01a0dde8-ef40-7202-b96b-03fab19c519d",
+      "thread": "01a0dde8-ef40-7202-b96b-03fab19c519d",
+      "repo": "/Users/ckorhonen/.codex/worktrees/9a36/solemate",
+      "file": "packages/scan-analysis/bin/watertight-preview.test.mjs",
+      "ts": "2026-09-27T13:31:53.579Z",
+      "changeKind": "patch",
+      "p": 0.51,
+      "outcome": "fixed",
+      "excerpt": "  PHYSICAL_PLANTAR_ALGORITHM_REVISION,\nassert.equal(\n  physicalStrong.manifest.source.plantar.algorithmRevision,\n  PHYSICAL_PLANTAR_ALGORITHM_REVISION,\n  \"physical samples without an explicit revision canonicalize to the current relief algorithm\",\n);\nassert.throws(\n  () =>\n    generateWatertightPreview({\n      ...physicalInput,\n      plantarSamples: {\n        ...physicalInput.plantarSamples,\n     ",
+      "excerptKind": "edit-start",
+      "grade": {
+        "verdict": "noise",
+        "confidence": 0.86,
+        "reason": "The excerpt shows no unexplained numeric literal; the apparent revision value is a named constant, and the remaining code is truncated."
+      },
+      "inputTokens": 505,
+      "outputTokens": 48,
+      "cached": true
+    },
+    {
+      "rule": "ts-no-magic-numbers",
+      "session": "01a0dde8-ef40-7202-b96b-03fab19c519d",
+      "thread": "01a0dde8-ef40-7202-b96b-03fab19c519d",
+      "repo": "/Users/ckorhonen/.codex/worktrees/9a36/solemate",
+      "file": "apps/tools/inbox/manufacturing-preview-ui.test.mjs",
+      "ts": "2026-09-27T13:33:44.987Z",
+      "changeKind": "patch",
+      "p": 0.76,
+      "outcome": "kept",
+      "excerpt": "  const fitted = f.builtArtwork().at(-1).polygons[0].points;\n  assert.equal(Math.min(...fitted.map(([x]) => x)), 0.5);\n  assert.equal(Math.max(...fitted.map(([x]) => x)), 19.5);\n  assert.ok(\n    Math.max(...fitted.map(([, y]) => y)) -\n      Math.min(...fitted.map(([, y]) => y)) >\n      14,\n    \"the fitted artwork keeps a toe-to-heel extent instead of the former 80% box\",\n  );\n  assert.equal(f.buil",
+      "excerptKind": "edit-start",
+      "grade": {
+        "verdict": "noise",
+        "confidence": 0.91,
+        "reason": "The literals are test expectations for geometry coordinates and an extent threshold; their meanings are clear from the assertions and descriptive message."
+      },
+      "inputTokens": 550,
+      "outputTokens": 47,
+      "cached": true
+    },
+    {
+      "rule": "ts-boolean-trap",
+      "session": "01a0dde8-ef40-7202-b96b-03fab19c519d",
+      "thread": "01a0dde8-ef40-7202-b96b-03fab19c519d",
+      "repo": "/Users/ckorhonen/.codex/worktrees/9a36/solemate",
+      "file": "apps/tools/inbox/index.test.mjs",
+      "ts": "2026-09-27T13:34:58.056Z",
+      "changeKind": "patch",
+      "p": 0.91,
+      "outcome": "fixed",
+      "excerpt": "    /const allowFallback = watertightFallbackAllowed\\(\\);[\\s\\S]*status: \"generating\"[\\s\\S]*watertightStatusPath\\(id, foot, false, allowFallback, null, true, requestedGenerationOptions\\)/,",
+      "excerptKind": "edit-start",
+      "grade": {
+        "verdict": "noise",
+        "confidence": 0.96,
+        "reason": "The excerpt is a regex in a test matching source text, not an actual function call with positional boolean arguments."
+      },
+      "inputTokens": 432,
+      "outputTokens": 167,
+      "cached": true
+    },
+    {
+      "rule": "ts-unvalidated-external-data",
+      "session": "01a0dde8-ef40-7202-b96b-03fab19c519d",
+      "thread": "01a0dde8-ef40-7202-b96b-03fab19c519d",
+      "repo": "/Users/ckorhonen/.codex/worktrees/9a36/solemate",
+      "file": "apps/tools/inbox/index.test.mjs",
+      "ts": "2026-09-27T13:43:37.258Z",
+      "changeKind": "patch",
+      "p": 0.7,
+      "outcome": "fixed",
+      "excerpt": "import { createHash, webcrypto } from \"node:crypto\";\n\n  const physicalKeys = artifactKeys(id, \"left\", body.artifactId);\n  const previousPhysicalManifest = JSON.parse(\n    await (await env.SCANS.get(physicalKeys.manifest)).text(),\n  );\n  previousPhysicalManifest.source.plantar.algorithmRevision = \"physical-relief-v1\";\n  const { integrity, ...unsignedPreviousPhysicalManifest } =\n    previousPhysical",
+      "excerptKind": "edit-start",
+      "grade": {
+        "verdict": "noise",
+        "confidence": 0.87,
+        "reason": "The JSON.parse result is inferred as untyped in this JavaScript test; the excerpt shows no cast or assignment to a domain type, as the rule requires."
+      },
+      "inputTokens": 566,
+      "outputTokens": 410,
+      "cached": true
+    },
+    {
+      "rule": "ts-no-magic-numbers",
+      "session": "01a0dde8-ef40-7202-b96b-03fab19c519d",
+      "thread": "01a0dde8-ef40-7202-b96b-03fab19c519d",
+      "repo": "/Users/ckorhonen/.codex/worktrees/9a36/solemate",
+      "file": "apps/tools/inbox/laser-preview.test.mjs",
+      "ts": "2026-09-27T13:41:34.967Z",
+      "changeKind": "patch",
+      "p": 0.56,
+      "outcome": "kept",
+      "excerpt": "\ntest(\"surface fit uses the toe-to-heel footprint, keeps holes, and binds the selected source\", () => {\n  const mesh = {\n    triangles: [\n      [\n        [0, 0, 3],\n        [20, 0, 3],\n        [20, 40, 3],\n      ],\n      [\n        [0, 0, 3],\n        [20, 40, 3],\n        [0, 40, 3],\n      ],\n    ],\n  };\n  const artwork = {\n    polygons: [\n      {\n        points: [\n          [0, 0],\n          [10, 0",
+      "excerptKind": "edit-start",
+      "grade": {
+        "verdict": "noise",
+        "confidence": 0.9,
+        "reason": "The visible numbers describe test geometry and coordinates, which are self-explanatory in context; no unexplained numeric logic is shown."
+      },
+      "inputTokens": 554,
+      "outputTokens": 49,
+      "cached": true
+    },
+    {
+      "rule": "ts-no-debug-console",
+      "session": "01a0dde8-ef40-7202-b96b-03fab19c519d",
+      "thread": "01a0dde8-ef40-7202-b96b-03fab19c519d",
+      "repo": "/Users/ckorhonen/.codex/worktrees/9a36/solemate",
+      "file": "output/feedback-2026-09-27/capture-wipe-smoke.mjs",
+      "ts": "2026-09-27T15:59:55.082Z",
+      "changeKind": "patch",
+      "p": 0.94,
+      "outcome": "fixed",
+      "excerpt": "  const divider = comparison.locator('[role=\"slider\"]');\n  await divider.focus();\n  await page.keyboard.press(\"Home\");\n  if (await divider.getAttribute(\"aria-valuenow\") !== \"0\") throw new Error(\"Wipe Home did not select all depth.\");\n  await page.keyboard.press(\"ArrowRight\");\n  if (await divider.getAttribute(\"aria-valuenow\") !== \"1\") throw new Error(\"Wipe ArrowRight did not increase RGB reveal.\");",
+      "excerptKind": "edit-start",
+      "grade": {
+        "verdict": "review-comment",
+        "confidence": 0.65,
+        "reason": "The smoke-test script likely contains a debug console call beyond the excerpt; removing leftover diagnostic logging is a reasonable review request."
+      },
+      "inputTokens": 492,
+      "outputTokens": 473,
+      "cached": true
+    },
+    {
+      "rule": "ts-no-explicit-any",
+      "session": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "thread": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "repo": "/Users/ckorhonen/Repos/jev-lint",
+      "file": "eval/bench-rules.ts",
+      "ts": "2026-09-27T15:01:07.759Z",
+      "changeKind": "write",
+      "p": 0.66,
+      "outcome": "fixed",
+      "excerpt": "// How does the number of rules asked per edit affect Jev's accuracy, latency and tokens,\n// and does splitting the rules into parallel requests help?\n//   bun eval/bench-rules.ts [--cases 48] [--sizes 25,50,100] [--chunk 10]\n// Writes eval/results/bench-rule-count.json.\n//\n// For each sampled held-out case, its own rules (the labeled scope) are the targets. Extra\n// \"distractor\" rules from other ",
+      "excerptKind": "file-header",
+      "grade": {
+        "verdict": "review-comment",
+        "confidence": 0.89,
+        "reason": "The later check stopped flagging the file after it was changed, supporting that the added code used explicit `any`; replacing it is a reasonable review request."
+      },
+      "inputTokens": 506,
+      "outputTokens": 169,
+      "cached": true
+    },
+    {
+      "rule": "ts-no-empty-catch",
+      "session": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "thread": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "repo": "/Users/ckorhonen/Repos/jev-lint",
+      "file": "src/install.ts",
+      "ts": "2026-09-27T15:07:10.552Z",
+      "changeKind": "write",
+      "p": 0.89,
+      "outcome": "kept",
+      "excerpt": "#!/usr/bin/env bun\n// Install or update the jev-lint hook for Claude Code and Codex, idempotently.\n//   bun ~/Repos/jev-lint/src/install.ts                 # check only: key, configs, skills (no writes)\n//   bun ~/Repos/jev-lint/src/install.ts --apply         # write hooks (backs up each file first)\n//   options: --claude-only | --codex-only, --project <repo> (Claude hook in <repo>/.claude/setting",
+      "excerptKind": "file-header",
+      "grade": {
+        "verdict": "review-comment",
+        "confidence": 0.59,
+        "reason": "An installer can encounter meaningful filesystem or configuration failures; silently swallowing one could hide incomplete installation and merits review."
+      },
+      "inputTokens": 507,
+      "outputTokens": 231,
+      "cached": true
+    },
+    {
+      "rule": "ts-no-magic-numbers",
+      "session": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "thread": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "repo": "/Users/ckorhonen/Repos/jev-lint",
+      "file": "src/install.ts",
+      "ts": "2026-09-27T15:07:10.552Z",
+      "changeKind": "write",
+      "p": 0.73,
+      "outcome": "fixed",
+      "excerpt": "#!/usr/bin/env bun\n// Install or update the jev-lint hook for Claude Code and Codex, idempotently.\n//   bun ~/Repos/jev-lint/src/install.ts                 # check only: key, configs, skills (no writes)\n//   bun ~/Repos/jev-lint/src/install.ts --apply         # write hooks (backs up each file first)\n//   options: --claude-only | --codex-only, --project <repo> (Claude hook in <repo>/.claude/setting",
+      "excerptKind": "file-header",
+      "grade": {
+        "verdict": "review-comment",
+        "confidence": 0.68,
+        "reason": "An unexplained numeric literal in installer logic is worth naming so its operational meaning is clear, though the excerpt omits the specific value."
+      },
+      "inputTokens": 533,
+      "outputTokens": 316,
+      "cached": true
+    },
+    {
+      "rule": "ts-unvalidated-external-data",
+      "session": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "thread": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "repo": "/Users/ckorhonen/Repos/jev-lint",
+      "file": "src/install.ts",
+      "ts": "2026-09-27T15:07:10.552Z",
+      "changeKind": "write",
+      "p": 0.52,
+      "outcome": "fixed",
+      "excerpt": "#!/usr/bin/env bun\n// Install or update the jev-lint hook for Claude Code and Codex, idempotently.\n//   bun ~/Repos/jev-lint/src/install.ts                 # check only: key, configs, skills (no writes)\n//   bun ~/Repos/jev-lint/src/install.ts --apply         # write hooks (backs up each file first)\n//   options: --claude-only | --codex-only, --project <repo> (Claude hook in <repo>/.claude/setting",
+      "excerptKind": "file-header",
+      "grade": {
+        "verdict": "review-comment",
+        "confidence": 0.7,
+        "reason": "An installer likely parses user-editable configuration; validating its shape before treating it as typed data would improve robustness and merits review."
+      },
+      "inputTokens": 594,
+      "outputTokens": 322,
+      "cached": true
+    },
+    {
+      "rule": "ts-no-empty-catch",
+      "session": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "thread": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "repo": "/Users/ckorhonen/Repos/jev-lint",
+      "file": "eval/skill/run.ts",
+      "ts": "2026-09-27T15:28:50.616Z",
+      "changeKind": "write",
+      "p": 0.83,
+      "outcome": "kept",
+      "excerpt": "// Does the jev-lint-rules skill onboard a real repo well? Runs the skill headless (dry run,\n// stopping at the proposal) on pinned copies of real repos and scores the proposal against\n// hand-checked gold annotations.\n//   bun eval/skill/run.ts [--cases a,b] [--reps 2] [--agent claude|codex] [--tag name] [--grade-only]\n//\n// Fixtures are PRIVATE and live outside this repo (default ~/.local/share/",
+      "excerptKind": "file-header",
+      "grade": {
+        "verdict": "review-comment",
+        "confidence": 0.57,
+        "reason": "Silently swallowed failures in an evaluation runner can hide broken runs or misleading results; a reviewer would generally ask to log or handle them."
+      },
+      "inputTokens": 504,
+      "outputTokens": 412,
+      "cached": true
+    },
+    {
+      "rule": "ts-unvalidated-external-data",
+      "session": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "thread": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "repo": "/Users/ckorhonen/Repos/jev-lint",
+      "file": "eval/skill/run.ts",
+      "ts": "2026-09-27T15:28:50.616Z",
+      "changeKind": "write",
+      "p": 0.76,
+      "outcome": "fixed",
+      "excerpt": "// Does the jev-lint-rules skill onboard a real repo well? Runs the skill headless (dry run,\n// stopping at the proposal) on pinned copies of real repos and scores the proposal against\n// hand-checked gold annotations.\n//   bun eval/skill/run.ts [--cases a,b] [--reps 2] [--agent claude|codex] [--tag name] [--grade-only]\n//\n// Fixtures are PRIVATE and live outside this repo (default ~/.local/share/",
+      "excerptKind": "file-header",
+      "grade": {
+        "verdict": "noise",
+        "confidence": 0.93,
+        "reason": "The excerpt shows an evaluation runner, and the rule only applies when this file parses raw external data and trusts it as a domain type; no evidence supports that."
+      },
+      "inputTokens": 591,
+      "outputTokens": 55,
+      "cached": true
+    },
+    {
+      "rule": "ts-no-magic-numbers",
+      "session": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "thread": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "repo": "/Users/ckorhonen/Repos/jev-lint",
+      "file": "eval/skill/run.ts",
+      "ts": "2026-09-27T15:28:50.616Z",
+      "changeKind": "write",
+      "p": 0.6,
+      "outcome": "fixed",
+      "excerpt": "// Does the jev-lint-rules skill onboard a real repo well? Runs the skill headless (dry run,\n// stopping at the proposal) on pinned copies of real repos and scores the proposal against\n// hand-checked gold annotations.\n//   bun eval/skill/run.ts [--cases a,b] [--reps 2] [--agent claude|codex] [--tag name] [--grade-only]\n//\n// Fixtures are PRIVATE and live outside this repo (default ~/.local/share/",
+      "excerptKind": "file-header",
+      "grade": {
+        "verdict": "review-comment",
+        "confidence": 0.61,
+        "reason": "Evaluation logic should name non-obvious numeric thresholds or counts for clarity and maintainability; the file’s scoring and repetition context makes unexplained literals plausible."
+      },
+      "inputTokens": 530,
+      "outputTokens": 54,
+      "cached": true
+    },
+    {
+      "rule": "ts-sequential-await-loop",
+      "session": "09cbf7c7-740f-412c-8972-6c4c15fa6272",
+      "thread": "09cbf7c7-740f-412c-8972-6c4c15fa6272",
+      "repo": "/Users/ckorhonen/Repos/creative-studio",
+      "file": "scripts/quality-ab.ts",
+      "ts": "2026-09-27T15:48:49.052Z",
+      "changeKind": "write",
+      "p": 0.7,
+      "outcome": "kept",
+      "excerpt": "#!/usr/bin/env bun\n/**\n * Opt-in H3 render-quality A/B on the primary Spark (never run in CI).\n *   STUDIO_IT=spark bun scripts/quality-ab.ts [--configs a,b,c] [--seconds 4] [--keep-loaded]\n * Renders one fixed dance prompt at several size/step settings with the same seed, recording wall time\n * and minimum available unified memory per render, then writes a receipt plus a 1920x1080 contact\n * shee",
+      "excerptKind": "file-header",
+      "grade": {
+        "verdict": "noise",
+        "confidence": 0.82,
+        "reason": "This is a render benchmark measuring per-render time and memory; running renders concurrently would interfere with those measurements, so sequential execution is justified."
+      },
+      "inputTokens": 536,
+      "outputTokens": 213,
+      "cached": true
+    },
+    {
+      "rule": "ts-no-magic-numbers",
+      "session": "09cbf7c7-740f-412c-8972-6c4c15fa6272",
+      "thread": "09cbf7c7-740f-412c-8972-6c4c15fa6272",
+      "repo": "/Users/ckorhonen/Repos/creative-studio",
+      "file": "scripts/quality-ab.ts",
+      "ts": "2026-09-27T15:48:49.052Z",
+      "changeKind": "write",
+      "p": 0.66,
+      "outcome": "fixed",
+      "excerpt": "#!/usr/bin/env bun\n/**\n * Opt-in H3 render-quality A/B on the primary Spark (never run in CI).\n *   STUDIO_IT=spark bun scripts/quality-ab.ts [--configs a,b,c] [--seconds 4] [--keep-loaded]\n * Renders one fixed dance prompt at several size/step settings with the same seed, recording wall time\n * and minimum available unified memory per render, then writes a receipt plus a 1920x1080 contact\n * shee",
+      "excerptKind": "file-header",
+      "grade": {
+        "verdict": "review-comment",
+        "confidence": 0.68,
+        "reason": "A quality-measurement script may contain operational limits or timing values whose meaning should be named rather than left as unexplained literals."
+      },
+      "inputTokens": 534,
+      "outputTokens": 277,
+      "cached": true
+    },
+    {
+      "rule": "ts-no-empty-catch",
+      "session": "09cbf7c7-740f-412c-8972-6c4c15fa6272",
+      "thread": "09cbf7c7-740f-412c-8972-6c4c15fa6272",
+      "repo": "/Users/ckorhonen/Repos/creative-studio",
+      "file": "scripts/quality-ab.ts",
+      "ts": "2026-09-27T15:48:49.052Z",
+      "changeKind": "write",
+      "p": 0.65,
+      "outcome": "kept",
+      "excerpt": "#!/usr/bin/env bun\n/**\n * Opt-in H3 render-quality A/B on the primary Spark (never run in CI).\n *   STUDIO_IT=spark bun scripts/quality-ab.ts [--configs a,b,c] [--seconds 4] [--keep-loaded]\n * Renders one fixed dance prompt at several size/step settings with the same seed, recording wall time\n * and minimum available unified memory per render, then writes a receipt plus a 1920x1080 contact\n * shee",
+      "excerptKind": "file-header",
+      "grade": {
+        "verdict": "review-comment",
+        "confidence": 0.75,
+        "reason": "A silent catch in a quality-measurement script could hide failed renders or incomplete results; a reviewer would likely request explicit handling."
+      },
+      "inputTokens": 508,
+      "outputTokens": 199,
+      "cached": true
+    },
+    {
+      "rule": "ts-unvalidated-external-data",
+      "session": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "thread": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "repo": "/Users/ckorhonen/Repos/jev-lint",
+      "file": "src/daemon.ts",
+      "ts": "2026-09-27T16:01:57.762Z",
+      "changeKind": "write",
+      "p": 0.92,
+      "outcome": "fixed",
+      "excerpt": "#!/usr/bin/env bun\n// Optional long-lived helper for the hook. Each hook call is a new process that would\n// otherwise pay for a new HTTPS connection plus TLS (~100 ms) and a Keychain lookup (~20 ms)\n// on every check. The daemon resolves the key once, keeps the API connection warm, and\n// serves checks over a user-only Unix socket. The hook starts it on first use and falls\n// back to checking in ",
+      "excerptKind": "file-header",
+      "grade": {
+        "verdict": "review-comment",
+        "confidence": 0.83,
+        "reason": "A daemon reading JSON over a Unix socket should validate its shape before treating it as a domain type; user-only socket access limits the security impact."
+      },
+      "inputTokens": 581,
+      "outputTokens": 244,
+      "cached": true
+    },
+    {
+      "rule": "ts-no-empty-catch",
+      "session": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "thread": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "repo": "/Users/ckorhonen/Repos/jev-lint",
+      "file": "src/daemon.ts",
+      "ts": "2026-09-27T16:01:57.762Z",
+      "changeKind": "write",
+      "p": 0.85,
+      "outcome": "kept",
+      "excerpt": "#!/usr/bin/env bun\n// Optional long-lived helper for the hook. Each hook call is a new process that would\n// otherwise pay for a new HTTPS connection plus TLS (~100 ms) and a Keychain lookup (~20 ms)\n// on every check. The daemon resolves the key once, keeps the API connection warm, and\n// serves checks over a user-only Unix socket. The hook starts it on first use and falls\n// back to checking in ",
+      "excerptKind": "file-header",
+      "grade": {
+        "verdict": "review-comment",
+        "confidence": 0.63,
+        "reason": "A daemon’s silently swallowed failures can hide startup or request errors; a reviewer would likely ask to handle or document them."
+      },
+      "inputTokens": 494,
+      "outputTokens": 243,
+      "cached": true
+    },
+    {
+      "rule": "ts-no-magic-numbers",
+      "session": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "thread": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "repo": "/Users/ckorhonen/Repos/jev-lint",
+      "file": "src/daemon.ts",
+      "ts": "2026-09-27T16:12:16.435Z",
+      "changeKind": "write",
+      "p": 0.5,
+      "outcome": "fixed",
+      "excerpt": "#!/usr/bin/env bun\n// Optional long-lived helper for the hook. Each hook call is a new process that would\n// otherwise pay for a new HTTPS connection plus TLS (~100 ms) and a Keychain lookup (~20 ms)\n// on every check. The daemon keeps the API connection warm, resolves the key once, and\n// serves checks over a user-only Unix socket. The hook starts it on first use and falls\n// back to checking in ",
+      "excerptKind": "file-header",
+      "grade": {
+        "verdict": "review-comment",
+        "confidence": 0.57,
+        "reason": "Daemon logic commonly uses non-obvious timeout or size thresholds; naming such values would clarify their meaning, though the flagged code is not shown."
+      },
+      "inputTokens": 520,
+      "outputTokens": 285,
+      "cached": true
+    },
+    {
+      "rule": "ts-unvalidated-external-data",
+      "session": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "thread": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "repo": "/Users/ckorhonen/Repos/jev-lint",
+      "file": "src/daemonClient.ts",
+      "ts": "2026-09-27T16:01:58.515Z",
+      "changeKind": "write",
+      "p": 0.96,
+      "outcome": "fixed",
+      "excerpt": "// Hook side of the optional daemon (see daemon.ts). JEV_LINT_DAEMON=off disables it.\n\nimport { createHash } from \"node:crypto\";\nimport { homedir } from \"node:os\";\nimport { join } from \"node:path\";\nimport type { Settled } from \"./checks\";\nimport type { ChangedFile } from \"./extract\";\n\n// Settings that change what a check does. Each combination gets its own daemon, because\n// the daemon's rules, mo",
+      "excerptKind": "file-header",
+      "grade": {
+        "verdict": "review-comment",
+        "confidence": 0.79,
+        "reason": "A daemon client likely parses external daemon responses; assigning unvalidated JSON to domain types warrants runtime validation, and the reported fix supports that this was actionable."
+      },
+      "inputTokens": 588,
+      "outputTokens": 54,
+      "cached": true
+    },
+    {
+      "rule": "ts-no-empty-catch",
+      "session": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "thread": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "repo": "/Users/ckorhonen/Repos/jev-lint",
+      "file": "src/daemonClient.ts",
+      "ts": "2026-09-27T16:01:58.515Z",
+      "changeKind": "write",
+      "p": 0.71,
+      "outcome": "kept",
+      "excerpt": "// Hook side of the optional daemon (see daemon.ts). JEV_LINT_DAEMON=off disables it.\n\nimport { createHash } from \"node:crypto\";\nimport { homedir } from \"node:os\";\nimport { join } from \"node:path\";\nimport type { Settled } from \"./checks\";\nimport type { ChangedFile } from \"./extract\";\n\n// Settings that change what a check does. Each combination gets its own daemon, because\n// the daemon's rules, mo",
+      "excerptKind": "file-header",
+      "grade": {
+        "verdict": "noise",
+        "confidence": 0.42,
+        "reason": "The excerpt omits the flagged code, so no silent catch is verifiable; retaining it in daemon-client code alone does not show swallowed errors."
+      },
+      "inputTokens": 501,
+      "outputTokens": 52,
+      "cached": true
+    },
+    {
+      "rule": "ts-no-magic-numbers",
+      "session": "09cbf7c7-740f-412c-8972-6c4c15fa6272",
+      "thread": "09cbf7c7-740f-412c-8972-6c4c15fa6272",
+      "repo": "/Users/ckorhonen/Repos/creative-studio/.claude/worktrees/agent-a93e53a1d14e3e14a",
+      "file": "src/media/camera-intent.ts",
+      "ts": "2026-09-27T16:06:15.833Z",
+      "changeKind": "write",
+      "p": 0.81,
+      "outcome": "fixed",
+      "excerpt": "import type { CameraMoveIntent, DanceSection, ProjectSpec } from \"../contracts/project\";\n\n/**\n * Camera movement belongs in the render, not in post: dance-sync sections carry a camera-move\n * intent that the planner writes (with pace words from tempo and section energy) into the shot\n * prompts, so the video model moves the camera. Post only adds non-magnifying accents.\n */\n\nexport type Pace = \"sl",
+      "excerptKind": "file-header",
+      "grade": {
+        "verdict": "review-comment",
+        "confidence": 0.68,
+        "reason": "Camera-intent logic likely uses non-obvious numeric thresholds; naming such values clarifies their meaning, and the flag was subsequently resolved."
+      },
+      "inputTokens": 518,
+      "outputTokens": 189,
+      "cached": true
+    },
+    {
+      "rule": "ts-no-magic-numbers",
+      "session": "09cbf7c7-740f-412c-8972-6c4c15fa6272",
+      "thread": "09cbf7c7-740f-412c-8972-6c4c15fa6272",
+      "repo": "/Users/ckorhonen/Repos/creative-studio/.claude/worktrees/agent-a93e53a1d14e3e14a",
+      "file": "src/media/edit.ts",
+      "ts": "2026-09-27T16:18:38.464Z",
+      "changeKind": "edit",
+      "p": 0.7,
+      "outcome": "kept",
+      "excerpt": "    // Camera treatment (clip-local output time) and frame-exact length, after normalisation. The\n    // clone-pad goes BEFORE the camera filters and the frame trim AFTER them: zoompan withholds its\n    // last frame and does not pass end-of-stream on to a following tpad (observed ffmpeg 8.1: the\n    // next clip in a concat then never started and the video stream ended early).\n    const cam = c.c",
+      "excerptKind": "edit-start",
+      "grade": {
+        "verdict": "noise",
+        "confidence": 0.66,
+        "reason": "The visible 8.1 is an explanatory version number in a comment, not a numeric literal used in logic; no other flagged number is shown."
+      },
+      "inputTokens": 511,
+      "outputTokens": 339,
+      "cached": true
+    },
+    {
+      "rule": "ts-no-hardcoded-secret",
+      "session": "01a0dde8-ef40-7202-b96b-03fab19c519d",
+      "thread": "01a0dde8-ef40-7202-b96b-03fab19c519d",
+      "repo": "/Users/ckorhonen/.codex/worktrees/9a36/solemate",
+      "file": "output/admin-transitions-2026-09-27/preview-server.mjs",
+      "ts": "2026-09-27T16:28:43.370Z",
+      "changeKind": "patch",
+      "p": 0.72,
+      "outcome": "fixed",
+      "excerpt": "#!/usr/bin/env node\n/** Local-only synthetic Admin fixture for CUA visual review. */\nimport { createServer } from \"node:http\";\nimport { createRequire } from \"node:module\";\nimport path from \"node:path\";\nimport { fileURLToPath, pathToFileURL } from \"node:url\";\nimport { readFile } from \"node:fs/promises\";\n\nconst here = path.dirname(fileURLToPath(import.meta.url));\nconst repoRoot = path.resolve(here, ",
+      "excerptKind": "edit-start",
+      "grade": {
+        "verdict": "noise",
+        "confidence": 0.91,
+        "reason": "The excerpt shows a local-only synthetic preview server and no credential literal; the flag may concern unseen code, but the evidence provided does not support a real secret."
+      },
+      "inputTokens": 499,
+      "outputTokens": 55,
+      "cached": true
+    },
+    {
+      "rule": "ts-unvalidated-external-data",
+      "session": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "thread": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "repo": "/Users/ckorhonen/Repos/jev-lint",
+      "file": "eval/pack-status.ts",
+      "ts": "2026-09-27T17:28:57.318Z",
+      "changeKind": "write",
+      "p": 0.96,
+      "outcome": "kept",
+      "excerpt": "// Decide which candidate rules ship, from a holdout summary, using the same bar as\n// src/validate.ts (fixed before the new packs were measured):\n//   precision ≥ 90% at p ≥ 0.8, precision ≥ 75% and recall ≥ 80% at p ≥ 0.5 (gated policies).\n//   bun eval/pack-status.ts eval/results/<holdout summary>.json [--apply]\n// Writes eval/results/pack-status.json (per-rule holdout numbers, used by the pack",
+      "excerptKind": "file-header",
+      "grade": {
+        "verdict": "review-comment",
+        "confidence": 0.78,
+        "reason": "The script consumes a CLI-supplied JSON summary; validating its shape before treating it as a domain type would make malformed inputs fail safely."
+      },
+      "inputTokens": 602,
+      "outputTokens": 369,
+      "cached": true
+    },
+    {
+      "rule": "ts-no-magic-numbers",
+      "session": "01a0dde8-ef40-7202-b96b-03fab19c519d",
+      "thread": "01a0dde8-ef40-7202-b96b-03fab19c519d",
+      "repo": "/Users/ckorhonen/.codex/worktrees/9a36/solemate",
+      "file": "output/depth-eval/cloudflare-cpu/worker.mjs",
+      "ts": "2026-09-27T17:37:04.876Z",
+      "changeKind": "patch",
+      "p": 0.64,
+      "outcome": "fixed",
+      "excerpt": "import { DurableObject } from 'cloudflare:workers';\n\nexport default {\n  async fetch(request, env) {\n    const auth = request.headers.get('authorization') || '';\n    if (Date.now() > Number(env.BENCH_EXPIRES_AT) || !auth.startsWith('Bearer ')) {\n      return new Response('Not found', { status: 404 });\n    }\n    const digest = [...new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder(",
+      "excerptKind": "edit-start",
+      "grade": {
+        "verdict": "review-comment",
+        "confidence": 0.65,
+        "reason": "The visible 404 is self-explanatory, but this benchmark worker likely uses non-obvious numeric limits or durations later that merit named constants."
+      },
+      "inputTokens": 520,
+      "outputTokens": 253,
+      "cached": true
+    },
+    {
+      "rule": "ts-shell-command-interpolation",
+      "session": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "thread": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "repo": "/Users/ckorhonen/Repos/jev-lint",
+      "file": "src/repoEval.ts",
+      "ts": "2026-09-27T18:01:25.155Z",
+      "changeKind": "write",
+      "p": 0.92,
+      "outcome": "fixed",
+      "excerpt": "#!/usr/bin/env bun\n// Prove that a change to a repo's agent instructions, skills or rules helps, before keeping it.\n// Runs small tasks from `.jev-lint/evals/*.json` with a headless coding agent twice: once on a\n// clean copy of the base commit, once on a copy of the working tree (your proposed change).\n// The jev-lint hook is OFF in both, so only the instructions differ. Jev then checks the code\n",
+      "excerptKind": "file-header",
+      "grade": {
+        "verdict": "security",
+        "confidence": 0.78,
+        "reason": "A repo evaluation script likely interpolates repository paths or task data into shell commands; passing them as arguments avoids shell injection."
+      },
+      "inputTokens": 616,
+      "outputTokens": 230,
+      "cached": true
+    },
+    {
+      "rule": "ts-no-empty-catch",
+      "session": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "thread": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "repo": "/Users/ckorhonen/Repos/jev-lint",
+      "file": "src/repoEval.ts",
+      "ts": "2026-09-27T18:01:25.155Z",
+      "changeKind": "write",
+      "p": 0.76,
+      "outcome": "kept",
+      "excerpt": "#!/usr/bin/env bun\n// Prove that a change to a repo's agent instructions, skills or rules helps, before keeping it.\n// Runs small tasks from `.jev-lint/evals/*.json` with a headless coding agent twice: once on a\n// clean copy of the base commit, once on a copy of the working tree (your proposed change).\n// The jev-lint hook is OFF in both, so only the instructions differ. Jev then checks the code\n",
+      "excerptKind": "file-header",
+      "grade": {
+        "verdict": "noise",
+        "confidence": 0.44,
+        "reason": "The excerpt provides no evidence of a catch, and the lint flag alone cannot establish that this evaluation script silently swallows errors."
+      },
+      "inputTokens": 501,
+      "outputTokens": 48,
+      "cached": true
+    },
+    {
+      "rule": "ts-sequential-await-loop",
+      "session": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "thread": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "repo": "/Users/ckorhonen/Repos/jev-lint",
+      "file": "src/repoEval.ts",
+      "ts": "2026-09-27T18:01:25.155Z",
+      "changeKind": "write",
+      "p": 0.69,
+      "outcome": "kept",
+      "excerpt": "#!/usr/bin/env bun\n// Prove that a change to a repo's agent instructions, skills or rules helps, before keeping it.\n// Runs small tasks from `.jev-lint/evals/*.json` with a headless coding agent twice: once on a\n// clean copy of the base commit, once on a copy of the working tree (your proposed change).\n// The jev-lint hook is OFF in both, so only the instructions differ. Jev then checks the code\n",
+      "excerptKind": "file-header",
+      "grade": {
+        "verdict": "review-comment",
+        "confidence": 0.57,
+        "reason": "Evaluation tasks appear independent, so a reviewer might ask about bounded concurrency; however, headless agent runs can be resource-intensive or rate-limited."
+      },
+      "inputTokens": 529,
+      "outputTokens": 494,
+      "cached": true
+    },
+    {
+      "rule": "ts-no-magic-numbers",
+      "session": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "thread": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "repo": "/Users/ckorhonen/Repos/jev-lint",
+      "file": "src/repoEval.ts",
+      "ts": "2026-09-27T18:01:25.155Z",
+      "changeKind": "write",
+      "p": 0.67,
+      "outcome": "fixed",
+      "excerpt": "#!/usr/bin/env bun\n// Prove that a change to a repo's agent instructions, skills or rules helps, before keeping it.\n// Runs small tasks from `.jev-lint/evals/*.json` with a headless coding agent twice: once on a\n// clean copy of the base commit, once on a copy of the working tree (your proposed change).\n// The jev-lint hook is OFF in both, so only the instructions differ. Jev then checks the code\n",
+      "excerptKind": "file-header",
+      "grade": {
+        "verdict": "review-comment",
+        "confidence": 0.57,
+        "reason": "A non-obvious numeric literal in evaluation logic would merit a named constant; the file context suggests operational limits may be involved, though the flagged code is not shown."
+      },
+      "inputTokens": 527,
+      "outputTokens": 363,
+      "cached": true
+    },
+    {
+      "rule": "ts-no-empty-catch",
+      "session": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "thread": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "repo": "/Users/ckorhonen/Repos/jev-lint",
+      "file": "site/public/app.js",
+      "ts": "2026-09-27T18:08:27.039Z",
+      "changeKind": "write",
+      "p": 0.86,
+      "outcome": "kept",
+      "excerpt": "// jev-lint.dev — progressive enhancement only. The page is complete without this file.\n(() => {\n  const reduce = matchMedia(\"(prefers-reduced-motion: reduce)\").matches;\n  const $ = (s, r = document) => r.querySelector(s);\n  const $$ = (s, r = document) => [...r.querySelectorAll(s)];\n  const ease = (t) => 1 - (1 - t) ** 4;\n\n  /* ── Setup prompt: Claude Code / Codex variants ───────────────────────",
+      "excerptKind": "file-header",
+      "grade": {
+        "verdict": "review-comment",
+        "confidence": 0.65,
+        "reason": "A silent catch hides failures even in progressive enhancement; a reviewer would generally ask for logging, explicit fallback handling, or an explanation."
+      },
+      "inputTokens": 515,
+      "outputTokens": 335,
+      "cached": true
+    },
+    {
+      "rule": "ts-no-magic-numbers",
+      "session": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "thread": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "repo": "/Users/ckorhonen/Repos/jev-lint",
+      "file": "site/public/app.js",
+      "ts": "2026-09-27T18:08:27.039Z",
+      "changeKind": "write",
+      "p": 0.81,
+      "outcome": "kept",
+      "excerpt": "// jev-lint.dev — progressive enhancement only. The page is complete without this file.\n(() => {\n  const reduce = matchMedia(\"(prefers-reduced-motion: reduce)\").matches;\n  const $ = (s, r = document) => r.querySelector(s);\n  const $$ = (s, r = document) => [...r.querySelectorAll(s)];\n  const ease = (t) => 1 - (1 - t) ** 4;\n\n  /* ── Setup prompt: Claude Code / Codex variants ───────────────────────",
+      "excerptKind": "file-header",
+      "grade": {
+        "verdict": "review-comment",
+        "confidence": 0.58,
+        "reason": "The high-confidence flag suggests an unexplained numeric literal in logic; extracting it into a named constant would improve clarity, though the flagged code is unavailable."
+      },
+      "inputTokens": 545,
+      "outputTokens": 311,
+      "cached": true
+    },
+    {
+      "rule": "ts-shell-command-interpolation",
+      "session": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "thread": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "repo": "/Users/ckorhonen/Repos/jev-lint",
+      "file": "eval/e2e/languages.ts",
+      "ts": "2026-09-27T18:18:53.305Z",
+      "changeKind": "write",
+      "p": 0.93,
+      "outcome": "fixed",
+      "excerpt": "// Per-language E2E settings for the rule-pack languages (python, ruby, kotlin, rust, bazel).\n// TypeScript and Swift keep their original, hard-coded handling in run.ts/grade.ts/review.ts\n// so earlier rounds reproduce exactly.\n\nimport { spawnSync } from \"node:child_process\";\nimport { existsSync, readdirSync, readFileSync, statSync } from \"node:fs\";\nimport { basename, join, relative } from \"node:p",
+      "excerptKind": "file-header",
+      "grade": {
+        "verdict": "security",
+        "confidence": 0.88,
+        "reason": "The flagged rule targets runtime values embedded in shell-parsed commands; this E2E settings file imports spawnSync, making unsafe command interpolation plausible."
+      },
+      "inputTokens": 618,
+      "outputTokens": 203,
+      "cached": true
+    },
+    {
+      "rule": "ts-no-magic-numbers",
+      "session": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "thread": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "repo": "/Users/ckorhonen/Repos/jev-lint",
+      "file": "eval/e2e/languages.ts",
+      "ts": "2026-09-27T18:18:53.305Z",
+      "changeKind": "write",
+      "p": 0.54,
+      "outcome": "fixed",
+      "excerpt": "// Per-language E2E settings for the rule-pack languages (python, ruby, kotlin, rust, bazel).\n// TypeScript and Swift keep their original, hard-coded handling in run.ts/grade.ts/review.ts\n// so earlier rounds reproduce exactly.\n\nimport { spawnSync } from \"node:child_process\";\nimport { existsSync, readdirSync, readFileSync, statSync } from \"node:fs\";\nimport { basename, join, relative } from \"node:p",
+      "excerptKind": "file-header",
+      "grade": {
+        "verdict": "review-comment",
+        "confidence": 0.56,
+        "reason": "The per-language E2E settings file likely contains operational numeric values whose purpose should be named; the excerpt does not show the flagged code."
+      },
+      "inputTokens": 529,
+      "outputTokens": 189,
+      "cached": true
+    },
+    {
+      "rule": "ts-unvalidated-external-data",
+      "session": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "thread": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "repo": "/Users/ckorhonen/Repos/jev-lint",
+      "file": "src/recheck.ts",
+      "ts": "2026-09-27T19:54:49.107Z",
+      "changeKind": "write",
+      "p": 0.87,
+      "outcome": "fixed",
+      "excerpt": "#!/usr/bin/env bun\n// End-of-turn re-check for the learning loop. Runs as a Stop (or SubagentStop) hook in Claude\n// Code and Codex. For every file this conversation edited whose last check still had findings,\n// it asks just those rules again against the file as it is now, and logs the result. That gives\n// every finding an outcome (fixed or kept) even when the agent never touched the file again,",
+      "excerptKind": "file-header",
+      "grade": {
+        "verdict": "review-comment",
+        "confidence": 0.77,
+        "reason": "A hook script commonly parses externally supplied event or tool data; validating its shape before trusting typed fields is a reasonable reliability review request."
+      },
+      "inputTokens": 580,
+      "outputTokens": 254,
+      "cached": true
+    },
+    {
+      "rule": "ts-unvalidated-external-data",
+      "session": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "thread": "fd32180a-6132-42c1-9d75-19912f4a08a9/a837c17a1807b82a3",
+      "repo": "/Users/ckorhonen/Repos/jev-lint",
+      "file": "local/autoresearch/score.ts",
+      "ts": "2026-09-28T00:12:25.024Z",
+      "changeKind": "write",
+      "p": 0.65,
+      "outcome": "kept",
+      "excerpt": "// Score a served checkpoint (any /v1/systemone server) on TUNE, calibration or HOLDOUT cases with\n// the hook's own request path (eval/systems.ts judgeLocal: gated, shipped rules only).\n//\n//   bun local/autoresearch/score.ts --name <run> --split tune [--base-url http://127.0.0.1:18009]\n//   bun local/autoresearch/score.ts --name <run> --split tune --rescore [--thresholds t.json]\n//\n// Judgments ",
+      "excerptKind": "file-header",
+      "grade": {
+        "verdict": "review-comment",
+        "confidence": 0.72,
+        "reason": "A scoring script consuming responses from a served checkpoint should validate parsed response shapes before trusting them as domain types."
+      },
+      "inputTokens": 606,
+      "outputTokens": 174,
+      "cached": true
+    },
+    {
+      "rule": "ts-no-vague-names",
+      "session": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "thread": "fd32180a-6132-42c1-9d75-19912f4a08a9/a837c17a1807b82a3",
+      "repo": "/Users/ckorhonen/Repos/jev-lint",
+      "file": "local/autoresearch/score.ts",
+      "ts": "2026-09-28T00:12:25.024Z",
+      "changeKind": "write",
+      "p": 0.54,
+      "outcome": "fixed",
+      "excerpt": "// Score a served checkpoint (any /v1/systemone server) on TUNE, calibration or HOLDOUT cases with\n// the hook's own request path (eval/systems.ts judgeLocal: gated, shipped rules only).\n//\n//   bun local/autoresearch/score.ts --name <run> --split tune [--base-url http://127.0.0.1:18009]\n//   bun local/autoresearch/score.ts --name <run> --split tune --rescore [--thresholds t.json]\n//\n// Judgments ",
+      "excerptKind": "file-header",
+      "grade": {
+        "verdict": "review-comment",
+        "confidence": 0.69,
+        "reason": "The agent fixed the flag, suggesting a newly declared vague name was present; clarifying it would help reviewers understand the score logic."
+      },
+      "inputTokens": 523,
+      "outputTokens": 204,
+      "cached": true
+    },
+    {
+      "rule": "ts-no-vague-names",
+      "session": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "thread": "fd32180a-6132-42c1-9d75-19912f4a08a9/a837c17a1807b82a3",
+      "repo": "/Users/ckorhonen/Repos/jev-lint",
+      "file": "local/autoresearch/fit_thresholds.ts",
+      "ts": "2026-09-28T00:17:06.876Z",
+      "changeKind": "write",
+      "p": 0.5,
+      "outcome": "kept",
+      "excerpt": "// Fit flag thresholds for a run on the CALIBRATION split (never TUNE), from cached judgments.\n//\n//   bun local/autoresearch/fit_thresholds.ts --name <run> --mode global|per-rule [--min-pos 5]\n//\n// global:   one threshold from a 0.05-step grid that maximises calibration F1 with clean-edit false\n//           alarms <= 5%; ties go to the threshold closest to 0.5.\n// per-rule: start from the fitted",
+      "excerptKind": "file-header",
+      "grade": {
+        "verdict": "noise",
+        "confidence": 0.58,
+        "reason": "The excerpt and file context provide no evidence of a vague declaration; without the flagged name, there’s no basis to conclude a reviewer would request a rename."
+      },
+      "inputTokens": 520,
+      "outputTokens": 384,
+      "cached": true
+    },
+    {
+      "rule": "ts-no-vague-names",
+      "session": "09cbf7c7-740f-412c-8972-6c4c15fa6272",
+      "thread": "09cbf7c7-740f-412c-8972-6c4c15fa6272",
+      "repo": "/Users/ckorhonen/Repos/creative-studio",
+      "file": "tests/library.test.ts",
+      "ts": "2026-09-28T01:22:08.891Z",
+      "changeKind": "write",
+      "p": 0.62,
+      "outcome": "kept",
+      "excerpt": "import { beforeEach, describe, expect, test } from \"bun:test\";\nimport { existsSync, mkdtempSync, writeFileSync } from \"node:fs\";\nimport { tmpdir } from \"node:os\";\nimport { join } from \"node:path\";\nimport { type LibraryCharacter, type LibraryScene, ProjectSpec } from \"../src/contracts\";\nimport { ingestFile } from \"../src/core/assets\";\nimport {\n  expandLibrary,\n  LibraryError,\n  listEntries,\n  missi",
+      "excerptKind": "file-header",
+      "grade": {
+        "verdict": "noise",
+        "confidence": 0.74,
+        "reason": "The excerpt reveals no vague names, and test files commonly use short local labels; without the flagged code, there is no basis to request a rename."
+      },
+      "inputTokens": 516,
+      "outputTokens": 53,
+      "cached": true
+    },
+    {
+      "rule": "ts-sequential-await-loop",
+      "session": "09cbf7c7-740f-412c-8972-6c4c15fa6272",
+      "thread": "09cbf7c7-740f-412c-8972-6c4c15fa6272",
+      "repo": "/Users/ckorhonen/Repos/creative-studio",
+      "file": "src/runner/archive.ts",
+      "ts": "2026-09-28T10:35:52.458Z",
+      "changeKind": "write",
+      "p": 0.75,
+      "outcome": "kept",
+      "excerpt": "import { copyFileSync, cpSync, existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from \"node:fs\";\nimport { basename, extname, join, relative } from \"node:path\";\nimport { fileSha256 } from \"../core/assets\";\nimport { projectDir } from \"../core/config\";\nimport { currentJobs, type JobRow } from \"../core/jobs\";\nimport { getProject } from \"../core/projects\";\n\n/**\n * Project archive: the acce",
+      "excerptKind": "file-header",
+      "grade": {
+        "verdict": "review-comment",
+        "confidence": 0.57,
+        "reason": "If archive processing awaits independent per-job calls in a loop, a reviewer would likely ask whether they can run concurrently; the excerpt does not establish a reason for sequencing."
+      },
+      "inputTokens": 532,
+      "outputTokens": 497,
+      "cached": true
+    },
+    {
+      "rule": "ts-unvalidated-external-data",
+      "session": "09cbf7c7-740f-412c-8972-6c4c15fa6272",
+      "thread": "09cbf7c7-740f-412c-8972-6c4c15fa6272",
+      "repo": "/Users/ckorhonen/Repos/creative-studio",
+      "file": "src/runner/archive.ts",
+      "ts": "2026-09-28T10:35:52.458Z",
+      "changeKind": "write",
+      "p": 0.65,
+      "outcome": "fixed",
+      "excerpt": "import { copyFileSync, cpSync, existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from \"node:fs\";\nimport { basename, extname, join, relative } from \"node:path\";\nimport { fileSha256 } from \"../core/assets\";\nimport { projectDir } from \"../core/config\";\nimport { currentJobs, type JobRow } from \"../core/jobs\";\nimport { getProject } from \"../core/projects\";\n\n/**\n * Project archive: the acce",
+      "excerptKind": "file-header",
+      "grade": {
+        "verdict": "review-comment",
+        "confidence": 0.68,
+        "reason": "Archive files may contain externally supplied data; parsing and trusting it as a domain type without runtime validation warrants a review comment."
+      },
+      "inputTokens": 591,
+      "outputTokens": 231,
+      "cached": true
+    },
+    {
+      "rule": "ts-no-magic-numbers",
+      "session": "01a0e9fe-a64f-7200-a46a-63109e329381",
+      "thread": "01a0e9fe-a64f-7200-a46a-63109e329381/01a0e9ff-5a13-7110-8172-3dafec4a7915",
+      "repo": "/Users/ckorhonen/.codex/worktrees/9a36/solemate",
+      "file": "apps/tools/inbox/laser-preview.mjs",
+      "ts": "2026-09-28T21:53:14.681Z",
+      "changeKind": "patch",
+      "p": 0.86,
+      "outcome": "fixed",
+      "excerpt": "            ids,\n      const exteriorEdges = exteriorBoundary.ids.map((id, index) => {\n        const next = exteriorBoundary.ids[\n          (index + 1) % exteriorBoundary.ids.length\n        ];\n        const key = edgeKey(id, next);\n        const length = Math.hypot(\n          ...vertices[id].map((value, axis) => value - vertices[next][axis]),\n        );\n        return { key, length };\n      });\n  ",
+      "excerptKind": "edit-start",
+      "grade": {
+        "verdict": "noise",
+        "confidence": 0.89,
+        "reason": "The only nontrivial literal shown is 1 in standard cyclic array indexing, which is obvious from context and explicitly exempted by the rule."
+      },
+      "inputTokens": 507,
+      "outputTokens": 52,
+      "cached": true
+    },
+    {
+      "rule": "ts-shell-command-interpolation",
+      "session": "09cbf7c7-740f-412c-8972-6c4c15fa6272",
+      "thread": "09cbf7c7-740f-412c-8972-6c4c15fa6272",
+      "repo": "/Users/ckorhonen/Repos/creative-studio",
+      "file": "src/hosts/loan.ts",
+      "ts": "2026-09-29T11:41:14.850Z",
+      "changeKind": "write",
+      "p": 0.88,
+      "outcome": "kept",
+      "excerpt": "import { existsSync, mkdirSync, readFileSync, writeFileSync } from \"node:fs\";\nimport { join } from \"node:path\";\nimport { z } from \"zod\";\nimport { REPO_ROOT, studioHome } from \"../core/config\";\nimport { loadRules } from \"../core/rules\";\nimport { type RemoteResult, sshRun } from \"../runner/remote\";\n\n/**\n * Borrowed render hosts: a declarative loan profile (config/loans/<id>.json) turned into idempot",
+      "excerptKind": "file-header",
+      "grade": {
+        "verdict": "security",
+        "confidence": 0.68,
+        "reason": "Host-loan code likely builds SSH shell commands from runtime configuration; interpolating those values can permit command injection."
+      },
+      "inputTokens": 629,
+      "outputTokens": 312,
+      "cached": true
+    },
+    {
+      "rule": "ts-sequential-await-loop",
+      "session": "09cbf7c7-740f-412c-8972-6c4c15fa6272",
+      "thread": "09cbf7c7-740f-412c-8972-6c4c15fa6272",
+      "repo": "/Users/ckorhonen/Repos/creative-studio",
+      "file": "src/hosts/loan.ts",
+      "ts": "2026-09-29T11:41:14.850Z",
+      "changeKind": "write",
+      "p": 0.77,
+      "outcome": "kept",
+      "excerpt": "import { existsSync, mkdirSync, readFileSync, writeFileSync } from \"node:fs\";\nimport { join } from \"node:path\";\nimport { z } from \"zod\";\nimport { REPO_ROOT, studioHome } from \"../core/config\";\nimport { loadRules } from \"../core/rules\";\nimport { type RemoteResult, sshRun } from \"../runner/remote\";\n\n/**\n * Borrowed render hosts: a declarative loan profile (config/loans/<id>.json) turned into idempot",
+      "excerptKind": "file-header",
+      "grade": {
+        "verdict": "review-comment",
+        "confidence": 0.58,
+        "reason": "Loan profiles may involve independent remote-host operations; if the loop awaits each host sequentially without a stated rate limit or dependency, a reviewer would likely request concurrency."
+      },
+      "inputTokens": 538,
+      "outputTokens": 344,
+      "cached": true
+    },
+    {
+      "rule": "ts-regexp-from-input",
+      "session": "09cbf7c7-740f-412c-8972-6c4c15fa6272",
+      "thread": "09cbf7c7-740f-412c-8972-6c4c15fa6272",
+      "repo": "/Users/ckorhonen/Repos/creative-studio",
+      "file": "src/hosts/loan.ts",
+      "ts": "2026-09-29T11:41:14.850Z",
+      "changeKind": "write",
+      "p": 0.71,
+      "outcome": "kept",
+      "excerpt": "import { existsSync, mkdirSync, readFileSync, writeFileSync } from \"node:fs\";\nimport { join } from \"node:path\";\nimport { z } from \"zod\";\nimport { REPO_ROOT, studioHome } from \"../core/config\";\nimport { loadRules } from \"../core/rules\";\nimport { type RemoteResult, sshRun } from \"../runner/remote\";\n\n/**\n * Borrowed render hosts: a declarative loan profile (config/loans/<id>.json) turned into idempot",
+      "excerptKind": "file-header",
+      "grade": {
+        "verdict": "noise",
+        "confidence": 0.67,
+        "reason": "The file describes repository loan profiles, suggesting developer-controlled configuration; there’s no evidence that untrusted runtime text is used to construct a RegExp."
+      },
+      "inputTokens": 629,
+      "outputTokens": 431,
+      "cached": true
+    },
+    {
+      "rule": "ts-unvalidated-external-data",
+      "session": "09cbf7c7-740f-412c-8972-6c4c15fa6272",
+      "thread": "09cbf7c7-740f-412c-8972-6c4c15fa6272",
+      "repo": "/Users/ckorhonen/Repos/creative-studio",
+      "file": "src/hosts/loan.ts",
+      "ts": "2026-09-29T11:41:14.850Z",
+      "changeKind": "write",
+      "p": 0.63,
+      "outcome": "kept",
+      "excerpt": "import { existsSync, mkdirSync, readFileSync, writeFileSync } from \"node:fs\";\nimport { join } from \"node:path\";\nimport { z } from \"zod\";\nimport { REPO_ROOT, studioHome } from \"../core/config\";\nimport { loadRules } from \"../core/rules\";\nimport { type RemoteResult, sshRun } from \"../runner/remote\";\n\n/**\n * Borrowed render hosts: a declarative loan profile (config/loans/<id>.json) turned into idempot",
+      "excerptKind": "file-header",
+      "grade": {
+        "verdict": "noise",
+        "confidence": 0.88,
+        "reason": "The file imports Zod, strongly suggesting the loan JSON is runtime-validated rather than trusted through an unchecked cast."
+      },
+      "inputTokens": 601,
+      "outputTokens": 198,
+      "cached": true
+    },
+    {
+      "rule": "ts-unvalidated-external-data",
+      "session": "09cbf7c7-740f-412c-8972-6c4c15fa6272",
+      "thread": "09cbf7c7-740f-412c-8972-6c4c15fa6272",
+      "repo": "/Users/ckorhonen/Repos/creative-studio",
+      "file": "tests/loan.test.ts",
+      "ts": "2026-09-29T11:42:25.737Z",
+      "changeKind": "write",
+      "p": 0.87,
+      "outcome": "kept",
+      "excerpt": "import { beforeEach, describe, expect, test } from \"bun:test\";\nimport { writeFileSync } from \"node:fs\";\nimport { join } from \"node:path\";\nimport { borrow, readState, restore } from \"../src/hosts/loan\";\nimport type { RemoteResult } from \"../src/runner/remote\";\nimport { freshStudio } from \"./helpers\";\n\n/** Fake fleet: GLM pair, image/transfer progress and the serving container, driven by scripts. */",
+      "excerptKind": "file-header",
+      "grade": {
+        "verdict": "noise",
+        "confidence": 0.78,
+        "reason": "In a loan test, parsing controlled test data is unlikely to create a meaningful external-data trust boundary; runtime schema validation would add little value."
+      },
+      "inputTokens": 592,
+      "outputTokens": 421,
+      "cached": true
+    },
+    {
+      "rule": "ts-perf-query-per-item",
+      "session": "09cbf7c7-740f-412c-8972-6c4c15fa6272",
+      "thread": "09cbf7c7-740f-412c-8972-6c4c15fa6272/a4cd5a4c2b6aa9825",
+      "repo": "/Users/ckorhonen/Repos/creative-studio/.claude/worktrees/agent-a4cd5a4c2b6aa9825",
+      "file": "src/core/jobs.ts",
+      "ts": "2026-09-29T11:43:09.501Z",
+      "changeKind": "edit",
+      "p": 0.76,
+      "outcome": "kept",
+      "excerpt": "        if (!ready) continue;\n        const b = bind?.(job);\n        if (b && (b.backend !== job.backend || b.lane !== job.lane)) {\n          const moved = db\n            .query(\"UPDATE jobs SET backend = ?, lane = ?, updated_at = ? WHERE id = ? AND state = 'queued'\")\n            .run(b.backend, b.lane, nowIso(), job.id);\n          if (moved.changes !== 1) continue;\n          event(job.id, \"queued",
+      "excerptKind": "edit-start",
+      "grade": {
+        "verdict": "review-comment",
+        "confidence": 0.78,
+        "reason": "The per-job UPDATE appears to run inside a collection-processing loop; batching or grouping updates could avoid one database round trip per job."
+      },
+      "inputTokens": 719,
+      "outputTokens": 455,
+      "cached": true
+    },
+    {
+      "rule": "ts-no-non-null-assertion",
+      "session": "09cbf7c7-740f-412c-8972-6c4c15fa6272",
+      "thread": "09cbf7c7-740f-412c-8972-6c4c15fa6272/a4cd5a4c2b6aa9825",
+      "repo": "/Users/ckorhonen/Repos/creative-studio/.claude/worktrees/agent-a4cd5a4c2b6aa9825",
+      "file": "tests/spark.test.ts",
+      "ts": "2026-09-29T11:45:59.593Z",
+      "changeKind": "edit",
+      "p": 0.98,
+      "outcome": "kept",
+      "excerpt": "    expect(r.status).toBe(\"not_submitted\");\n  });\n});\n\ndescribe(\"spark adapter hosts and pools\", () => {\n  beforeEach(() => freshStudio());\n  const gx10 = (h: string) => SPARK_BACKENDS.find((b) => b.id === `gx10-h3-turbo-${h}`)!;\n  const turbo = () => SPARK_BACKENDS.find((b) => b.id === \"spark-h3-turbo\")!;\n\n  test(\"GX10 turbo backends share the spark-h3-turbo stack and pool, without a lifecycle pr",
+      "excerptKind": "edit-start",
+      "grade": {
+        "verdict": "review-comment",
+        "confidence": 0.94,
+        "reason": "Both lookup helpers use postfix non-null assertions; explicit handling would clarify failures if a backend ID is missing, even in tests."
+      },
+      "inputTokens": 520,
+      "outputTokens": 49,
+      "cached": true
+    },
+    {
+      "rule": "ts-no-vague-names",
+      "session": "09cbf7c7-740f-412c-8972-6c4c15fa6272",
+      "thread": "09cbf7c7-740f-412c-8972-6c4c15fa6272/ad9af39c2d9c67a43",
+      "repo": "/Users/ckorhonen/Repos/creative-studio/.claude/worktrees/agent-ad9af39c2d9c67a43",
+      "file": "tests/cachekey.test.ts",
+      "ts": "2026-09-29T16:34:22.152Z",
+      "changeKind": "write",
+      "p": 0.56,
+      "outcome": "kept",
+      "excerpt": "import { describe, expect, test } from \"bun:test\";\nimport { BackendProfile, type PlannedStage, type PlanVariant } from \"../src/contracts\";\nimport { hashJson } from \"../src/core/canonical\";\nimport { enqueuePlan, setState } from \"../src/core/jobs\";\nimport { createProject, savePlan } from \"../src/core/projects\";\nimport { legacyCacheKeys, stageCacheKey } from \"../src/runner/run\";\nimport { freshStudio ",
+      "excerptKind": "file-header",
+      "grade": {
+        "verdict": "noise",
+        "confidence": 0.56,
+        "reason": "The excerpt does not reveal the flagged declaration, and cache-key tests commonly use contextual names like `key`; there is no basis to conclude a vague name warrants review."
+      },
+      "inputTokens": 507,
+      "outputTokens": 526,
+      "cached": true
+    },
+    {
+      "rule": "ts-unvalidated-external-data",
+      "session": "09cbf7c7-740f-412c-8972-6c4c15fa6272",
+      "thread": "09cbf7c7-740f-412c-8972-6c4c15fa6272/a78ae595a6dc81b27",
+      "repo": "/Users/ckorhonen/Repos/creative-studio/.claude/worktrees/agent-a78ae595a6dc81b27",
+      "file": "src/cli/commands/production.ts",
+      "ts": "2026-09-29T16:35:00.882Z",
+      "changeKind": "write",
+      "p": 0.8,
+      "outcome": "fixed",
+      "excerpt": "import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync } from \"node:fs\";\nimport { tmpdir } from \"node:os\";\nimport { dirname, extname, join } from \"node:path\";\nimport { currentJobs, isTerminal, type JobRow } from \"../../core/jobs\";\nimport { getProject, projectDir } from \"../../core/projects\";\nimport { probeMedia } from \"../../media/probe\";\nimport { atomicWrite, run, safePath, w",
+      "excerptKind": "file-header",
+      "grade": {
+        "verdict": "review-comment",
+        "confidence": 0.78,
+        "reason": "The CLI likely parses persisted or external JSON into typed domain data; runtime validation would be a worthwhile review request, though the excerpt omits the flagged code."
+      },
+      "inputTokens": 599,
+      "outputTokens": 262,
+      "cached": true
+    },
+    {
+      "rule": "ts-no-vague-names",
+      "session": "09cbf7c7-740f-412c-8972-6c4c15fa6272",
+      "thread": "09cbf7c7-740f-412c-8972-6c4c15fa6272/a78ae595a6dc81b27",
+      "repo": "/Users/ckorhonen/Repos/creative-studio/.claude/worktrees/agent-a78ae595a6dc81b27",
+      "file": "src/cli/commands/production.ts",
+      "ts": "2026-09-29T16:35:00.882Z",
+      "changeKind": "write",
+      "p": 0.59,
+      "outcome": "kept",
+      "excerpt": "import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync } from \"node:fs\";\nimport { tmpdir } from \"node:os\";\nimport { dirname, extname, join } from \"node:path\";\nimport { currentJobs, isTerminal, type JobRow } from \"../../core/jobs\";\nimport { getProject, projectDir } from \"../../core/projects\";\nimport { probeMedia } from \"../../media/probe\";\nimport { atomicWrite, run, safePath, w",
+      "excerptKind": "file-header",
+      "grade": {
+        "verdict": "review-comment",
+        "confidence": 0.55,
+        "reason": "The rule flags names that obscure what a value contains; in a production CLI command, such a name would merit a rename request if present."
+      },
+      "inputTokens": 524,
+      "outputTokens": 456,
+      "cached": true
+    },
+    {
+      "rule": "ts-test-fixed-sleep",
+      "session": "09cbf7c7-740f-412c-8972-6c4c15fa6272",
+      "thread": "09cbf7c7-740f-412c-8972-6c4c15fa6272/a78ae595a6dc81b27",
+      "repo": "/Users/ckorhonen/Repos/creative-studio/.claude/worktrees/agent-a78ae595a6dc81b27",
+      "file": "tests/production.test.ts",
+      "ts": "2026-09-29T16:36:13.656Z",
+      "changeKind": "write",
+      "p": 0.68,
+      "outcome": "fixed",
+      "excerpt": "import { describe, expect, test } from \"bun:test\";\nimport { existsSync, statSync } from \"node:fs\";\nimport { join } from \"node:path\";\nimport {\n  acceptTarget,\n  encodePreview,\n  previewSource,\n  type WatchDeps,\n  type WatchOptions,\n  watchProject,\n} from \"../src/cli/commands/production\";\nimport { recordApproval } from \"../src/core/approvals\";\nimport { hashJson } from \"../src/core/canonical\";\nimport",
+      "excerptKind": "file-header",
+      "grade": {
+        "verdict": "review-comment",
+        "confidence": 0.69,
+        "reason": "The file is a test, and the fix outcome supports that it contained a fixed sleep; replacing such waits with condition-based synchronization is a worthwhile review request."
+      },
+      "inputTokens": 715,
+      "outputTokens": 206,
+      "cached": true
+    },
+    {
+      "rule": "ts-no-vague-names",
+      "session": "09cbf7c7-740f-412c-8972-6c4c15fa6272",
+      "thread": "09cbf7c7-740f-412c-8972-6c4c15fa6272/a78ae595a6dc81b27",
+      "repo": "/Users/ckorhonen/Repos/creative-studio/.claude/worktrees/agent-a78ae595a6dc81b27",
+      "file": "tests/production.test.ts",
+      "ts": "2026-09-29T16:36:13.656Z",
+      "changeKind": "write",
+      "p": 0.55,
+      "outcome": "fixed",
+      "excerpt": "import { describe, expect, test } from \"bun:test\";\nimport { existsSync, statSync } from \"node:fs\";\nimport { join } from \"node:path\";\nimport {\n  acceptTarget,\n  encodePreview,\n  previewSource,\n  type WatchDeps,\n  type WatchOptions,\n  watchProject,\n} from \"../src/cli/commands/production\";\nimport { recordApproval } from \"../src/core/approvals\";\nimport { hashJson } from \"../src/core/canonical\";\nimport",
+      "excerptKind": "file-header",
+      "grade": {
+        "verdict": "review-comment",
+        "confidence": 0.58,
+        "reason": "The lint was later cleared, suggesting a genuinely vague test variable; descriptive names improve test readability, though the excerpt omits the declaration."
+      },
+      "inputTokens": 512,
+      "outputTokens": 204,
+      "cached": true
+    },
+    {
+      "rule": "ts-sequential-await-loop",
+      "session": "09cbf7c7-740f-412c-8972-6c4c15fa6272",
+      "thread": "09cbf7c7-740f-412c-8972-6c4c15fa6272/ad9af39c2d9c67a43",
+      "repo": "/Users/ckorhonen/Repos/creative-studio/.claude/worktrees/agent-ad9af39c2d9c67a43",
+      "file": "src/cli/commands/inspect.ts",
+      "ts": "2026-09-29T16:37:21.454Z",
+      "changeKind": "write",
+      "p": 0.8,
+      "outcome": "fixed",
+      "excerpt": "import { existsSync, mkdirSync, writeFileSync } from \"node:fs\";\nimport { join } from \"node:path\";\nimport { RoutingMode, usdToMicro } from \"../../contracts\";\nimport { activeApproval } from \"../../core/approvals\";\nimport { assetPath, getAsset } from \"../../core/assets\";\nimport { committedMicroUsd } from \"../../core/budget\";\nimport { currentJobs, type JobRow } from \"../../core/jobs\";\nimport { getProj",
+      "excerptKind": "file-header",
+      "grade": {
+        "verdict": "review-comment",
+        "confidence": 0.57,
+        "reason": "The reported pattern is a plausible performance issue in an inspect command, and the agent changed the code to address it; the excerpt does not show whether calls were independent."
+      },
+      "inputTokens": 525,
+      "outputTokens": 186,
+      "cached": true
+    },
+    {
+      "rule": "ts-test-shared-mutable-state",
+      "session": "09cbf7c7-740f-412c-8972-6c4c15fa6272",
+      "thread": "09cbf7c7-740f-412c-8972-6c4c15fa6272/ad9af39c2d9c67a43",
+      "repo": "/Users/ckorhonen/Repos/creative-studio/.claude/worktrees/agent-ad9af39c2d9c67a43",
+      "file": "tests/inspect.test.ts",
+      "ts": "2026-09-29T16:38:26.204Z",
+      "changeKind": "write",
+      "p": 0.92,
+      "outcome": "kept",
+      "excerpt": "import { afterAll, beforeAll, describe, expect, setDefaultTimeout, test } from \"bun:test\";\nimport { existsSync, readFileSync, writeFileSync } from \"node:fs\";\nimport { join } from \"node:path\";\nimport { recordApproval } from \"../src/core/approvals\";\nimport { currentJobs, enqueueRepair, type JobRow } from \"../src/core/jobs\";\nimport { createProject, getProject } from \"../src/core/projects\";\nimport typ",
+      "excerptKind": "file-header",
+      "grade": {
+        "verdict": "noise",
+        "confidence": 0.59,
+        "reason": "The excerpt shows a test file but no shared mutable state or order-dependent tests; imports and setup hooks alone do not establish a violation."
+      },
+      "inputTokens": 628,
+      "outputTokens": 350,
+      "cached": true
+    },
+    {
+      "rule": "ts-unvalidated-external-data",
+      "session": "09cbf7c7-740f-412c-8972-6c4c15fa6272",
+      "thread": "09cbf7c7-740f-412c-8972-6c4c15fa6272/ad9af39c2d9c67a43",
+      "repo": "/Users/ckorhonen/Repos/creative-studio/.claude/worktrees/agent-ad9af39c2d9c67a43",
+      "file": "tests/inspect.test.ts",
+      "ts": "2026-09-29T16:38:26.204Z",
+      "changeKind": "write",
+      "p": 0.74,
+      "outcome": "kept",
+      "excerpt": "import { afterAll, beforeAll, describe, expect, setDefaultTimeout, test } from \"bun:test\";\nimport { existsSync, readFileSync, writeFileSync } from \"node:fs\";\nimport { join } from \"node:path\";\nimport { recordApproval } from \"../src/core/approvals\";\nimport { currentJobs, enqueueRepair, type JobRow } from \"../src/core/jobs\";\nimport { createProject, getProject } from \"../src/core/projects\";\nimport typ",
+      "excerptKind": "file-header",
+      "grade": {
+        "verdict": "review-comment",
+        "confidence": 0.62,
+        "reason": "If the test parses JSON and trusts it as a domain type, a reviewer may ask for validation; test context lowers the urgency but does not remove the issue."
+      },
+      "inputTokens": 592,
+      "outputTokens": 593,
+      "cached": true
+    },
+    {
+      "rule": "ts-no-vague-names",
+      "session": "09cbf7c7-740f-412c-8972-6c4c15fa6272",
+      "thread": "09cbf7c7-740f-412c-8972-6c4c15fa6272/ad9af39c2d9c67a43",
+      "repo": "/Users/ckorhonen/Repos/creative-studio/.claude/worktrees/agent-ad9af39c2d9c67a43",
+      "file": "tests/inspect.test.ts",
+      "ts": "2026-09-29T16:38:26.204Z",
+      "changeKind": "write",
+      "p": 0.63,
+      "outcome": "kept",
+      "excerpt": "import { afterAll, beforeAll, describe, expect, setDefaultTimeout, test } from \"bun:test\";\nimport { existsSync, readFileSync, writeFileSync } from \"node:fs\";\nimport { join } from \"node:path\";\nimport { recordApproval } from \"../src/core/approvals\";\nimport { currentJobs, enqueueRepair, type JobRow } from \"../src/core/jobs\";\nimport { createProject, getProject } from \"../src/core/projects\";\nimport typ",
+      "excerptKind": "file-header",
+      "grade": {
+        "verdict": "noise",
+        "confidence": 0.57,
+        "reason": "The excerpt and filename do not reveal any newly declared vague name; without the flagged code, there is no basis to say a reviewer would request a rename."
+      },
+      "inputTokens": 513,
+      "outputTokens": 327,
+      "cached": true
+    },
+    {
+      "rule": "ts-sequential-await-loop",
+      "session": "09cbf7c7-740f-412c-8972-6c4c15fa6272",
+      "thread": "09cbf7c7-740f-412c-8972-6c4c15fa6272/ad9af39c2d9c67a43",
+      "repo": "/Users/ckorhonen/Repos/creative-studio/.claude/worktrees/agent-ad9af39c2d9c67a43",
+      "file": "tests/inspect.test.ts",
+      "ts": "2026-09-29T16:38:26.204Z",
+      "changeKind": "write",
+      "p": 0.5,
+      "outcome": "fixed",
+      "excerpt": "import { afterAll, beforeAll, describe, expect, setDefaultTimeout, test } from \"bun:test\";\nimport { existsSync, readFileSync, writeFileSync } from \"node:fs\";\nimport { join } from \"node:path\";\nimport { recordApproval } from \"../src/core/approvals\";\nimport { currentJobs, enqueueRepair, type JobRow } from \"../src/core/jobs\";\nimport { createProject, getProject } from \"../src/core/projects\";\nimport typ",
+      "excerptKind": "file-header",
+      "grade": {
+        "verdict": "review-comment",
+        "confidence": 0.53,
+        "reason": "If the test loop awaits independent operations, parallelizing them is a reasonable review request, though test sequencing or shared-state constraints may justify it."
+      },
+      "inputTokens": 525,
+      "outputTokens": 309,
+      "cached": true
+    },
+    {
+      "rule": "ts-unvalidated-external-data",
+      "session": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "thread": "fd32180a-6132-42c1-9d75-19912f4a08a9/adfbdad78da082cfd",
+      "repo": "/Users/ckorhonen/Repos/jev-lint",
+      "file": "local/autoresearch/round3/bench.ts",
+      "ts": "2026-09-30T11:00:08.076Z",
+      "changeKind": "write",
+      "p": 0.92,
+      "outcome": "kept",
+      "excerpt": "// Round 3 latency benchmark, one trial: the 100 fixed checks (workload.json \"latency\"), one after\n// another, each timed exactly as the hook's check: src/lint.ts lintChange per changed file (rule\n// lookup, gating, one POST /v1/systemone per file through src/jev.ts), files sequentially, no\n// concurrency. The bun process keeps its connection between checks, like the hook's daemon.\n//\n//   R3_BASE",
+      "excerptKind": "file-header",
+      "grade": {
+        "verdict": "noise",
+        "confidence": 0.68,
+        "reason": "This is a repository-local benchmark using a fixed workload; the excerpt gives no indication it parses untrusted external data."
+      },
+      "inputTokens": 596,
+      "outputTokens": 482,
+      "cached": true
+    },
+    {
+      "rule": "ts-unvalidated-external-data",
+      "session": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "thread": "fd32180a-6132-42c1-9d75-19912f4a08a9/adfbdad78da082cfd",
+      "repo": "/Users/ckorhonen/Repos/jev-lint",
+      "file": "local/autoresearch/round3/acc.ts",
+      "ts": "2026-09-30T11:02:49.181Z",
+      "changeKind": "write",
+      "p": 0.74,
+      "outcome": "kept",
+      "excerpt": "// Round 3 accuracy gate: score a served configuration on the fixed 400-case TUNE subset\n// (workload.json \"accuracy\"), on full TUNE, or on HOLDOUT, with round 2's scoring (score.ts:\n// the case's own pack, gated, p >= 0.5, in-scope rules only). Also reports precision at p >= 0.8\n// (the \"fix these\" tier). Judgments are cached per name under ../.autoresearch/cache/r3-<name>/.\n//\n//   bun local/aut",
+      "excerptKind": "file-header",
+      "grade": {
+        "verdict": "review-comment",
+        "confidence": 0.68,
+        "reason": "The script processes workload JSON, so parsing it directly into a domain type without shape checks would merit a validation comment, even for benchmark data."
+      },
+      "inputTokens": 611,
+      "outputTokens": 510,
+      "cached": true
+    },
+    {
+      "rule": "ts-no-non-null-assertion",
+      "session": "09cbf7c7-740f-412c-8972-6c4c15fa6272",
+      "thread": "09cbf7c7-740f-412c-8972-6c4c15fa6272/a75522830e07c46fa",
+      "repo": "/Users/ckorhonen/Repos/creative-studio",
+      "file": "tests/voice-clone.test.ts",
+      "ts": "2026-09-30T13:26:08.938Z",
+      "changeKind": "write",
+      "p": 0.96,
+      "outcome": "fixed",
+      "excerpt": "import { afterEach, beforeEach, describe, expect, test } from \"bun:test\";\nimport { copyFileSync, mkdirSync, mkdtempSync, writeFileSync } from \"node:fs\";\nimport { tmpdir } from \"node:os\";\nimport { join } from \"node:path\";\nimport { fileSha256, ingestFile } from \"../src/core/assets\";\nimport { QWEN3_TTS_BACKEND, SPARK_BACKENDS, SparkAdapter } from \"../src/providers/spark\";\nimport type { RunContext } f",
+      "excerptKind": "file-header",
+      "grade": {
+        "verdict": "style",
+        "confidence": 0.76,
+        "reason": "Non-null assertions in tests can reduce type safety, but are often a harmless convenience and unlikely to merit a review comment by themselves."
+      },
+      "inputTokens": 527,
+      "outputTokens": 325,
+      "cached": true
+    },
+    {
+      "rule": "ts-no-magic-numbers",
+      "session": "09cbf7c7-740f-412c-8972-6c4c15fa6272",
+      "thread": "09cbf7c7-740f-412c-8972-6c4c15fa6272",
+      "repo": "/Users/ckorhonen/Repos/creative-studio",
+      "file": "src/providers/spark.ts",
+      "ts": "2026-10-02T10:42:21.955Z",
+      "changeKind": "edit",
+      "p": 0.88,
+      "outcome": "fixed",
+      "excerpt": "    // it bind a random port the studio never polls (music3, 2026-09-30). Wait for the port to close.\n    // A refused connect is not enough: the dying server can still hold the listening socket (music3\n    // again, 2026-10-02), so also require no listener in `ss` on three consecutive checks.\n    let free = 0;\n    for (let i = 0; i < 45; i++) {\n      const occ = await this.occupancy();\n      free",
+      "excerptKind": "edit-start",
+      "grade": {
+        "verdict": "review-comment",
+        "confidence": 0.91,
+        "reason": "The 45-iteration polling limit is an unexplained operational timeout; a named constant would clarify its intent and make it easier to adjust."
+      },
+      "inputTokens": 526,
+      "outputTokens": 52,
+      "cached": true
+    },
+    {
+      "rule": "ts-sequential-await-loop",
+      "session": "09cbf7c7-740f-412c-8972-6c4c15fa6272",
+      "thread": "09cbf7c7-740f-412c-8972-6c4c15fa6272",
+      "repo": "/Users/ckorhonen/Repos/creative-studio",
+      "file": "src/review/look-metrics.ts",
+      "ts": "2026-10-03T15:32:19.883Z",
+      "changeKind": "write",
+      "p": 0.9,
+      "outcome": "kept",
+      "excerpt": "import { analyzeClipColor } from \"../media/grade\";\nimport { runBytes, safePath } from \"../media/proc\";\nimport { Collector } from \"./common\";\n\nexport interface ShotSpan {\n  stage: string;\n  start_s: number;\n  end_s: number;\n}\n\nexport interface ExposureLimits {\n  /** Mean luma ceiling on 0–255 (from the look's look_metrics.mean_luma_max). */\n  mean_luma_max?: number;\n  /** Max share (%) of a shot's ",
+      "excerptKind": "file-header",
+      "grade": {
+        "verdict": "review-comment",
+        "confidence": 0.66,
+        "reason": "Clip analyses are plausibly independent, and sequentially awaiting media-processing work can unnecessarily slow the metrics pass; no sequencing rationale is shown."
+      },
+      "inputTokens": 536,
+      "outputTokens": 279,
+      "cached": true
+    },
+    {
+      "rule": "ts-unvalidated-external-data",
+      "session": "fd32180a-6132-42c1-9d75-19912f4a08a9",
+      "thread": "fd32180a-6132-42c1-9d75-19912f4a08a9/a5342cc9773505e36",
+      "repo": "/Users/ckorhonen/Repos/jev-lint",
+      "file": "src/valueAudit.ts",
+      "ts": "2026-10-03T22:17:56.544Z",
+      "changeKind": "write",
+      "p": 0.94,
+      "outcome": "fixed",
+      "excerpt": "export const AUDIT_MODEL = process.env.AUDIT_MODEL ?? \"gpt-6-luna\";\nexport const AUDIT_EFFORT = process.env.AUDIT_EFFORT ?? \"low\";\nconst CACHE = join(import.meta.dir, \"../eval/results/cache/value-audit\");\n\nexport const VERDICTS = [\"bug\", \"security\", \"review-comment\", \"style\", \"noise\"] as const;\nexport type Verdict = (typeof VERDICTS)[number];\nexport type Grade = { verdict: Verdict; confidence: num",
+      "line": 27,
+      "excerptKind": "flagged-lines",
+      "grade": {
+        "verdict": "noise",
+        "confidence": 0.99,
+        "reason": "The flagged cast is `as const`; this excerpt contains no raw external-data parsing or assignment requiring runtime validation."
+      },
+      "inputTokens": 567,
+      "outputTokens": 93,
+      "cached": true
+    }
+  ]
+}

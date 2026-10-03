@@ -359,7 +359,7 @@ repo dogfoods it: see [`.jev-lint/`](.jev-lint/).
 ### Learn from what it catches
 
 The hook keeps a local findings log: one line per checked file, with the rules that fired,
-a short excerpt, latency and tokens. For each finding it records whether the agent **fixed**
+the lines around each flag, latency and tokens. For each finding it records whether the agent **fixed**
 it on a later edit, **kept** it (disagreed or ignored it), or never touched the file again.
 At the end of each turn, a re-check hook (`src/recheck.ts`, installed on `Stop` and
 `SubagentStop` by `install.ts`) looks again at files that still had findings, so almost every
@@ -369,7 +369,12 @@ finding gets a fixed-or-kept outcome. Subagents are tracked separately.
 bun ~/Repos/jev-lint/src/findings.ts --repo . --days 30              # per rule, plus failed checks and judge cost
 bun ~/Repos/jev-lint/src/findings.ts --repo . --clusters             # rule × area × test/non-test
 bun ~/Repos/jev-lint/src/findings.ts --repo . --compare <rule> --at <date>   # before/after, 95% CI
+bun ~/Repos/jev-lint/src/valueAudit.ts --repo . --days 30            # LLM-graded: were the fixed/kept findings worth it?
 ```
+
+The **value audit** asks `gpt-6-luna` whether a reviewer would have asked for each fixed or
+kept change (bug, security, review comment) or whether it was style or noise; see
+[Is it worth fixing?](docs/feedback-loop.md#is-it-worth-fixing-the-value-audit).
 
 The **`jev-lint-learn`** skill turns this into a few changes that pay for themselves, not a
 new line for every flag:
