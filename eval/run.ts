@@ -102,7 +102,7 @@ function cacheDir(system: SystemName, run: number, pack: BuiltInPack, lang: stri
     system === "llm"
       ? LLM_MODEL
       : system === "jev"
-        ? (process.env.JEV_LINT_MODEL ?? "jev-1.13.0")
+        ? (process.env.JEV_LINT_MODEL ?? "jev-latest")
         : system === "local"
           ? LOCAL_NAME
           : system === "clef" || system === "clef-flash"
@@ -231,7 +231,8 @@ async function main() {
   if (systems.includes("jev") && !process.env.TYPESAFE_BASE_URL && !apiKey()) throw new Error("Jev eval requires a TypeSafe API key");
   const runs = Number(args.runs);
   if (!Number.isInteger(runs) || runs < 1) throw new Error("--runs must be a positive integer");
-  if (existsSync(join(RESULTS, args.out as string)))
+  // summary.json is the rolling default (snapshot it first, per AGENTS.md); a named experiment file is never overwritten.
+  if (args.out !== "summary.json" && existsSync(join(RESULTS, args.out as string)))
     throw new Error("Output already exists; use a new --out name or snapshot the previous result first");
   console.error(`${cases.length} cases; systems=${systems.join(",")} runs=${runs}`);
 
@@ -362,7 +363,7 @@ async function main() {
         generatedAt: new Date().toISOString(),
         gateStats,
         llmModel: LLM_MODEL,
-        models: { jev: process.env.JEV_LINT_MODEL ?? "jev-1.13.0", clef: "@cf/cloudflare/clef", "clef-flash": "@cf/cloudflare/clef-flash" },
+        models: { jev: process.env.JEV_LINT_MODEL ?? "jev-latest", clef: "@cf/cloudflare/clef", "clef-flash": "@cf/cloudflare/clef-flash" },
         thresholds: { HIGH, MEDIUM },
         caseCounts,
         errors,

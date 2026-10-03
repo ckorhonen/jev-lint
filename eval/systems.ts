@@ -67,7 +67,7 @@ export async function judgeJev(c: Case, baseUrl?: string, gate = false, options:
         baseUrl,
         gate,
         provider: "typesafe",
-        model: process.env.JEV_LINT_MODEL ?? "jev-1.13.0",
+        model: process.env.JEV_LINT_MODEL, // unset: the client's default (jev-latest), as before
         ...options,
       }),
     ),

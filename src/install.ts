@@ -249,6 +249,12 @@ if (import.meta.main) {
       ? `Cloudflare token: ${cloudflareKey() ? "present" : "MISSING"} (must be available to the agent at runtime)`
       : `TypeSafe key: ${keyStatus()}`,
   );
+  try {
+    judgeCommandEnv(); // a missing account ID or an unknown model is a setup error, not a crash
+  } catch (error) {
+    console.error(`Cloudflare setup: ${error instanceof Error ? error.message : error}`);
+    process.exit(1);
+  }
   if (!values["codex-only"]) {
     const path = values.project ? join(resolve(values.project), ".claude/settings.json") : join(homedir(), ".claude/settings.json");
     console.log(

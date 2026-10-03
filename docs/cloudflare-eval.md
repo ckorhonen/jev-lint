@@ -31,7 +31,10 @@ The client was checked against Cloudflare's published
 Regression tests cover both models, the REST envelope, malformed/missing answers,
 64-question batching, usage aggregation, retries/deadlines, token files,
 installer/recheck configuration, and provider/account/token daemon isolation.
-These are protocol tests, not model accuracy measurements.
+These are protocol tests, not model accuracy measurements, and they use mocked
+responses: as of 3 October 2026 the adapter has not been run against the live
+Workers AI endpoint (a Workers AI API token is needed; wrangler's OAuth session is
+rejected with 401).
 
 The credential-free regex holdout baseline ran successfully with zero API errors:
 
@@ -40,7 +43,7 @@ The credential-free regex holdout baseline ran successfully with zero API errors
 | swift | 66 | 96.4% | 50.0% | 65.9% | 4.2% |
 | typescript | 66 | 96.2% | 53.2% | 68.5% | 3.4% |
 
-Source: [`regex-cloudflare-integration-2026-10-02.json`](../eval/results/regex-cloudflare-integration-2026-10-02.json).
+Source: [`regex-cloudflare-integration-2026-10-02.json`](../eval/results/snapshots/regex-cloudflare-integration-2026-10-02.json).
 The runner loaded 2,089 holdout cases; regex supports only hygiene, so the table
 covers that subset. It does not compare Clef and Jev.
 

@@ -443,7 +443,10 @@ Two rules were removed because the model is weak at counting and tracing; use a 
 Cloudflare decision models served by Workers AI. Opt in with
 `JEV_LINT_PROVIDER=cloudflare`; TypeSafe Jev remains the default. This is an
 experimental alternative: the Jev accuracy, latency and cost results above do
-**not** establish Clef's performance on these rules. See the
+**not** establish Clef's performance on these rules. The adapter is tested against
+responses that match Cloudflare's published Clef schema, not yet against the live
+API, so treat the first real run as a smoke test (`bun src/install.ts --smoke` in
+Cloudflare mode must flag an empty `catch`). See the
 [comparison plan and current status](docs/cloudflare-eval.md).
 
 1. Find your Cloudflare account ID and create an API token using the Workers AI token template (or **Workers AI → Read** and **Workers AI → Edit**
