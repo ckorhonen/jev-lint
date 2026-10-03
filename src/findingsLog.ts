@@ -36,10 +36,16 @@ export type CheckRecord = {
   gatedOut?: number; // rules skipped by their `when` patterns
 };
 
+// Findings log, daemon sockets and pre-mode denials live here. XDG_STATE_HOME lets tests
+// (and non-standard setups) keep them out of the real state directory.
+export function stateDir(): string {
+  return join(process.env.XDG_STATE_HOME || join(homedir(), ".local/state"), "jev-lint");
+}
+
 export function findingsLogPath(): string | undefined {
   const configured = process.env.JEV_LINT_FINDINGS_LOG;
   if (configured === "off") return undefined;
-  return configured || join(homedir(), ".local/state/jev-lint/findings.jsonl");
+  return configured || join(stateDir(), "findings.jsonl");
 }
 
 // Nearest directory above the file that has .git or .jev-lint; otherwise the event cwd.

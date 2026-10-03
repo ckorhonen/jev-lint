@@ -403,6 +403,11 @@ numbers.
 | [`performance`](docs/packs/performance.md) | 13 | kotlin, python, ruby, rust, swift, typescript | N+1 queries and per-item writes, sync I/O on request paths, unbounded queries, independent calls awaited one by one, unbounded fan-out |
 | `repo` | yours | any | Your team's rules in `.jev-lint/*.rules.json`, written with the `jev-lint-rules` and `jev-lint-write-rule` skills |
 
+Three style rules, `ts-no-magic-numbers`, `ts-no-vague-names` and `ts-unvalidated-external-data`
+(plus `swift-no-magic-numbers`), are skipped in test files (`*.test.*`, `__tests__/`, `test/`,
+`tests/`, `e2e/`), where bare numbers, short names and unchecked fixtures are normal. A week of
+real use showed those flags were mostly kept there, not fixed.
+
 Rules still being evaluated are marked `"status": "candidate"` and are not asked by the hook.
 A rule ships only after it passes on held-out examples written by a separate author
 (precision ≥ 90% on "fix" findings, ≥ 75% overall, recall ≥ 80%) and a dry run on real code.
@@ -433,6 +438,7 @@ Two rules were removed because the model is weak at counting and tracing; use a 
 | `JEV_LINT_FINDINGS_LOG` | `~/.local/state/jev-lint/findings.jsonl` | Findings log used by `jev-lint-learn`; `off` disables it |
 | `TYPESAFE_BASE_URL` | `https://api.typesafe.ai` | Any `/v1/systemone` server, e.g. a local Kev or Laya (no key needed) |
 | `JEV_LINT_RECHECK` | `on` | `off` disables the end-of-turn re-check (`src/recheck.ts`) that gives each finding a fixed/kept outcome |
+| `JEV_LINT_SCOPE` | `repo` | Only files inside the repo around the session's cwd are checked; `all` also checks scratch files elsewhere (such as `/tmp` debug scripts, where printing is usually intended) |
 | `JEV_LINT_DAEMON` | `on` | `off` checks in the hook process every time. When `on`, the first check starts a small background process that keeps the API connection open and reads the key once; later checks go through it (about 100 ms faster each). It is local only (a user-only Unix socket), exits after 30 idle minutes (`JEV_LINT_DAEMON_IDLE_MS`) or when jev-lint's code changes, and the hook falls back to checking in process if it is unavailable. |
 | `JEV_LINT_DEBUG` | unset | Print errors to stderr, including why each failed check failed (e.g. `Cloudflare 401`) |
 

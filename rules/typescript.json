@@ -47,7 +47,19 @@
       "question": "Does `added_code` declare a variable, parameter, or function with a vague or meaningless name such as `data`, `temp`, `tmp`, `foo`, `thing`, `stuff`, `x`, `val2`, or `obj`, outside of short loop indices or conventional names like `i`, `e`, `err`, `id`, `req`, `res`?",
       "true": "A newly declared name gives no clue what it holds.",
       "false": "All newly declared names are descriptive or conventional.",
-      "fix": "Rename to say what the value is."
+      "fix": "Rename to say what the value is.",
+      "excludePaths": [
+        "**/*.test.*",
+        "**/*.spec.*",
+        "**/*_test.*",
+        "**/__tests__/**",
+        "**/test/**",
+        "**/tests/**",
+        "**/Tests/**",
+        "**/*Tests.swift",
+        "**/*Test.swift",
+        "**/e2e/**"
+      ]
     },
     {
       "id": "ts-no-magic-numbers",

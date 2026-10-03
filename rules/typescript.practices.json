@@ -65,7 +65,19 @@
       "true": "External data is cast or assigned straight to a domain type with no runtime validation.",
       "false": "The parsed data is validated (zod/valibot/arktype schema, a type-guard function, manual field checks) or kept as `unknown` and narrowed. Calling a typed API-client function, React Query, or SWR does not count, because this code does not parse raw data itself. If none of res.json, JSON.parse, storage reads, or event.data appear, the answer is no.",
       "fix": "Validate external data with a schema or type guard before trusting its type.",
-      "when": ["\\.json\\(|JSON\\.parse|localStorage|sessionStorage|\\.data\\b|process\\.env"]
+      "when": ["\\.json\\(|JSON\\.parse|localStorage|sessionStorage|\\.data\\b|process\\.env"],
+      "excludePaths": [
+        "**/*.test.*",
+        "**/*.spec.*",
+        "**/*_test.*",
+        "**/__tests__/**",
+        "**/test/**",
+        "**/tests/**",
+        "**/Tests/**",
+        "**/*Tests.swift",
+        "**/*Test.swift",
+        "**/e2e/**"
+      ]
     },
     {
       "id": "ts-sequential-await-loop",

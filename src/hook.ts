@@ -13,20 +13,20 @@
 //        avoid deadlocks on a false alarm, the same rule can deny the same file at most twice
 //        per conversation; after that the edit goes through with the finding as a hint.
 //      JEV_LINT_DAEMON=off  always check in process instead of via the warm daemon (daemon.ts)
+//      JEV_LINT_SCOPE=repo (default: only files inside the repo around cwd) | all (scratch files too)
 
 import { appendFileSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { homedir } from "node:os";
 import { dirname, join } from "node:path";
 import { MAX_FILES, runChecks, type Settled } from "./checks";
 import { checkViaDaemon, daemonEnabled, startDaemon } from "./daemonClient";
 import { extractChanges } from "./extract";
-import { appendRecords, isInsideRepo, toErrorRecords, toRecords } from "./findingsLog";
+import { appendRecords, isInsideRepo, stateDir, toErrorRecords, toRecords } from "./findingsLog";
 import { formatFeedback, type LintResult } from "./lint";
 
 // Pre-write mode: how often one rule may block one file in a conversation before it lets the
 // edit through as a hint (a false alarm must not deadlock the agent).
 const MAX_DENIALS = 2;
-const DENIALS_FILE = join(homedir(), ".local/state/jev-lint/pre-denials.json");
+const DENIALS_FILE = join(stateDir(), "pre-denials.json");
 
 function readDenials(): Record<string, number> {
   try {
@@ -66,9 +66,11 @@ async function main() {
 
   // Skip files outside the working repo (scratchpad and /tmp debug scripts): printing and
   // throwaway code are the point there, and real-world logs showed them as pure noise.
+  // JEV_LINT_SCOPE=all checks them anyway; the findings log still only keeps repo files.
   const cwd = event.cwd ?? process.cwd();
+  const everything = process.env.JEV_LINT_SCOPE === "all";
   const changes = extractChanges(event)
-    .filter((c) => isInsideRepo(c.filePath, cwd))
+    .filter((c) => everything || isInsideRepo(c.filePath, cwd))
     .slice(0, MAX_FILES);
   if (!changes.length) return;
 

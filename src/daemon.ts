@@ -165,6 +165,7 @@ function main() {
     removeIfOurs(socket, inode);
     try {
       if (readFileSync(lock, "utf8").trim() === String(process.pid)) unlinkSync(lock);
+      unlinkSync(`${socket}.started`); // the client's respawn-limit stamp; a clean exit may be followed by a start
     } catch {
       // lock already replaced or removed
     }

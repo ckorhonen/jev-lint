@@ -15,8 +15,11 @@ const mock = Bun.serve({
     return Response.json({ model: "mock", answers, usage: { input_tokens: 10, output_tokens: 0 } });
   },
 });
-// A unique base URL gives this test its own daemon socket.
+// A unique base URL gives this test its own daemon socket, in a temporary state directory.
+// Under /tmp, not tmpdir(): macOS Unix socket paths are limited to 104 bytes, and
+// /var/folders/… plus the socket name is longer than that.
 process.env.TYPESAFE_BASE_URL = `http://127.0.0.1:${mock.port}`;
+process.env.XDG_STATE_HOME = mkdtempSync("/tmp/jev-lint-state-");
 const { checkViaDaemon, daemonSocketPath, startDaemon } = await import("../src/daemonClient");
 
 const repo = mkdtempSync(join(tmpdir(), "jev-lint-daemon-"));
@@ -28,6 +31,7 @@ afterAll(() => {
   if (pid) process.kill(pid, "SIGTERM");
   mock.stop(true);
   rmSync(repo, { recursive: true, force: true });
+  rmSync(process.env.XDG_STATE_HOME as string, { recursive: true, force: true });
 });
 
 describe("daemon", () => {
@@ -47,7 +51,7 @@ describe("daemon", () => {
     const [first] = settled ?? [];
     expect(first.ok).toBe(true);
     if (first.ok) expect(first.value?.findings.some((f) => f.ruleId === "ts-no-empty-catch")).toBe(true);
-    expect(daemonSocketPath()).toContain(".local/state/jev-lint/daemon-");
+    expect(daemonSocketPath()).toContain(join(process.env.XDG_STATE_HOME as string, "jev-lint/daemon-"));
     expect(calls).toBeGreaterThan(0);
   }, 10_000);
 

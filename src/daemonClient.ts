@@ -7,6 +7,7 @@ import { homedir } from "node:os";
 import { dirname, join } from "node:path";
 import { isSettledList, type Settled } from "./checks";
 import type { ChangedFile } from "./extract";
+import { stateDir } from "./findingsLog";
 
 // Settings that change what a check does. Each combination gets its own daemon, because
 // the daemon's rules, model and endpoint are fixed by the environment it started with.
@@ -39,7 +40,7 @@ export function daemonSocketPath(): string {
     .update(`${import.meta.dir}\n${config}`)
     .digest("hex")
     .slice(0, 12);
-  return join(homedir(), ".local/state/jev-lint", `daemon-${id}.sock`);
+  return join(stateDir(), `daemon-${id}.sock`);
 }
 
 export const daemonEnabled = () => process.env.JEV_LINT_DAEMON !== "off";

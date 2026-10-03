@@ -1,0 +1,7 @@
+{
+  "skipPaths": {
+    "ts-no-empty-catch": [
+      "src/**"
+    ]
+  }
+}
