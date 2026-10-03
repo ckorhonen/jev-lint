@@ -84,5 +84,175 @@
     "aiRelevance": "ImpossibleBench documents special-casing test inputs and conditions as a common way agents make failing tests pass; Anthropic's prompting guide warns about it explicitly.",
     "expectedNoise": "low-med",
     "languageFile": "typescript"
+  },
+  "ts-test-asserts-internal-calls": {
+    "evidence": [
+      {
+        "grade": "C",
+        "url": "https://testing.googleblog.com/2015/01/testing-on-toilet-change-detector-tests.html",
+        "checked": "2026-10-03",
+        "note": "Google Testing Blog, Alex Eagle, 2015-01-27. The example test mocks firstPart/secondPart and asserts `verify_in_order was_called part1.process(w); was_called part2.process(w)`: \"This is a change-detector test—it is a transformation of the same information in the code under test—and it breaks in response to any change to the production code, without verifying correct behavior of either the original or modified production code. Change detectors provide negative value, since the tests do not catch any defects, and the added maintenance cost slows down development. These tests should be re-written or deleted.\""
+      },
+      {
+        "grade": "C",
+        "url": "https://abseil.io/resources/swe-book/html/ch12.html",
+        "checked": "2026-10-03",
+        "note": "Software Engineering at Google, ch. 12 'Test State, Not Interactions': \"interaction tests check how a system arrived at its result, whereas usually you should care only what the result is.\" Example 12-4 `verify(database).put(\"foobar\")` \"will pass\" if a bug deletes the record right after writing, and \"will fail\" if the code is refactored to an equivalent API. \"The most common reason for problematic interaction tests is an over reliance on mocking frameworks.\""
+      },
+      {
+        "grade": "B",
+        "url": "https://homes.cs.washington.edu/~rjust/publ/mocking_reflection_testing_icst_2017.pdf",
+        "checked": "2026-10-03",
+        "note": "Arcuri, Fraser, Just, ICST 2017 (EvoSuite): \"we have decided to not use any verify calls in EvoSuite. The reason is to avoid 'brittle' tests, i.e., tests that could fail in successive modifications of the CUT even though no regression bug is introduced, and so become false positives. To find bugs, we rely on assertions on the return values of the CUT methods, and not on their interactions with the input parameters, as these could change without altering the external behavior of the CUT.\""
+      },
+      {
+        "grade": "B",
+        "url": "https://arxiv.org/abs/2503.19284",
+        "checked": "2026-10-03",
+        "note": "Zhu, Terragni, Wei, Cheung, Wu, Liu, 'Understanding and Characterizing Mock Assertions in Unit Tests', FSE 2025: 4,652 tests from 11 Java projects; mock assertions are \"mostly applied to validating specific kinds of method calls, such as those interacting with external resources\" and those tracking code-path execution. Supports the rule's carve-out (call assertions on external boundaries are legitimate); the paper frames mock assertions as complementary, not harmful, so it does not by itself condemn internal-call assertions."
+      }
+    ],
+    "whyNotLinter": "eslint-plugin-jest/vitest can flag `toHaveBeenCalled*` syntactically but cannot tell a spy on the unit's own helper (implementation) from a spy on an HTTP client or mailer (observable boundary), nor whether a result assertion elsewhere in the test already covers the behaviour; both need the test's meaning.",
+    "aiRelevance": "Agents reach for `vi.spyOn`/`jest.spyOn` plus `toHaveBeenCalledWith` because it is the cheapest assertion that goes green without a fixture or oracle; Hora & Robbes 2026 find agent test commits add mocks 36% of the time vs 26% for humans, and change-detector tests fail on every later refactor the agent itself makes.",
+    "expectedNoise": "low-med (tests whose only purpose is a boundary side effect look similar; the false branch carves them out).",
+    "languageFile": "typescript",
+    "notes": "Two B sources, but neither is about JavaScript: Arcuri et al. is a Java test-generation paper and Zhu et al. frames mock assertions as useful for external calls (the carve-out) rather than harmful for internal ones. The direct wording comes from C-grade Google material."
+  },
+  "ts-test-reimplements-logic": {
+    "evidence": [
+      {
+        "grade": "C",
+        "url": "https://testing.googleblog.com/2014/07/testing-on-toilet-dont-put-logic-in.html",
+        "checked": "2026-10-03",
+        "note": "Google Testing Blog, Erik Kuefler, 2014-07-31: \"Tests can avoid complexity by stating their inputs and outputs directly rather than computing them. Otherwise it's easy for tests to develop their own bugs.\" The example `assertEquals(baseUrl + \"/u/0/photos\", nav.getCurrentUrl())` hides a double-slash bug: \"This test will either fail or (even worse) incorrectly pass if the production code has the same bug. We never would have written this if we stated our inputs and outputs directly instead of trying to compute them.\""
+      },
+      {
+        "grade": "C",
+        "url": "https://abseil.io/resources/swe-book/html/ch12.html",
+        "checked": "2026-10-03",
+        "note": "Software Engineering at Google, ch. 12 'Don't Put Logic in Tests': \"if you feel like you need to write a test to verify your test, something has gone wrong!\" Example 12-15 computes the expected URL as `baseUrl + \"/albums\"`; Example 12-16 writes it out and the bug is visible: \"If the production code made a similar mistake, this test would fail to detect a bug. Duplicating the base URL was a small price to pay for making the test more descriptive and meaningful.\""
+      },
+      {
+        "grade": "B",
+        "url": "https://docs.python.org/3/library/unittest.mock-examples.html",
+        "checked": "2026-10-03",
+        "note": "Python stdlib docs, unittest.mock 'Partial mocking' example: the test must not end up \"calculating an expected result using exactly the same algorithm as the code under test, which is a classic testing anti-pattern.\""
+      }
+    ],
+    "whyNotLinter": "Whether `expected` is derived with the same algorithm as the implementation requires comparing the test's computation to the production code's; a linter sees only arithmetic or a map/reduce in a test file, which is also what legitimate fixture setup looks like.",
+    "aiRelevance": "When an agent writes the implementation and its tests in the same turn it tends to paste the formula into the test rather than work out a literal, so both sides share the same bug (the Google double-slash example); hand-computed golden values are exactly the step agents skip.",
+    "expectedNoise": "low-med (loops over literal tables and input builders look similar; the false branch excludes them).",
+    "languageFile": "typescript",
+    "notes": "Falls short of one A or two B: the only B is the Python stdlib docs' 'classic testing anti-pattern' sentence, cited cross-language; Jest/Vitest docs say nothing about it. Google blog and SWE at Google are C. Held back on 2026-10-03: passed the holdout bar (P@0.8 100%, R@0.5 100%) but a dry run on real code flagged a differential test (two implementations of the same computation compared with the same seed) at 0.92, and the evidence is one B source. Re-evaluate after narrowing `false` for differential/reference-implementation tests on a new dev batch."
+  },
+  "ts-test-mocks-own-module": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://pure.tudelft.nl/ws/files/94079936/Spadini2019_Article_MockObjectsForTestingJavaSyste.pdf",
+        "checked": "2026-10-03",
+        "note": "Spadini, Aniche, Bruntink, Bacchelli, 'Mock objects for testing java systems', Empirical Software Engineering 2019 (2,000+ mock usages in 3 OSS + 1 industrial system, interviews, survey of 105 developers): \"Developers report to frequently mock dependencies that make testing difficult (e.g., infrastructure-related dependencies) and to not mock classes that encapsulate domain concepts/rules of the system. Among the key challenges, developers report that maintaining the behavior of the mock compatible with the behavior of original class is hard and that mocking increases the coupling between the test and the production code.\" RQ3 'Unstable dependencies': \"As the production class tends to change often, the mock object becomes unstable and, as a consequence, more prone to change.\""
+      },
+      {
+        "grade": "B",
+        "url": "https://mauricioaniche.com/publications/to-mock-or-not-to-mock/",
+        "checked": "2026-10-03",
+        "note": "Spadini, Aniche, Bruntink, Bacchelli, 'To Mock or Not To Mock? An Empirical Study on Mocking Practices', MSR 2017 (DOI 10.1109/MSR.2017.61): classes related to external resources such as databases and web services are often mocked; developers \"prefer to not mock classes that encapsulate domain concepts/rules of the system\"; challenges: \"maintaining the behavior of the mock compatible with the behavior of the original class is hard\" and mocking \"increases the coupling between the test and the production code\"."
+      },
+      {
+        "grade": "C",
+        "url": "https://testing.googleblog.com/2013/05/testing-on-toilet-dont-overuse-mocks.html",
+        "checked": "2026-10-03",
+        "note": "Google Testing Blog, Andrew Trenk, 2013-05-28: \"When you tell a mock how to behave, the only assurance you get with your tests is that your code will work if your mocks behave exactly like your real implementations. This can be very hard to guarantee, and the problem gets worse as your code changes over time, as the behavior of the real implementations is likely to get out of sync with your mocks.\" Signs of overuse: \"mocking out more than one or two classes\". Prefer a real dependency, a hermetic server or a fake when the real thing is \"too slow or talks over the network\"."
+      },
+      {
+        "grade": "C",
+        "url": "https://abseil.io/resources/swe-book/html/ch13.html",
+        "checked": "2026-10-03",
+        "note": "Software Engineering at Google, ch. 13 'Prefer Realism Over Isolation': \"Replacing all dependencies of a class with test doubles arbitrarily isolates the system under test to the implementation that the author happens to put directly into the class and excludes implementation that happens to be in different classes. However, a good test should be independent of implementation.\" and \"If unit tests rely too much on test doubles, an engineer might need to run integration tests or manually verify that their feature is working.\""
+      },
+      {
+        "grade": "C",
+        "url": "https://arxiv.org/abs/2602.00409",
+        "checked": "2026-10-03",
+        "note": "Hora & Robbes, 'Are Coding Agents Generating Over-Mocked Tests? An Empirical Study', arXiv preprint 2026-01-30 (1,254,878 commits, 2,168 TS/JS/Python repos, 48,563 agent commits from Claude Code, Copilot Agent, Cursor and others): 36% of agent test commits add mocks vs 26% for humans; agents use mocks (95%) far more than fakes (32%) or spies (33%); authors recommend \"guidance on mocking best practices and anti-patterns in agent configuration files\" such as CLAUDE.md. Preprint, so C."
+      }
+    ],
+    "whyNotLinter": "`vi.mock('../x')` is trivially greppable, but whether `../x` is a database/HTTP/clock adapter (fine) or a pricing service/validator (not fine) is a judgement about what the module does, and the two look identical at the import site.",
+    "aiRelevance": "Hora & Robbes 2026: coding agents add mocks in 36% of test commits vs 26% for humans and overwhelmingly use mocks rather than fakes; mocking every collaborator lets a test pass without any fixture, which is the path of least resistance for an agent that cannot run the real dependency.",
+    "expectedNoise": "med (isolated unit tests of error handling that stub a collaborator to throw are legitimate and look the same).",
+    "languageFile": "typescript"
+  },
+  "ts-test-snapshot-lock-in": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://jestjs.io/docs/snapshot-testing",
+        "checked": "2026-10-03",
+        "note": "Jest docs, 'Best Practices': \"Treat snapshots as code. Commit snapshots and review them as part of your regular code review process.\" \"Ensure that your snapshots are readable by keeping them focused, short, and by using tools that enforce these stylistic conventions\" (recommends eslint-plugin-jest `no-large-snapshots`). \"The aim of snapshot testing is not to replace existing unit tests, but to provide additional value.\" For generated fields, use property matchers with `toMatchSnapshot({ createdAt: expect.any(Date) })`."
+      },
+      {
+        "grade": "B",
+        "url": "https://homepages.dcc.ufmg.br/~mtov/pub/2023-jss-snapshot.pdf",
+        "checked": "2026-10-03",
+        "note": "Cruz, Rocha, Valente, 'Snapshot testing in practice: Benefits and drawbacks', Journal of Systems and Software 204 (2023) 111797; grey-literature review of 50 documents: \"The most common drawback is the fragility of snapshot tests, leading to the necessity of constant updates of the 'golden standard' snapshot\" (28% of documents); \"every time a new increment is added to the code, the test will probably fail, resulting in a false positive\"; developers \"blindly\" update: \"when tests fail, it is very easy to update the snapshots without fixing the code and understanding the failure reason\" (D34); large snapshots in 16%; recommends \"small and focused snapshot tests\"."
+      },
+      {
+        "grade": "B",
+        "url": "https://vitest.dev/guide/snapshot",
+        "checked": "2026-10-03",
+        "note": "Vitest docs: \"Snapshot tests are a very useful tool whenever you want to make sure the output of your functions does not change unexpectedly.\" \"The snapshot artifact should be committed alongside code changes, and reviewed as part of your code review process.\" Documents toMatchSnapshot, toMatchInlineSnapshot and toMatchFileSnapshot; no guidance on size or on pairing with targeted assertions (weak support)."
+      },
+      {
+        "grade": "C",
+        "url": "https://kentcdodds.com/blog/effective-snapshot-testing",
+        "checked": "2026-10-03",
+        "note": "Kent C. Dodds (Testing Library maintainer), 2017-10-30: snapshots \"lock in the test's behavior without editorialization of what's important and why\"; \"When your snapshot is more than a few dozen lines it's going to suffer major maintenance issues\"; developers tend to nuke and re-record rather than read the diff; recommends converting to explicit assertions and reserving snapshots for small stable outputs (error messages, babel transforms, CSS-in-JS)."
+      },
+      {
+        "grade": "C",
+        "url": "https://github.com/jest-community/eslint-plugin-jest/blob/main/docs/rules/no-large-snapshots.md",
+        "checked": "2026-10-03",
+        "note": "eslint-plugin-jest `no-large-snapshots` (maintainer docs): \"A stored snapshot is only as good as its review and as such keeping it short, sweet, and readable is important to allow for thorough reviews.\" Flags snapshots over 50 lines by default; it measures size only, not whether the snapshot is the test's sole assertion."
+      }
+    ],
+    "whyNotLinter": "`no-large-snapshots` counts lines; it cannot tell that a snapshot is the test's only assertion on a rendered tree, nor distinguish a snapshot of a short error message (fine) from one of a whole component (lock-in).",
+    "aiRelevance": "`toMatchSnapshot()` is the one assertion an agent can write without knowing the expected output, so it appears whenever the agent is unsure what a component renders; the runner then writes the oracle from the current implementation and the agent re-records on every failure, which Cruz et al. document as the main drawback in practice.",
+    "expectedNoise": "low (visual-regression tests and snapshots beside targeted assertions are excluded).",
+    "languageFile": "typescript",
+    "notes": "Vitest docs are a weak B (only 'review snapshots'); Jest docs and Cruz et al. carry the grade."
+  },
+  "ts-test-untyped-fake-response": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://mswjs.io/docs/best-practices/typescript",
+        "checked": "2026-10-03",
+        "note": "msw docs, 'Using with TypeScript': all `http` handlers take generic arguments for params, request body and response body; \"The JSON response body type must satisfy the 'AddCommentResponseBody' type\" and \"The response body type must satisfy the provided type\", so a typed handler fails to compile when the fake response and the declared response type diverge. Supports the rule's fix (typed fake responses), not the harm statement."
+      },
+      {
+        "grade": "B",
+        "url": "https://pure.tudelft.nl/ws/files/94079936/Spadini2019_Article_MockObjectsForTestingJavaSyste.pdf",
+        "checked": "2026-10-03",
+        "note": "Spadini, Aniche, Bruntink, Bacchelli, 'Mock objects for testing java systems', Empirical Software Engineering 2019 (2,000+ mock usages in 3 OSS + 1 industrial system, interviews, survey of 105 developers): \"Developers report to frequently mock dependencies that make testing difficult (e.g., infrastructure-related dependencies) and to not mock classes that encapsulate domain concepts/rules of the system. Among the key challenges, developers report that maintaining the behavior of the mock compatible with the behavior of original class is hard and that mocking increases the coupling between the test and the production code.\" RQ3 'Unstable dependencies': \"As the production class tends to change often, the mock object becomes unstable and, as a consequence, more prone to change.\""
+      },
+      {
+        "grade": "C",
+        "url": "https://testing.googleblog.com/2018/11/testing-on-toilet-exercise-service-call.html",
+        "checked": "2026-10-03",
+        "note": "Google Testing Blog, Ben Yu, 2018-11-27: a test that stubs `mockCloudService.write(...)` to return a hand-built `WriteResponse` — \"Lots of things can go wrong, especially when service contracts get complex. For example, plain/text may not be a valid file type, and you can't verify that the URI of the uploaded file is correct. If the code under test relies on the contract of a service, prefer exercising the service call instead of mocking it out.\" Use a fake \"usually maintained by the service owners; don't create your own fake unless you can ensure its behavior will stay in sync with the real implementation\"."
+      },
+      {
+        "grade": "C",
+        "url": "https://abseil.io/resources/swe-book/html/ch13.html",
+        "checked": "2026-10-03",
+        "note": "Software Engineering at Google, ch. 13 'The Dangers of Overusing Stubbing': \"With stubbing, there is no way to ensure the function being stubbed behaves like the real implementation\" (example `when(stubCalculator.add(1, 2)).thenReturn(3)`); \"Stubbing is a poor choice if the system under test depends on the real implementation's contract because you will be forced to duplicate the details of the contract, and there is no way to guarantee that the contract is correct (i.e., that the stubbed function has fidelity to the real implementation).\""
+      }
+    ],
+    "whyNotLinter": "An object literal passed to `mockResolvedValue` is ordinary code; whether it stands in for an external API response (where drift matters) or an internal value, and whether a type annotation or factory would catch drift, is semantic. TypeScript only checks the literal against the mock's declared type, which is usually `any`.",
+    "aiRelevance": "Agents guess the shape of third-party responses from memory and write it inline; the stubbed shape then defines the test's reality, so the common agent failure at API/schema boundaries never surfaces in CI. Hora & Robbes 2026 note agents prefer plain mocks over fakes.",
+    "expectedNoise": "med (one-field literals and error stubs are excluded, but short inline happy-path bodies in boundary tests are common and sometimes acceptable).",
+    "languageFile": "typescript",
+    "notes": "Two Bs but both indirect: msw docs support the fix (typed handlers) rather than the harm, and Spadini et al. describe mock/real drift for class mocks in Java. Pact (https://docs.pact.io/getting_started/how_pact_works) and Fowler's IntegrationContractTest (https://martinfowler.com/bliki/IntegrationContractTest.html) state the drift problem directly but are C. Shipped 2026-10-03 at the high tier only (thresholds.medium = null): on 47 real TypeScript and 32 Python test files it fired at >= 0.8 on 6, all inline fakes of real external APIs by the rule's definition, but the habit is common, so the double-check tier was turned off to keep noise down."
   }
 }

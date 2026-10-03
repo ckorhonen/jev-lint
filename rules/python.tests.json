@@ -81,6 +81,42 @@
       "false": "The test orders or ignores order before asserting (sorting before asserting, comparing as sets/`Counter`, `assertCountEqual`, or asserting order that the code guarantees (`order_by`, `sorted`)), or the source is ordered (lists built in order, sorted results, `asyncio.gather` results, which follow argument order, dicts, which keep insertion order). Non-test code does not count.",
       "fix": "Sort before asserting or compare without order (as a set or with an order-insensitive matcher).",
       "when": ["def test_|class \\w+\\(.*TestCase\\)"]
+    },
+    {
+      "id": "py-test-asserts-internal-calls",
+      "question": "Does `added_code` add a pytest `def test_...` or `unittest` `test_...` method whose assertions are only about how the unit did its work rather than what it produced: `assert_called`, `assert_called_once`, `assert_called_with`, `assert_called_once_with`, `assert_has_calls`, `call_count`, `call_args` or `mock_calls` checks on a patch, spy or `Mock` of a function, method or module that belongs to the same package (`patch('myapp.module.helper')`, `patch.object(Service, '_private')`, `mocker.spy(module, 'func')`, `patch(..., wraps=real)`; a spy that keeps the real implementation still counts), with no assertion on the unit's return value, raised exception, output or persisted state?",
+      "true": "At least one added test asserts only which internal functions or methods were called, how often, in what order or with what arguments, so it pins the implementation and would fail on a correct refactor.",
+      "false": "The test asserts a result (return value, raised exception, output, stored record) and may also check calls; or the call assertion is on an external boundary (an HTTP client, database session, queue, mailer, logger, SDK or third-party library) with arguments the unit computed, which is observable behaviour; or the test's only purpose is that boundary call. Mocking the unit under test itself, or asserting that a function the test called directly was called, belongs to py-test-cannot-fail and does not count here. Non-test code does not count.",
+      "fix": "Assert on what the unit returns, raises, writes or persists; only check calls to external boundaries, and delete assertions about internal call mechanics.",
+      "when": ["\\bdef test_", "class Test\\w*\\(", "@pytest\\."]
+    },
+    {
+      "id": "py-test-reimplements-logic",
+      "question": "Does `added_code` add a pytest `def test_...` or `unittest` `test_...` method that computes its expected value by redoing the same calculation or transformation as the code under test (the same formula, comprehension, sum/sorted/join, string formatting or date arithmetic applied to the same input, often in a local `expected` variable or a loop over cases), then asserts the function's output equals it?",
+      "true": "The expected value in at least one added test is derived from the input with the same logic the implementation uses, so the test duplicates the implementation and passes even when both are wrong.",
+      "false": "Expected values are literals, hand-written fixtures, golden files, values from an independent source (a different algorithm, an inverse operation, a known reference), or property checks (sorted, length, round-trip). Setup code that builds the input, `pytest.mark.parametrize` tables of literal input/expected pairs, and helper calls that are not the logic under test do not count. Non-test code does not count.",
+      "fix": "Assert against a literal or golden value worked out independently of the implementation, not against a re-computation of it.",
+      "when": ["\\bdef test_", "class Test\\w*\\(", "@pytest\\."],
+      "status": "candidate"
+    },
+    {
+      "id": "py-test-mocks-own-module",
+      "question": "Does `added_code` add a pytest `def test_...` or `unittest` `test_...` method (or a fixture used by one, including `autouse` fixtures) that replaces another module, function or class of the same package with a mock that does not run the real code — a bare `@patch('myapp.services.pricing.compute_total')` or `patch.object(module, 'helper')` (which substitutes a `MagicMock`), `monkeypatch.setattr(myapp.module, 'func', fake)`, or `mocker.patch('myapp....')` with or without `return_value`/`side_effect` — where the replaced thing is ordinary application logic (services, utilities, validators, scoring, domain code) rather than an adapter to the outside world? This counts even when the same test also, correctly, mocks an external boundary.",
+      "true": "A test stubs out internal application logic (with or without a return value), so the test never crosses the real boundary between the unit and its collaborators and cannot catch a drift between them.",
+      "false": "The patched target is a boundary to something external — a database session or ORM, HTTP client or `requests`/`httpx`, file system, clock (`datetime.now`, `time.time`), randomness, environment/config, queue, cache, mailer, payment/SDK wrapper, logger, subprocess — whether it lives in the package (`myapp.db`, `myapp.clients.http`, `myapp.clock`) or in a third-party library; or the patch wraps the real implementation (`wraps=`); or the test is explicitly an isolated unit test of error handling that patches a collaborator to raise. Patching the very unit under test belongs to py-test-cannot-fail. Non-test code does not count.",
+      "fix": "Call the real internal code and patch only at external boundaries (database, network, file system, clock), so the test covers the seam between units.",
+      "when": ["\\bdef test_", "class Test\\w*\\(", "@pytest\\."]
+    },
+    {
+      "id": "py-test-untyped-fake-response",
+      "question": "Does `added_code` add a pytest `def test_...` or `unittest` `test_...` method that stubs the response of an external system — an HTTP call (`requests`, `httpx`, `responses`, `respx`, `aiohttp`), API client, database query or SDK — with a hand-written inline `dict`/`list` literal (`return_value={...}`, `json={...}`, `side_effect=[{...}]`) that is neither built by a typed factory or model (a `TypedDict`, `dataclass`, pydantic model, `Model(...)` constructor) nor loaded from a recorded or shared fixture (`conftest` fixture, JSON file, cassette)?",
+      "true": "A test invents the shape of an external response inline, so the test keeps passing when the real API or schema drifts.",
+      "false": "The fake response comes from a shared fixture, a recorded cassette or JSON file, a typed model or factory, or a builder; or the stub is an exception, an empty result, a primitive, or a one-key literal the test immediately asserts on; or the stubbed thing is internal, not an external system. Non-test code does not count.",
+      "fix": "Build fake external responses from a typed model, factory or recorded fixture so schema drift breaks the test.",
+      "when": ["\\bdef test_", "class Test\\w*\\(", "@pytest\\."],
+      "thresholds": {
+        "medium": null
+      }
     }
   ]
 }

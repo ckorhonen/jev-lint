@@ -753,6 +753,133 @@ async def test_quotes_in_request_order():
 
 Holdout: precision 83%, recall 100% (5 violations in the holdout set).
 
+### `py-test-asserts-internal-calls`
+
+Does the new code add a pytest `def test_...` or `unittest` `test_...` method whose assertions are only about how the unit did its work rather than what it produced: `assert_called`, `assert_called_once`, `assert_called_with`, `assert_called_once_with`, `assert_has_calls`, `call_count`, `call_args` or `mock_calls` checks on a patch, spy or `Mock` of a function, method or module that belongs to the same package (`patch('myapp.module.helper')`, `patch.object(Service, '_private')`, `mocker.spy(module, 'func')`, `patch(..., wraps=real)`; a spy that keeps the real implementation still counts), with no assertion on the unit's return value, raised exception, output or persisted state?
+
+**Catches:** At least one added test asserts only which internal functions or methods were called, how often, in what order or with what arguments, so it pins the implementation and would fail on a correct refactor.
+
+**Why it matters:** `patch` + `assert_called_with` is the cheapest green assertion when the agent has no oracle; Hora & Robbes 2026 find agent test commits add mocks 36% of the time vs 26% for humans, and these tests fail on the agent's own later refactors.
+
+**Fix:** Assert on what the unit returns, raises, writes or persists; only check calls to external boundaries, and delete assertions about internal call mechanics.
+
+**Bad** (`test_cart.py`):
+
+```python
+def test_tax_is_applied_per_line(mocker):
+    apply_tax = mocker.spy(Cart, "_apply_tax")
+    cart = Cart(region="DE")
+    cart.add("MUG", qty=2, unit=Decimal("10.00"))
+    cart.add("TEE", qty=1, unit=Decimal("25.00"))
+    cart.total()
+    assert apply_tax.mock_calls == [
+        mocker.call(cart, Decimal("20.00")),
+        mocker.call(cart, Decimal("25.00")),
+    ]
+```
+
+**Not flagged:** The test asserts a result (return value, raised exception, output, stored record) and may also check calls; or the call assertion is on an external boundary (an HTTP client, database session, queue, mailer, logger, SDK or third-party library) with arguments the unit computed, which is observable behaviour; or the test's only purpose is that boundary call. Mocking the unit under test itself, or asserting that a function the test called directly was called, belongs to py-test-cannot-fail and does not count here. Non-test code does not count.
+
+Holdout: precision 100%, recall 100% (7 violations in the holdout set). Sources: [homes.cs.washington.edu](https://homes.cs.washington.edu/~rjust/publ/mocking_reflection_testing_icst_2017.pdf), [arxiv.org](https://arxiv.org/abs/2503.19284)
+
+### `py-test-reimplements-logic` _(candidate)_
+
+Does the new code add a pytest `def test_...` or `unittest` `test_...` method that computes its expected value by redoing the same calculation or transformation as the code under test (the same formula, comprehension, sum/sorted/join, string formatting or date arithmetic applied to the same input, often in a local `expected` variable or a loop over cases), then asserts the function's output equals it?
+
+**Catches:** The expected value in at least one added test is derived from the input with the same logic the implementation uses, so the test duplicates the implementation and passes even when both are wrong.
+
+**Why it matters:** An agent that writes the function and its test in one turn reuses the same expression on both sides, so a wrong formula passes; working out a literal by hand is the step agents skip.
+
+**Fix:** Assert against a literal or golden value worked out independently of the implementation, not against a re-computation of it.
+
+**Bad** (`test_cart_total.py`):
+
+```python
+from decimal import Decimal
+
+from cart.total import cart_total
+
+SAMPLES = [
+    [("A", 2, Decimal("12.00"))],
+    [("A", 1, Decimal("12.00")), ("B", 4, Decimal("3.50"))],
+    [],
+]
+
+
+def test_cart_total_sums_price_times_quantity():
+    for lines in SAMPLES:
+        expected = sum(qty * unit for _, qty, unit in lines)
+        assert cart_total(lines) == expected
+```
+
+**Not flagged:** Expected values are literals, hand-written fixtures, golden files, values from an independent source (a different algorithm, an inverse operation, a known reference), or property checks (sorted, length, round-trip). Setup code that builds the input, `pytest.mark.parametrize` tables of literal input/expected pairs, and helper calls that are not the logic under test do not count. Non-test code does not count.
+
+Holdout: precision 100%, recall 100% (7 violations in the holdout set). Sources: [docs.python.org](https://docs.python.org/3/library/unittest.mock-examples.html)
+
+### `py-test-mocks-own-module`
+
+Does the new code add a pytest `def test_...` or `unittest` `test_...` method (or a fixture used by one, including `autouse` fixtures) that replaces another module, function or class of the same package with a mock that does not run the real code — a bare `@patch('myapp.services.pricing.compute_total')` or `patch.object(module, 'helper')` (which substitutes a `MagicMock`), `monkeypatch.setattr(myapp.module, 'func', fake)`, or `mocker.patch('myapp....')` with or without `return_value`/`side_effect` — where the replaced thing is ordinary application logic (services, utilities, validators, scoring, domain code) rather than an adapter to the outside world? This counts even when the same test also, correctly, mocks an external boundary.
+
+**Catches:** A test stubs out internal application logic (with or without a return value), so the test never crosses the real boundary between the unit and its collaborators and cannot catch a drift between them.
+
+**Why it matters:** Hora & Robbes 2026: coding agents add mocks in 36% of test commits vs 26% for humans and prefer mocks to fakes; patching every collaborator lets a test pass without a fixture or a real dependency, which is the path of least resistance for an agent.
+
+**Fix:** Call the real internal code and patch only at external boundaries (database, network, file system, clock), so the test covers the seam between units.
+
+**Bad** (`test_create_post.py`):
+
+```python
+from unittest.mock import patch
+@patch("posts.create.slugify", return_value="fixed-slug")
+def test_uses_slug_as_key(slugify):
+    post = create_post(title="Anything Goes", body="...")
+    assert post.key == "fixed-slug"
+    assert post.title == "Anything Goes"
+```
+
+**Not flagged:** The patched target is a boundary to something external — a database session or ORM, HTTP client or `requests`/`httpx`, file system, clock (`datetime.now`, `time.time`), randomness, environment/config, queue, cache, mailer, payment/SDK wrapper, logger, subprocess — whether it lives in the package (`myapp.db`, `myapp.clients.http`, `myapp.clock`) or in a third-party library; or the patch wraps the real implementation (`wraps=`); or the test is explicitly an isolated unit test of error handling that patches a collaborator to raise. Patching the very unit under test belongs to py-test-cannot-fail. Non-test code does not count.
+
+Holdout: precision 88%, recall 100% (7 violations in the holdout set). Sources: [pure.tudelft.nl](https://pure.tudelft.nl/ws/files/94079936/Spadini2019_Article_MockObjectsForTestingJavaSyste.pdf), [docs.python.org](https://docs.python.org/3/library/unittest.mock-examples.html)
+
+### `py-test-untyped-fake-response`
+
+Does the new code add a pytest `def test_...` or `unittest` `test_...` method that stubs the response of an external system — an HTTP call (`requests`, `httpx`, `responses`, `respx`, `aiohttp`), API client, database query or SDK — with a hand-written inline `dict`/`list` literal (`return_value={...}`, `json={...}`, `side_effect=[{...}]`) that is neither built by a typed factory or model (a `TypedDict`, `dataclass`, pydantic model, `Model(...)` constructor) nor loaded from a recorded or shared fixture (`conftest` fixture, JSON file, cassette)?
+
+**Catches:** A test invents the shape of an external response inline, so the test keeps passing when the real API or schema drifts.
+
+**Why it matters:** Agents guess third-party payload shapes from memory and write them inline, so the stub defines the test's reality and the schema-drift failures agents make at API boundaries never reach CI. Hora & Robbes 2026 note agents prefer plain mocks over fakes.
+
+**Fix:** Build fake external responses from a typed model, factory or recorded fixture so schema drift breaks the test.
+
+**Bad** (`test_fetch_account.py`):
+
+```python
+from accounts.fetch import fetch_account
+
+
+def test_maps_account_payload(mocker):
+    mocker.patch(
+        "accounts.fetch.http.get_json",
+        return_value={
+            "data": {
+                "id": "acc_1",
+                "display_name": "Ada Lovelace",
+                "plan": {"tier": "pro", "seats": 5, "renews_at": "2027-01-01"},
+                "flags": ["beta"],
+            }
+        },
+    )
+
+    account = fetch_account("acc_1")
+
+    assert account.name == "Ada Lovelace"
+    assert account.seats == 5
+```
+
+**Not flagged:** The fake response comes from a shared fixture, a recorded cassette or JSON file, a typed model or factory, or a builder; or the stub is an exception, an empty result, a primitive, or a one-key literal the test immediately asserts on; or the stubbed thing is internal, not an external system. Non-test code does not count.
+
+Holdout: precision 88%, recall 100% (7 violations in the holdout set). Sources: [docs.python.org](https://docs.python.org/3/library/unittest.mock.html), [vcrpy.readthedocs.io](https://vcrpy.readthedocs.io/en/latest/)
+
 ## Ruby
 
 ### `rb-test-cannot-fail`
@@ -1504,3 +1631,164 @@ describe("collectTags", () => {
 **Not flagged:** The test orders or ignores order before asserting (sorting before asserting, `expect.arrayContaining`/`toContainEqual`/`toHaveLength` checks, comparing as sets, or asserting order that the code guarantees (an explicit sort or `orderBy`)), or the source is ordered (arrays/lists built in order, sorted results, `Promise.all`/`Promise.allSettled` results, which keep input order, insertion-ordered maps). Exact expectations on randomly shuffled output belong to ts-test-uncontrolled-randomness. Non-test code does not count.
 
 Holdout: precision 75%, recall 75% (4 violations in the holdout set).
+
+### `ts-test-asserts-internal-calls`
+
+Does the new code add a test (`it`/`test` in vitest, jest, bun:test or node:test) whose assertions are only about how the unit did its work rather than what it produced: `toHaveBeenCalled`, `toHaveBeenCalledTimes`, `toHaveBeenCalledWith`, `toHaveBeenNthCalledWith`, `mock.calls` or call-order checks on a spy of a function, method or module that belongs to the same codebase (a relative import, the unit's own methods via `vi.spyOn`/`jest.spyOn`, a private helper), with no assertion on the unit's return value, thrown error, rendered output, emitted event or persisted state?
+
+**Catches:** At least one added test asserts only which internal functions or methods were called, how many times, in what order or with what arguments, so it pins the implementation and would fail on a correct refactor.
+
+**Why it matters:** Agents reach for `vi.spyOn`/`jest.spyOn` plus `toHaveBeenCalledWith` because it is the cheapest assertion that goes green without a fixture or oracle; Hora & Robbes 2026 find agent test commits add mocks 36% of the time vs 26% for humans, and change-detector tests fail on every later refactor the agent itself makes.
+
+**Fix:** Assert on what the unit returns, throws, renders or persists; only check calls to external boundaries, and delete assertions about internal call mechanics.
+
+**Bad** (`SignupForm.test.ts`):
+
+```ts
+it("runs validation before submitting", () => {
+    const validate = vi.spyOn(SignupForm.prototype as any, "validate");
+    const form = new SignupForm({ email: "a@b.co", password: "correct horse battery" });
+    form.submit();
+    expect(validate).toHaveBeenCalledOnce();
+    expect(validate).toHaveBeenCalledWith({ email: "a@b.co", password: "correct horse battery" });
+  });
+```
+
+**Not flagged:** The test asserts a result (returned value, thrown error, rendered DOM, emitted event, stored record) and may also check calls; or the call assertion is on an external boundary (an HTTP client, database, queue, mailer, logger, SDK or third-party package) with arguments the unit computed, which is observable behaviour; or the test's only purpose is that boundary call (e.g. 'sends the welcome email'). Mocking the unit under test itself, or asserting that a function the test called directly was called, belongs to ts-test-cannot-fail and does not count here. Non-test code does not count.
+
+Holdout: precision 100%, recall 100% (7 violations in the holdout set). Sources: [homes.cs.washington.edu](https://homes.cs.washington.edu/~rjust/publ/mocking_reflection_testing_icst_2017.pdf), [arxiv.org](https://arxiv.org/abs/2503.19284)
+
+### `ts-test-reimplements-logic` _(candidate)_
+
+Does the new code add a test (`it`/`test` in vitest, jest, bun:test or node:test) that computes its expected value by redoing the same calculation or transformation as the code under test (the same formula, reduce, map/filter chain, string formatting or date arithmetic applied to the same input, often in a local `expected` variable or a loop over cases), then asserts the function's output equals it?
+
+**Catches:** The expected value in at least one added test is derived from the input with the same logic the implementation uses, so the test duplicates the implementation and passes even when both are wrong.
+
+**Why it matters:** When an agent writes the implementation and its tests in the same turn it tends to paste the formula into the test rather than work out a literal, so both sides share the same bug (the Google double-slash example); hand-computed golden values are exactly the step agents skip.
+
+**Fix:** Assert against a literal or golden value worked out independently of the implementation, not against a re-computation of it.
+
+**Bad** (`slugify.test.ts`):
+
+```ts
+import { slugify } from "../slugify";
+
+describe("slugify", () => {
+  const inputs = ["Hello World", "  Déjà Vu  ", "Rock & Roll!!", "already-a-slug"];
+
+  test.each(inputs)("slugifies %s", (input) => {
+    const expected = input
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "");
+    expect(slugify(input)).toBe(expected);
+  });
+});
+```
+
+**Not flagged:** Expected values are literals, hand-written fixtures, golden files, values from an independent source (a different algorithm, an inverse operation, a known reference), or property checks (sorted, length, round-trip). Setup code that builds the input, simple loops over literal input/expected pairs, and helper calls that are not the logic under test do not count. Non-test code does not count.
+
+Holdout: precision 100%, recall 100% (6 violations in the holdout set). Sources: [docs.python.org](https://docs.python.org/3/library/unittest.mock-examples.html)
+
+### `ts-test-mocks-own-module`
+
+Does the new code add a test (`it`/`test` in vitest, jest, bun:test or node:test) that replaces another module of the same codebase with a mock or stub — `vi.mock('../x')`, `jest.mock('./x')`, `mock.module('../x')`, `vi.doMock`, or `vi.spyOn`/`jest.spyOn` with `mockImplementation`/`mockReturnValue` on a function imported by relative path — where that module is ordinary application logic (services, utilities, validators, reducers, components, domain code) rather than an adapter to the outside world?
+
+**Catches:** A test stubs out internal application logic, so the test never crosses the real boundary between the unit and its collaborators and cannot catch a drift between them.
+
+**Why it matters:** Hora & Robbes 2026: coding agents add mocks in 36% of test commits vs 26% for humans and overwhelmingly use mocks rather than fakes; mocking every collaborator lets a test pass without any fixture, which is the path of least resistance for an agent that cannot run the real dependency.
+
+**Fix:** Call the real internal module and mock only at external boundaries (database, network, file system, clock), so the test covers the seam between units.
+
+**Bad** (`matchCandidates.test.ts`):
+
+```ts
+jest.mock("../../domain/scoring", () => ({
+  scoreCandidate: jest.fn((c: { years: number }) => (c.years > 5 ? 0.9 : 0.2)),
+}));
+  it("orders senior candidates first", () => {
+    const result = matchCandidates([
+      { id: "a", years: 2 },
+      { id: "b", years: 8 },
+    ]);
+    expect(result.map((r) => r.id)).toEqual(["b", "a"]);
+  });
+```
+
+**Not flagged:** The mocked module is a boundary to something external — a database or ORM client, HTTP/fetch client, file system, clock, randomness, environment/config loader, queue, cache, mailer, payment/SDK wrapper, logger — whether it lives in the codebase (`./db`, `../lib/http`, `./clock`) or in node_modules; or the mock is a spy that keeps the real implementation (`vi.spyOn(x, 'y')` without a mock return); or the test is explicitly an isolated unit test of error handling that stubs a collaborator to throw. Mocking the very unit under test belongs to ts-test-cannot-fail. Non-test code does not count.
+
+Holdout: precision 86%, recall 100% (6 violations in the holdout set). Sources: [pure.tudelft.nl](https://pure.tudelft.nl/ws/files/94079936/Spadini2019_Article_MockObjectsForTestingJavaSyste.pdf), [mauricioaniche.com](https://mauricioaniche.com/publications/to-mock-or-not-to-mock/)
+
+### `ts-test-snapshot-lock-in`
+
+Does the new code add a test (`it`/`test` in vitest, jest or bun:test) whose only assertion on a rendered component, a multi-field object or a generated document is an auto-written snapshot — `toMatchSnapshot()`, `toMatchInlineSnapshot()` or `toMatchFileSnapshot()` — with no targeted assertion about a specific value, text, element or field?
+
+**Catches:** At least one added test asserts nothing but a whole-output snapshot that the test runner writes from the current implementation, so it locks in whatever the code does today and fails on any change, correct or not.
+
+**Why it matters:** `toMatchSnapshot()` is the one assertion an agent can write without knowing the expected output, so it appears whenever the agent is unsure what a component renders; the runner then writes the oracle from the current implementation and the agent re-records on every failure, which Cruz et al. document as the main drawback in practice.
+
+**Fix:** Assert the specific values, text or fields that matter, or compare against a hand-maintained golden fixture; keep snapshots for small, stable outputs.
+
+**Bad** (`ast.test.ts`):
+
+```ts
+import { describe, expect, test } from "bun:test";
+import { parseExpression } from "./ast";
+
+describe("parseExpression", () => {
+  test("parses operator precedence", () => {
+    expect(parseExpression("1 + 2 * (3 - 4) / x")).toMatchSnapshot();
+  });
+
+  test("parses a function call with keyword args", () => {
+    expect(parseExpression("clamp(value, min=0, max=10)")).toMatchSnapshot();
+  });
+});
+```
+
+**Not flagged:** The snapshot is of a small scalar or short string, or sits beside targeted assertions (`toBe`, `toEqual` on specific fields, `getByText`, `toHaveTextContent`); or the expected output is a hand-maintained golden file or fixture compared with `toEqual`/`toBe` (a golden test, not an auto-written snapshot); or the test is explicitly a visual-regression or screenshot test (Playwright `toHaveScreenshot`). Non-test code does not count.
+
+Holdout: precision 100%, recall 100% (6 violations in the holdout set). Sources: [jestjs.io](https://jestjs.io/docs/snapshot-testing), [homepages.dcc.ufmg.br](https://homepages.dcc.ufmg.br/~mtov/pub/2023-jss-snapshot.pdf)
+
+### `ts-test-untyped-fake-response`
+
+Does the new code add a test (`it`/`test` in vitest, jest, bun:test or node:test) that stubs the response of an external system — an HTTP/fetch call, API client, database query or SDK — with a hand-written inline object or array literal (`mockResolvedValue({...})`, `mockReturnValue([...])`, `msw`/`nock` reply bodies, `fetch` mocks returning `Response.json({...})`) that is neither typed against the response type (`satisfies`/`: ApiResponse`, a typed factory) nor loaded from a recorded or shared fixture?
+
+**Catches:** A test invents the shape of an external response inline, so the test keeps passing when the real API or schema drifts.
+
+**Why it matters:** Agents guess the shape of third-party responses from memory and write it inline; the stubbed shape then defines the test's reality, so the common agent failure at API/schema boundaries never surfaces in CI. Hora & Robbes 2026 note agents prefer plain mocks over fakes.
+
+**Fix:** Build fake external responses from a typed factory or a recorded fixture (or annotate them with the response type) so schema drift breaks the test.
+
+**Bad** (`customer.test.ts`):
+
+```ts
+import { describe, expect, it, mock } from "bun:test";
+
+mock.module("stripe", () => ({
+  default: class {
+    customers = {
+      retrieve: async () => ({
+        id: "cus_1",
+        email: "ada@example.com",
+        subscriptions: { data: [{ id: "sub_1", status: "active", items: { data: [{ price: { id: "price_pro" } }] } }] },
+      }),
+    };
+  },
+}));
+
+const { activePlan } = await import("./customer");
+
+describe("activePlan", () => {
+  it("reads the price id of the active subscription", async () => {
+    expect(await activePlan("cus_1")).toBe("price_pro");
+  });
+});
+```
+
+**Not flagged:** The fake response comes from a shared fixture file, a recorded response, a typed factory or builder, or is annotated with the response type (`satisfies UserResponse`, `const body: ApiUser = ...`); or the stub is an error, an empty result, a primitive, or a one-field literal the test immediately asserts on; or the stubbed thing is internal, not an external system. Non-test code does not count.
+
+Holdout: precision 88%, recall 100% (7 violations in the holdout set). Sources: [mswjs.io](https://mswjs.io/docs/best-practices/typescript), [pure.tudelft.nl](https://pure.tudelft.nl/ws/files/94079936/Spadini2019_Article_MockObjectsForTestingJavaSyste.pdf)

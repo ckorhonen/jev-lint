@@ -1,0 +1,423 @@
+{
+  "generatedAt": "2026-10-03T21:41:07.992Z",
+  "gateStats": {
+    "tests.python": {
+      "cases": 68,
+      "rules": 14,
+      "asked": 764
+    }
+  },
+  "llmModel": "gpt-6-luna",
+  "models": {
+    "jev": "jev-1.13.0",
+    "clef": "@cf/cloudflare/clef",
+    "clef-flash": "@cf/cloudflare/clef-flash"
+  },
+  "thresholds": {
+    "HIGH": 0.8,
+    "MEDIUM": 0.5
+  },
+  "caseCounts": {
+    "tests.python.dev": 68
+  },
+  "errors": {
+    "jev": 0
+  },
+  "results": [
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "python",
+      "split": "dev",
+      "policy": "high",
+      "threshold": 0.8,
+      "tp": 27,
+      "fp": 0,
+      "fn": 3,
+      "precision": 1,
+      "recall": 0.9,
+      "f1": 0.9473684210526316,
+      "cleanCases": 41,
+      "cleanFalseAlarmRate": 0,
+      "perRule": {
+        "py-test-asserts-internal-calls": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 1,
+          "precision": 1,
+          "recall": 0.8571428571428571,
+          "f1": 0.923076923076923
+        },
+        "py-test-reimplements-logic": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "py-test-mocks-own-module": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 2,
+          "precision": 1,
+          "recall": 0.75,
+          "f1": 0.8571428571428571
+        },
+        "py-test-untyped-fake-response": {
+          "tp": 8,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        }
+      },
+      "latency": {
+        "p50": 304.011625,
+        "p90": 378.2094169999998,
+        "n": 68,
+        "returnedModels": [
+          "jev-1.13.0"
+        ],
+        "tokens": {
+          "input": 295804,
+          "output": 0
+        }
+      }
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "python",
+      "split": "dev",
+      "policy": "high+medium",
+      "threshold": 0.5,
+      "tp": 30,
+      "fp": 2,
+      "fn": 0,
+      "precision": 0.9375,
+      "recall": 1,
+      "f1": 0.967741935483871,
+      "cleanCases": 41,
+      "cleanFalseAlarmRate": 0.04878048780487805,
+      "perRule": {
+        "py-test-asserts-internal-calls": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "py-test-reimplements-logic": {
+          "tp": 7,
+          "fp": 1,
+          "fn": 0,
+          "precision": 0.875,
+          "recall": 1,
+          "f1": 0.9333333333333333
+        },
+        "py-test-mocks-own-module": {
+          "tp": 8,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "py-test-untyped-fake-response": {
+          "tp": 8,
+          "fp": 1,
+          "fn": 0,
+          "precision": 0.8888888888888888,
+          "recall": 1,
+          "f1": 0.9411764705882353
+        }
+      },
+      "latency": {
+        "p50": 304.011625,
+        "p90": 378.2094169999998,
+        "n": 68,
+        "returnedModels": [
+          "jev-1.13.0"
+        ],
+        "tokens": {
+          "input": 295804,
+          "output": 0
+        }
+      }
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "python",
+      "split": "dev",
+      "policy": "gated high",
+      "threshold": 0.8,
+      "tp": 27,
+      "fp": 0,
+      "fn": 3,
+      "precision": 1,
+      "recall": 0.9,
+      "f1": 0.9473684210526316,
+      "cleanCases": 41,
+      "cleanFalseAlarmRate": 0,
+      "perRule": {
+        "py-test-asserts-internal-calls": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 1,
+          "precision": 1,
+          "recall": 0.8571428571428571,
+          "f1": 0.923076923076923
+        },
+        "py-test-reimplements-logic": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "py-test-mocks-own-module": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 2,
+          "precision": 1,
+          "recall": 0.75,
+          "f1": 0.8571428571428571
+        },
+        "py-test-untyped-fake-response": {
+          "tp": 8,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        }
+      },
+      "latency": {
+        "p50": 304.011625,
+        "p90": 378.2094169999998,
+        "n": 68,
+        "returnedModels": [
+          "jev-1.13.0"
+        ],
+        "tokens": {
+          "input": 295804,
+          "output": 0
+        }
+      }
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "python",
+      "split": "dev",
+      "policy": "gated high+medium",
+      "threshold": 0.5,
+      "tp": 30,
+      "fp": 2,
+      "fn": 0,
+      "precision": 0.9375,
+      "recall": 1,
+      "f1": 0.967741935483871,
+      "cleanCases": 41,
+      "cleanFalseAlarmRate": 0.04878048780487805,
+      "perRule": {
+        "py-test-asserts-internal-calls": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "py-test-reimplements-logic": {
+          "tp": 7,
+          "fp": 1,
+          "fn": 0,
+          "precision": 0.875,
+          "recall": 1,
+          "f1": 0.9333333333333333
+        },
+        "py-test-mocks-own-module": {
+          "tp": 8,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "py-test-untyped-fake-response": {
+          "tp": 8,
+          "fp": 1,
+          "fn": 0,
+          "precision": 0.8888888888888888,
+          "recall": 1,
+          "f1": 0.9411764705882353
+        }
+      },
+      "latency": {
+        "p50": 304.011625,
+        "p90": 378.2094169999998,
+        "n": 68,
+        "returnedModels": [
+          "jev-1.13.0"
+        ],
+        "tokens": {
+          "input": 295804,
+          "output": 0
+        }
+      }
+    }
+  ],
+  "sweeps": [
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "python",
+      "split": "dev",
+      "threshold": 0.1,
+      "precision": 0.46875,
+      "recall": 1,
+      "f1": 0.6382978723404256,
+      "cleanFalseAlarmRate": 0.4878048780487805
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "python",
+      "split": "dev",
+      "threshold": 0.2,
+      "precision": 0.6818181818181818,
+      "recall": 1,
+      "f1": 0.8108108108108109,
+      "cleanFalseAlarmRate": 0.3170731707317073
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "python",
+      "split": "dev",
+      "threshold": 0.3,
+      "precision": 0.7894736842105263,
+      "recall": 1,
+      "f1": 0.8823529411764706,
+      "cleanFalseAlarmRate": 0.17073170731707318
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "python",
+      "split": "dev",
+      "threshold": 0.4,
+      "precision": 0.8823529411764706,
+      "recall": 1,
+      "f1": 0.9375,
+      "cleanFalseAlarmRate": 0.0975609756097561
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "python",
+      "split": "dev",
+      "threshold": 0.5,
+      "precision": 0.9375,
+      "recall": 1,
+      "f1": 0.967741935483871,
+      "cleanFalseAlarmRate": 0.04878048780487805
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "python",
+      "split": "dev",
+      "threshold": 0.6,
+      "precision": 0.967741935483871,
+      "recall": 1,
+      "f1": 0.9836065573770492,
+      "cleanFalseAlarmRate": 0.024390243902439025
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "python",
+      "split": "dev",
+      "threshold": 0.7,
+      "precision": 0.967741935483871,
+      "recall": 1,
+      "f1": 0.9836065573770492,
+      "cleanFalseAlarmRate": 0.024390243902439025
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "python",
+      "split": "dev",
+      "threshold": 0.8,
+      "precision": 1,
+      "recall": 0.9,
+      "f1": 0.9473684210526316,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "python",
+      "split": "dev",
+      "threshold": 0.9,
+      "precision": 1,
+      "recall": 0.7333333333333333,
+      "f1": 0.846153846153846,
+      "cleanFalseAlarmRate": 0
+    }
+  ],
+  "bands": [
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "python",
+      "split": "dev",
+      "lo": 0.8,
+      "hi": 1.01,
+      "findings": 27,
+      "real": 27,
+      "precision": 1
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "python",
+      "split": "dev",
+      "lo": 0.5,
+      "hi": 0.8,
+      "findings": 5,
+      "real": 3,
+      "precision": 0.6
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "python",
+      "split": "dev",
+      "lo": 0.3,
+      "hi": 0.5,
+      "findings": 6,
+      "real": 0,
+      "precision": 0
+    },
+    {
+      "system": "jev",
+      "pack": "tests",
+      "lang": "python",
+      "split": "dev",
+      "lo": 0.1,
+      "hi": 0.3,
+      "findings": 26,
+      "real": 0,
+      "precision": 0
+    }
+  ]
+}

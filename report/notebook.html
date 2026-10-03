@@ -111,7 +111,8 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12.5px}
   <div class="eyebrow">Contents</div>
   <ol id="toc-list">
     <li><a href="#answer">Current answer</a></li>
-    <li><a href="#e9">Entry 9 · Optional Cloudflare Clef <span class="tag new">latest</span></a></li>
+    <li><a href="#e10">Entry 10 · Test rules from the "unit tests are bloat" debate <span class="tag new">latest</span></a></li>
+    <li><a href="#e9">Entry 9 · Optional Cloudflare Clef</a></li>
     <li><a href="#e8">Entry 8 · Local model, accuracy and speed</a>
       <ol>
         <li><a href="#e8-summary">Local vs Jev</a></li>
@@ -183,7 +184,7 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12.5px}
 </nav>
 
 <main>
-  <div class="eyebrow">Experiment notebook · jev-lint · updated 1 Oct 2026</div>
+  <div class="eyebrow">Experiment notebook · jev-lint · updated 3 Oct 2026</div>
   <h1>Jev as a fuzzy linter for coding agents</h1>
   <p class="lede">Can a small, fast judgment model check an agent's code after every edit, against rules no deterministic linter can express, and does the agent get better for it? This notebook logs each experiment, newest first. Older results stay here; when a newer run replaces a number, the old one is marked <span class="tag old">superseded</span>.</p>
 
@@ -192,10 +193,11 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12.5px}
   <section id="answer">
     <h2>Current answer</h2>
     <div class="verdict">
-      <p class="eyebrow">Recommendation as of Entry 9</p>
+      <p class="eyebrow">Recommendation as of Entry 10</p>
       <p><b>Adopt it, with the five default packs on, as a non-blocking background hint.</b> The hook now carries {{LIVE_ALL}} rules across seven languages. Every new rule shipped only after passing a held-out bar fixed in advance. Thanks to the gate, a check on real code still takes about 0.3 s with twice as many rules. With every pack on, it cut graded rule violations in real Claude Code runs by {{E7_V_ABS}} ({{E7_V_NONE}} → {{E7_V_JEV}} per task), for about {{E7_COST_ABS}} more agent cost. It's most worth it where review is human, or where no AI reviewer checks every change. It still doesn't replace an AI code reviewer: most review comments are about logic and design.</p>
       <p><b>Use cloud Jev.</b> A fine-tuned local model now runs on this Mac for free and offline, at about 0.5 s per check. It's a usable fallback, but it misses more than Jev ({{E8_E22_F1R}}% held-out F1 against {{E8_JEV_F1}}%) and is slower (Entry 8).</p>
     </div>
+    <p><b>Seven new test rules ship</b> for the patterns behind the "delete your unit tests" debate: tests that assert internal calls, mock the codebase's own modules, snapshot whole outputs, or hand-type fake API responses. All passed the held-out bar with 100% precision at the fix tier; the fake-response rule fires only at that tier because the habit is common. Two "test re-implements the logic" rules stay candidates after a real-code false alarm (Entry 10).</p>
     <p><b>Cloudflare Clef is optional and experimental.</b> Its integration is tested, but the live comparison is pending credentials (Entry 9). Earlier Jev measurements do not establish Clef accuracy, speed or cost.</p>
     <details class="more"><summary>Entry 6 verdict <span class="tag old">superseded</span></summary>
       <p><b>Adopt it with both rule packs, as a non-blocking hint.</b> On best-practice rules like "don't mirror a prop into state with an effect", Jev is accurate once each rule is worded narrowly. In real agent runs it cut graded rule violations by about a third. On React tasks, it cut the review comments our rules cover from 1.42 to 0.25 per task. SwiftUI tasks had too few of those comments to show an effect. It does not replace an AI code reviewer. About three quarters of what the reviewer raised was logic and design problems that no snippet-level rule can see.</p>
@@ -232,6 +234,39 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12.5px}
     <h3>Speed</h3>
     <p class="note">Median seconds per check on the held-out edits. Jev also costs less ($0.76 vs $2.41 per 10,000 single-pack checks for Luna), but at these prices cost is not the deciding factor; the extra second or more per edit is.</p>
     {{CHART_LATENCY}}
+  </section>
+
+  <section class="entry" id="e10">
+    <p class="eyebrow">3 Oct 2026 · Entry 10</p>
+    <h2>Test rules from the "unit tests are bloat" debate</h2>
+    <h3>Question</h3>
+    <p>Three widely shared posts this week argue that unit tests are mostly bloat in the age of coding agents: they lock in whatever the agent wrote, agents fail most where data crosses an API or schema boundary, and golden, integration and end-to-end tests are worth more. One team reported deleting 800,000 lines of unit tests. Behind the slogans are a few concrete, snippet-visible patterns. Can Jev judge them well enough to ship as rules?</p>
+    <h3>Setup</h3>
+    <p>Nine candidate rules in the <code>tests</code> pack, five TypeScript and four Python: <b>asserts-internal-calls</b> (the only assertions are which internal functions were called, how often or in what order), <b>mocks-own-module</b> (a test stubs the codebase's own logic instead of an external boundary), <b>snapshot-lock-in</b> (the only assertion is an auto-written whole-output snapshot), <b>untyped-fake-response</b> (an external API or database response is faked with a hand-typed inline literal, so schema drift never breaks the test), and <b>reimplements-logic</b> (the expected value is computed with the same logic as the code under test). Each rule's <code>false</code> criteria carve out the look-alikes: calls to an external boundary with computed arguments, spies that keep the real implementation, golden fixtures compared with <code>toEqual</code>, typed factories, literal expected values.</p>
+    <p>Judge <code>jev-1.13.0</code>, thresholds 0.8 / 0.5 fixed in advance. Two authors who could not see each other's files wrote 147 dev cases (79 TypeScript, 68 Python; vitest, React Testing Library, pytest) and 116 holdout cases (63 and 53; jest, node:test, unittest, Codex <code>apply_patch</code> payloads). Each rule has at least five positives and three hard negatives per split, plus clean edits, multi-violation cases and traps where the violation sits only in removed lines. Wording was tuned on dev only, then the holdout set was run once. Shipping bar as before: precision ≥ 90% at 0.8, precision ≥ 75% and recall ≥ 80% at 0.5. New this time: a dry run over 79 real test files from four local repositories, as a noise check the labeled sets cannot give.</p>
+    <h3>Results</h3>
+    <p><b>Dev.</b> TypeScript was clean on the first pass (100% precision and recall at 0.8 for four rules; snapshot-lock-in 86% recall). Python's asserts-internal-calls and mocks-own-module reached only 43% and 62% recall at 0.8, because the question named <code>patch(...)</code> forms but the misses used <code>mocker.spy</code>, <code>wraps=</code>, or a bare <code>@patch</code> next to a correct boundary mock. One rewording naming those forms raised them to 86% and 75% at 0.8, and 100% at 0.5.</p>
+    <p><b>Holdout, final wording, one run.</b> All nine rules passed the bar: precision 100% at 0.8 for every rule, 86–100% at 0.5, recall 100% at 0.5. At pack level the TypeScript tests pack scored 100% precision and 94% recall at the fix tier with 0% of clean edits flagged (6% at the double-check tier); Python 100% and 96%, with 0% and 7%.</p>
+    <div class="table"><table>
+      <thead><tr><th>Rule (TS / PY)</th><th>P@0.8</th><th>P@0.5</th><th>R@0.5</th><th>Evidence</th><th>Real code (≥ 0.8)</th><th>Decision</th></tr></thead>
+      <tbody>
+        <tr><td>asserts-internal-calls</td><td>100 / 100</td><td>100 / 100</td><td>100 / 100</td><td>two B (Java studies) + Google</td><td>0 of 79 files</td><td>ship</td></tr>
+        <tr><td>mocks-own-module</td><td>100 / 100</td><td>86 / 88</td><td>100 / 100</td><td>two B (Spadini 2017, 2019) + Google</td><td>0</td><td>ship</td></tr>
+        <tr><td>snapshot-lock-in (TS)</td><td>100</td><td>100</td><td>100</td><td>three B (Jest docs, Cruz 2023)</td><td>0</td><td>ship</td></tr>
+        <tr><td>untyped-fake-response</td><td>100 / 100</td><td>88 / 88</td><td>100 / 100</td><td>indirect B only</td><td>5 TS + 1 PY, all inline fakes of real APIs</td><td>ship, fix tier only</td></tr>
+        <tr><td>reimplements-logic</td><td>100 / 100</td><td>100 / 100</td><td>100 / 100</td><td>one B</td><td>1 TS true, 1 PY borderline, <b>1 PY false alarm</b></td><td>hold back</td></tr>
+      </tbody>
+    </table></div>
+    <p><b>Real code.</b> The dry run is where the labeled sets stop helping. <b>untyped-fake-response</b> fired at the fix tier on 6 of 79 files: hand-typed Hue, LIFX, weather-service, MediaWiki, text-to-speech and tuner API responses. Every one is what the rule describes, and every one is normal practice in those repos, so the rule ships at the fix tier only (<code>thresholds.medium = null</code>, as for magic numbers) to keep the double-check noise down. <b>reimplements-logic</b> flagged three files: a token-offset test that recomputes the contract's arithmetic (true), a LoRA merge test that re-derives the merge formula in a second framework (borderline: that is arguably an independent reference), and a <b>differential test</b> that runs two implementations with the same seed and asserts they agree, at 0.92. That last one is exactly what the rule's <code>false</code> criteria call "a different algorithm", and Jev did not read it that way. Following the Entry 7 precedent (<code>ts-perf-linear-lookup-in-loop</code>), both reimplements-logic rules stay candidates rather than being reworded after the holdout was seen. The other four rules fired on nothing at the fix tier across all 79 files.</p>
+    <h3>What we learned</h3>
+    <ul>
+      <li><b>The debate's concrete half is checkable.</b> "Tests lock in slop" turns into four literal patterns Jev judges with 100% held-out precision. The other half (which test layer to invest in) is a design decision no snippet rule can see.</li>
+      <li><b>Agents really do over-mock.</b> Hora and Robbes (arXiv, Jan 2026; 1.25M commits across 2,168 repositories) found agent test commits add mocks in 36% of cases against 26% for humans, and use mocks rather than fakes 95% of the time against 32%. That is the behaviour mocks-own-module targets.</li>
+      <li><b>Boundary-vs-internal is judged by names.</b> From the added code alone, Jev can only tell <code>../db</code> from <code>../pricing</code> by what the module is called. Both authors flagged this as the likely false-positive source; it did not show up in holdout or on real code, but repos with vaguely named adapters will see it.</li>
+      <li><b>A real-code dry run belongs in the bar.</b> Two synthetic sets agreed on reimplements-logic and were both wrong about differential tests. Thirty files of real tests caught it in minutes.</li>
+      <li><b>Opinionated rules need a volume check, not just a precision check.</b> untyped-fake-response is 100% precise and still the one most likely to get disabled, because it argues with a habit. Fix tier only is the compromise; the findings log will say whether it gets fixed or kept.</li>
+    </ul>
+    <p class="note">Not verified: cases are synthetic and written by authors who read the rules; one Jev run per split; the holdout was seen once; the real-code sample is 79 files from four repositories on one machine, graded by one reader; no end-to-end agent run yet. Result files: <code>summary-tests-v7-dev-2026-10-03.json</code>, <code>summary-tests-v7-dev-py-pass2-2026-10-03.json</code>, <code>summary-tests-v7-holdout-2026-10-03.json</code>; sources with grades in <code>rules/sources/*.tests.json</code>.</p>
   </section>
 
   <section class="entry" id="e9">
@@ -773,6 +808,7 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12.5px}
 
   <section id="rec">
     <h2>Recommendation</h2>
+    <p>Entry 10 adds seven test rules for implementation lock-in and over-mocking; they are on by default in the tests pack. If untyped-fake-response argues with your team's habits, disable it in <code>.jev-lint/config.json</code> rather than lowering its threshold.</p>
     <p>Entry 9 adds optional Cloudflare Clef support. Keep Jev as the measured default until the hosted comparison is completed.</p>
     <ol>
       <li><b>Install the hook with the default packs on</b>: hygiene, practices, security, tests and performance ({{LIVE_ALL}} rules). Candidates stay off until they pass. Use it in Claude Code and Codex, as a non-blocking hint with thresholds 0.8 / 0.5, and pin <code>JEV_LINT_MODEL=jev-1.13.0</code>. <span class="note">(Until Entry 7 this said "both packs"; the new packs cost almost no time on real code.)</span></li>
@@ -792,6 +828,7 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12.5px}
   <section id="next">
     <h2>Next experiments</h2>
     <ul>
+      <li><b>reimplements-logic, second attempt.</b> Narrow <code>false</code> for differential and reference-implementation tests (two implementations compared, same seed), write a fresh dev batch, and re-run holdout before shipping. Then an end-to-end round with test-writing tasks, to see whether the Entry 10 rules change what agents actually write, not just what Jev flags.</li>
       <li><b>End-to-end tasks for the new languages.</b> Python, Ruby, Kotlin, Rust and Bazel rules have held-out numbers but no agent runs. Write about 12 tasks per language and repeat the Entry 7 comparison.</li>
       <li><b>repoEval in real repos.</b> Run <code>src/repoEval.ts</code> on a few real repositories, to test whether a proposed rule or instruction change actually lowers violations before it's kept.</li>
       <li><b>The feedback loop on a live repo.</b> Run the weekly <code>jev-lint-learn</code> review on an active repo for a few weeks, and measure whether recurring findings fall.</li>
@@ -849,6 +886,7 @@ python3 report/build.py path/to/DepartureMono-Regular.woff2 # rebuild this page<
   <section id="log">
     <h2>Changelog</h2>
     <ul>
+      <li><b>3 Oct 2026, Entry 10.</b> Nine candidate test rules from the "unit tests are bloat" debate; 263 new labeled cases from separate authors; all nine passed holdout; seven ship (untyped-fake-response at the fix tier only), two reimplements-logic rules held back after a real-code false alarm. Real-code dry runs added to the method.</li>
       <li><b>2 Oct 2026, Entry 9.</b> Added optional Clef/Clef-flash integration and comparison harness. Live comparison blocked by missing credentials; regex holdout completed. No prior evidence replaced.</li>
       <li><b>1 Oct 2026, Entry 8.</b>
         <ul>

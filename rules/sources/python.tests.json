@@ -120,5 +120,137 @@
     "aiRelevance": "As for the TypeScript variant.",
     "expectedNoise": "low-med",
     "languageFile": "python"
+  },
+  "py-test-asserts-internal-calls": {
+    "evidence": [
+      {
+        "grade": "C",
+        "url": "https://testing.googleblog.com/2015/01/testing-on-toilet-change-detector-tests.html",
+        "checked": "2026-10-03",
+        "note": "Google Testing Blog, Alex Eagle, 2015-01-27. The example test mocks firstPart/secondPart and asserts `verify_in_order was_called part1.process(w); was_called part2.process(w)`: \"This is a change-detector test—it is a transformation of the same information in the code under test—and it breaks in response to any change to the production code, without verifying correct behavior of either the original or modified production code. Change detectors provide negative value, since the tests do not catch any defects, and the added maintenance cost slows down development. These tests should be re-written or deleted.\""
+      },
+      {
+        "grade": "C",
+        "url": "https://abseil.io/resources/swe-book/html/ch12.html",
+        "checked": "2026-10-03",
+        "note": "Software Engineering at Google, ch. 12 'Test State, Not Interactions': \"interaction tests check how a system arrived at its result, whereas usually you should care only what the result is.\" Example 12-4 `verify(database).put(\"foobar\")` \"will pass\" if a bug deletes the record right after writing, and \"will fail\" if the code is refactored to an equivalent API. \"The most common reason for problematic interaction tests is an over reliance on mocking frameworks.\""
+      },
+      {
+        "grade": "B",
+        "url": "https://homes.cs.washington.edu/~rjust/publ/mocking_reflection_testing_icst_2017.pdf",
+        "checked": "2026-10-03",
+        "note": "Arcuri, Fraser, Just, ICST 2017 (EvoSuite): \"we have decided to not use any verify calls in EvoSuite. The reason is to avoid 'brittle' tests, i.e., tests that could fail in successive modifications of the CUT even though no regression bug is introduced, and so become false positives. To find bugs, we rely on assertions on the return values of the CUT methods, and not on their interactions with the input parameters, as these could change without altering the external behavior of the CUT.\""
+      },
+      {
+        "grade": "B",
+        "url": "https://arxiv.org/abs/2503.19284",
+        "checked": "2026-10-03",
+        "note": "Zhu, Terragni, Wei, Cheung, Wu, Liu, 'Understanding and Characterizing Mock Assertions in Unit Tests', FSE 2025: 4,652 tests from 11 Java projects; mock assertions are \"mostly applied to validating specific kinds of method calls, such as those interacting with external resources\" and those tracking code-path execution. Supports the rule's carve-out (call assertions on external boundaries are legitimate); the paper frames mock assertions as complementary, not harmful, so it does not by itself condemn internal-call assertions."
+      }
+    ],
+    "whyNotLinter": "ruff's PT rules check assertion syntax; `assert_called_once_with` on a patch of `myapp.services.helper` (implementation) and on a patch of `myapp.clients.http` (boundary) are the same tokens, and only reading the test tells whether a return/raise assertion already covers the behaviour.",
+    "aiRelevance": "`patch` + `assert_called_with` is the cheapest green assertion when the agent has no oracle; Hora & Robbes 2026 find agent test commits add mocks 36% of the time vs 26% for humans, and these tests fail on the agent's own later refactors.",
+    "expectedNoise": "low-med (tests whose only purpose is a boundary side effect look similar; the false branch carves them out).",
+    "languageFile": "python",
+    "notes": "Two B sources, both Java studies: Arcuri et al. (EvoSuite refuses verify() calls to avoid brittle tests) and Zhu et al. (mock assertions mostly target external-resource calls, which supports the carve-out). Direct wording is C-grade Google material; unittest.mock docs do not warn against call assertions."
+  },
+  "py-test-reimplements-logic": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://docs.python.org/3/library/unittest.mock-examples.html",
+        "checked": "2026-10-03",
+        "note": "Python stdlib docs, unittest.mock 'Partial mocking' example: the test must not end up \"calculating an expected result using exactly the same algorithm as the code under test, which is a classic testing anti-pattern.\""
+      },
+      {
+        "grade": "C",
+        "url": "https://testing.googleblog.com/2014/07/testing-on-toilet-dont-put-logic-in.html",
+        "checked": "2026-10-03",
+        "note": "Google Testing Blog, Erik Kuefler, 2014-07-31: \"Tests can avoid complexity by stating their inputs and outputs directly rather than computing them. Otherwise it's easy for tests to develop their own bugs.\" The example `assertEquals(baseUrl + \"/u/0/photos\", nav.getCurrentUrl())` hides a double-slash bug: \"This test will either fail or (even worse) incorrectly pass if the production code has the same bug. We never would have written this if we stated our inputs and outputs directly instead of trying to compute them.\""
+      },
+      {
+        "grade": "C",
+        "url": "https://abseil.io/resources/swe-book/html/ch12.html",
+        "checked": "2026-10-03",
+        "note": "Software Engineering at Google, ch. 12 'Don't Put Logic in Tests': \"if you feel like you need to write a test to verify your test, something has gone wrong!\" Example 12-15 computes the expected URL as `baseUrl + \"/albums\"`; Example 12-16 writes it out and the bug is visible: \"If the production code made a similar mistake, this test would fail to detect a bug. Duplicating the base URL was a small price to pay for making the test more descriptive and meaningful.\""
+      }
+    ],
+    "whyNotLinter": "Telling an `expected` that re-runs the implementation's formula from an `expected` built by legitimate setup needs the production code's algorithm for comparison; a linter sees only arithmetic or a comprehension in a test function.",
+    "aiRelevance": "An agent that writes the function and its test in one turn reuses the same expression on both sides, so a wrong formula passes; working out a literal by hand is the step agents skip.",
+    "expectedNoise": "low-med (parametrize tables and input builders look similar; the false branch excludes them).",
+    "languageFile": "python",
+    "notes": "Falls short of one A or two B: the stdlib unittest.mock docs sentence is the only B; pytest docs say nothing about it. Google blog and SWE at Google are C. Held back on 2026-10-03: passed the holdout bar (P@0.8 100%, R@0.5 100%) but a dry run on real code flagged a differential test (two implementations of the same computation compared with the same seed) at 0.92, and the evidence is one B source. Re-evaluate after narrowing `false` for differential/reference-implementation tests on a new dev batch."
+  },
+  "py-test-mocks-own-module": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://pure.tudelft.nl/ws/files/94079936/Spadini2019_Article_MockObjectsForTestingJavaSyste.pdf",
+        "checked": "2026-10-03",
+        "note": "Spadini, Aniche, Bruntink, Bacchelli, 'Mock objects for testing java systems', Empirical Software Engineering 2019 (2,000+ mock usages in 3 OSS + 1 industrial system, interviews, survey of 105 developers): \"Developers report to frequently mock dependencies that make testing difficult (e.g., infrastructure-related dependencies) and to not mock classes that encapsulate domain concepts/rules of the system. Among the key challenges, developers report that maintaining the behavior of the mock compatible with the behavior of original class is hard and that mocking increases the coupling between the test and the production code.\" RQ3 'Unstable dependencies': \"As the production class tends to change often, the mock object becomes unstable and, as a consequence, more prone to change.\""
+      },
+      {
+        "grade": "B",
+        "url": "https://docs.python.org/3/library/unittest.mock-examples.html",
+        "checked": "2026-10-03",
+        "note": "Python stdlib docs, unittest.mock examples: \"One problem with over use of mocking is that it couples your tests to the implementation of your mocks rather than your real code. Suppose you have a class that implements some_method. In a test for another class, you provide a mock of this object that also provides some_method. If later you refactor the first class, so that it no longer has some_method - then your tests will continue to pass even though your code is now broken!\""
+      },
+      {
+        "grade": "B",
+        "url": "https://docs.pytest.org/en/stable/how-to/monkeypatch.html",
+        "checked": "2026-10-03",
+        "note": "pytest docs frame monkeypatch as a tool for boundaries: \"Modifying the behavior of a function or the property of a class for a test e.g. there is an API call or database connection you will not make for a test\"; the examples patch `requests.get`, `Path.home` and environment variables, never the package's own domain code. Also: \"patch the reference that your code uses instead\" (patch where it is looked up)."
+      },
+      {
+        "grade": "C",
+        "url": "https://testing.googleblog.com/2013/05/testing-on-toilet-dont-overuse-mocks.html",
+        "checked": "2026-10-03",
+        "note": "Google Testing Blog, Andrew Trenk, 2013-05-28: \"When you tell a mock how to behave, the only assurance you get with your tests is that your code will work if your mocks behave exactly like your real implementations. This can be very hard to guarantee, and the problem gets worse as your code changes over time, as the behavior of the real implementations is likely to get out of sync with your mocks.\" Signs of overuse: \"mocking out more than one or two classes\". Prefer a real dependency, a hermetic server or a fake when the real thing is \"too slow or talks over the network\"."
+      },
+      {
+        "grade": "C",
+        "url": "https://arxiv.org/abs/2602.00409",
+        "checked": "2026-10-03",
+        "note": "Hora & Robbes, 'Are Coding Agents Generating Over-Mocked Tests? An Empirical Study', arXiv preprint 2026-01-30 (1,254,878 commits, 2,168 TS/JS/Python repos, 48,563 agent commits from Claude Code, Copilot Agent, Cursor and others): 36% of agent test commits add mocks vs 26% for humans; agents use mocks (95%) far more than fakes (32%) or spies (33%); authors recommend \"guidance on mocking best practices and anti-patterns in agent configuration files\" such as CLAUDE.md. Preprint, so C."
+      }
+    ],
+    "whyNotLinter": "`patch('myapp.x.y')` is greppable, but whether `myapp.x.y` wraps a database/HTTP/clock (fine) or is a pricing function or validator (not fine) is a judgement about the target's role; the call sites are identical.",
+    "aiRelevance": "Hora & Robbes 2026: coding agents add mocks in 36% of test commits vs 26% for humans and prefer mocks to fakes; patching every collaborator lets a test pass without a fixture or a real dependency, which is the path of least resistance for an agent.",
+    "expectedNoise": "med (isolated error-handling tests that patch a collaborator to raise are legitimate and look the same).",
+    "languageFile": "python",
+    "notes": "Spadini et al. and the stdlib docs are the two direct Bs; pytest monkeypatch docs support the boundary framing by example only."
+  },
+  "py-test-untyped-fake-response": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://docs.python.org/3/library/unittest.mock.html",
+        "checked": "2026-10-03",
+        "note": "Python stdlib docs, unittest.mock 'Autospeccing': a plain Mock accepts any attribute, so a renamed method or wrong signature still passes; \"Auto-speccing creates mock objects that have the same attributes and methods as the objects they are replacing ... This ensures that your mocks will fail in the same way as your production code if they are used incorrectly.\" The same drift argument applies to a hand-written response dict, but the docs address call signatures, not payload shapes, so this is indirect support."
+      },
+      {
+        "grade": "B",
+        "url": "https://vcrpy.readthedocs.io/en/latest/",
+        "checked": "2026-10-03",
+        "note": "VCR.py docs: \"VCR.py records all HTTP interactions that take place through the libraries it supports and serializes and writes them to a flat file ... called a cassette\"; benefits: \"The ability to work offline, Completely deterministic tests, Increased test execution speed\"; when the API changes, delete the cassette and re-record. Official docs for the recorded-fixture alternative the rule's fix names; supports the fix, not the harm."
+      },
+      {
+        "grade": "C",
+        "url": "https://testing.googleblog.com/2018/11/testing-on-toilet-exercise-service-call.html",
+        "checked": "2026-10-03",
+        "note": "Google Testing Blog, Ben Yu, 2018-11-27: a test that stubs `mockCloudService.write(...)` to return a hand-built `WriteResponse` — \"Lots of things can go wrong, especially when service contracts get complex. For example, plain/text may not be a valid file type, and you can't verify that the URI of the uploaded file is correct. If the code under test relies on the contract of a service, prefer exercising the service call instead of mocking it out.\" Use a fake \"usually maintained by the service owners; don't create your own fake unless you can ensure its behavior will stay in sync with the real implementation\"."
+      },
+      {
+        "grade": "C",
+        "url": "https://abseil.io/resources/swe-book/html/ch13.html",
+        "checked": "2026-10-03",
+        "note": "Software Engineering at Google, ch. 13 'The Dangers of Overusing Stubbing': \"With stubbing, there is no way to ensure the function being stubbed behaves like the real implementation\" (example `when(stubCalculator.add(1, 2)).thenReturn(3)`); \"Stubbing is a poor choice if the system under test depends on the real implementation's contract because you will be forced to duplicate the details of the contract, and there is no way to guarantee that the contract is correct (i.e., that the stubbed function has fidelity to the real implementation).\""
+      }
+    ],
+    "whyNotLinter": "A dict passed as `return_value` or `json=` is ordinary code; whether it stands in for an external response (where drift matters) and whether a pydantic model, TypedDict or cassette would catch drift is semantic. Python has no static check of a dict literal against the real API.",
+    "aiRelevance": "Agents guess third-party payload shapes from memory and write them inline, so the stub defines the test's reality and the schema-drift failures agents make at API boundaries never reach CI. Hora & Robbes 2026 note agents prefer plain mocks over fakes.",
+    "expectedNoise": "med (one-key literals and exception stubs are excluded, but short inline happy-path bodies in boundary tests are common and sometimes acceptable).",
+    "languageFile": "python",
+    "notes": "Two Bs but both indirect: unittest.mock autospec docs are about call signatures, not payload shapes, and VCR.py docs support the recorded-fixture fix rather than stating the harm. Google (2018) and SWE at Google ch. 13 state the harm directly but are C. Pact docs (https://docs.pact.io/getting_started/how_pact_works) are C for the same reason. Shipped 2026-10-03 at the high tier only (thresholds.medium = null): on 47 real TypeScript and 32 Python test files it fired at >= 0.8 on 6, all inline fakes of real external APIs by the rule's definition, but the habit is common, so the double-check tier was turned off to keep noise down."
   }
 }

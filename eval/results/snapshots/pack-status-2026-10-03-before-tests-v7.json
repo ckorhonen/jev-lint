@@ -61,7 +61,7 @@
     "falsePositives": 3,
     "pass": false,
     "reasons": [
-      "precision at p≥0.8 80%"
+      "precision at p\u22650.8 80%"
     ]
   },
   "swift-unprotected-shared-state": {
@@ -306,7 +306,7 @@
     "falsePositives": 0,
     "pass": false,
     "reasons": [
-      "recall at p≥0.5 75%"
+      "recall at p\u22650.5 75%"
     ]
   },
   "react-transition-state-after-await": {
@@ -506,7 +506,7 @@
     "falsePositives": 1,
     "pass": false,
     "reasons": [
-      "precision at p≥0.8 83%"
+      "precision at p\u22650.8 83%"
     ]
   },
   "kt-flow-emit-wrong-context": {
@@ -868,7 +868,7 @@
     "falsePositives": 0,
     "pass": false,
     "reasons": [
-      "recall at p≥0.5 60%"
+      "recall at p\u22650.5 60%"
     ]
   },
   "bzl-depset-flatten-in-impl": {
@@ -1005,7 +1005,7 @@
     "falsePositives": 0,
     "pass": false,
     "reasons": [
-      "recall at p≥0.5 60%"
+      "recall at p\u22650.5 60%"
     ]
   },
   "swift-test-real-network": {
@@ -1034,8 +1034,8 @@
     "falsePositives": 2,
     "pass": false,
     "reasons": [
-      "precision at p≥0.8 80%",
-      "precision at p≥0.5 67%"
+      "precision at p\u22650.8 80%",
+      "precision at p\u22650.5 67%"
     ]
   },
   "kt-test-error-path-passes-silently": {
@@ -1064,7 +1064,7 @@
     "falsePositives": 0,
     "pass": false,
     "reasons": [
-      "recall at p≥0.5 67%"
+      "recall at p\u22650.5 67%"
     ]
   },
   "kt-test-uncontrolled-randomness": {
@@ -1174,7 +1174,7 @@
     "falsePositives": 1,
     "pass": false,
     "reasons": [
-      "recall at p≥0.5 75%"
+      "recall at p\u22650.5 75%"
     ]
   },
   "rs-test-cannot-fail": {
@@ -1617,87 +1617,6 @@
     "precisionAtHigh": 1,
     "positives": 6,
     "falsePositives": 0,
-    "pass": true,
-    "reasons": []
-  },
-  "py-test-asserts-internal-calls": {
-    "precision": 1,
-    "recall": 1,
-    "precisionAtHigh": 1,
-    "positives": 7,
-    "falsePositives": 0,
-    "pass": true,
-    "reasons": []
-  },
-  "py-test-reimplements-logic": {
-    "precision": 1,
-    "recall": 1,
-    "precisionAtHigh": 1,
-    "positives": 7,
-    "falsePositives": 0,
-    "pass": true,
-    "reasons": []
-  },
-  "py-test-mocks-own-module": {
-    "precision": 0.875,
-    "recall": 1,
-    "precisionAtHigh": 1,
-    "positives": 7,
-    "falsePositives": 1,
-    "pass": true,
-    "reasons": []
-  },
-  "py-test-untyped-fake-response": {
-    "precision": 0.875,
-    "recall": 1,
-    "precisionAtHigh": 1,
-    "positives": 7,
-    "falsePositives": 1,
-    "pass": true,
-    "reasons": []
-  },
-  "ts-test-asserts-internal-calls": {
-    "precision": 1,
-    "recall": 1,
-    "precisionAtHigh": 1,
-    "positives": 7,
-    "falsePositives": 0,
-    "pass": true,
-    "reasons": []
-  },
-  "ts-test-reimplements-logic": {
-    "precision": 1,
-    "recall": 1,
-    "precisionAtHigh": 1,
-    "positives": 6,
-    "falsePositives": 0,
-    "pass": true,
-    "reasons": []
-  },
-  "ts-test-mocks-own-module": {
-    "precision": 0.8571428571428571,
-    "recall": 1,
-    "precisionAtHigh": 1,
-    "positives": 6,
-    "falsePositives": 1,
-    "pass": true,
-    "reasons": []
-  },
-  "ts-test-snapshot-lock-in": {
-    "precision": 1,
-    "recall": 1,
-    "precisionAtHigh": 1,
-    "positives": 6,
-    "falsePositives": 0,
-    "pass": true,
-    "reasons": []
-  },
-  "ts-test-untyped-fake-response": {
-    "precision": 0.875,
-    "recall": 1,
-    "precisionAtHigh": 1,
-    "positives": 7,
-    "falsePositives": 1,
     "pass": true,
     "reasons": []
   }
