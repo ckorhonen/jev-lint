@@ -10,11 +10,15 @@ import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { parseArgs } from "node:util";
+import { apiKey, cloudflareKey } from "../src/jev";
 import { BUILT_IN_PACKS, type BuiltInPack, LANGUAGES, type Pack, RULE_FILES, ruleApplies, ruleSetForLanguage } from "../src/lint";
 import {
   type Case,
   caseCode,
   type Judgment,
+  jevModel,
+  judgeClef,
+  judgeClefFlash,
   judgeJev,
   judgeLlm,
   judgeLocal,
@@ -48,7 +52,14 @@ const { values: args } = parseArgs({
   },
 });
 
-const JUDGES = { jev: (c: Case) => judgeJev(c), llm: judgeLlm, regex: judgeRegex, local: judgeLocal } as const;
+const JUDGES = {
+  jev: (c: Case) => judgeJev(c),
+  llm: judgeLlm,
+  regex: judgeRegex,
+  local: judgeLocal,
+  clef: judgeClef,
+  "clef-flash": judgeClefFlash,
+} as const;
 type SystemName = keyof typeof JUDGES;
 
 // Case files: <lang>[.<pack>][.<batch>].<split>.jsonl. No pack means hygiene; later batches
@@ -89,7 +100,15 @@ const packHash = (pack: BuiltInPack, lang: string) =>
     .slice(0, 10);
 function cacheDir(system: SystemName, run: number, pack: BuiltInPack, lang: string) {
   const variant =
-    system === "llm" ? LLM_MODEL : system === "jev" ? (process.env.JEV_LINT_MODEL ?? "jev-latest") : system === "local" ? LOCAL_NAME : "v1";
+    system === "llm"
+      ? LLM_MODEL
+      : system === "jev"
+        ? (jevModel() ?? "jev-latest")
+        : system === "local"
+          ? LOCAL_NAME
+          : system === "clef" || system === "clef-flash"
+            ? `${system}-workers-ai-v1`
+            : "v1";
   return join(RESULTS, "cache", `${system}-${variant}-${packHash(pack, lang)}-r${run}`);
 }
 
@@ -193,6 +212,7 @@ function latencyStats(cases: Case[], judgments: Map<string, Judgment>) {
     p50: q(0.5),
     p90: q(0.9),
     n: values.length,
+    returnedModels: [...new Set(judged.flatMap((j) => j.models ?? []))],
     tokens: {
       input: judged.reduce((n, j) => n + j.inputTokens, 0),
       output: judged.reduce((n, j) => n + j.outputTokens, 0),
@@ -204,7 +224,17 @@ async function main() {
   const splits = (args.splits as string).split(",");
   const cases = loadCases().filter((c) => splits.includes(c.split));
   const systems = (args.systems as string).split(",") as SystemName[];
+  for (const system of systems) if (!(system in JUDGES)) throw new Error(`Unknown system: ${system}`);
+  if (systems.some((s) => s === "clef" || s === "clef-flash")) {
+    if (!process.env.CLOUDFLARE_ACCOUNT_ID || !cloudflareKey())
+      throw new Error("Clef eval requires CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN (or CLOUDFLARE_API_TOKEN_FILE)");
+  }
+  if (systems.includes("jev") && !process.env.TYPESAFE_BASE_URL && !apiKey()) throw new Error("Jev eval requires a TypeSafe API key");
   const runs = Number(args.runs);
+  if (!Number.isInteger(runs) || runs < 1) throw new Error("--runs must be a positive integer");
+  // summary.json is the rolling default (snapshot it first, per AGENTS.md); a named experiment file is never overwritten.
+  if (args.out !== "summary.json" && existsSync(join(RESULTS, args.out as string)))
+    throw new Error("Output already exists; use a new --out name or snapshot the previous result first");
   console.error(`${cases.length} cases; systems=${systems.join(",")} runs=${runs}`);
 
   const judgments: Partial<Record<SystemName, Map<string, Judgment>[]>> = {};
@@ -255,13 +285,13 @@ async function main() {
           const subset = cases.filter((c) => c.pack === pack && c.lang === lang && c.split === split);
           if (!subset.length) continue;
           const policies: Record<string, number> =
-            system === "jev" || system === "local"
+            system === "jev" || system === "local" || system === "clef" || system === "clef-flash"
               ? { high: HIGH, "high+medium": MEDIUM }
               : system === "llm"
                 ? { high: 0.9, "high+medium": 0.6 }
                 : { high: 1 };
           const regexCovered = ruleIds(lang, "hygiene").filter((id) => REGEX_RULES[id]);
-          if (system === "jev" || system === "llm") {
+          if (system === "jev" || system === "llm" || system === "clef" || system === "clef-flash") {
             for (const [policy, threshold] of Object.entries(policies)) policies[`gated ${policy}`] = threshold;
           }
           for (const [policy, threshold] of Object.entries(policies)) {
@@ -281,7 +311,7 @@ async function main() {
               latency: latencyStats(subset, runsForSystem[0]),
             });
           }
-          if (system === "jev" || system === "local") {
+          if (system === "jev" || system === "local" || system === "clef" || system === "clef-flash") {
             for (const t of SWEEP) {
               const s = score(subset, runsForSystem[0], t);
               sweeps.push({
@@ -334,6 +364,7 @@ async function main() {
         generatedAt: new Date().toISOString(),
         gateStats,
         llmModel: LLM_MODEL,
+        models: { jev: jevModel() ?? "jev-latest", clef: "@cf/cloudflare/clef", "clef-flash": "@cf/cloudflare/clef-flash" },
         thresholds: { HIGH, MEDIUM },
         caseCounts,
         errors,

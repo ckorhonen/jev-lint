@@ -382,9 +382,12 @@ if (import.meta.main) {
       const asked = timed.reduce((n, r) => n + (r.asked ?? 0), 0);
       const total = asked + timed.reduce((n, r) => n + (r.gatedOut ?? 0), 0);
       console.log(
-        `judge: median ${lat[Math.floor(lat.length / 2)]} ms, p90 ${lat[Math.floor(lat.length * 0.9)]} ms; ${tokens} input tokens (~$${((tokens * 0.042) / 1e6).toFixed(5)} at Jev list price); ${asked} of ${total} rules asked after the gate`,
+        `judge: median ${lat[Math.floor(lat.length / 2)]} ms, p90 ${lat[Math.floor(lat.length * 0.9)]} ms; ${tokens} input tokens; ${asked} of ${total} rules asked after the gate`,
       );
     }
+    const jevTokens = timed.filter((r) => /^jev(?:-|$)/.test(r.model)).reduce((n, r) => n + (r.inputTokens ?? 0), 0);
+    if (jevTokens)
+      console.log(`Jev only: ~$${((jevTokens * 0.042) / 1e6).toFixed(5)} at Jev list price; other models excluded (see provider billing)`);
     console.log("rule                                    flags  high  med  sessions  fixed  kept  unknown  suggestion");
     for (const s of summary) {
       console.log(

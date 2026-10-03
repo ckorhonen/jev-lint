@@ -49,7 +49,7 @@
       "applicationCategory": "DeveloperApplication",
       "applicationSubCategory": "Linter",
       "operatingSystem": "macOS, Linux",
-      "softwareRequirements": "Bun, a TypeSafe API key, Claude Code or Codex",
+      "softwareRequirements": "Bun, a TypeSafe API key or Cloudflare Workers AI credentials, Claude Code or Codex",
       "license": "https://opensource.org/licenses/MIT",
       "isAccessibleForFree": true,
       "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
@@ -447,7 +447,7 @@ footer a{color:var(--dim);display:inline-flex;align-items:center;min-height:44px
     <p class="lead">Under the hood, it's small on purpose.</p>
     <h2 id="h-how">One hook. One call. Two tiers.</h2>
     <ol class="steps">
-      <li><p class="when">after every edit</p><h3>The hook sends only the new code.</h3><p>A PostToolUse hook in Claude Code or Codex sends the code the agent just added to <a href="https://docs.typesafe.ai">TypeSafe Jev</a>, a fast judgment model: one yes/no question per rule, in one call. A keyword gate skips rules that can't apply.</p></li>
+      <li><p class="when">after every edit</p><h3>The hook sends only the new code.</h3><p>A PostToolUse hook in Claude Code or Codex sends the code the agent just added to <a href="https://docs.typesafe.ai">TypeSafe Jev</a>, a fast judgment model: one yes/no question per rule, in one call. A keyword gate skips rules that can't apply. <a href="#cloudflare">Cloudflare Clef is an optional alternative.</a></p></li>
       <li><p class="when">about 0.3 s later</p><h3>Findings go straight back.</h3><div class="tiers"><div><span class="red">p ≥ 0.8</span> <span class="dim">likely violations: fix these</span></div><div><span style="color:var(--amber)">0.5–0.8</span> <span class="dim">possible: double-check</span></div></div></li>
       <li><p class="when">never in the way</p><h3>It fails open.</h3><p>On a timeout, an API error or an unknown file type it exits silently and the edit goes through. It complements linters, type checkers and review; it doesn't replace them.</p></li>
     </ol>
@@ -582,7 +582,7 @@ footer a{color:var(--dim);display:inline-flex;align-items:center;min-height:44px
   <div class="wrap">
     <p class="lead">Try it on your repo.</p>
     <h2 id="h-setup">One paste. Your agent does the rest.</h2>
-    <p class="lede">Needs <a href="https://bun.sh">bun</a> and a <a href="https://docs.typesafe.ai">TypeSafe</a> API key. Paste this into your agent from the repo you want checked.</p>
+    <p class="lede">Needs <a href="https://bun.sh">bun</a> and a <a href="https://docs.typesafe.ai">TypeSafe</a> API key for the default mode, or <a href="#cloudflare">Cloudflare Workers AI credentials</a>. Paste this into your agent from the repo you want checked.</p>
     <div class="prompt">
       <header>
         <div class="seg" role="group" aria-label="Choose your agent">
@@ -606,13 +606,36 @@ I'm using Claude Code, so install the hook for Claude Code (--claude-only).</pre
   </div>
 </section>
 
+<section id="cloudflare" aria-labelledby="h-cloudflare">
+  <div class="wrap">
+    <p class="lead">An optional judge.</p>
+    <h2 id="h-cloudflare">Use Cloudflare Clef.</h2>
+    <p class="lede">Already using Workers AI? Choose Clef or Clef-flash to check edits with the same rules, keyword gates and feedback tiers. TypeSafe Jev remains the default.</p>
+    <div class="prompt">
+      <header><span class="f">optional Cloudflare setup</span></header>
+<pre>export JEV_LINT_PROVIDER=cloudflare
+export JEV_LINT_MODEL=clef  # or clef-flash
+export CLOUDFLARE_ACCOUNT_ID=your_32_character_account_id
+# Configure your Workers AI token or private token file first.
+bun src/install.ts --skills --smoke
+bun src/install.ts --apply --skills --smoke</pre>
+    </div>
+    <p style="margin-top:20px">Cloudflare receives the added code and rule questions, and bills usage to your account. The hook still fails open if a check fails. Keep the token in your agent's environment or a private file.</p>
+    <p style="margin-top:16px"><b>Experimental; comparison pending.</b> The accuracy, speed and cost results on this site were measured with Jev. They do not establish Clef's performance on these rules.</p>
+    <div class="setup-cta">
+      <a href="https://github.com/ckorhonen/jev-lint#cloudflare-clef-optional">Cloudflare setup and switching back →</a>
+      <a href="https://github.com/ckorhonen/jev-lint/blob/main/docs/cloudflare-eval.md">Comparison method and status →</a>
+    </div>
+  </div>
+</section>
+
 <section class="end" aria-labelledby="h-end">
   <div class="dots" aria-hidden="true"></div>
   <div class="wrap" style="position:relative">
     <h2 id="h-end" class="mark">jev-lint</h2>
     <p class="tag">a fuzzy linter for coding agents</p>
     <a class="url" href="https://github.com/ckorhonen/jev-lint"><svg class="gh" aria-hidden="true"><use href="#gh"/></svg>github.com/ckorhonen/jev-lint</a>
-    <p class="src" style="margin:20px auto 0">Claude Code + Codex hook · powered by TypeSafe Jev · MIT</p>
+    <p class="src" style="margin:20px auto 0">Claude Code + Codex hook · TypeSafe Jev by default · optional Cloudflare Clef · MIT</p>
   </div>
 </section>
 

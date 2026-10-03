@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { basename, dirname, extname, isAbsolute, join, relative, resolve } from "node:path";
 import type { ChangedFile } from "./extract";
-import { askNouls, type NoulQuestion } from "./jev";
+import { askNouls, type JudgeProvider, type NoulQuestion } from "./jev";
 import { findRepoConfig } from "./repoRules";
 
 // `when`: optional regex sources (case-insensitive). The rule is only asked when one of
@@ -198,6 +198,8 @@ export async function lintChange(
     packs?: Pack[];
     cwd?: string;
     baseUrl?: string;
+    provider?: JudgeProvider;
+    model?: string;
     gate?: boolean;
     onlyRules?: string[]; // ask just these rules (the end-of-session re-check)
   } = {},

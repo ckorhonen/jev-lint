@@ -21,6 +21,17 @@ cd "$JEV" && bun install
 
 You need [bun](https://bun.sh). If it's missing, tell the user to install it; don't install it yourself.
 
+## Optional provider: Cloudflare Clef
+
+TypeSafe remains the default. If the user asks for Cloudflare, follow the README's
+[Cloudflare Clef section](../../../../README.md#cloudflare-clef-optional): select
+`JEV_LINT_PROVIDER=cloudflare`, `JEV_LINT_MODEL=clef` (or `clef-flash`), and
+`CLOUDFLARE_ACCOUNT_ID`. The user supplies `CLOUDFLARE_API_TOKEN` in the agent's
+environment or a mode-600 `CLOUDFLARE_API_TOKEN_FILE`; never handle or print its value.
+The same installer commands below persist the provider for edit and recheck hooks.
+No TypeSafe key is needed. Report Cloudflare as the recipient of code in this mode,
+and do not claim Jev's measured accuracy, latency or cost for Clef.
+
 ## 2. Check before changing anything
 
 ```sh
@@ -28,13 +39,13 @@ bun "$JEV/src/install.ts" --skills --smoke
 ```
 
 This dry run writes nothing. It reports:
-- **The TypeSafe key:** present or MISSING. It never prints the key.
+- **The selected provider credential:** present or MISSING. It never prints the key.
 - **Each hook config:** whether it would be `added`, `updated` or `unchanged`.
 - **Codex's hooks feature flag.**
 - **The skill links** it would create.
 - **A real smoke check:** a file with an empty `catch` must come back flagged.
 
-**If the key is missing,** ask the user to add it themselves. Don't handle the value.
+**If the key is missing,** follow the Cloudflare section above for Clef, or for TypeSafe ask the user to add it themselves. Don't handle the value.
 - **macOS:** `security add-generic-password -a "$USER" -s typesafe-api-key -w`, which prompts for it.
 - **Linux, or a Mac reached only over SSH** (where the Keychain is locked): a user-only file at `~/.config/jev-lint/api-key` (mode 600; override with `TYPESAFE_API_KEY_FILE`). The hook ignores a key file that others can read.
 - **Or** `TYPESAFE_API_KEY` in the environment the agent runs in.
@@ -74,7 +85,7 @@ and linter configs, and proposes rules for approval before writing anything.
 ## 5. Tell the user
 
 - **What changed:** the files and whether each was added or updated, where the backups are, and the smoke result.
-- **Privacy:** the added code of each edit to a matching file is sent to TypeSafe. Findings are logged locally to `~/.local/state/jev-lint/findings.jsonl`; set `JEV_LINT_FINDINGS_LOG=off` to stop.
+- **Privacy:** the added code of each edit to a matching file is sent to the selected provider (TypeSafe by default, Cloudflare for Clef). Findings are logged locally to `~/.local/state/jev-lint/findings.jsonl`; set `JEV_LINT_FINDINGS_LOG=off` to stop.
 - **How to turn it off:** remove the jev-lint entry, or restore a backup.
 - **After a week or two of use:** the **jev-lint-learn** skill turns the log into evidence-backed changes.
 - **Options:** `$JEV/README.md` lists them all (packs, tiers, gating, modes, model).

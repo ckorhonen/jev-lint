@@ -2,15 +2,25 @@
 
 import { spawn } from "node:child_process";
 import { createHash } from "node:crypto";
-import { readFileSync, statSync, unlinkSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, statSync, unlinkSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { isSettledList, type Settled } from "./checks";
 import type { ChangedFile } from "./extract";
 
 // Settings that change what a check does. Each combination gets its own daemon, because
 // the daemon's rules, model and endpoint are fixed by the environment it started with.
-const CONFIG_ENV = ["JEV_LINT_MODEL", "JEV_LINT_PACKS", "JEV_LINT_GATE", "JEV_LINT_HIGH", "JEV_LINT_MEDIUM", "TYPESAFE_BASE_URL"];
+const CONFIG_ENV = [
+  "JEV_LINT_MODEL",
+  "JEV_LINT_PACKS",
+  "JEV_LINT_GATE",
+  "JEV_LINT_HIGH",
+  "JEV_LINT_MEDIUM",
+  "TYPESAFE_BASE_URL",
+  "JEV_LINT_PROVIDER",
+  "CLOUDFLARE_ACCOUNT_ID",
+  "CLOUDFLARE_API_TOKEN_FILE",
+];
 const CONNECT_TIMEOUT_MS = 300;
 const HEALTH_TIMEOUT_MS = 200;
 // At most one daemon start per socket in this window, so a daemon that crashes on startup
@@ -20,7 +30,11 @@ const RESPAWN_WINDOW_MS = 30_000;
 export function daemonSocketPath(): string {
   // The key is part of the identity (hashed, never stored) so projects with different keys
   // never share a daemon. A Keychain key isn't known here; the daemon exits on 401/403 instead.
-  const config = [...CONFIG_ENV.map((k) => `${k}=${process.env[k] ?? ""}`), `key=${process.env.TYPESAFE_API_KEY ?? ""}`].join("\n");
+  const config = [
+    ...CONFIG_ENV.map((k) => `${k}=${process.env[k] ?? ""}`),
+    `key=${process.env.TYPESAFE_API_KEY ?? ""}`,
+    `cfKey=${process.env.CLOUDFLARE_API_TOKEN ?? ""}`,
+  ].join("\n");
   const id = createHash("sha256")
     .update(`${import.meta.dir}\n${config}`)
     .digest("hex")
@@ -90,6 +104,7 @@ export function startDaemon(opts: { force?: boolean } = {}): number | undefined 
     // never started
   }
   try {
+    mkdirSync(dirname(stamp), { recursive: true, mode: 0o700 });
     writeFileSync(stamp, "");
     const child = spawn(process.execPath, [join(import.meta.dir, "daemon.ts")], {
       detached: true,
