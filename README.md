@@ -605,6 +605,9 @@ missing usage, timeout or HTTP failure fails the whole file check; the hook stay
 silent and exits successfully. Refusals never become zero-probability clean-code
 judgments. Retries are off for hooks and share one deadline when requested.
 
+An October 6, 2026 synthetic live smoke request passed (`gpt-6-luna`, predicate
+probability 0.99, 164 input tokens, zero output tokens); see the
+[verification receipt](docs/decisions-eval.md#live-smoke-and-publication-receipt).
 No live Decisions accuracy, latency or cost comparison has been measured. Jev's
 measurements do not apply to this mode. OpenAI bills usage to your account under
 the current Decisions rates; findings record returned model IDs and input tokens,

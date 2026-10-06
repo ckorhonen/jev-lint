@@ -5,7 +5,7 @@ and [create reference](https://developers.openai.com/api/reference/resources/dec
 This continues archived task `01a0fcb0-52db-75b8-8289-41ce92251013` and
 [PR #2](https://github.com/ckorhonen/jev-lint/pull/2) (now merged), which added
 optional Clef/Clef-flash. The pending Decisions implementation commitment is
-fulfilled locally; live comparison remains pending explicit approval. Chris's
+fulfilled; live comparison remains pending explicit approval. Chris's
 production preference for Clef is preserved. The separate jevlint-app production
 checkout is outside scope.
 
@@ -37,8 +37,9 @@ JEV_LINT_MODEL=jev-1.13.0 bun eval/run.ts --systems jev,clef,clef-flash,decision
 
 Use a fresh output name if that file exists. Do not overwrite prior evidence.
 No notebook numbers or recommendations change until results exist and are reviewed.
-No live paid calls, credential creation/grants, terms acceptance, deployment or
-private source transmission were performed for this implementation. Prior
+At the local implementation checkpoint, no live paid calls, credential
+creation/grants, terms acceptance, deployment or private source transmission
+had been performed. Prior
 Cloudflare synthetic-eval approval is consumed and does not authorize OpenAI.
 
 ## Local validation receipt
@@ -55,5 +56,29 @@ Cloudflare synthetic-eval approval is consumed and does not authorize OpenAI.
   Fixed synthetic probabilities validate plumbing only, not model accuracy.
 
 Original checkout/user untracked files and jevlint-app were not modified.
-Publication remains pending verified authorization; GitHub push/admin access alone
-is not publication consent. Live OpenAI smoke/comparison remains approval-gated.
+At the local implementation checkpoint, publication and live OpenAI verification
+remained approval-gated. Subsequent owner approval and verification are below.
+
+## Live smoke and publication receipt
+
+The owner authorized pushing the reviewed branch, a draft PR, reuse of an
+existing local OpenAI credential for a minimal synthetic smoke, and merge after
+checks pass. Published as [PR #3](https://github.com/ckorhonen/jev-lint/pull/3).
+
+A single no-retry live adapter request on October 6, 2026 evaluated the synthetic
+sentence "The package arrived with a broken screen." with one predicate asking
+whether the customer reports a damaged item. No repository code was sent.
+
+- Passed: returned model `gpt-6-luna`, probability 0.99.
+- Usage: 164 input tokens, zero output tokens.
+- Observed client round-trip: 1,267 ms; this is one smoke, not a latency benchmark.
+- Estimated base charge: $0.0000164 at the documented $0.10 per million input
+  tokens ([Decisions pricing](https://developers.openai.com/api/docs/guides/decisions#pricing-and-availability)).
+  This is not an invoice; regional/long-context modifiers may apply.
+- Existing environment credential reused in memory; no credential creation,
+  persistence, grants, payment setup or terms acceptance.
+
+GitHub reported no CI checks or Actions runs for the implementation commit and
+no branch protection on main; local validation passed (142 tests, types and lint
+with 12 existing warnings). No live comparison, production deployment or X post
+was performed by this task.
