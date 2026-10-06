@@ -27,12 +27,13 @@ import {
 import { homedir, tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { parseArgs } from "node:util";
+import { openaiKey } from "./decisions";
 import { cloudflareKey, judgeModel, judgeProvider, keyFilePath } from "./jev";
 
 const REPO = resolve(import.meta.dir, "..");
 const HOOK = join(REPO, "src/hook.ts");
 const MODEL = "jev-1.13.0";
-const installedModel = () => process.env.JEV_LINT_MODEL ?? (judgeProvider() === "cloudflare" ? judgeModel() : MODEL);
+const installedModel = () => process.env.JEV_LINT_MODEL ?? (judgeProvider() !== "typesafe" ? judgeModel() : MODEL);
 const shellQuote = (value: string) => `'${value.replaceAll("'", "'\\''")}'`;
 
 // Persist non-secret provider settings for both hooks. Credentials stay in the
@@ -41,6 +42,11 @@ export function judgeCommandEnv(): string {
   const provider = judgeProvider();
   const model = installedModel();
   if (provider === "typesafe") return `JEV_LINT_PROVIDER=typesafe JEV_LINT_MODEL=${model === MODEL ? MODEL : shellQuote(model)}`;
+  if (provider === "openai") {
+    if (model !== "gpt-6-luna") throw new Error("OpenAI Decisions model must be gpt-6-luna");
+    const keyFile = process.env.OPENAI_API_KEY_FILE;
+    return `JEV_LINT_PROVIDER=openai JEV_LINT_MODEL=${shellQuote(model)}${keyFile ? ` OPENAI_API_KEY_FILE=${shellQuote(resolve(keyFile))}` : ""}`;
+  }
   if (model !== "clef" && model !== "clef-flash") throw new Error("Cloudflare model must be clef or clef-flash");
   const account = process.env.CLOUDFLARE_ACCOUNT_ID;
   if (!account || !/^[a-f0-9]{32}$/i.test(account)) throw new Error("CLOUDFLARE_ACCOUNT_ID must be a 32-character account ID");
@@ -308,12 +314,14 @@ if (import.meta.main) {
   console.log(
     judgeProvider() === "cloudflare"
       ? `Cloudflare token: ${cloudflareKey() ? "present" : "MISSING"} (must be available to the agent at runtime)`
-      : `TypeSafe key: ${keyStatus()}`,
+      : judgeProvider() === "openai"
+        ? `OpenAI key: ${openaiKey() ? "present" : "MISSING"} (must be available to the agent at runtime)`
+        : `TypeSafe key: ${keyStatus()}`,
   );
   try {
     judgeCommandEnv(); // a missing account ID or an unknown model is a setup error, not a crash
   } catch (error) {
-    console.error(`Cloudflare setup: ${error instanceof Error ? error.message : error}`);
+    console.error(`Provider setup: ${error instanceof Error ? error.message : error}`);
     process.exit(1);
   }
   if (!values["codex-only"]) {

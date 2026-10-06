@@ -10,6 +10,7 @@ import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { parseArgs } from "node:util";
+import { openaiKey } from "../src/decisions";
 import { apiKey, cloudflareKey } from "../src/jev";
 import { BUILT_IN_PACKS, type BuiltInPack, LANGUAGES, type Pack, RULE_FILES, ruleApplies, ruleSetForLanguage } from "../src/lint";
 import {
@@ -19,6 +20,7 @@ import {
   jevModel,
   judgeClef,
   judgeClefFlash,
+  judgeDecisions,
   judgeJev,
   judgeLlm,
   judgeLocal,
@@ -57,6 +59,7 @@ const JUDGES = {
   llm: judgeLlm,
   regex: judgeRegex,
   local: judgeLocal,
+  decisions: judgeDecisions,
   clef: judgeClef,
   "clef-flash": judgeClefFlash,
 } as const;
@@ -108,7 +111,9 @@ function cacheDir(system: SystemName, run: number, pack: BuiltInPack, lang: stri
           ? LOCAL_NAME
           : system === "clef" || system === "clef-flash"
             ? `${system}-workers-ai-v1`
-            : "v1";
+            : system === "decisions"
+              ? "gpt-6-luna-decisions-v1"
+              : "v1";
   return join(RESULTS, "cache", `${system}-${variant}-${packHash(pack, lang)}-r${run}`);
 }
 
@@ -229,6 +234,7 @@ async function main() {
     if (!process.env.CLOUDFLARE_ACCOUNT_ID || !cloudflareKey())
       throw new Error("Clef eval requires CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN (or CLOUDFLARE_API_TOKEN_FILE)");
   }
+  if (systems.includes("decisions") && !openaiKey()) throw new Error("Decisions eval requires OPENAI_API_KEY (or OPENAI_API_KEY_FILE)");
   if (systems.includes("jev") && !process.env.TYPESAFE_BASE_URL && !apiKey()) throw new Error("Jev eval requires a TypeSafe API key");
   const runs = Number(args.runs);
   if (!Number.isInteger(runs) || runs < 1) throw new Error("--runs must be a positive integer");
@@ -285,13 +291,13 @@ async function main() {
           const subset = cases.filter((c) => c.pack === pack && c.lang === lang && c.split === split);
           if (!subset.length) continue;
           const policies: Record<string, number> =
-            system === "jev" || system === "local" || system === "clef" || system === "clef-flash"
+            system === "jev" || system === "local" || system === "clef" || system === "clef-flash" || system === "decisions"
               ? { high: HIGH, "high+medium": MEDIUM }
               : system === "llm"
                 ? { high: 0.9, "high+medium": 0.6 }
                 : { high: 1 };
           const regexCovered = ruleIds(lang, "hygiene").filter((id) => REGEX_RULES[id]);
-          if (system === "jev" || system === "llm" || system === "clef" || system === "clef-flash") {
+          if (system === "jev" || system === "llm" || system === "clef" || system === "clef-flash" || system === "decisions") {
             for (const [policy, threshold] of Object.entries(policies)) policies[`gated ${policy}`] = threshold;
           }
           for (const [policy, threshold] of Object.entries(policies)) {
@@ -311,7 +317,7 @@ async function main() {
               latency: latencyStats(subset, runsForSystem[0]),
             });
           }
-          if (system === "jev" || system === "local" || system === "clef" || system === "clef-flash") {
+          if (system === "jev" || system === "local" || system === "clef" || system === "clef-flash" || system === "decisions") {
             for (const t of SWEEP) {
               const s = score(subset, runsForSystem[0], t);
               sweeps.push({
@@ -364,7 +370,12 @@ async function main() {
         generatedAt: new Date().toISOString(),
         gateStats,
         llmModel: LLM_MODEL,
-        models: { jev: jevModel() ?? "jev-latest", clef: "@cf/cloudflare/clef", "clef-flash": "@cf/cloudflare/clef-flash" },
+        models: {
+          decisions: "gpt-6-luna",
+          jev: jevModel() ?? "jev-latest",
+          clef: "@cf/cloudflare/clef",
+          "clef-flash": "@cf/cloudflare/clef-flash",
+        },
         thresholds: { HIGH, MEDIUM },
         caseCounts,
         errors,
