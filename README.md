@@ -590,7 +590,9 @@ bun src/install.ts --apply --smoke
 ```
 
 The installer persists the provider/model and optional key-file path for both
-edit and recheck hooks. Changing provider or credentials isolates the daemon.
+edit and recheck hooks. Relative `OPENAI_API_KEY_FILE` paths resolve against the
+invoking directory; the daemon retains that absolute path when it starts from
+the home directory. Changing provider or credentials isolates the daemon.
 `TYPESAFE_BASE_URL` has no effect in OpenAI mode; explicit local endpoints still
 use the System One protocol. There is no automatic fallback between providers.
 
