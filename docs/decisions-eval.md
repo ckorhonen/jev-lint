@@ -82,3 +82,28 @@ GitHub reported no CI checks or Actions runs for the implementation commit and
 no branch protection on main; local validation passed (142 tests, types and lint
 with 12 existing warnings). No live comparison, production deployment or X post
 was performed by this task.
+
+## Adversarial review follow-up
+
+Review of merged PR #3 identified a relative `OPENAI_API_KEY_FILE` defect in
+manual daemon configurations: the caller read the project-relative file, while
+the daemon inherited the relative filename and resolved it from the home
+directory. The same filename in different projects could share a daemon identity.
+The follow-up resolves one absolute path consistently for identity and child
+environment, without changing the caller environment or provider defaults.
+Absolute paths are preserved verbatim and relative paths receive a caller-directory
+prefix without collapsing `..`, preserving symlink traversal and credential choice.
+Installer-generated plain absolute paths and environment keys were unaffected.
+Regression tests use only temporary dummy keys and local child processes.
+
+Follow-up validation: 147 tests passed; types passed; lint passed with the same
+12 existing warnings. Independent Sol 6.1 adversarial re-review passed 35 focused
+tests, including relative and absolute symlink/`..` child-process checks, with no
+material findings remaining. No additional live API requests were made.
+
+The review also reproduced an inherited evaluation-harness limitation: errored
+judgments are excluded from scoring, so an all-error slice can display perfect
+precision/recall/F1 with zero evaluated cases. Error totals cover only the first
+run. This is outside the narrow credential-path fix; future comparisons must
+report evaluated coverage and errors per slice/run before making performance
+claims. No comparative Decisions performance claims are made here.
