@@ -21,6 +21,7 @@ const CONFIG_ENV = [
   "JEV_LINT_PROVIDER",
   "CLOUDFLARE_ACCOUNT_ID",
   "CLOUDFLARE_API_TOKEN_FILE",
+  "OPENAI_API_KEY_FILE",
 ];
 const CONNECT_TIMEOUT_MS = 300;
 const HEALTH_TIMEOUT_MS = 200;
@@ -34,6 +35,7 @@ export function daemonSocketPath(): string {
   const config = [
     ...CONFIG_ENV.map((k) => `${k}=${process.env[k] ?? ""}`),
     `key=${process.env.TYPESAFE_API_KEY ?? ""}`,
+    `openaiKey=${process.env.OPENAI_API_KEY ?? ""}`,
     `cfKey=${process.env.CLOUDFLARE_API_TOKEN ?? ""}`,
   ].join("\n");
   const id = createHash("sha256")

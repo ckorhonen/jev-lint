@@ -39,6 +39,18 @@ If jev-lint is already installed and the user asks to update or upgrade it, run
 the hooks in their current mode. Report the commit range it printed and the smoke result if you
 add `--smoke`. Then stop; the steps below are for a first install.
 
+## Optional provider: OpenAI Decisions
+
+If requested, follow the README's [OpenAI Decisions section](../../../../README.md#openai-decisions-optional).
+Select `JEV_LINT_PROVIDER=openai`, `JEV_LINT_MODEL=gpt-6-luna`. The user supplies
+an existing `OPENAI_API_KEY` or a mode-600 `OPENAI_API_KEY_FILE` in the agent's
+environment; never handle or print its value. OpenAI receives added edit code,
+whole files for Writes and end-of-turn rechecks, file context and rule text in this
+mode. Preserve provider defaults and do not run `--smoke` or evals without the
+user's approval for paid OpenAI requests and code transmission. Cloudflare
+approval does not grant OpenAI approval. A plain installer dry run makes no API
+request. Do not claim measured Jev/Clef results for Decisions.
+
 ## 2. Check before changing anything
 
 ```sh

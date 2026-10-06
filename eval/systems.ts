@@ -52,11 +52,13 @@ export function caseCode(c: Case): string {
 }
 
 // JEV_LINT_MODEL also selects the Cloudflare model for the hook; a Clef name set in the shell
-// must not be sent to TypeSafe (unset means the client's default, jev-latest).
+// must not be sent to TypeSafe. Resolve explicitly so the client cannot inherit
+// a different provider's model from the environment again.
 export const jevModel = () => {
   const m = process.env.JEV_LINT_MODEL;
-  return m === "clef" || m === "clef-flash" ? undefined : m;
+  return !m || m === "clef" || m === "clef-flash" || m === "gpt-6-luna" ? "jev-latest" : m;
 };
+export const judgeDecisions = (c: Case) => judgeJev(c, undefined, false, { provider: "openai", model: "gpt-6-luna" });
 export const judgeClef = (c: Case) => judgeJev(c, undefined, false, { provider: "cloudflare", model: "clef" });
 export const judgeClefFlash = (c: Case) => judgeJev(c, undefined, false, { provider: "cloudflare", model: "clef-flash" });
 

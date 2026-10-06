@@ -24,6 +24,7 @@ which of your team's rules it just broke, and fixes them before anyone reviews t
   - [Rule packs](#rule-packs)
     - [Options (environment variables on the hook command)](#options-environment-variables-on-the-hook-command)
   - [Cloudflare Clef (optional)](#cloudflare-clef-optional)
+  - [OpenAI Decisions (optional)](#openai-decisions-optional)
   - [Local models](#local-models)
   - [Evaluation harness](#evaluation-harness)
   - [For agents working in this repo](#for-agents-working-in-this-repo)
@@ -468,11 +469,13 @@ Two rules were removed because the model is weak at counting and tracing; use a 
 | `JEV_LINT_GATE` | on | `off` asks every rule. By default a rule is only asked when its `when` patterns match the added code (about a third of rules per edit) |
 | `JEV_LINT_HIGH` / `JEV_LINT_MEDIUM` | `0.8` / `0.5` | Tier thresholds |
 | `JEV_LINT_MODE` | `context` | `block` sends findings as `decision: "block"`; `rewake` is for Claude Code async hooks (see below) |
-| `JEV_LINT_PROVIDER` | `typesafe` | `cloudflare` opts into Workers AI Clef; see setup below |
-| `JEV_LINT_MODEL` | `jev-latest` (TypeSafe), `clef` (Cloudflare) | Pin `jev-1.13.0` for TypeSafe; Cloudflare accepts `clef` or `clef-flash` |
+| `JEV_LINT_PROVIDER` | `typesafe` | `cloudflare` opts into Workers AI Clef; `openai` opts into OpenAI Decisions; see setup below |
+| `JEV_LINT_MODEL` | `jev-latest` (TypeSafe), `clef` (Cloudflare), `gpt-6-luna` (OpenAI) | Pin `jev-1.13.0` for TypeSafe; Cloudflare accepts `clef` or `clef-flash`; Decisions accepts `gpt-6-luna` |
 | `CLOUDFLARE_ACCOUNT_ID` | unset | Required in Cloudflare mode: your 32-character account ID |
 | `CLOUDFLARE_API_TOKEN` | unset | Workers AI token, read only in Cloudflare mode; never written to hook configs |
 | `CLOUDFLARE_API_TOKEN_FILE` | unset | Alternative token file; must have no group/other permissions (use mode 600). Environment token takes priority |
+| `OPENAI_API_KEY` | unset | OpenAI key, read by the Decisions provider; never written to hook configs |
+| `OPENAI_API_KEY_FILE` | unset | Alternative Decisions key file with no group/other permissions (mode 600); environment key takes priority |
 | `JEV_LINT_TIMEOUT_MS` | `8000` | Per-call timeout |
 | `JEV_LINT_LOG` | unset | Debug: append every raw judgment to a JSONL file |
 | `JEV_LINT_FINDINGS_LOG` | `~/.local/state/jev-lint/findings.jsonl` | Findings log used by `jev-lint-learn`; `off` disables it |
@@ -563,6 +566,53 @@ per pack/language. Each provider has separate caches keyed by model, rule text a
 payload. The harness asks every rule and derives gated scores by masking: those
 latencies are **ungated**, not production-hook timings. Existing results are not
 overwritten. See [docs/cloudflare-eval.md](docs/cloudflare-eval.md) for limitations.
+
+### OpenAI Decisions (optional)
+
+Set `JEV_LINT_PROVIDER=openai` to use the public beta
+[Decisions API](https://developers.openai.com/api/docs/guides/decisions).
+TypeSafe remains the default; Clef remains available independently. This mode uses
+`POST https://api.openai.com/v1/decisions` with `gpt-6-luna`, not Chat Completions
+or System One. Contract checked against the
+[create reference](https://developers.openai.com/api/reference/resources/decisions/methods/create)
+on October 6, 2026.
+
+After approving OpenAI billing and transmission of your code, make an existing
+`OPENAI_API_KEY` available to the agent, or set `OPENAI_API_KEY_FILE` to a private
+mode-600 file. Credentials are never persisted in hook configs. Select:
+
+```sh
+export JEV_LINT_PROVIDER=openai
+export JEV_LINT_MODEL=gpt-6-luna
+bun src/install.ts                         # dry run, no API request
+# After approving a paid smoke request and hook installation:
+bun src/install.ts --apply --smoke
+```
+
+The installer persists the provider/model and optional key-file path for both
+edit and recheck hooks. Changing provider or credentials isolates the daemon.
+`TYPESAFE_BASE_URL` has no effect in OpenAI mode; explicit local endpoints still
+use the System One protocol. There is no automatic fallback between providers.
+
+OpenAI receives the added code for edits, the whole file for Writes and
+end-of-turn rechecks (including pre-existing content), file path/language context
+and built-in or repository rule questions. Rule
+questions become predicates; true/false criteria are included in instructions,
+and the documented ordered `answers` array becomes internal rule probabilities.
+Names are optional in the API: the adapter sends rule IDs and accepts null answer
+names by position, while rejecting mismatched names. A refusal, malformed answer,
+missing usage, timeout or HTTP failure fails the whole file check; the hook stays
+silent and exits successfully. Refusals never become zero-probability clean-code
+judgments. Retries are off for hooks and share one deadline when requested.
+
+No live Decisions accuracy, latency or cost comparison has been measured. Jev's
+measurements do not apply to this mode. OpenAI bills usage to your account under
+the current Decisions rates; findings record returned model IDs and input tokens,
+and existing Jev-only cost estimates exclude them.
+
+For a comparison after approval, see [the fixed plan](docs/decisions-eval.md).
+Switch back using the existing Cloudflare or TypeSafe installer commands and the
+appropriate model. No credentials or provider defaults are changed automatically.
 
 ### Local models
 

@@ -5,6 +5,7 @@ import { spawnSync } from "node:child_process";
 import { readFileSync, statSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
+import { askDecisions } from "./decisions";
 
 export type NoulQuestion = {
   type: "noul";
@@ -56,17 +57,18 @@ export function apiKey(): string | undefined {
   return cachedKey;
 }
 
-export type JudgeProvider = "typesafe" | "cloudflare";
+export type JudgeProvider = "typesafe" | "cloudflare" | "openai";
 export type JudgeOptions = { model?: string; timeoutMs?: number; retries?: number; baseUrl?: string; provider?: JudgeProvider };
 
 export function judgeProvider(): JudgeProvider {
   const provider = process.env.JEV_LINT_PROVIDER ?? "typesafe";
-  if (provider !== "typesafe" && provider !== "cloudflare") throw new Error(`Unknown JEV_LINT_PROVIDER: ${provider}`);
+  if (provider !== "typesafe" && provider !== "cloudflare" && provider !== "openai")
+    throw new Error(`Unknown JEV_LINT_PROVIDER: ${provider}`);
   return provider;
 }
 
 export function judgeModel(provider = judgeProvider()): string {
-  return process.env.JEV_LINT_MODEL ?? (provider === "cloudflare" ? "clef" : "jev-latest");
+  return process.env.JEV_LINT_MODEL ?? (provider === "cloudflare" ? "clef" : provider === "openai" ? "gpt-6-luna" : "jev-latest");
 }
 
 export function cloudflareKey(): string | undefined {
@@ -164,6 +166,7 @@ async function askCloudflare(state: unknown, questions: Record<string, NoulQuest
 export async function askNouls(state: unknown, questions: Record<string, NoulQuestion>, opts: JudgeOptions = {}): Promise<JevResponse> {
   const provider = opts.provider ?? (opts.baseUrl ? "typesafe" : judgeProvider());
   if (provider === "cloudflare") return askCloudflare(state, questions, opts);
+  if (provider === "openai") return askDecisions(state, questions, opts);
   const baseUrl = opts.baseUrl ?? process.env.TYPESAFE_BASE_URL ?? DEFAULT_BASE_URL;
   const key = isTypeSafe(baseUrl) ? apiKey() : "local";
   if (!key) throw new Error("TYPESAFE_API_KEY not set and no Keychain item 'typesafe-api-key'");
