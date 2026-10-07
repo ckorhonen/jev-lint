@@ -73,15 +73,22 @@ Paste this into Claude Code or Codex, from the repo you want checked:
 
 ```text
 Set up jev-lint for me: https://github.com/ckorhonen/jev-lint
-Clone it to ~/Repos/jev-lint if it isn't there, then follow its jev-lint-setup skill
-(.agents/skills/jev-lint-setup/SKILL.md): check my TypeSafe key, show me the dry run, install
-the hook once I confirm, and run the smoke test. Then use its jev-lint-rules skill on this
-repo: read all of our agent instructions, skills, docs and linter configs, and propose rules
+Reuse an existing checkout, or ask me where to clone it. Follow its jev-lint-setup
+skill (.agents/skills/jev-lint-setup/SKILL.md): choose TypeSafe Jev, Cloudflare Clef,
+or OpenAI Decisions, check existing credentials without printing them, show me the
+local dry run, and install the hook once I confirm. Do not create credentials or
+make model requests during setup. Then use its jev-lint-rules skill on this repo:
+read our agent instructions, skills, docs and linter configs, and propose rules
 for me to approve before writing anything.
 ```
 
-The agent does the rest with two scripts: `src/install.ts` installs the hook idempotently,
-with backups, and `src/inventory.ts` lists every file that says what your team values.
+For guided setup, run `bun src/setup.ts` from the checkout. It offers TypeSafe
+Jev (default), Cloudflare Clef (`clef`), and OpenAI Decisions (`gpt-6-luna`), checks
+existing credentials, previews the local installer dry run, and asks before
+`--apply`. Pass installer options such as `--claude-only`, `--codex-only`,
+`--project <repo>`, `--pre`, `--async`, or `--skills` to choose the scope.
+`src/install.ts` remains available for manual setup; `src/inventory.ts` lists
+files that describe your team's conventions.
 
 ## How it works
 
@@ -213,31 +220,56 @@ evaluation harness, and how the repo itself is developed.
 Most people should use [Set it up with your agent](#set-it-up-with-your-agent) above. This
 section is the manual reference.
 
-Requires [bun](https://bun.sh) and a TypeSafe API key for the default mode, or
-[Cloudflare Workers AI credentials](#cloudflare-clef-optional) for optional Clef mode.
+Requires [bun](https://bun.sh) and existing credentials for your selected provider.
+Reuse an existing checkout. Otherwise, choose a parent folder and run:
 
 ```sh
-git clone https://github.com/ckorhonen/jev-lint ~/Repos/jev-lint && cd ~/Repos/jev-lint
+git clone https://github.com/ckorhonen/jev-lint
+cd jev-lint
 bun install
-security add-generic-password -a "$USER" -s typesafe-api-key -w   # macOS Keychain, or:
-# (umask 077; mkdir -p ~/.config/jev-lint; cat > ~/.config/jev-lint/api-key)   # Linux / SSH-only Macs; must be mode 600
+bun src/setup.ts
 ```
 
-Then let the installer do the rest. It checks first and writes only with `--apply`. It backs
-up each file, and replaces only the jev-lint entry, so re-running it is safe:
+TypeSafe uses `TYPESAFE_API_KEY`, a private mode-600 file at
+`~/.config/jev-lint/api-key` (override with `TYPESAFE_API_KEY_FILE`), or the macOS
+Keychain service `typesafe-api-key`. Cloudflare needs `CLOUDFLARE_ACCOUNT_ID` and
+`CLOUDFLARE_API_TOKEN` or a mode-600 `CLOUDFLARE_API_TOKEN_FILE`. OpenAI uses
+`OPENAI_API_KEY` or a mode-600 `OPENAI_API_KEY_FILE`. Setup checks for existing
+credentials without printing them; it does not create credentials or call a model.
+
+For a noninteractive local preview, use `bun src/setup.ts --provider typesafe`
+(or `clef` / `decisions`). Add `--apply` to authorize the reviewed local changes.
+The guide accepts the scope and mode flags shown below; network smoke tests stay separate.
+
+All shell examples below run from the jev-lint checkout. Use absolute target-repo
+paths where an example asks for a repo or files. The manual installer checks first
+and writes only with `--apply`, after you approve its preview:
 
 ```sh
-bun src/install.ts --skills --smoke                 # dry run: key, configs, skill links, one real check
-bun src/install.ts --apply --skills --smoke         # Claude Code + Codex, user-wide
+bun src/install.ts --skills                 # local dry run; no model request
+bun src/install.ts --apply --skills         # Claude Code + Codex, user-wide
 #   --claude-only | --codex-only   --project <repo> (Claude, repo-scoped)   --async (Claude, background)
 ```
+
+**Optional network verification:** `bun src/install.ts --smoke` makes a REAL NETWORK
+request, sending synthetic fixture code and rule questions to the selected provider;
+it may incur charges. Run it only with explicit approval for that provider and
+transmission. It must flag an empty `catch`; report failures instead of treating
+installation as verified. Honor permission denials; never add a broad Bash allowlist
+or bypass approval or hook trust to make it pass.
+
+`--apply` backs up changed files as `*.bak-jev-lint-<time>` and replaces only
+jev-lint entries. To turn it off, remove those entries or restore the corresponding
+backups; keep other hooks intact.
+The installer reports each actual backup path. Settings files that are symlinks are
+refused during preview: review their target and configure that location explicitly.
 
 **Upgrading.** One command pulls this checkout, installs dependencies and re-applies the hooks
 in whatever mode they're in (`--pre`, `--async`, re-check on or off are read back from your
 config), for both Claude Code and Codex:
 
 ```sh
-bun ~/Repos/jev-lint/src/install.ts --upgrade
+bun src/install.ts --upgrade
 ```
 
 The warm daemon notices the code change and restarts itself on the next check. Running
@@ -249,14 +281,14 @@ Or by hand:
 
 ```json
 { "matcher": "Write|Edit|MultiEdit",
-  "hooks": [{ "type": "command", "command": "JEV_LINT_MODEL=jev-1.13.0 bun ~/Repos/jev-lint/src/hook.ts", "timeout": 15 }] }
+  "hooks": [{ "type": "command", "command": "JEV_LINT_MODEL=jev-1.13.0 bun \"/absolute/path/to/jev-lint/src/hook.ts\"", "timeout": 15 }] }
 ```
 
 **Codex:** add to `~/.codex/hooks.json` under `hooks.PostToolUse`. Codex `apply_patch` payloads are parsed from `tool_input.command`, and only `+` lines are judged:
 
 ```json
 { "matcher": "Edit|Write|apply_patch",
-  "hooks": [{ "type": "command", "command": "JEV_LINT_MODEL=jev-1.13.0 bun ~/Repos/jev-lint/src/hook.ts", "timeout": 15 }] }
+  "hooks": [{ "type": "command", "command": "JEV_LINT_MODEL=jev-1.13.0 bun \"/absolute/path/to/jev-lint/src/hook.ts\"", "timeout": 15 }] }
 ```
 
 `--skills` links the skills into `~/.agents/skills`, `~/.claude/skills` and `~/.codex/skills`,
@@ -302,19 +334,19 @@ are the main reason a review-time check on the pull request is on the roadmap.
 local judge), run it in the background and let findings wake the agent:
 
 ```json
-{ "type": "command", "command": "JEV_LINT_MODE=rewake JEV_LINT_MODEL=jev-1.13.0 bun ~/Repos/jev-lint/src/hook.ts", "timeout": 180, "asyncRewake": true }
+{ "type": "command", "command": "JEV_LINT_MODE=rewake JEV_LINT_MODEL=jev-1.13.0 bun \"/absolute/path/to/jev-lint/src/hook.ts\"", "timeout": 180, "asyncRewake": true }
 ```
 
 Codex supports `async` hooks but not rewake, so keep Codex synchronous. Codex needs
-`[features] hooks = true` in `config.toml` and, the first time, trusting the hook (or `--dangerously-bypass-hook-trust` in automation).
+`[features] hooks = true` in `config.toml` and, the first time, trusting the hook through the normal approval flow.
 
 The hook fails open: on a timeout, an API error or an unknown file type it exits 0 silently.
-**Privacy:** the added code of every edit to a matching file is sent to the selected provider: TypeSafe by default, Cloudflare in Clef mode, or your configured local server.
+**Privacy:** installed hooks send added edit code, whole files for Writes, and current file content for end-of-turn rechecks to the selected provider: TypeSafe, Cloudflare Clef, OpenAI Decisions, or your configured local server. Replace the manual JSON examples' quoted absolute path with your checkout path.
 
 ### Generate rules for your repo
 
 Run the **`jev-lint-rules`** skill inside any repo. It works in seven steps:
-1. **Read everything the team wrote down.** `bun ~/Repos/jev-lint/src/inventory.ts .` lists:
+1. **Read everything the team wrote down.** `bun src/inventory.ts /absolute/path/to/target-repo` lists:
    - agent instructions: `AGENTS.md`, `CLAUDE.md`, Cursor/Copilot rules;
    - skills;
    - README, CONTRIBUTING, style guides and ADRs;
@@ -335,7 +367,7 @@ Run the **`jev-lint-rules`** skill inside any repo. It works in seven steps:
 6. **Write and check the rules.** It writes `.jev-lint/<language>.rules.json` and labeled
    examples in `.jev-lint/cases.jsonl`, then validates every rule against Jev:
    ```sh
-   bun ~/Repos/jev-lint/src/validate.ts .jev-lint   # keep / reword-or-drop / needs-cases per rule
+   bun src/validate.ts /absolute/path/to/target-repo/.jev-lint   # keep / reword-or-drop / needs-cases per rule
    ```
 7. **Keep only rules that pass.** It records the dropped ideas and the reasons in
    `.jev-lint/README.md`.
@@ -354,7 +386,7 @@ only asked where its convention holds. That's useful in multi-language repos, an
 folder-specific rules.
 
 To see what the rules would flag on existing code before enabling them, run
-`bun ~/Repos/jev-lint/src/check.ts <files…>`. This
+`bun src/check.ts <files…>`. This
 repo dogfoods it: see [`.jev-lint/`](.jev-lint/).
 
 ### Learn from what it catches
@@ -367,10 +399,10 @@ At the end of each turn, a re-check hook (`src/recheck.ts`, installed on `Stop` 
 finding gets a fixed-or-kept outcome. Subagents are tracked separately.
 
 ```sh
-bun ~/Repos/jev-lint/src/findings.ts --repo . --days 30              # per rule, plus failed checks and judge cost
-bun ~/Repos/jev-lint/src/findings.ts --repo . --clusters             # rule × area × test/non-test
-bun ~/Repos/jev-lint/src/findings.ts --repo . --compare <rule> --at <date>   # before/after, 95% CI
-bun ~/Repos/jev-lint/src/valueAudit.ts --repo . --days 30            # LLM-graded: were the fixed/kept findings worth it?
+bun src/findings.ts --repo /absolute/path/to/target-repo --days 30              # per rule, plus failed checks and judge cost
+bun src/findings.ts --repo /absolute/path/to/target-repo --clusters             # rule × area × test/non-test
+bun src/findings.ts --repo /absolute/path/to/target-repo --compare <rule> --at <date>   # before/after, 95% CI
+bun src/valueAudit.ts --repo /absolute/path/to/target-repo --days 30            # LLM-graded: were the fixed/kept findings worth it?
 ```
 
 The **value audit** asks `gpt-6-luna` whether a reviewer would have asked for each fixed or
@@ -498,27 +530,17 @@ API, so treat the first real run as a smoke test (`bun src/install.ts --smoke` i
 Cloudflare mode must flag an empty `catch`). See the
 [comparison plan and current status](docs/cloudflare-eval.md).
 
-1. Find your Cloudflare account ID and create an API token using the Workers AI token template (or **Workers AI → Read** and **Workers AI → Edit**
-   permissions) for that account ([REST setup](https://developers.cloudflare.com/workers-ai/get-started/rest-api/)).
-2. Make the token available to the agent as `CLOUDFLARE_API_TOKEN`, or store it in
-   a private file. A file is useful when the agent is launched outside your shell:
+Use existing `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN`, or set
+`CLOUDFLARE_API_TOKEN_FILE` to an existing private mode-600 token file. Setup does
+not create tokens. From the checkout:
 
-   ```sh
-   mkdir -p ~/.config/jev-lint
-   (umask 077; cat > ~/.config/jev-lint/cloudflare-token)  # paste token, then Ctrl-D
-   chmod 600 ~/.config/jev-lint/cloudflare-token
-   export CLOUDFLARE_API_TOKEN_FILE="$HOME/.config/jev-lint/cloudflare-token"
-   ```
-
-3. Select the provider and run the installer from the checkout:
-
-   ```sh
-   export JEV_LINT_PROVIDER=cloudflare
-   export CLOUDFLARE_ACCOUNT_ID=your_32_character_account_id
-   export JEV_LINT_MODEL=clef             # or clef-flash
-   bun src/install.ts --skills --smoke   # inspect the dry run and real check
-   bun src/install.ts --apply --skills --smoke
-   ```
+```sh
+export JEV_LINT_PROVIDER=cloudflare
+export CLOUDFLARE_ACCOUNT_ID=your_32_character_account_id
+export JEV_LINT_MODEL=clef             # or clef-flash
+bun src/install.ts --skills           # local preview; no API request
+bun src/install.ts --apply --skills   # after approving the preview
+```
 
 The installer records the provider, model, account ID and optional absolute token
 file path in both the edit hook and the end-of-turn recheck. It never writes the
@@ -548,7 +570,7 @@ version pins; record the date and returned model when comparing runs.
 To switch installed hooks back to Jev:
 
 ```sh
-JEV_LINT_PROVIDER=typesafe JEV_LINT_MODEL=jev-1.13.0 bun src/install.ts --apply --smoke
+JEV_LINT_PROVIDER=typesafe JEV_LINT_MODEL=jev-1.13.0 bun src/install.ts --apply
 ```
 
 To compare the hosted models on the same existing holdout cases, configure **both**
@@ -585,8 +607,8 @@ mode-600 file. Credentials are never persisted in hook configs. Select:
 export JEV_LINT_PROVIDER=openai
 export JEV_LINT_MODEL=gpt-6-luna
 bun src/install.ts                         # dry run, no API request
-# After approving a paid smoke request and hook installation:
-bun src/install.ts --apply --smoke
+# After approving hook installation:
+bun src/install.ts --apply
 ```
 
 The installer persists the provider/model and optional key-file path for both

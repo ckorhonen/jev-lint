@@ -2,7 +2,7 @@
 
 import { spawn } from "node:child_process";
 import { createHash } from "node:crypto";
-import { mkdirSync, readFileSync, statSync, unlinkSync, writeFileSync } from "node:fs";
+import { mkdirSync, statSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { dirname, isAbsolute, join, sep } from "node:path";
 import { isSettledList, type Settled } from "./checks";
@@ -18,13 +18,13 @@ const CONFIG_ENV = [
   "JEV_LINT_HIGH",
   "JEV_LINT_MEDIUM",
   "TYPESAFE_BASE_URL",
+  "TYPESAFE_API_KEY_FILE",
   "JEV_LINT_PROVIDER",
   "CLOUDFLARE_ACCOUNT_ID",
   "CLOUDFLARE_API_TOKEN_FILE",
   "OPENAI_API_KEY_FILE",
 ];
 const CONNECT_TIMEOUT_MS = 300;
-const HEALTH_TIMEOUT_MS = 200;
 // At most one daemon start per socket in this window, so a daemon that crashes on startup
 // can't turn every edit into a new process.
 const RESPAWN_WINDOW_MS = 30_000;
@@ -34,8 +34,10 @@ const RESPAWN_WINDOW_MS = 30_000;
 function daemonEnvironment(): NodeJS.ProcessEnv {
   const env = { ...process.env };
   // Do not collapse '..': symlink/.. traversal can select a different key file.
-  const file = env.OPENAI_API_KEY_FILE;
-  if (file && !isAbsolute(file)) env.OPENAI_API_KEY_FILE = `${process.cwd()}${sep}${file}`;
+  for (const name of ["OPENAI_API_KEY_FILE", "CLOUDFLARE_API_TOKEN_FILE", "TYPESAFE_API_KEY_FILE"]) {
+    const file = env[name];
+    if (file && !isAbsolute(file)) env[name] = `${process.cwd()}${sep}${file}`;
+  }
   return env;
 }
 
@@ -73,38 +75,12 @@ export async function checkViaDaemon(changes: ChangedFile[], opts: { timeoutMs: 
     return isSettledList(settled) ? settled : undefined;
   } catch (error) {
     if (!(error instanceof Error && error.name === "TimeoutError")) return undefined; // not running or a stale socket
-    // Reached but too slow. If it can't even answer a health check it is wedged: replace it
-    // so later checks recover instead of timing out forever.
-    if (!(await healthy())) replaceWedgedDaemon();
+    // A lock PID alone cannot prove process ownership (PIDs can be reused). Leave
+    // cleanup to the daemon's idle/source-change/drain shutdown rather than kill
+    // or unlink an unverified owner. A wedged daemon may keep failing checks until
+    // it shuts down or its owner explicitly restarts it; the hook stays fail-open.
     return changes.map(() => ({ ok: false, error: "daemon timeout" }));
   }
-}
-
-async function healthy(): Promise<boolean> {
-  try {
-    const res = await fetch("http://jev-lint/health", { unix: daemonSocketPath(), signal: AbortSignal.timeout(HEALTH_TIMEOUT_MS) });
-    return res.ok;
-  } catch {
-    return false;
-  }
-}
-
-function replaceWedgedDaemon() {
-  const socket = daemonSocketPath();
-  try {
-    const pid = Number(readFileSync(`${socket}.lock`, "utf8").trim());
-    if (pid > 0) process.kill(pid, "SIGKILL");
-  } catch {
-    // no lock or already dead
-  }
-  for (const path of [socket, `${socket}.lock`]) {
-    try {
-      unlinkSync(path);
-    } catch {
-      // already gone
-    }
-  }
-  startDaemon({ force: true });
 }
 
 // Start a daemon for the next check, in its own session so it outlives this hook process
