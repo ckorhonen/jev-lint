@@ -1,6 +1,60 @@
 import { describe, expect, test } from "bun:test";
 import { hookGroup, installedMode, isJevLint, mergeHook, recheckGroup } from "../src/install";
 
+test("ownership requires literal bun execution, not mentions, suffixes or expansions", () => {
+  for (const command of [
+    "echo /tmp/jev-lint/src/hook.ts is unavailable",
+    "bun /tmp/jev-lint/src/hook.ts.bak",
+    "bun /tmp/jev-lint/src/hook.ts; echo audit",
+    'bun "/tmp/jev-lint/src/hook\\.ts"',
+    "bun /tmp/*/jev-lint/src/hook.ts",
+    "bun $ROOT/jev-lint/src/hook.ts",
+  ])
+    expect(isJevLint({ type: "command", command, timeout: 15 })).toBe(false);
+  expect(
+    isJevLint({
+      type: "command",
+      command: "JEV_LINT_PROVIDER=openai bun '/tmp/custom old/src/hook.ts'",
+      statusMessage: "jev-lint",
+      timeout: 15,
+    }),
+  ).toBe(true);
+});
+
+test("quoted and escaped assignment names are executable words; legacy tilde paths migrate", () => {
+  for (const command of [
+    "'NOT_AN_ASSIGNMENT=x' bun /tmp/jev-lint/src/hook.ts",
+    "\\NOT_AN_ASSIGNMENT=x bun /tmp/jev-lint/src/hook.ts",
+    '"JEV_LINT_MODEL"=x bun /tmp/jev-lint/src/hook.ts',
+  ])
+    expect(isJevLint({ type: "command", command, timeout: 15 })).toBe(false);
+  for (const command of [
+    "JEV_LINT_MODEL='jev-1.13.0' bun ~/Repos/jev-lint/src/hook.ts",
+    'JEV_LINT_MODEL="jev-1.13.0" bun /tmp/jev-lint/src/hook.ts',
+  ])
+    expect(isJevLint({ type: "command", command, timeout: 15 })).toBe(true);
+});
+
+test("provider changes coalesce every owned duplicate while preserving mixed-group hooks", () => {
+  const old = hookGroup("claude", { bun: "/usr/bin/bun" });
+  const audit = { type: "command" as const, command: "echo /tmp/jev-lint/src/hook.ts", timeout: 5 };
+  const updated = hookGroup("claude", { async: true });
+  const merged = mergeHook({ hooks: { PostToolUse: [old, { matcher: "*", hooks: [old.hooks[0], audit] }, old] } }, updated);
+  expect(merged.action).toBe("updated");
+  const groups = merged.config.hooks?.PostToolUse ?? [];
+  expect(groups.flatMap((g) => g.hooks).filter(isJevLint)).toEqual(updated.hooks);
+  expect(groups).toContainEqual({ matcher: "*", hooks: [audit] });
+  expect(mergeHook(merged.config, updated).action).toBe("unchanged");
+});
+
+test("binary normalization never conceals a changed credential file named bun", () => {
+  const first = hookGroup("claude");
+  first.hooks[0].command = "JEV_LINT_PROVIDER=typesafe TYPESAFE_API_KEY_FILE='/tmp/one/bun' /usr/bin/bun /tmp/jev-lint/src/hook.ts";
+  const second = structuredClone(first);
+  second.hooks[0].command = second.hooks[0].command.replace("/tmp/one/bun", "/tmp/two/bun");
+  expect(mergeHook({ hooks: { PostToolUse: [first] } }, second).action).toBe("updated");
+});
+
 describe("install mergeHook", () => {
   const group = hookGroup("claude", { bun: "/usr/bin/bun" });
 

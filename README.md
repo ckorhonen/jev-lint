@@ -261,7 +261,7 @@ or bypass approval or hook trust to make it pass.
 `--apply` backs up changed files as `*.bak-jev-lint-<time>` and replaces only
 jev-lint entries. To turn it off, remove those entries or restore the corresponding
 backups; keep other hooks intact.
-The installer reports each actual backup path. Settings files that are symlinks are
+The installer reports each actual backup path. Settings files or their agent-config directories that are symlinks are
 refused during preview: review their target and configure that location explicitly.
 
 **Upgrading.** One command pulls this checkout, installs dependencies and re-applies the hooks

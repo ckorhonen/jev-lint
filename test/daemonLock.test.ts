@@ -1,5 +1,17 @@
 import { afterEach, beforeEach, expect, spyOn, test } from "bun:test";
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, unlinkSync, writeFileSync } from "node:fs";
+import { spawnSync } from "node:child_process";
+import {
+  existsSync,
+  lstatSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  statSync,
+  symlinkSync,
+  unlinkSync,
+  writeFileSync,
+} from "node:fs";
 import { join } from "node:path";
 import { takeDaemonLock } from "../src/daemonLock";
 
@@ -11,6 +23,34 @@ beforeEach(() => {
 });
 afterEach(() => {
   rmSync(root, { recursive: true, force: true });
+});
+
+test.each(["fifo", "symlink", "oversized"])("unexpected %s lock state is never read or removed on acquisition or release", (kind) => {
+  const owner = takeDaemonLock(lock, () => {});
+  unlinkSync(lock);
+  if (kind === "fifo") expect(spawnSync("mkfifo", [lock]).status).toBe(0);
+  else if (kind === "symlink") {
+    const target = join(root, "unrelated");
+    writeFileSync(target, String(process.pid));
+    symlinkSync(target, lock);
+  } else writeFileSync(lock, "0".repeat(33));
+  const inode = lstatSync(lock).ino;
+  expect(
+    takeDaemonLock(
+      lock,
+      () => {
+        throw new Error("unexpected cleanup");
+      },
+      { alive: () => false },
+    ),
+  ).toBeUndefined();
+  expect(
+    owner?.release(() => {
+      throw new Error("unexpected release cleanup");
+    }),
+  ).toBe(false);
+  expect(lstatSync(lock).ino).toBe(inode);
+  expect(existsSync(`${lock}.guard`)).toBe(false);
 });
 
 test("a contender observing a dead owner excludes another contender until replacement completes", () => {

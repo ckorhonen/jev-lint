@@ -25,7 +25,7 @@ import {
   writeFileSync,
 } from "node:fs";
 import { homedir, tmpdir } from "node:os";
-import { dirname, isAbsolute, join, resolve, sep } from "node:path";
+import { basename, dirname, isAbsolute, join, resolve, sep } from "node:path";
 import { parseArgs } from "node:util";
 import { openaiKey } from "./decisions";
 import { cloudflareKey, judgeModel, judgeProvider, keyFilePath } from "./jev";
@@ -91,10 +91,104 @@ const RECHECK = join(REPO, "src/recheck.ts");
 // Ours if it runs this checkout's script, or one from a checkout named jev-lint (an older
 // install elsewhere). A clone under another name must still be recognised, or every re-run
 // would add a second hook.
-export const isJevLint = (h: HookCommand) =>
-  h.command.includes(HOOK) || h.command.includes(shellQuote(HOOK)) || /jev-lint\/src\/hook\.ts/.test(h.command);
-const isJevLintRecheck = (h: HookCommand) =>
-  h.command.includes(RECHECK) || h.command.includes(shellQuote(RECHECK)) || /jev-lint\/src\/recheck\.ts/.test(h.command);
+// Parse only literal shell words; never evaluate expansions or compound commands
+// while deciding which user hooks this installer owns.
+function literalWords(command: string): { words: string[]; assignments: Set<number> } | undefined {
+  const words: string[] = [];
+  const assignments = new Set<number>();
+  let word = "";
+  let quote = "";
+  let started = false;
+  let literalName = true;
+  let equals = false;
+  const finish = () => {
+    if (started) {
+      if (literalName && /^[A-Za-z_]\w*=/.test(word)) assignments.add(words.length);
+      words.push(word);
+    }
+    word = "";
+    started = false;
+    literalName = true;
+    equals = false;
+  };
+  for (let i = 0; i < command.length; i++) {
+    const ch = command[i];
+    if (quote === "'") {
+      if (ch === "'") quote = "";
+      else word += ch;
+    } else if (ch === "\\" && quote !== "'") {
+      if (!equals) literalName = false;
+      if (quote === '"' && !["$", "`", '"', "\\"].includes(command[i + 1])) {
+        word += ch;
+        continue;
+      }
+      if (++i >= command.length) return undefined;
+      word += command[i];
+      started = true;
+    } else if (quote === '"') {
+      if (ch === '"') quote = "";
+      else if (ch === "$" || ch === "`") return undefined;
+      else word += ch;
+    } else if (ch === "'" || ch === '"') {
+      if (!equals) literalName = false;
+      quote = ch;
+      started = true;
+    } else if (/\s/.test(ch)) {
+      if (ch === "\n" || ch === "\r") return undefined;
+      finish();
+    } else if (ch === "~" && !started && command[i + 1] === "/") {
+      word = homedir();
+      started = true;
+    } else if (/[;$`|&<>()*?[~#]/.test(ch)) return undefined;
+    else {
+      if (ch === "=") equals = true;
+      word += ch;
+      started = true;
+    }
+  }
+  if (quote) return undefined;
+  finish();
+  return { words, assignments };
+}
+
+function invocation(h: HookCommand): { words: string[]; binary: number; script: string } | undefined {
+  const parsed = literalWords(h.command);
+  if (!parsed) return undefined;
+  const { words, assignments } = parsed;
+  const binary = words.findIndex((_, index) => !assignments.has(index));
+  if (binary < 0 || basename(words[binary]) !== "bun" || !words[binary + 1]) return undefined;
+  return { words, binary, script: words[binary + 1] };
+}
+
+export const isJevLint = (h: HookCommand) => {
+  const script = invocation(h)?.script;
+  return Boolean(
+    script &&
+      (script === HOOK ||
+        /(?:^|\/)jev-lint\/src\/hook\.ts$/.test(script) ||
+        (h.statusMessage === "jev-lint" && isAbsolute(script) && script.endsWith("/src/hook.ts"))),
+  );
+};
+function recheckOwner(config: HookConfig): (h: HookCommand) => boolean {
+  const oldScripts = new Set(
+    ["PreToolUse", "PostToolUse"].flatMap((event) =>
+      (config.hooks?.[event] ?? [])
+        .flatMap((group) => group.hooks)
+        .filter(isJevLint)
+        .map((hook) => invocation(hook)?.script.replace(/hook\.ts$/, "recheck.ts")),
+    ),
+  );
+  return (h) => {
+    const script = invocation(h)?.script;
+    return Boolean(
+      script &&
+        (script === RECHECK ||
+          oldScripts.has(script) ||
+          /(?:^|\/)jev-lint\/src\/recheck\.ts$/.test(script) ||
+          (h.statusMessage === "jev-lint recheck" && isAbsolute(script) && script.endsWith("/src/recheck.ts"))),
+    );
+  };
+}
 const RECHECK_TIMEOUT_S = 20;
 export const RECHECK_EVENTS = ["Stop", "SubagentStop"] as const;
 
@@ -102,13 +196,30 @@ export const RECHECK_EVENTS = ["Stop", "SubagentStop"] as const;
 export function recheckGroup(opts: { bun?: string } = {}): HookGroup {
   const bun = opts.bun ?? Bun.which("bun") ?? process.execPath;
   return {
-    hooks: [{ type: "command", command: `${judgeCommandEnv()} ${shellQuote(bun)} ${shellQuote(RECHECK)}`, timeout: RECHECK_TIMEOUT_S }],
+    hooks: [
+      {
+        type: "command",
+        command: `${judgeCommandEnv()} ${shellQuote(bun)} ${shellQuote(RECHECK)}`,
+        timeout: RECHECK_TIMEOUT_S,
+        statusMessage: "jev-lint recheck",
+      },
+    ],
   };
 }
 
 // Which bun binary runs the hook doesn't matter (Homebrew vs ~/.bun), so it isn't a change.
 const sameHook = (a: HookGroup, b: HookGroup) => {
-  const normal = (g: HookGroup) => JSON.stringify(g).replace(/'[^']*\/bun' |[^\s"']*\/bun /g, "bun ");
+  const normal = (g: HookGroup) =>
+    JSON.stringify({
+      ...g,
+      hooks: g.hooks.map((h) => {
+        const parsed = invocation(h);
+        if (!parsed) return h;
+        const words = [...parsed.words];
+        words[parsed.binary] = "bun";
+        return { ...h, command: words };
+      }),
+    });
   return normal(a) === normal(b);
 };
 
@@ -120,19 +231,28 @@ export function mergeHook(
   ours: (h: HookCommand) => boolean = isJevLint,
 ): { config: HookConfig; action: "added" | "updated" | "unchanged" } {
   const post = [...(config.hooks?.[event] ?? [])];
-  const index = post.findIndex((g) => g.hooks?.some(ours));
+  const indexes = post.flatMap((g, index) => (g.hooks?.some(ours) ? [index] : []));
+  const index = indexes[0] ?? -1;
   let action: "added" | "updated" | "unchanged" = "added";
   if (index === -1) post.push(group);
-  else if (sameHook(post[index], group)) action = "unchanged";
+  else if (indexes.length === 1 && sameHook(post[index], group)) action = "unchanged";
   else {
     // Keep any unrelated hooks that share the group; swap only the jev-lint command.
     // A group's matcher is shared by all its hooks, so never change it under other hooks:
     // leave them in their group and give jev-lint its own.
-    const others = post[index].hooks.filter((h) => !ours(h));
-    if (others.length) {
-      post[index] = { ...post[index], hooks: others };
-      post.push(group);
-    } else post[index] = group;
+    let placed = false;
+    const kept = post.flatMap((existing) => {
+      if (!existing.hooks.some(ours)) return [existing];
+      const others = existing.hooks.filter((h) => !ours(h));
+      if (others.length) return [{ ...existing, hooks: others }];
+      if (!placed) {
+        placed = true;
+        return [group];
+      }
+      return [];
+    });
+    if (!placed) kept.push(group);
+    post.splice(0, post.length, ...kept);
     action = "updated";
   }
   return { config: { ...config, hooks: { ...config.hooks, [event]: post } }, action };
@@ -175,7 +295,7 @@ export function installedMode(config: HookConfig): { installed: boolean; pre: bo
     installed: main.length > 0,
     pre: pre.length > 0,
     async: main.some((h) => h.asyncRewake || /JEV_LINT_MODE=rewake/.test(h.command)),
-    recheck: RECHECK_EVENTS.some((e) => (config.hooks?.[e] ?? []).some((g) => g.hooks?.some(isJevLintRecheck))),
+    recheck: RECHECK_EVENTS.some((e) => (config.hooks?.[e] ?? []).some((g) => g.hooks?.some(recheckOwner(config)))),
   };
 }
 
@@ -199,11 +319,14 @@ function upgradeCheckout(): string {
 
 // Main hook on PostToolUse (or PreToolUse with --pre), plus (unless disabled) the end-of-turn re-check on Stop/SubagentStop.
 function writeConfig(path: string, group: HookGroup, apply: boolean, recheck: boolean, pre = false): string {
+  if (lstatSync(dirname(path), { throwIfNoEntry: false })?.isSymbolicLink())
+    throw new Error(`${dirname(path)} is a symlink; review its target and configure that location explicitly before applying`);
   if (lstatSync(path, { throwIfNoEntry: false })?.isSymbolicLink())
     throw new Error(`${path} is a symlink; review its target and configure that location explicitly before applying`);
   const parsed: unknown = existsSync(path) ? JSON.parse(readFileSync(path, "utf8")) : {};
   if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) throw new Error(`${path} is not a JSON object; not touching it`);
   let config = parsed as HookConfig;
+  const isJevLintRecheck = recheckOwner(config);
   const actions: string[] = [];
   // The hook runs on exactly one of PreToolUse / PostToolUse, so switching modes moves it.
   const [event, other] = pre ? ["PreToolUse", "PostToolUse"] : ["PostToolUse", "PreToolUse"];

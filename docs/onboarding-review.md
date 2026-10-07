@@ -87,3 +87,34 @@ Independent read-only review found no blockers and passed all seven new ownershi
 tests (32 assertions), including the six-process election. A local Unix-socket probe
 also confirmed that `server.stop(true)` leaves its socket for guarded removal on the
 installed Bun runtime. No merge or deployment was performed.
+
+## Authorized adversarial review before merge
+
+Chris subsequently authorized independent adversarial review, fixes, publication and
+normal merge of PR #5. Review of `002b3ca` reproduced four installer ownership/scope
+issues: custom-named relocated checkouts were missed; duplicate groups retained old
+provider commands; an `echo` mentioning a hook path was incorrectly treated as owned;
+and a project's symlinked `.claude` directory redirected a scoped install elsewhere.
+Review also reproduced a FIFO ownership-file read blocking daemon startup while it
+held the guard. These cases used temporary state and dummy credentials only.
+
+The installer now recognises literal Bun script invocations, using exact paths or
+generated hook markers and associated old checkout roots. It preserves complex shell
+commands it cannot safely identify. All owned duplicates are coalesced while unrelated
+commands and matchers are preserved. Binary normalization applies only to the executable,
+so credential paths ending in `bun` cannot conceal a provider credential change.
+Symlinked agent-config directories are refused during preview and apply, preventing
+project configuration from crossing scope. Ownership recovery and release refuse
+symlinks, nonregular files and files over 32 bytes before reading them, leaving them intact.
+
+The updated full suite passed 192 tests with 1,128 assertions across 18 files. Types and
+Biome passed with 12 existing warnings. New regressions cover false-positive ownership,
+relocation, duplicate removal, symlinked config directories, normalization boundaries,
+and FIFO/symlink/oversized ownership state on acquisition and release. The private state
+directory and cooperative guard protect normal lifecycle transitions; this is not a
+security boundary against an active hostile process running as the same user.
+Final parser review additionally covered quoted/escaped assignment names (which must
+be executable words, not skipped environment assignments), and historically documented
+unquoted `~/` checkout paths. These now have explicit migration regressions. The final
+full run passed 193 tests with 1,133 assertions; types passed and lint retained the same
+12 baseline warnings. No paid requests or new credentials were used.

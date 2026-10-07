@@ -1,6 +1,6 @@
 // Serialize daemon ownership changes. Never reap an existing guard: a stale
 // observer must not remove a successor's lock, socket, or guard.
-import { closeSync, mkdirSync, openSync, readFileSync, rmdirSync, statSync, unlinkSync, writeSync } from "node:fs";
+import { closeSync, lstatSync, mkdirSync, openSync, readFileSync, rmdirSync, statSync, unlinkSync, writeSync } from "node:fs";
 
 function withGuard<T>(lock: string, action: () => T): T | undefined {
   const guard = `${lock}.guard`;
@@ -41,6 +41,8 @@ export function takeDaemonLock(
       fd = openSync(lock, "wx", 0o600);
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code !== "EEXIST") return undefined;
+      const info = lstatSync(lock);
+      if (!info.isFile() || info.size > 32) return undefined; // Unexpected state is not permission to read or remove it.
       const owner = Number(readFileSync(lock, "utf8").trim());
       if (Number.isInteger(owner) && owner > 0 && alive(owner)) return undefined;
       // Every creator/releaser uses the guard, so nobody can replace this stale
@@ -59,7 +61,8 @@ export function takeDaemonLock(
       release(cleanup) {
         return (
           withGuard(lock, () => {
-            if (statSync(lock).ino !== inode || readFileSync(lock, "utf8").trim() !== String(pid)) return false;
+            const info = lstatSync(lock);
+            if (!info.isFile() || info.size > 32 || info.ino !== inode || readFileSync(lock, "utf8").trim() !== String(pid)) return false;
             cleanup();
             unlinkSync(lock);
             return true;

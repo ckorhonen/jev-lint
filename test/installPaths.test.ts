@@ -19,6 +19,59 @@ let root: string;
 let cwd: string;
 let env: NodeJS.ProcessEnv;
 const installer = join(import.meta.dir, "../src/install.ts");
+
+test("project config-directory symlinks refuse preview and apply without crossing scope", () => {
+  const project = join(root, "untrusted project");
+  const outside = join(root, "other scope");
+  mkdirSync(project);
+  mkdirSync(outside);
+  symlinkSync(outside, join(project, ".claude"));
+  const config = join(outside, "settings.json");
+  writeFileSync(config, "{}");
+  for (const apply of [false, true]) {
+    const run = spawnSync(process.execPath, [installer, "--project", project, ...(apply ? ["--apply"] : [])], {
+      env: { PATH: process.env.PATH, HOME: root, TYPESAFE_API_KEY: "dummy" },
+      encoding: "utf8",
+    });
+    expect(run.status).toBe(1);
+    expect(run.stderr).toContain("is a symlink");
+    expect(readFileSync(config, "utf8")).toBe("{}");
+  }
+  expect(readdirSync(outside)).toEqual(["settings.json"]);
+});
+
+test("relocated custom checkouts remove all old provider edits and rechecks", () => {
+  const project = join(root, "project");
+  mkdirSync(join(project, ".claude"), { recursive: true });
+  const config = join(project, ".claude/settings.json");
+  const oldMain = {
+    type: "command",
+    command: "JEV_LINT_PROVIDER=openai JEV_LINT_MODEL=gpt-6-luna bun '/tmp/renamed old/src/hook.ts'",
+    statusMessage: "jev-lint",
+    timeout: 15,
+  };
+  const oldRecheck = { type: "command", command: "JEV_LINT_PROVIDER=openai bun '/tmp/renamed old/src/recheck.ts'", timeout: 20 };
+  writeFileSync(
+    config,
+    JSON.stringify({
+      hooks: {
+        PostToolUse: [{ hooks: [oldMain] }, { hooks: [oldMain] }],
+        Stop: [{ hooks: [oldRecheck] }],
+        SubagentStop: [{ hooks: [oldRecheck] }],
+      },
+    }),
+  );
+  const run = spawnSync(process.execPath, [installer, "--project", project, "--apply", "--no-recheck"], {
+    env: { PATH: process.env.PATH, HOME: root, TYPESAFE_API_KEY: "dummy" },
+    encoding: "utf8",
+  });
+  expect(run.status).toBe(0);
+  const updated = JSON.parse(readFileSync(config, "utf8"));
+  expect(updated.hooks.PostToolUse).toHaveLength(1);
+  expect(updated.hooks.Stop).toBeUndefined();
+  expect(updated.hooks.SubagentStop).toBeUndefined();
+  expect(readFileSync(config, "utf8")).not.toContain("openai");
+});
 beforeEach(() => {
   root = realpathSync(mkdtempSync("/tmp/jev-install-path-"));
   cwd = process.cwd();
