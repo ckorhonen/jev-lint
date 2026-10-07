@@ -131,7 +131,7 @@ h2{font-size:clamp(28px,3.9vw,52px);max-width:22ch}
 
 /* Hero */
 .hero{padding-top:clamp(36px,6vw,80px)}
-.hero h1{font-size:clamp(34px,5.4vw,80px);letter-spacing:-.025em;line-height:1.04;max-width:18ch}
+.hero h1{font-size:clamp(34px,5.4vw,80px);letter-spacing:-.025em;line-height:1.04;max-width:22ch}
 .hero h1 .cur{display:inline-block;width:.42em;height:.74em;background:var(--fg);vertical-align:-.05em;margin-left:.1em;animation:blink 1.1s steps(1) infinite}
 .hero .grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:clamp(28px,4vw,64px);align-items:start;margin-top:clamp(24px,3vw,40px)}
 @media (max-width:980px){.hero .grid{grid-template-columns:1fr}}
@@ -215,6 +215,14 @@ h2{font-size:clamp(28px,3.9vw,52px);max-width:22ch}
 .hero-demo figcaption a{display:inline-flex;align-items:center;min-height:44px}
 .hero .providers{margin-top:20px;font-size:13px}
 .hero .providers a{gap:6px}
+.demo-notes,.setup-prompt{margin-top:12px;font-size:13px;color:var(--dim)}
+summary{cursor:pointer;min-height:44px;display:list-item;align-content:center}
+summary:focus-visible{outline:2px solid var(--fg);outline-offset:3px}
+.demo-notes ol{padding-left:22px;line-height:1.7}
+.demo-notes li+li{margin-top:10px}
+.setup-prompt .prompt{margin-top:10px}
+.compact-steps{margin-top:32px}
+@media(max-width:640px){.hero .grid{gap:24px}.hero .providers{gap:0 16px}.hero .providers a{font-size:12px}.rules-list{font-size:13px;line-height:2;overflow-wrap:anywhere}.hero h1{font-size:clamp(26px,7vw,40px)}.hero h1 .cur{display:none}.hero .pitch{font-size:17px}}
 
 /* How it works: a sequence, not cards */
 .steps{list-style:none;margin:36px 0 0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(20px,3vw,44px);counter-reset:s}
@@ -308,7 +316,7 @@ h2{font-size:clamp(28px,3.9vw,52px);max-width:22ch}
 .end .url{display:inline-flex;align-items:center;margin-top:28px;border:2px solid var(--fg);padding:12px 22px;font-size:clamp(15px,2.2vw,26px);text-decoration:none;min-height:44px}
 .end .url:hover{background:var(--fg);color:var(--bg)}
 .dots{position:absolute;inset:0;background-image:radial-gradient(#262626 1.2px,transparent 1.3px);background-size:40px 40px;mask-image:radial-gradient(ellipse at center,#000 30%,transparent 75%);-webkit-mask-image:radial-gradient(ellipse at center,#000 30%,transparent 75%);pointer-events:none}
-footer{border-top:1px solid var(--line);padding:24px 0 48px;font-size:13.5px;color:var(--dim);margin-top:var(--gap)}
+footer{border-top:1px solid var(--line);padding:24px 0 48px;font-size:13.5px;color:var(--dim);margin-top:0}
 footer .wrap{display:flex;flex-wrap:wrap;align-items:center;gap:0 24px}
 footer a{color:var(--dim);display:inline-flex;align-items:center;min-height:44px}
 
@@ -356,27 +364,23 @@ footer a{color:var(--dim);display:inline-flex;align-items:center;min-height:44px
     <h1 id="h-hero">Your code passes.<br>Does it make sense?<span class="cur" aria-hidden="true"></span></h1>
     <div class="grid">
       <div>
-        <p class="pitch">Turn the standards you normally explain in review into focused checks for Claude Code and Codex. <b>JevLint checks agent edits against your rules</b> and sends findings back while the agent is still working.</p>
+        <p class="pitch">Turn your team’s review standards into checks for Claude Code and Codex. <b>JevLint flags fuzzy rule violations</b> while the agent is still working.</p>
         <div class="cta">
           <div class="seg" role="group" aria-label="Choose your agent">
             <button type="button" data-agent="claude" aria-pressed="true">Claude Code</button>
             <button type="button" data-agent="codex" aria-pressed="false">Codex</button>
           </div>
           <button class="copy" type="button" data-copy>Copy the setup prompt</button>
-          <p class="hint">Paste it into <span data-agent-name>Claude Code</span> from the repo you want checked. It installs the hook, then proposes rules for your repo. Nothing is written until you approve.</p>
-          <div class="links">
-            <a href="https://github.com/ckorhonen/jev-lint"><svg class="gh" aria-hidden="true"><use href="#gh"/></svg>ckorhonen/jev-lint</a>
-            <a href="#demo">Watch the 28-second demo</a>
-          </div>
-          <p class="meta">Open source · your rules live in your repo · MIT</p>
+          <p class="hint">Paste into <span data-agent-name>Claude Code</span>. Review the setup and proposed rules before applying them.</p>
+          <div class="links"><a href="#demo">Watch the 28-second demo →</a><a href="https://github.com/ckorhonen/jev-lint">GitHub →</a></div>
+          <p class="meta">Open source · MIT · your rules live in your repo</p>
         </div>
-    <div class="providers" role="group" aria-label="Supported providers">
-      <a href="#decisions">OpenAI Decisions API <span>optional · beta</span></a>
-      <a href="#cloudflare">Cloudflare Clef <span>optional</span></a>
-      <a href="https://docs.typesafe.ai">TypeSafe Jev <span>default</span></a>
-    </div>
+        <div class="providers" role="group" aria-label="Supported providers">
+          <a href="https://docs.typesafe.ai">TypeSafe Jev <span>default</span></a>
+          <a href="https://github.com/ckorhonen/jev-lint#openai-decisions-optional">OpenAI Decisions API <span>optional · beta</span></a>
+          <a href="https://github.com/ckorhonen/jev-lint#cloudflare-clef-optional">Cloudflare Clef <span>optional</span></a>
+        </div>
       </div>
-
       <figure id="demo" class="hero-demo" aria-labelledby="demo-caption">
         <div class="video square">
           <video controls preload="metadata" playsinline poster="/media/jev-lint-on-off-poster.webp" width="1080" height="1080" aria-label="JevLint demo, 28 seconds, silent with on-screen text" aria-describedby="demo-caption">
@@ -384,187 +388,56 @@ footer a{color:var(--dim);display:inline-flex;align-items:center;min-height:44px
             <a href="/media/jev-lint-on-off-flagship.mp4">Download the demo (MP4)</a>
           </video>
         </div>
-        <figcaption id="demo-caption">A test that passes but proves nothing. <span class="dim">Animated saved case; local correction, not model re-scored.</span> <a href="/methodology.html#transcript">Transcript and demo notes →</a></figcaption>
+        <figcaption id="demo-caption">A passing test that proves nothing. Animated saved case; correction tested locally.</figcaption>
+        <details class="demo-notes"><summary>Demo transcript</summary>
+          <ol>
+            <li><b>0–6s:</b> “Your test passes. Does it prove anything?” Code compares the result with itself. One red pulse follows.</li>
+            <li><b>6–10s:</b> “This test proves nothing.” An editorial headline for a saved TypeSafe Jev finding.</li>
+            <li><b>10–14s:</b> A real expected value replaces self-equality. Broken code now fails the local test. The correction was not re-scored by Jev.</li>
+            <li><b>14–20s:</b> An illustrative workflow moves feedback from review to the edit; review remains.</li>
+            <li><b>20–24s:</b> “41% fewer rule-covered review comments.” Historical result from 48 Claude Code runs, scoped below.</li>
+            <li><b>24–28s:</b> “JevLint. Your team’s rules. In the edit. Keep the code. Cut the slop.” https://jevlint.dev</li>
+          </ol>
+        </details>
       </figure>
     </div>
-
-    <div class="strip" role="list">
-      <div role="listitem"><div class="n"><span class="green">41% fewer</span></div><div class="l">rule-covered review comments (48 Claude Code runs)</div></div>
-      <div role="listitem"><div class="n">~<span data-count="0.3" data-dec="1">0.3</span> s</div><div class="l">per check, while the agent works</div></div>
-      <div role="listitem"><div class="n"><span data-count="177" data-dec="0">177</span></div><div class="l">tested rules in 5 packs, plus yours</div></div>
-      <div role="listitem"><div class="n">~$<span data-count="2" data-dec="0">2</span></div><div class="l">per 10,000 edits checked</div></div>
-    </div>
   </div>
 </section>
 
-<!-- Problem -->
-<section id="why" aria-labelledby="h-why">
+<section id="rules" aria-labelledby="h-rules">
   <div class="wrap">
-    <h2 id="h-why">Your team has standards <span class="dim">a linter can’t express.</span></h2>
-    <div class="rules-list" aria-label="Examples">
-      <div>// don't use useEffect to derive state</div>
-      <div>// a test must be able to fail</div>
-      <div>// never trust a client-sent userId</div>
+    <p class="lead">A linter knows syntax. You know your team.</p>
+    <h2 id="h-rules">The standards you keep explaining in review.</h2>
+    <div class="rules-list" aria-label="Illustrative team standards">
+      <div>// tests should check behavior, not themselves</div>
+      <div>// don’t use an effect to derive state</div>
+      <div>// fallbacks shouldn’t hide bad data</div>
     </div>
-    <p class="lede">What counts as a useful test, an appropriate fallback or an idiomatic pattern depends on your team. A general review may miss it unless you spell it out. Make the standard explicit, then check it where the edit happens. Keep deterministic linters for syntax and types, and review for logic and design.</p>
-
-    <div class="flowrow draw" style="--n:4" data-draw>
-      <p class="lbl">Today</p>
-      <div class="loop" aria-label="Today: agent writes, review, agent fixes, review again">
-        <span class="node" style="--i:0">agent writes</span><span class="arrow" style="--i:0"></span><span class="node" style="--i:1">review</span><span class="arrow" style="--i:1"></span><span class="node hot" style="--i:2">agent fixes</span><span class="arrow" style="--i:2"></span><span class="node hot" style="--i:3">review again</span>
-      </div>
-      <p class="trip" style="--n:4"><span class="dim">An illustrative review workflow.</span> Feedback can arrive after the agent has moved on.</p>
-    </div>
-    <div class="flowrow draw" style="--n:4" data-draw>
-      <p class="lbl">With jev-lint</p>
-      <div class="loop" aria-label="With jev-lint: agent writes, jev-lint checks in 0.3 seconds, agent fixes, review">
-        <span class="node" style="--i:0">agent writes</span><span class="arrow" style="--i:0"></span><span class="node ok" style="--i:1">jev-lint · 0.3 s</span><span class="arrow" style="--i:1"></span><span class="node" style="--i:2">agent fixes</span><span class="arrow" style="--i:2"></span><span class="node" style="--i:3">review</span>
-      </div>
-      <p class="trip" style="--n:4"><span class="green">Feedback while the agent is still working.</span> The workflow is illustrative; measured review cycles saved are not claimed.</p>
-    </div>
-  </div>
-</section>
-
-<!-- Team standards -->
-<section id="standards" aria-labelledby="h-standards">
-  <div class="wrap">
-    <p class="lead">Junk tests are one example. Your standards go further.</p>
-    <h2 id="h-standards">The rules you keep explaining in review.</h2>
-    <p class="lede">Turn focused conventions into yes/no questions: does this test check behavior? Does this effect derive state? Can this fallback hide bad data? Rules can be opinionated and specific to your repo. JevLint judges the code it sees, so findings are probabilistic—not guarantees about the whole system.</p>
-    <p class="src">Tests, type checkers and human review still matter. Start with tested packs, then approve rules for your team. <a href="#h-yours">Make the rules yours →</a></p>
-  </div>
-</section>
-
-<!-- How -->
-<section id="how" aria-labelledby="h-how">
-  <div class="wrap">
-    <p class="lead">Under the hood, it's small on purpose.</p>
-    <h2 id="h-how">One hook. One call. Two tiers.</h2>
-    <ol class="steps">
-      <li><p class="when">after every edit</p><h3>The hook checks the code you changed.</h3><p>A PostToolUse hook in Claude Code or Codex sends added code for edits (whole files for writes and end-of-turn rechecks) to <a href="https://docs.typesafe.ai">TypeSafe Jev</a>, a fast judgment model: one yes/no question per rule, in one call. A keyword gate skips rules that can't apply. Or opt into the <a href="#decisions">OpenAI Decisions API</a> or <a href="#cloudflare">Cloudflare Clef</a>.</p></li>
-      <li><p class="when">about 0.3 s with Jev</p><h3>Findings go straight back.</h3><div class="tiers"><div><span class="red">p ≥ 0.8</span> <span class="dim">likely violations: fix these</span></div><div><span style="color:var(--amber)">0.5–0.8</span> <span class="dim">possible: double-check</span></div></div></li>
-      <li><p class="when">never in the way</p><h3>It fails open.</h3><p>On a timeout, an API error or an unknown file type it exits silently and the edit goes through. It complements linters, type checkers and review; it doesn't replace them.</p></li>
+    <p class="lede">What counts as a useful test or an idiomatic pattern depends on your team. Make it a focused yes/no rule. JevLint checks edits against it.</p>
+    <p class="src">Start with 177 tested rules across five packs. Switch rules off, scope them to folders, or add yours in <code>.jev-lint/</code>. <a href="https://github.com/ckorhonen/jev-lint/tree/main/docs/packs">Explore the packs →</a></p>
+    <ol class="steps compact-steps">
+      <li><p class="when">01 · set the standard</p><h3>Your repo. Your rules.</h3><p>Your agent reads the repo’s guidance and proposes rules for you to approve.</p></li>
+      <li><p class="when">02 · catch it at the edit</p><h3>Feedback goes straight back.</h3><p>The hook checks changed code and sends findings to the agent while it works.</p></li>
+      <li><p class="when">03 · keep your tools</p><h3>Review still matters.</h3><p>Fuzzy judgments can be wrong. Keep tests, linters and review. Checks fail open on API errors.</p></li>
     </ol>
   </div>
 </section>
 
-<!-- Proof -->
 <section id="proof" aria-labelledby="h-proof">
   <div class="wrap">
-    <p class="lead">Does it work? We measured it in real agent runs.</p>
-    <h2 id="h-proof">Less for review to flag.</h2>
-    <p class="lede"><span class="green">41% fewer rule-covered review comments</span> with JevLint on: 32 findings without the hook, 19 with it, across 48 Claude Code runs. This measured a specific synthetic task set, not time or tokens saved.</p>
-    <p class="src"><a href="/methodology.html#outcome">Full scope, confidence interval and original data →</a></p>
-    <h3 class="sub">Agents act on the feedback.</h3>
-    <p class="lede">Rule violations left in the final code, per task, with the hook off and on. These results use TypeSafe Jev; comparisons with Decisions and Clef are pending.</p>
-    <div class="legend"><span><i style="background:#5c5c5c"></i>hook off</span><span><i style="background:var(--green)"></i>hook on</span></div>
-    <div class="chart anim" data-anim>
-      <div class="grp">
-        <h3>Claude Code<small>96 runs · original rules</small></h3>
-        <div class="rows">
-          <div class="row off"><div class="bar-fill" style="width:calc(2.38 / 2.8 * 80%)"></div><span class="v" data-count="2.38" data-dec="2">2.38</span><span class="sr">violations per task with the hook off</span></div>
-          <div class="row on"><div class="bar-fill" style="width:calc(1.21 / 2.8 * 80%);transition-delay:.12s"></div><span class="v" data-count="1.21" data-dec="2">1.21</span><span class="sr">with the hook on</span></div>
-        </div>
-      </div>
-      <div class="grp">
-        <h3>Claude Code<small>48 runs · all 170 rules</small></h3>
-        <div class="rows">
-          <div class="row off"><div class="bar-fill" style="width:calc(2.71 / 2.8 * 80%);transition-delay:.24s"></div><span class="v" data-count="2.71" data-dec="2">2.71</span><span class="sr">violations per task with the hook off</span></div>
-          <div class="row on"><div class="bar-fill" style="width:calc(1.54 / 2.8 * 80%);transition-delay:.36s"></div><span class="v" data-count="1.54" data-dec="2">1.54</span><span class="sr">with the hook on</span></div>
-        </div>
-      </div>
-      <div class="grp">
-        <h3>Codex<small>48 runs</small></h3>
-        <div class="rows">
-          <div class="row off"><div class="bar-fill" style="width:calc(1.67 / 2.8 * 80%);transition-delay:.48s"></div><span class="v" data-count="1.67" data-dec="2">1.67</span><span class="sr">violations per task with the hook off</span></div>
-          <div class="row on"><div class="bar-fill" style="width:calc(0.92 / 2.8 * 80%);transition-delay:.6s"></div><span class="v" data-count="0.92" data-dec="2">0.92</span><span class="sr">with the hook on</span></div>
-        </div>
-      </div>
-    </div>
-    <p class="src">With every pack on, the drop holds: −43% (2.71 → 1.54); that baseline is higher because more rules are checked. All three drops are statistically significant. Measured 26–27 Sep 2026; method and caveats in the <a href="https://claude.ai/artifact/BUZG9LEnaiJyaJuaP7tajs">experiment notebook</a>.</p>
-
-    <h3 class="sub" id="h-cost">Fewer comments for the reviewer to send back.</h3>
-    <p class="lede">With the hook on, review comments that one of our rules covers fell from 1.33 to 0.79 per task. That means fewer of these findings reached review in this experiment. It does not measure fewer review cycles or time and tokens saved.</p>
-    <div class="mini anim" data-anim style="margin-top:18px;max-width:760px">
-      <p class="lbl">rule-covered review comments per task, hook off</p>
-      <div class="row off"><div class="bar-fill" style="width:calc(1.33 / 1.4 * 70%)"></div><span class="v" data-count="1.33" data-dec="2">1.33</span></div>
-      <p class="lbl">hook on</p>
-      <div class="row on"><div class="bar-fill" style="width:calc(0.79 / 1.4 * 70%);transition-delay:.2s"></div><span class="v"><span data-count="0.79" data-dec="2">0.79</span> <span class="dim" style="font-size:.7em">−41%</span></span></div>
-    </div>
-    <p class="src">Reviews still find logic and design issues that no rule covers. Review findings: all 170 rules, 48 Claude Code runs, 95% CI of the change −1.08 to −0.04 per task. Overall agent spend and wall time increased with the hook in this cohort. <a href="/methodology.html#outcome">Original counts and limitations →</a></p>
-
-    <h3 class="sub" id="h-speed">Background feedback. Fast checks.</h3>
-    <div class="speed">
-      <div class="clock">
-        <div class="d"><span data-stopwatch>0.300</span><small> s</small></div>
-        <p class="s">one typical check: the code your agent just added, every applicable rule, one call to TypeSafe Jev</p>
-        <button type="button" data-stopwatch-run>&gt; run it again</button>
-        <p class="gag">You've been on this page long enough for jev-lint to check <b data-gag>0</b> edits.</p>
-        <p class="warm">With the warm connection: ~0.23 s (median 228 ms, measured on a quiet Mac).</p>
-      </div>
-      <div>
-        <h3 style="font-size:clamp(18px,1.9vw,24px)">Twice the rules, same speed.</h3>
-        <p class="lede" style="margin-top:10px">Doubling the applicable rules per file moved the median check by 8 ms. The keyword gate only asks the ~12 rules whose patterns appear in the new code.</p>
-        <div class="mini anim" data-anim style="margin-top:18px">
-          <p class="lbl">23 applicable rules per file</p>
-          <div class="row"><div class="bar-fill" style="width:calc(299 / 320 * 70%);background:#8a8a8a"></div><span class="v"><span data-count="299" data-dec="0">299</span> ms</span></div>
-          <p class="lbl">48 applicable rules per file</p>
-          <div class="row"><div class="bar-fill" style="width:calc(307 / 320 * 70%);background:var(--fg);transition-delay:.2s"></div><span class="v"><span data-count="307" data-dec="0">307</span> ms</span></div>
-        </div>
-        <p class="lede" style="margin-top:26px">About <span class="fg">$2 per 10,000 edits</span>, under a cent per 40 edits. It never blocks the agent: if anything fails, the edit goes through unchanged.</p>
-        <p class="src">Median check times from our benchmark. Cost measured at $1.51 per 10,000 edits before the larger packs; they add about 30% tokens, so ~$2 is an estimate.</p>
-      </div>
-    </div>
+    <p class="lead">One measured result.</p>
+    <h2 id="h-proof"><span class="green">41% fewer</span><br>rule-covered review comments.</h2>
+    <p class="lede">32 findings with JevLint off. 19 with it on. Across 48 synthetic Claude Code runs with TypeSafe Jev: 12 React and SwiftUI tasks, run twice per condition.</p>
+    <p class="src">September 2026 · AI review and rule mapping · not measured time, token or review-cycle savings. <a href="https://github.com/ckorhonen/jev-lint#results">Read the results →</a></p>
   </div>
 </section>
 
-<!-- Rules -->
-<section id="rules" aria-labelledby="h-rules">
-  <div class="wrap">
-    <p class="lead">What it checks on day one.</p>
-    <h2 id="h-rules">Opinionated out of the box.</h2>
-    <div class="hundred"><span class="n" data-count="177" data-dec="0">177</span><span class="l">tested rules in 5 packs, each switched on only after passing a held-out evaluation written by a separate author.</span></div>
-    <div class="packs anim" data-anim>
-      <div class="pack"><a href="https://github.com/ckorhonen/jev-lint/blob/main/docs/packs/hygiene.md"><div class="pn">hygiene</div><div class="pd">any, force-unwraps, empty catch, secrets</div></a><div class="pbar"><div class="bar-fill" style="width:calc(24 / 65 * 78%)"></div><span class="v">24</span></div></div>
-      <div class="pack"><a href="https://github.com/ckorhonen/jev-lint/blob/main/docs/packs/practices.md"><div class="pn">practices</div><div class="pd">React effects, SwiftUI state, idioms</div></a><div class="pbar"><div class="bar-fill" style="width:78%;transition-delay:.08s"></div><span class="v">65</span></div></div>
-      <div class="pack"><a href="https://github.com/ckorhonen/jev-lint/blob/main/docs/packs/security.md"><div class="pn">security</div><div class="pd">SSRF, path traversal, mass assignment</div></a><div class="pbar"><div class="bar-fill" style="width:calc(33 / 65 * 78%);transition-delay:.16s"></div><span class="v">33</span></div></div>
-      <div class="pack"><a href="https://github.com/ckorhonen/jev-lint/blob/main/docs/packs/tests.md"><div class="pn">tests <span class="new-tag">new rules</span></div><div class="pd">tests that can't fail, flaky tests, tests that lock in the implementation</div></a><div class="pbar"><div class="bar-fill" style="width:calc(42 / 65 * 78%);transition-delay:.24s"></div><span class="v">42</span></div></div>
-      <div class="pack"><a href="https://github.com/ckorhonen/jev-lint/blob/main/docs/packs/performance.md"><div class="pn">performance</div><div class="pd">N+1, sequential awaits, unbounded fan-out</div></a><div class="pbar"><div class="bar-fill" style="width:calc(13 / 65 * 78%);transition-delay:.32s"></div><span class="v">13</span></div></div>
-    </div>
-    <div class="chips" aria-label="Languages"><span>TypeScript / React</span><span>Swift / SwiftUI</span><span>Kotlin</span><span>Rust</span><span>Python</span><span>Ruby</span><span>Bazel</span></div>
-    <p class="src">On held-out edits each pack scored 91–100% precision per language, and flagged 0–4% of clean edits. 110 of 117 new candidate rules passed; 12 of 12 new security rules passed; 9 of 9 test rules for implementation lock-in and over-mocking passed held-out evaluation in October; 7 are live, and the fake-response pair went back to candidate after two false alarms on agent-written tests. The rest stay candidates the hook doesn't ask. <a href="https://github.com/ckorhonen/jev-lint/tree/main/docs/packs">Every rule, with a good and a bad example →</a></p>
-
-    <div class="example">
-      <div class="snippet">
-        <header><span>users.test.ts</span><span class="red" style="margin-left:auto">flagged</span></header>
-<pre><code>test("returns 404 for an unknown user", async () =&gt; {
-  const res = await app.request("/users/does-not-exist");
-<span class="hl">  expect(res.status).toBe(200);</span>
-  expect(await res.json()).toEqual({ user: null });
-});</code></pre>
-      </div>
-      <div class="verdict">
-        <p class="h">ts-test-title-contradicts-assertions</p>
-        <p>The title promises a 404; the assertion checks 200. Agents under pressure flip assertions until tests pass. This catches the residue.</p>
-        <p class="dim">Fix: make the assertion check the behavior the title promises, or fix the code. Never flip an assertion just to make the test pass.</p>
-      </div>
-    </div>
-
-    <h3 class="sub" id="h-yours">Your rules, not just ours.</h3>
-    <ul class="yours">
-      <li><span><b>Defaults, not dogma.</b> Turn any pack or rule off, scope it to some folders, or add rules for your team in <code>.jev-lint/</code>. They live in your repo, so the whole team shares them.</span></li>
-      <li><span><b>Onboards itself.</b> A skill reads your agent instructions, docs, skills and linter configs, then proposes rules for you to approve. Nothing a linter already checks.</span></li>
-      <li><span><b>Learns what agents get wrong.</b> Every check is logged. The learning skill finds the mistakes agents keep making, proposes a few targeted fixes, and measures whether they worked.</span></li>
-    </ul>
-  </div>
-</section>
-
-<!-- Setup -->
 <section id="setup" aria-labelledby="h-setup">
   <div class="wrap">
     <p class="lead">Try it on your repo.</p>
-    <h2 id="h-setup">One paste. Your agent does the rest.</h2>
-    <p class="lede">Needs <a href="https://bun.sh">bun</a> and a <a href="https://docs.typesafe.ai">TypeSafe</a> API key for the default mode, or credentials for the optional <a href="#decisions">OpenAI Decisions API</a> or <a href="#cloudflare">Cloudflare Clef</a> provider. Paste this into your agent from the repo you want checked.</p>
+    <h2 id="h-setup">One paste. Your agent takes it from here.</h2>
+    <p class="lede">You’ll need <a href="https://bun.sh">Bun</a> and a provider API key. TypeSafe Jev is the default; OpenAI Decisions API and Cloudflare Clef are optional.</p>
+    <details class="setup-prompt"><summary>Read the setup prompt</summary>
     <div class="prompt">
       <header>
         <div class="seg" role="group" aria-label="Choose your agent">
@@ -584,58 +457,9 @@ repo: read all of our agent instructions, skills, docs and linter configs, and p
 for me to approve before writing anything.
 I'm using Claude Code, so install the hook for Claude Code (--claude-only).</pre>
     </div>
-    <div class="setup-cta">
-      <button class="copy" type="button" data-copy>Copy the setup prompt</button>
-      <a href="https://github.com/ckorhonen/jev-lint#install">or install by hand →</a>
-    </div>
-  </div>
-</section>
-
-<section id="cloudflare" aria-labelledby="h-cloudflare">
-  <div class="wrap">
-    <p class="lead">An optional judge.</p>
-    <h2 id="h-cloudflare">Use Cloudflare Clef.</h2>
-    <p class="lede">Already using Workers AI? Choose Clef or Clef-flash to check edits with the same rules, keyword gates and feedback tiers. TypeSafe Jev remains the default.</p>
-    <div class="prompt">
-      <header><span class="f">optional Cloudflare setup</span></header>
-<pre>export JEV_LINT_PROVIDER=cloudflare
-export JEV_LINT_MODEL=clef  # or clef-flash
-export CLOUDFLARE_ACCOUNT_ID=your_32_character_account_id
-# Configure your Workers AI token or private token file first.
-bun src/install.ts --skills --smoke
-bun src/install.ts --apply --skills --smoke</pre>
-    </div>
-    <p style="margin-top:20px">Cloudflare receives added code for edits, whole files for writes and end-of-turn rechecks, and rule questions. Usage is billed to your account. The hook still fails open if a check fails. Keep the token in your agent's environment or a private file.</p>
-    <p style="margin-top:16px"><b>Experimental; comparison pending.</b> The accuracy, speed and cost results on this site were measured with Jev. They do not establish Clef's performance on these rules.</p>
-    <div class="setup-cta">
-      <a href="https://github.com/ckorhonen/jev-lint#cloudflare-clef-optional">Cloudflare setup and switching back →</a>
-      <a href="https://github.com/ckorhonen/jev-lint/blob/main/docs/cloudflare-eval.md">Comparison method and status →</a>
-    </div>
-  </div>
-</section>
-
-<section id="decisions" aria-labelledby="h-decisions">
-  <div class="wrap">
-    <p class="lead">A new optional judge.</p>
-    <h2 id="h-decisions">Use the OpenAI Decisions API.</h2>
-    <p class="lede">Turn your team's rules into yes/no questions with OpenAI's public beta Decisions API. The same rule packs, keyword gates and feedback tiers work with <code>gpt-6-luna</code>. TypeSafe Jev remains the default.</p>
-    <div class="prompt">
-      <header><span class="f">optional OpenAI setup</span></header>
-<pre>export JEV_LINT_PROVIDER=openai
-export JEV_LINT_MODEL=gpt-6-luna
-# Provide an existing OPENAI_API_KEY in your agent's environment,
-# or OPENAI_API_KEY_FILE pointing to a private mode-600 file.
-bun src/install.ts                         # dry run
-# After approving billing, code transmission and installation:
-bun src/install.ts --apply --smoke</pre>
-    </div>
-    <p style="margin-top:20px">OpenAI receives added code for edits, whole files for writes and end-of-turn rechecks, file context and rule questions. Usage is billed to your OpenAI account. Keys stay out of hook configs; an optional private key-file path is retained across hook and daemon startup.</p>
-    <p style="margin-top:16px">The hook fails open if a request fails. Switching providers is explicit, with no automatic fallback.</p>
-    <p style="margin-top:16px"><b>Live smoke verified; comparison pending.</b> A synthetic Decisions request passed. Accuracy, speed and cost comparisons on these rules have not been measured; the Jev results on this page do not apply to Decisions.</p>
-    <div class="setup-cta">
-      <a href="https://github.com/ckorhonen/jev-lint#openai-decisions-optional">OpenAI setup and switching back →</a>
-      <a href="https://github.com/ckorhonen/jev-lint/blob/main/docs/decisions-eval.md">Verification and comparison status →</a>
-    </div>
+    </details>
+    <div class="setup-cta"><button class="copy" type="button" data-copy>Copy the setup prompt</button><a href="https://github.com/ckorhonen/jev-lint#install">Installation and provider setup →</a></div>
+    <p class="src">Checks send code and rule questions to your chosen provider; usage is billed to your account. Provider comparisons are pending.</p>
   </div>
 </section>
 
@@ -643,18 +467,8 @@ bun src/install.ts --apply --smoke</pre>
   <div class="wrap">
     <p class="lead">In development · hosted reviews</p>
     <h2 id="h-hosted">Your team’s rules.<br>Every pull request.</h2>
-    <p class="lede">Bring the standards you set at the edit into pull request review. Hosted reviews are coming next. The open-source Claude Code and Codex hooks are available today.</p>
-    <div class="links"><a href="#setup">Set up the open-source hook →</a></div>
-  </div>
-</section>
-
-<section class="end" aria-labelledby="h-end">
-  <div class="dots" aria-hidden="true"></div>
-  <div class="wrap" style="position:relative">
-    <h2 id="h-end" class="mark">jev-lint</h2>
-    <p class="tag">a fuzzy linter for coding agents</p>
-    <a class="url" href="https://jevlint.dev">jevlint.dev</a>
-    <p class="src" style="margin:20px auto 0">Claude Code + Codex hook · TypeSafe Jev by default · optional OpenAI Decisions API + Cloudflare Clef · MIT</p>
+    <p class="lede">The same standards, brought to pull request review. Coming next. The open-source hooks are available today.</p>
+    <div class="links"><a href="#setup">Start with the open-source hook →</a></div>
   </div>
 </section>
 
@@ -664,9 +478,8 @@ bun src/install.ts --apply --smoke</pre>
   <div class="wrap">
     <span>© 2026 Chris Korhonen · MIT</span>
     <a href="https://github.com/ckorhonen/jev-lint"><svg class="gh" aria-hidden="true"><use href="#gh"/></svg>GitHub</a>
-    <a href="/methodology.html">Methodology and demo transcript</a>
     <a href="https://github.com/ckorhonen/jev-lint/tree/main/docs/packs">Rule packs</a>
-    <a href="https://claude.ai/artifact/BUZG9LEnaiJyaJuaP7tajs">Experiment notebook</a>
+    <a href="https://github.com/ckorhonen/jev-lint#results">Results</a>
     <a href="https://docs.typesafe.ai">TypeSafe Jev</a>
     <span>Set in <a href="https://departuremono.com">Departure Mono</a> by Helena Zhang (<a href="/fonts/DepartureMono-OFL.txt">SIL OFL 1.1</a>)</span>
   </div>

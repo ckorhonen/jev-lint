@@ -2,13 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
   <url>
     <loc>https://jevlint.dev/</loc>
-    <lastmod>2026-09-27</lastmod>
+    <lastmod>2026-10-07</lastmod>
     <video:video>
-      <video:thumbnail_loc>https://jevlint.dev/media/jev-lint-demo-poster.webp</video:thumbnail_loc>
-      <video:title>jev-lint in 40 seconds</video:title>
-      <video:description>An agent writes a useEffect fetch, the hook flags a race in 0.3 s, and the agent fixes it before review.</video:description>
-      <video:content_loc>https://jevlint.dev/media/jev-lint-demo.mp4</video:content_loc>
-      <video:duration>41</video:duration>
+      <video:thumbnail_loc>https://jevlint.dev/media/jev-lint-on-off-poster.webp</video:thumbnail_loc>
+      <video:title>JevLint: feedback at the edit</video:title>
+      <video:description>Animated saved-case walkthrough: a weak test, local correction, and feedback at the edit.</video:description>
+      <video:content_loc>https://jevlint.dev/media/jev-lint-on-off-flagship.mp4</video:content_loc>
+      <video:duration>28</video:duration>
     </video:video>
   </url>
 </urlset>
