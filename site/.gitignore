@@ -1,3 +1,4 @@
 .wrangler/
 # a copy of docs/media/jev-lint-demo-1920x1080.mp4, refreshed by scripts/sync-media.sh before deploying
 public/media/jev-lint-demo.mp4
+public/media/jev-lint-on-off-flagship.mp4
