@@ -275,6 +275,11 @@ bun src/install.ts --upgrade
 The warm daemon notices the code change and restarts itself on the next check. Running
 agents pick up the new hook on their next edit; nothing needs restarting.
 
+Daemon ownership recovery and shutdown are serialized. A crash during the brief
+ownership transaction can leave a guard requiring verified manual cleanup; the guard
+is never automatically reaped. Hooks continue in process when the daemon is unavailable
+(`JEV_LINT_DAEMON=off` also selects in-process checks). See [lifecycle review](docs/onboarding-review.md#lifecycle-follow-up).
+
 Or by hand:
 
 **Claude Code:** add to `~/.claude/settings.json` (or a repo's `.claude/settings.json`) under `hooks.PostToolUse`:

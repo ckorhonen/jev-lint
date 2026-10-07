@@ -23,6 +23,8 @@ guidance mixing local installation, network smoke, and permission expansion. Thi
 not establish a Claude host permission-dialog defect. This executor attempted current
 Library materialization twice; both authorized downloads returned HTTP 403, so it did
 not independently view the pixels. No permission bypass is proposed.
+The parent subsequently confirmed its direct visual inspection satisfies screenshot
+review: the image showed assistant guidance, no actual host denial or reaper reference.
 
 ## Lifecycle investigation
 
@@ -38,9 +40,9 @@ without signals, file deletion, or forced spawning. A wedged daemon can persist 
 its own shutdown or an explicitly verified owner restart. `JEV_LINT_DAEMON=off` remains
 available to use in-process checks.
 
-Static review also noted a preexisting check/unlink race when two starters recover the
-same stale lock in `src/daemon.ts`. It was not reproduced and is outside this narrow
-change; fresh concurrent-start behavior remains covered by the existing daemon suite.
+Initial static review also noted a preexisting check/unlink race when two starters
+recover the same stale lock. The first published revision documented it as unmodified;
+the lifecycle follow-up below addresses it.
 Clarify which tasks the original "reaper" request meant before adding task cleanup.
 
 ## Validation
@@ -55,3 +57,33 @@ preview failure, inherited model isolation, literal shell characters, unusual ch
 names, relative and symlink paths, backups/idempotence, unrelated-hook preservation,
 recheck removal, and daemon ownership preservation. A separate read-only reviewer
 verified the fixes and passed 30 focused tests with 113 assertions.
+
+## Lifecycle follow-up
+
+The old recovery sequence allowed starter A and starter B to read the same dead PID.
+A could unlink that stale lock and create its own; B would then unlink A's fresh lock
+based on its earlier observation. Both could believe they owned the daemon socket.
+Rechecking the inode before unlink would still leave a check-to-unlink window.
+
+`src/daemonLock.ts` now uses an exclusive, short-lived `<socket>.lock.guard` directory
+for every ownership transaction. Stale-owner inspection, removal, fresh lock creation,
+and stale socket cleanup share the guard. Shutdown uses the same guard and checks both
+lock inode and PID before removing its socket, stamp, or lock. A contender that cannot
+acquire the guard changes no ownership files. Liveness probes send only signal 0;
+permission errors never establish that an owner is dead. No process is terminated.
+
+This favors safety over automatic cleanup: a crash while holding the guard may leave
+it abandoned. It is never automatically deleted. The optional daemon then cannot start
+for that configuration until an operator verifies ownership and performs explicit
+cleanup; hooks continue in process. A lock PID reused by an unrelated live process also
+causes conservative refusal to start, rather than signalling that process.
+
+Focused regressions cover deterministic competing recovery, startup/shutdown exclusion,
+successor preservation, abandoned guards, permission errors, exception cleanup, and
+six real concurrent subprocesses recovering one stale lock (exactly one owner).
+The updated full suite passed: 184 tests, 1,091 assertions, 18 files. Type checking and
+Biome passed; the same 12 preexisting warnings remain. No live provider calls occurred.
+Independent read-only review found no blockers and passed all seven new ownership
+tests (32 assertions), including the six-process election. A local Unix-socket probe
+also confirmed that `server.stop(true)` leaves its socket for guarded removal on the
+installed Bun runtime. No merge or deployment was performed.
