@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>jev-lint — a fuzzy linter for coding agents</title>
-<meta name="description" content="A fuzzy linter for Claude Code and Codex. 0.3 s after your agent writes a file, it hears which of your team's rules it broke and fixes them before review. Open source.">
+<meta name="description" content="A fuzzy linter for Claude Code and Codex. Check edits with TypeSafe Jev, or opt into the OpenAI Decisions API or Cloudflare Clef. Open source.">
 <link rel="canonical" href="https://jevlint.dev/">
 <meta name="theme-color" content="#050505">
 <meta name="color-scheme" content="dark">
@@ -15,7 +15,7 @@
 <meta property="og:site_name" content="jev-lint">
 <meta property="og:url" content="https://jevlint.dev/">
 <meta property="og:title" content="jev-lint — a fuzzy linter for coding agents">
-<meta property="og:description" content="0.3 s after your agent writes a file, it hears which of your team's rules it broke, and fixes them before review. Violations per task: 2.38 → 1.21.">
+<meta property="og:description" content="Your team's rules, checked at every edit. TypeSafe Jev by default; OpenAI Decisions API and Cloudflare Clef available as optional providers.">
 <meta property="og:image" content="https://jevlint.dev/og.png">
 <meta property="og:image:type" content="image/png">
 <meta property="og:image:width" content="1200">
@@ -24,7 +24,7 @@
 <meta property="og:locale" content="en_US">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="jev-lint — a fuzzy linter for coding agents">
-<meta name="twitter:description" content="0.3 s after your agent writes a file, it hears which of your team's rules it broke, and fixes them before review.">
+<meta name="twitter:description" content="Your team's rules, checked at every edit. TypeSafe Jev by default; optional OpenAI Decisions API and Cloudflare Clef.">
 <meta name="twitter:image" content="https://jevlint.dev/og.png">
 <meta name="twitter:image:alt" content="jev-lint: a fuzzy linter for coding agents. Violations per task fell from 2.38 to 1.21.">
 
@@ -43,13 +43,13 @@
       "@id": "https://jevlint.dev/#app",
       "name": "jev-lint",
       "alternateName": "jevlint",
-      "description": "A fuzzy linter for coding agents. A Claude Code and Codex hook checks each edit against your team's rules with TypeSafe Jev in about 0.3 seconds, so the agent fixes violations before code review.",
+      "description": "A fuzzy linter for coding agents. A Claude Code and Codex hook checks edits against your team's rules with TypeSafe Jev by default, or optional OpenAI Decisions API and Cloudflare Clef providers, so the agent can fix violations before code review.",
       "url": "https://jevlint.dev/",
       "image": "https://jevlint.dev/og.png",
       "applicationCategory": "DeveloperApplication",
       "applicationSubCategory": "Linter",
       "operatingSystem": "macOS, Linux",
-      "softwareRequirements": "Bun, a TypeSafe API key or Cloudflare Workers AI credentials, Claude Code or Codex",
+      "softwareRequirements": "Bun, credentials for TypeSafe, OpenAI or Cloudflare Workers AI, Claude Code or Codex",
       "license": "https://opensource.org/licenses/MIT",
       "isAccessibleForFree": true,
       "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
@@ -150,6 +150,9 @@ h2{font-size:clamp(28px,3.9vw,52px);max-width:22ch}
 .links{display:flex;flex-wrap:wrap;gap:4px 22px;font-size:15px}
 .links a{display:inline-flex;align-items:center;min-height:44px}
 .meta{font-size:13px;color:var(--dim)}
+.providers{display:flex;flex-wrap:wrap;gap:8px 24px;margin-top:24px;font-size:14px;color:var(--text)}
+.providers a{display:inline-flex;align-items:center;min-height:44px;gap:8px}
+.providers span{font-size:12px;color:var(--dim)}
 
 /* Terminal widget */
 .term{border:1px solid #262626;background:var(--panel);box-shadow:0 28px 60px -20px rgba(0,0,0,.9);font-size:clamp(10px,2.75vw,14.5px);line-height:1.6;position:relative;overflow:hidden}
@@ -345,9 +348,14 @@ footer a{color:var(--dim);display:inline-flex;align-items:center;min-height:44px
 <section class="hero" aria-labelledby="h-hero">
   <div class="wrap">
     <h1 id="h-hero">A fuzzy linter for coding agents.<span class="cur" aria-hidden="true"></span></h1>
+    <div class="providers" role="group" aria-label="Supported providers">
+      <a href="#decisions">OpenAI Decisions API <span>optional · beta</span></a>
+      <a href="#cloudflare">Cloudflare Clef <span>optional</span></a>
+      <a href="https://docs.typesafe.ai">TypeSafe Jev <span>default</span></a>
+    </div>
     <div class="grid">
       <div>
-        <p class="pitch">Your agent writes a file; <b>0.3 seconds later</b> it hears which of your team's rules it just broke, and fixes them before anyone reviews the code.</p>
+        <p class="pitch">Your agent writes code. <b>Your rules catch the mistakes.</b> Findings go straight back to Claude Code or Codex, so the agent can fix them before review.</p>
         <div class="cta">
           <div class="seg" role="group" aria-label="Choose your agent">
             <button type="button" data-agent="claude" aria-pressed="true">Claude Code</button>
@@ -359,7 +367,7 @@ footer a{color:var(--dim);display:inline-flex;align-items:center;min-height:44px
             <a href="https://github.com/ckorhonen/jev-lint"><svg class="gh" aria-hidden="true"><use href="#gh"/></svg>ckorhonen/jev-lint</a>
             <a href="#demo">Watch the 40-second demo</a>
           </div>
-          <p class="meta">A hook for Claude Code and Codex · open source, MIT</p>
+          <p class="meta">About 0.3 s per check with TypeSafe Jev · open source, MIT</p>
         </div>
       </div>
 
@@ -448,8 +456,8 @@ footer a{color:var(--dim);display:inline-flex;align-items:center;min-height:44px
     <p class="lead">Under the hood, it's small on purpose.</p>
     <h2 id="h-how">One hook. One call. Two tiers.</h2>
     <ol class="steps">
-      <li><p class="when">after every edit</p><h3>The hook sends only the new code.</h3><p>A PostToolUse hook in Claude Code or Codex sends the code the agent just added to <a href="https://docs.typesafe.ai">TypeSafe Jev</a>, a fast judgment model: one yes/no question per rule, in one call. A keyword gate skips rules that can't apply. <a href="#cloudflare">Cloudflare Clef is an optional alternative.</a></p></li>
-      <li><p class="when">about 0.3 s later</p><h3>Findings go straight back.</h3><div class="tiers"><div><span class="red">p ≥ 0.8</span> <span class="dim">likely violations: fix these</span></div><div><span style="color:var(--amber)">0.5–0.8</span> <span class="dim">possible: double-check</span></div></div></li>
+      <li><p class="when">after every edit</p><h3>The hook checks the code you changed.</h3><p>A PostToolUse hook in Claude Code or Codex sends added code for edits (whole files for writes and end-of-turn rechecks) to <a href="https://docs.typesafe.ai">TypeSafe Jev</a>, a fast judgment model: one yes/no question per rule, in one call. A keyword gate skips rules that can't apply. Or opt into the <a href="#decisions">OpenAI Decisions API</a> or <a href="#cloudflare">Cloudflare Clef</a>.</p></li>
+      <li><p class="when">about 0.3 s with Jev</p><h3>Findings go straight back.</h3><div class="tiers"><div><span class="red">p ≥ 0.8</span> <span class="dim">likely violations: fix these</span></div><div><span style="color:var(--amber)">0.5–0.8</span> <span class="dim">possible: double-check</span></div></div></li>
       <li><p class="when">never in the way</p><h3>It fails open.</h3><p>On a timeout, an API error or an unknown file type it exits silently and the edit goes through. It complements linters, type checkers and review; it doesn't replace them.</p></li>
     </ol>
   </div>
@@ -460,7 +468,7 @@ footer a{color:var(--dim);display:inline-flex;align-items:center;min-height:44px
   <div class="wrap">
     <p class="lead">Does it work? We measured it in real agent runs.</p>
     <h2 id="h-proof">Agents act on it.</h2>
-    <p class="lede">Rule violations left in the final code, per task, with the hook off and on.</p>
+    <p class="lede">Rule violations left in the final code, per task, with the hook off and on. These results use TypeSafe Jev; comparisons with Decisions and Clef are pending.</p>
     <div class="legend"><span><i style="background:#5c5c5c"></i>hook off</span><span><i style="background:var(--green)"></i>hook on</span></div>
     <div class="chart anim" data-anim>
       <div class="grp">
@@ -583,7 +591,7 @@ footer a{color:var(--dim);display:inline-flex;align-items:center;min-height:44px
   <div class="wrap">
     <p class="lead">Try it on your repo.</p>
     <h2 id="h-setup">One paste. Your agent does the rest.</h2>
-    <p class="lede">Needs <a href="https://bun.sh">bun</a> and a <a href="https://docs.typesafe.ai">TypeSafe</a> API key for the default mode, or <a href="#cloudflare">Cloudflare Workers AI credentials</a>. Paste this into your agent from the repo you want checked.</p>
+    <p class="lede">Needs <a href="https://bun.sh">bun</a> and a <a href="https://docs.typesafe.ai">TypeSafe</a> API key for the default mode, or credentials for the optional <a href="#decisions">OpenAI Decisions API</a> or <a href="#cloudflare">Cloudflare Clef</a> provider. Paste this into your agent from the repo you want checked.</p>
     <div class="prompt">
       <header>
         <div class="seg" role="group" aria-label="Choose your agent">
@@ -592,9 +600,12 @@ footer a{color:var(--dim);display:inline-flex;align-items:center;min-height:44px
         </div>
         <span class="f">prompt.txt</span>
       </header>
-<pre id="prompt-text" data-prompt>Set up jev-lint for me: https://github.com/ckorhonen/jev-lint
+<pre id="prompt-text" data-prompt>Set up jev-lint for me: https://jevlint.dev
+Source: https://github.com/ckorhonen/jev-lint
 Clone it to ~/Repos/jev-lint if it isn't there, then follow its jev-lint-setup skill
-(.agents/skills/jev-lint-setup/SKILL.md): check my TypeSafe key, show me the dry run, install
+(.agents/skills/jev-lint-setup/SKILL.md): use TypeSafe Jev by default; if I choose OpenAI
+Decisions API or Cloudflare Clef, follow its README setup. Check the selected provider's
+credentials without printing them, show me the dry run, install
 the hook once I confirm, and run the smoke test. Then use its jev-lint-rules skill on this
 repo: read all of our agent instructions, skills, docs and linter configs, and propose rules
 for me to approve before writing anything.
@@ -621,11 +632,36 @@ export CLOUDFLARE_ACCOUNT_ID=your_32_character_account_id
 bun src/install.ts --skills --smoke
 bun src/install.ts --apply --skills --smoke</pre>
     </div>
-    <p style="margin-top:20px">Cloudflare receives the added code and rule questions, and bills usage to your account. The hook still fails open if a check fails. Keep the token in your agent's environment or a private file.</p>
+    <p style="margin-top:20px">Cloudflare receives added code for edits, whole files for writes and end-of-turn rechecks, and rule questions. Usage is billed to your account. The hook still fails open if a check fails. Keep the token in your agent's environment or a private file.</p>
     <p style="margin-top:16px"><b>Experimental; comparison pending.</b> The accuracy, speed and cost results on this site were measured with Jev. They do not establish Clef's performance on these rules.</p>
     <div class="setup-cta">
       <a href="https://github.com/ckorhonen/jev-lint#cloudflare-clef-optional">Cloudflare setup and switching back →</a>
       <a href="https://github.com/ckorhonen/jev-lint/blob/main/docs/cloudflare-eval.md">Comparison method and status →</a>
+    </div>
+  </div>
+</section>
+
+<section id="decisions" aria-labelledby="h-decisions">
+  <div class="wrap">
+    <p class="lead">A new optional judge.</p>
+    <h2 id="h-decisions">Use the OpenAI Decisions API.</h2>
+    <p class="lede">Turn your team's rules into yes/no questions with OpenAI's public beta Decisions API. The same rule packs, keyword gates and feedback tiers work with <code>gpt-6-luna</code>. TypeSafe Jev remains the default.</p>
+    <div class="prompt">
+      <header><span class="f">optional OpenAI setup</span></header>
+<pre>export JEV_LINT_PROVIDER=openai
+export JEV_LINT_MODEL=gpt-6-luna
+# Provide an existing OPENAI_API_KEY in your agent's environment,
+# or OPENAI_API_KEY_FILE pointing to a private mode-600 file.
+bun src/install.ts                         # dry run
+# After approving billing, code transmission and installation:
+bun src/install.ts --apply --smoke</pre>
+    </div>
+    <p style="margin-top:20px">OpenAI receives added code for edits, whole files for writes and end-of-turn rechecks, file context and rule questions. Usage is billed to your OpenAI account. Keys stay out of hook configs; an optional private key-file path is retained across hook and daemon startup.</p>
+    <p style="margin-top:16px">The hook fails open if a request fails. Switching providers is explicit, with no automatic fallback.</p>
+    <p style="margin-top:16px"><b>Live smoke verified; comparison pending.</b> A synthetic Decisions request passed. Accuracy, speed and cost comparisons on these rules have not been measured; the Jev results on this page do not apply to Decisions.</p>
+    <div class="setup-cta">
+      <a href="https://github.com/ckorhonen/jev-lint#openai-decisions-optional">OpenAI setup and switching back →</a>
+      <a href="https://github.com/ckorhonen/jev-lint/blob/main/docs/decisions-eval.md">Verification and comparison status →</a>
     </div>
   </div>
 </section>
@@ -635,8 +671,8 @@ bun src/install.ts --apply --skills --smoke</pre>
   <div class="wrap" style="position:relative">
     <h2 id="h-end" class="mark">jev-lint</h2>
     <p class="tag">a fuzzy linter for coding agents</p>
-    <a class="url" href="https://github.com/ckorhonen/jev-lint"><svg class="gh" aria-hidden="true"><use href="#gh"/></svg>github.com/ckorhonen/jev-lint</a>
-    <p class="src" style="margin:20px auto 0">Claude Code + Codex hook · TypeSafe Jev by default · optional Cloudflare Clef · MIT</p>
+    <a class="url" href="https://jevlint.dev">jevlint.dev</a>
+    <p class="src" style="margin:20px auto 0">Claude Code + Codex hook · TypeSafe Jev by default · optional OpenAI Decisions API + Cloudflare Clef · MIT</p>
   </div>
 </section>
 
