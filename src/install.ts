@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 // Install or update the jev-lint hook for Claude Code and Codex, idempotently.
-//   bun ~/Repos/jev-lint/src/install.ts                 # check only: key, configs, skills (no writes)
-//   bun ~/Repos/jev-lint/src/install.ts --apply         # write hooks (backs up each file first)
+//   bun src/install.ts                 # check only: key, configs, skills (no writes)
+//   bun src/install.ts --apply         # write hooks (backs up each file first)
 //   options: --pre (Claude Code: check each edit before it's applied and block high-confidence
 //            findings, instead of after the write), --no-recheck (skip the end-of-turn re-check on Stop/SubagentStop), --claude-only | --codex-only, --project <repo> (Claude hook in <repo>/.claude/settings.json),
 //            --async (Claude: background check that wakes the agent), --skills (link skills), --smoke
@@ -25,7 +25,7 @@ import {
   writeFileSync,
 } from "node:fs";
 import { homedir, tmpdir } from "node:os";
-import { dirname, join, resolve } from "node:path";
+import { basename, dirname, isAbsolute, join, resolve, sep } from "node:path";
 import { parseArgs } from "node:util";
 import { openaiKey } from "./decisions";
 import { cloudflareKey, judgeModel, judgeProvider, keyFilePath } from "./jev";
@@ -35,24 +35,30 @@ const HOOK = join(REPO, "src/hook.ts");
 const MODEL = "jev-1.13.0";
 const installedModel = () => process.env.JEV_LINT_MODEL ?? (judgeProvider() !== "typesafe" ? judgeModel() : MODEL);
 const shellQuote = (value: string) => `'${value.replaceAll("'", "'\\''")}'`;
+// Preserve symlink/.. traversal when anchoring a credential path for another cwd.
+export const credentialPath = (value: string) => (isAbsolute(value) ? value : `${process.cwd()}${sep}${value}`);
+const projectSettingsPath = (value: string) => `${credentialPath(value)}${sep}.claude${sep}settings.json`;
 
 // Persist non-secret provider settings for both hooks. Credentials stay in the
 // agent environment or a private token file, never in hook configuration.
 export function judgeCommandEnv(): string {
   const provider = judgeProvider();
   const model = installedModel();
-  if (provider === "typesafe") return `JEV_LINT_PROVIDER=typesafe JEV_LINT_MODEL=${model === MODEL ? MODEL : shellQuote(model)}`;
+  if (provider === "typesafe") {
+    const keyFile = process.env.TYPESAFE_API_KEY_FILE;
+    return `JEV_LINT_PROVIDER=typesafe JEV_LINT_MODEL=${model === MODEL ? MODEL : shellQuote(model)}${keyFile ? ` TYPESAFE_API_KEY_FILE=${shellQuote(credentialPath(keyFile))}` : ""}`;
+  }
   if (provider === "openai") {
     if (model !== "gpt-6-luna") throw new Error("OpenAI Decisions model must be gpt-6-luna");
     const keyFile = process.env.OPENAI_API_KEY_FILE;
-    return `JEV_LINT_PROVIDER=openai JEV_LINT_MODEL=${shellQuote(model)}${keyFile ? ` OPENAI_API_KEY_FILE=${shellQuote(resolve(keyFile))}` : ""}`;
+    return `JEV_LINT_PROVIDER=openai JEV_LINT_MODEL=${shellQuote(model)}${keyFile ? ` OPENAI_API_KEY_FILE=${shellQuote(credentialPath(keyFile))}` : ""}`;
   }
   if (model !== "clef" && model !== "clef-flash") throw new Error("Cloudflare model must be clef or clef-flash");
   const account = process.env.CLOUDFLARE_ACCOUNT_ID;
   if (!account || !/^[a-f0-9]{32}$/i.test(account)) throw new Error("CLOUDFLARE_ACCOUNT_ID must be a 32-character account ID");
   const tokenFile = process.env.CLOUDFLARE_API_TOKEN_FILE;
   return `JEV_LINT_PROVIDER=cloudflare JEV_LINT_MODEL=${shellQuote(model)} CLOUDFLARE_ACCOUNT_ID=${shellQuote(account)}${
-    tokenFile ? ` CLOUDFLARE_API_TOKEN_FILE=${shellQuote(resolve(tokenFile))}` : ""
+    tokenFile ? ` CLOUDFLARE_API_TOKEN_FILE=${shellQuote(credentialPath(tokenFile))}` : ""
   }`;
 }
 const SYNC_TIMEOUT_S = 15; // the agent waits on a synchronous check
@@ -66,7 +72,7 @@ type HookConfig = { hooks?: Record<string, HookGroup[] | undefined> } & Record<s
 export function hookGroup(agent: "claude" | "codex", opts: { async?: boolean; bun?: string } = {}): HookGroup {
   const bun = opts.bun ?? Bun.which("bun") ?? process.execPath; // the PATH shim survives bun upgrades
   const rewake = agent === "claude" && opts.async;
-  const command = `${rewake ? "JEV_LINT_MODE=rewake " : ""}${judgeCommandEnv()} ${bun} ${HOOK}`;
+  const command = `${rewake ? "JEV_LINT_MODE=rewake " : ""}${judgeCommandEnv()} ${shellQuote(bun)} ${shellQuote(HOOK)}`;
   return {
     matcher: agent === "claude" ? "Write|Edit|MultiEdit" : "Edit|Write|apply_patch",
     hooks: [
@@ -85,20 +91,135 @@ const RECHECK = join(REPO, "src/recheck.ts");
 // Ours if it runs this checkout's script, or one from a checkout named jev-lint (an older
 // install elsewhere). A clone under another name must still be recognised, or every re-run
 // would add a second hook.
-export const isJevLint = (h: HookCommand) => h.command.includes(HOOK) || /jev-lint\/src\/hook\.ts/.test(h.command);
-const isJevLintRecheck = (h: HookCommand) => h.command.includes(RECHECK) || /jev-lint\/src\/recheck\.ts/.test(h.command);
+// Parse only literal shell words; never evaluate expansions or compound commands
+// while deciding which user hooks this installer owns.
+function literalWords(command: string): { words: string[]; assignments: Set<number> } | undefined {
+  const words: string[] = [];
+  const assignments = new Set<number>();
+  let word = "";
+  let quote = "";
+  let started = false;
+  let literalName = true;
+  let equals = false;
+  const finish = () => {
+    if (started) {
+      if (literalName && /^[A-Za-z_]\w*=/.test(word)) assignments.add(words.length);
+      words.push(word);
+    }
+    word = "";
+    started = false;
+    literalName = true;
+    equals = false;
+  };
+  for (let i = 0; i < command.length; i++) {
+    const ch = command[i];
+    if (quote === "'") {
+      if (ch === "'") quote = "";
+      else word += ch;
+    } else if (ch === "\\" && quote !== "'") {
+      if (!equals) literalName = false;
+      if (quote === '"' && !["$", "`", '"', "\\"].includes(command[i + 1])) {
+        word += ch;
+        continue;
+      }
+      if (++i >= command.length) return undefined;
+      word += command[i];
+      started = true;
+    } else if (quote === '"') {
+      if (ch === '"') quote = "";
+      else if (ch === "$" || ch === "`") return undefined;
+      else word += ch;
+    } else if (ch === "'" || ch === '"') {
+      if (!equals) literalName = false;
+      quote = ch;
+      started = true;
+    } else if (/\s/.test(ch)) {
+      if (ch === "\n" || ch === "\r") return undefined;
+      finish();
+    } else if (ch === "~" && !started && command[i + 1] === "/") {
+      word = homedir();
+      started = true;
+    } else if (/[;$`|&<>()*?[~#]/.test(ch)) return undefined;
+    else {
+      if (ch === "=") equals = true;
+      word += ch;
+      started = true;
+    }
+  }
+  if (quote) return undefined;
+  finish();
+  return { words, assignments };
+}
+
+function invocation(h: HookCommand): { words: string[]; binary: number; script: string } | undefined {
+  const parsed = literalWords(h.command);
+  if (!parsed) return undefined;
+  const { words, assignments } = parsed;
+  const binary = words.findIndex((_, index) => !assignments.has(index));
+  if (binary < 0 || basename(words[binary]) !== "bun" || !words[binary + 1]) return undefined;
+  return { words, binary, script: words[binary + 1] };
+}
+
+export const isJevLint = (h: HookCommand) => {
+  const script = invocation(h)?.script;
+  return Boolean(
+    script &&
+      (script === HOOK ||
+        /(?:^|\/)jev-lint\/src\/hook\.ts$/.test(script) ||
+        (h.statusMessage === "jev-lint" && isAbsolute(script) && script.endsWith("/src/hook.ts"))),
+  );
+};
+function recheckOwner(config: HookConfig): (h: HookCommand) => boolean {
+  const oldScripts = new Set(
+    ["PreToolUse", "PostToolUse"].flatMap((event) =>
+      (config.hooks?.[event] ?? [])
+        .flatMap((group) => group.hooks)
+        .filter(isJevLint)
+        .map((hook) => invocation(hook)?.script.replace(/hook\.ts$/, "recheck.ts")),
+    ),
+  );
+  return (h) => {
+    const script = invocation(h)?.script;
+    return Boolean(
+      script &&
+        (script === RECHECK ||
+          oldScripts.has(script) ||
+          /(?:^|\/)jev-lint\/src\/recheck\.ts$/.test(script) ||
+          (h.statusMessage === "jev-lint recheck" && isAbsolute(script) && script.endsWith("/src/recheck.ts"))),
+    );
+  };
+}
 const RECHECK_TIMEOUT_S = 20;
 export const RECHECK_EVENTS = ["Stop", "SubagentStop"] as const;
 
 // End-of-turn re-check for the learning loop (see src/recheck.ts): no matcher, since Stop events have no tool.
 export function recheckGroup(opts: { bun?: string } = {}): HookGroup {
   const bun = opts.bun ?? Bun.which("bun") ?? process.execPath;
-  return { hooks: [{ type: "command", command: `${judgeCommandEnv()} ${bun} ${RECHECK}`, timeout: RECHECK_TIMEOUT_S }] };
+  return {
+    hooks: [
+      {
+        type: "command",
+        command: `${judgeCommandEnv()} ${shellQuote(bun)} ${shellQuote(RECHECK)}`,
+        timeout: RECHECK_TIMEOUT_S,
+        statusMessage: "jev-lint recheck",
+      },
+    ],
+  };
 }
 
 // Which bun binary runs the hook doesn't matter (Homebrew vs ~/.bun), so it isn't a change.
 const sameHook = (a: HookGroup, b: HookGroup) => {
-  const normal = (g: HookGroup) => JSON.stringify(g).replace(/[^\s"]*\/bun /g, "bun ");
+  const normal = (g: HookGroup) =>
+    JSON.stringify({
+      ...g,
+      hooks: g.hooks.map((h) => {
+        const parsed = invocation(h);
+        if (!parsed) return h;
+        const words = [...parsed.words];
+        words[parsed.binary] = "bun";
+        return { ...h, command: words };
+      }),
+    });
   return normal(a) === normal(b);
 };
 
@@ -110,19 +231,28 @@ export function mergeHook(
   ours: (h: HookCommand) => boolean = isJevLint,
 ): { config: HookConfig; action: "added" | "updated" | "unchanged" } {
   const post = [...(config.hooks?.[event] ?? [])];
-  const index = post.findIndex((g) => g.hooks?.some(ours));
+  const indexes = post.flatMap((g, index) => (g.hooks?.some(ours) ? [index] : []));
+  const index = indexes[0] ?? -1;
   let action: "added" | "updated" | "unchanged" = "added";
   if (index === -1) post.push(group);
-  else if (sameHook(post[index], group)) action = "unchanged";
+  else if (indexes.length === 1 && sameHook(post[index], group)) action = "unchanged";
   else {
     // Keep any unrelated hooks that share the group; swap only the jev-lint command.
     // A group's matcher is shared by all its hooks, so never change it under other hooks:
     // leave them in their group and give jev-lint its own.
-    const others = post[index].hooks.filter((h) => !ours(h));
-    if (others.length) {
-      post[index] = { ...post[index], hooks: others };
-      post.push(group);
-    } else post[index] = group;
+    let placed = false;
+    const kept = post.flatMap((existing) => {
+      if (!existing.hooks.some(ours)) return [existing];
+      const others = existing.hooks.filter((h) => !ours(h));
+      if (others.length) return [{ ...existing, hooks: others }];
+      if (!placed) {
+        placed = true;
+        return [group];
+      }
+      return [];
+    });
+    if (!placed) kept.push(group);
+    post.splice(0, post.length, ...kept);
     action = "updated";
   }
   return { config: { ...config, hooks: { ...config.hooks, [event]: post } }, action };
@@ -165,7 +295,7 @@ export function installedMode(config: HookConfig): { installed: boolean; pre: bo
     installed: main.length > 0,
     pre: pre.length > 0,
     async: main.some((h) => h.asyncRewake || /JEV_LINT_MODE=rewake/.test(h.command)),
-    recheck: RECHECK_EVENTS.some((e) => (config.hooks?.[e] ?? []).some((g) => g.hooks?.some(isJevLintRecheck))),
+    recheck: RECHECK_EVENTS.some((e) => (config.hooks?.[e] ?? []).some((g) => g.hooks?.some(recheckOwner(config)))),
   };
 }
 
@@ -189,9 +319,14 @@ function upgradeCheckout(): string {
 
 // Main hook on PostToolUse (or PreToolUse with --pre), plus (unless disabled) the end-of-turn re-check on Stop/SubagentStop.
 function writeConfig(path: string, group: HookGroup, apply: boolean, recheck: boolean, pre = false): string {
+  if (lstatSync(dirname(path), { throwIfNoEntry: false })?.isSymbolicLink())
+    throw new Error(`${dirname(path)} is a symlink; review its target and configure that location explicitly before applying`);
+  if (lstatSync(path, { throwIfNoEntry: false })?.isSymbolicLink())
+    throw new Error(`${path} is a symlink; review its target and configure that location explicitly before applying`);
   const parsed: unknown = existsSync(path) ? JSON.parse(readFileSync(path, "utf8")) : {};
   if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) throw new Error(`${path} is not a JSON object; not touching it`);
   let config = parsed as HookConfig;
+  const isJevLintRecheck = recheckOwner(config);
   const actions: string[] = [];
   // The hook runs on exactly one of PreToolUse / PostToolUse, so switching modes moves it.
   const [event, other] = pre ? ["PreToolUse", "PostToolUse"] : ["PostToolUse", "PreToolUse"];
@@ -207,14 +342,24 @@ function writeConfig(path: string, group: HookGroup, apply: boolean, recheck: bo
       config = merged.config;
       actions.push(`${event} re-check ${merged.action}`);
     }
+  } else {
+    for (const event of RECHECK_EVENTS) {
+      const removed = removeHook(config, event, isJevLintRecheck);
+      config = removed.config;
+      if (removed.removed) actions.push(`${event} re-check removed`);
+    }
   }
   const changed = actions.some((a) => !a.endsWith("unchanged"));
+  let backup: string | undefined;
   if (apply && changed) {
     mkdirSync(dirname(path), { recursive: true });
-    if (existsSync(path)) copyFileSync(path, `${path}.bak-jev-lint-${new Date().toISOString().replace(/[:.]/g, "-")}`);
+    if (existsSync(path)) {
+      backup = `${path}.bak-jev-lint-${new Date().toISOString().replace(/[:.]/g, "-")}`;
+      copyFileSync(path, backup);
+    }
     writeFileSync(path, `${JSON.stringify(config, null, 2)}\n`);
   }
-  return `${path}: ${actions.join(", ")}${apply || !changed ? "" : " (dry run; pass --apply)"}`;
+  return `${path}: ${actions.join(", ")}${apply || !changed ? "" : " (dry run; pass --apply)"}${backup ? `; backup: ${backup}` : ""}`;
 }
 
 function codexFeatureStatus(): string {
@@ -265,76 +410,94 @@ function smoke(): string {
 }
 
 if (import.meta.main) {
-  const { values } = parseArgs({
-    options: {
-      apply: { type: "boolean", default: false },
-      "claude-only": { type: "boolean", default: false },
-      "codex-only": { type: "boolean", default: false },
-      project: { type: "string" },
-      async: { type: "boolean", default: false },
-      skills: { type: "boolean", default: false },
-      smoke: { type: "boolean", default: false },
-      "no-recheck": { type: "boolean", default: false },
-      pre: { type: "boolean", default: false },
-      upgrade: { type: "boolean", default: false },
-    },
-  });
-  if (values.upgrade) {
-    // Pull first, so the modes below are detected and re-applied with the new code.
-    console.log(`upgrade: ${upgradeCheckout()}`);
-    const claudePath = values.project ? join(resolve(values.project), ".claude/settings.json") : join(homedir(), ".claude/settings.json");
-    const mode = installedMode(readConfig(claudePath));
-    const codexMode = installedMode(readConfig(join(homedir(), ".codex/hooks.json")));
-    if (!mode.installed && !codexMode.installed) {
-      console.error("upgrade: jev-lint is not installed here; run without --upgrade (and with --apply) to install");
+  try {
+    const { values } = parseArgs({
+      options: {
+        apply: { type: "boolean", default: false },
+        "claude-only": { type: "boolean", default: false },
+        "codex-only": { type: "boolean", default: false },
+        project: { type: "string" },
+        async: { type: "boolean", default: false },
+        skills: { type: "boolean", default: false },
+        smoke: { type: "boolean", default: false },
+        "no-recheck": { type: "boolean", default: false },
+        pre: { type: "boolean", default: false },
+        upgrade: { type: "boolean", default: false },
+      },
+    });
+    if (values.upgrade) {
+      // Pull first, so the modes below are detected and re-applied with the new code.
+      console.log(`upgrade: ${upgradeCheckout()}`);
+      const claudePath = values.project ? projectSettingsPath(values.project) : join(homedir(), ".claude/settings.json");
+      const mode = installedMode(readConfig(claudePath));
+      const codexMode = installedMode(readConfig(join(homedir(), ".codex/hooks.json")));
+      if (!mode.installed && !codexMode.installed) {
+        console.error("upgrade: jev-lint is not installed here; run without --upgrade (and with --apply) to install");
+        process.exit(1);
+      }
+      values.apply = true;
+      if (!values.pre && !values.async) {
+        values.pre = mode.pre;
+        values.async = mode.async;
+      }
+      if (!values["no-recheck"]) values["no-recheck"] = !(mode.recheck || codexMode.recheck);
+      if (!mode.installed) values["codex-only"] = true;
+      if (!codexMode.installed) values["claude-only"] = true;
+      console.log(
+        `upgrade: re-applying (${values.pre ? "before-the-write" : values.async ? "async" : "after-the-write"}${values["no-recheck"] ? ", no re-check" : ", with re-check"})`,
+      );
+    }
+    if (values.pre && values.async) {
+      console.error("--pre and --async are different modes: pick one");
       process.exit(1);
     }
-    values.apply = true;
-    if (!values.pre && !values.async) {
-      values.pre = mode.pre;
-      values.async = mode.async;
+    if (values["codex-only"] && values.project) {
+      console.error("Codex has no project-scoped hook config; drop --project or --codex-only");
+      process.exit(1);
     }
-    if (!values["no-recheck"]) values["no-recheck"] = !(mode.recheck || codexMode.recheck);
-    if (!mode.installed) values["codex-only"] = true;
-    if (!codexMode.installed) values["claude-only"] = true;
+    console.log(`jev-lint at ${REPO}`);
     console.log(
-      `upgrade: re-applying (${values.pre ? "before-the-write" : values.async ? "async" : "after-the-write"}${values["no-recheck"] ? ", no re-check" : ", with re-check"})`,
+      values.apply
+        ? "Local setup: applying hook configuration (backups created for changed files)."
+        : "Local setup preview: no hook or skill changes will be written. Use --apply when ready.",
     );
-  }
-  if (values.pre && values.async) {
-    console.error("--pre and --async are different modes: pick one");
-    process.exit(1);
-  }
-  if (values["codex-only"] && values.project) {
-    console.error("Codex has no project-scoped hook config; drop --project or --codex-only");
-    process.exit(1);
-  }
-  console.log(`jev-lint at ${REPO}`);
-  console.log(`bun: ${process.execPath}`);
-  console.log(
-    judgeProvider() === "cloudflare"
-      ? `Cloudflare token: ${cloudflareKey() ? "present" : "MISSING"} (must be available to the agent at runtime)`
-      : judgeProvider() === "openai"
-        ? `OpenAI key: ${openaiKey() ? "present" : "MISSING"} (must be available to the agent at runtime)`
-        : `TypeSafe key: ${keyStatus()}`,
-  );
-  try {
-    judgeCommandEnv(); // a missing account ID or an unknown model is a setup error, not a crash
+    console.log(
+      "Setup does not contact a model unless --smoke is explicitly supplied. Installed hooks send code to the selected provider on future edits.",
+    );
+    console.log(`bun: ${process.execPath}`);
+    console.log(
+      judgeProvider() === "cloudflare"
+        ? `Cloudflare token: ${cloudflareKey() ? "present" : "MISSING"} (must be available to the agent at runtime)`
+        : judgeProvider() === "openai"
+          ? `OpenAI key: ${openaiKey() ? "present" : "MISSING"} (must be available to the agent at runtime)`
+          : `TypeSafe key: ${keyStatus()}`,
+    );
+    try {
+      judgeCommandEnv(); // a missing account ID or an unknown model is a setup error, not a crash
+    } catch (error) {
+      console.error(`Provider setup: ${error instanceof Error ? error.message : error}`);
+      process.exit(1);
+    }
+    if (!values["codex-only"]) {
+      const path = values.project ? projectSettingsPath(values.project) : join(homedir(), ".claude/settings.json");
+      console.log(
+        `Claude Code: ${writeConfig(path, hookGroup("claude", { async: values.async }), values.apply, !values["no-recheck"], values.pre)}`,
+      );
+    }
+    if (!values["claude-only"] && !values.project) {
+      console.log(`Codex: ${writeConfig(join(homedir(), ".codex/hooks.json"), hookGroup("codex"), values.apply, !values["no-recheck"])}`);
+      console.log(`Codex: ${codexFeatureStatus()}; the first run asks you to trust the hook`);
+      if (values.pre) console.log("Codex: --pre applies to Claude Code only for now; Codex keeps checking after the write");
+    }
+    if (values.skills) for (const line of linkSkills(values.apply)) console.log(`skill ${line}`);
+    if (values.smoke) {
+      console.log(
+        `Network smoke test: sending a synthetic TypeScript fixture and rule context to ${judgeProvider()} (${installedModel()}); API charges may apply.`,
+      );
+      console.log(smoke());
+    }
   } catch (error) {
-    console.error(`Provider setup: ${error instanceof Error ? error.message : error}`);
-    process.exit(1);
+    console.error(`Setup could not complete: ${error instanceof Error ? error.message : error}`);
+    process.exitCode = 1;
   }
-  if (!values["codex-only"]) {
-    const path = values.project ? join(resolve(values.project), ".claude/settings.json") : join(homedir(), ".claude/settings.json");
-    console.log(
-      `Claude Code: ${writeConfig(path, hookGroup("claude", { async: values.async }), values.apply, !values["no-recheck"], values.pre)}`,
-    );
-  }
-  if (!values["claude-only"] && !values.project) {
-    console.log(`Codex: ${writeConfig(join(homedir(), ".codex/hooks.json"), hookGroup("codex"), values.apply, !values["no-recheck"])}`);
-    console.log(`Codex: ${codexFeatureStatus()}; the first run asks you to trust the hook`);
-    if (values.pre) console.log("Codex: --pre applies to Claude Code only for now; Codex keeps checking after the write");
-  }
-  if (values.skills) for (const line of linkSkills(values.apply)) console.log(`skill ${line}`);
-  if (values.smoke) console.log(smoke());
 }

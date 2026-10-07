@@ -7,7 +7,8 @@
 //
 // Lifecycle rules (each prevents a failure found in review):
 // - One daemon per socket: an exclusive lock file (with our pid) is taken before binding;
-//   a second daemon started at the same moment exits.
+//   a short-lived guard serializes stale recovery and shutdown. Other starters exit.
+//   An abandoned guard is never reaped; checks fall back in process until verified cleanup.
 // - Shutdown removes the socket only if it is still ours (same inode), so an old daemon
 //   can never delete a newer one's socket.
 // - Exits when idle for JEV_LINT_DAEMON_IDLE_MS (default 30 min), after jev-lint's own
@@ -15,8 +16,9 @@
 //   rejects the key (401/403), so a rotated key is re-read by the next daemon.
 // - Repo `.jev-lint/` rules and `when` gates are re-read on every request.
 
-import { chmodSync, closeSync, mkdirSync, openSync, readdirSync, readFileSync, statSync, unlinkSync, writeSync } from "node:fs";
+import { chmodSync, mkdirSync, readdirSync, statSync, unlinkSync } from "node:fs";
 import { dirname, join } from "node:path";
+import { takeDaemonLock } from "./daemonLock";
 
 const ROOT = join(import.meta.dir, "..");
 
@@ -47,41 +49,6 @@ const KEEPWARM_WINDOW_MS = 10 * 60_000;
 const DRAIN_LIMIT_MS = 20_000;
 const BASE_URL = process.env.TYPESAFE_BASE_URL ?? "https://api.typesafe.ai";
 
-function pidAlive(pid: number): boolean {
-  try {
-    process.kill(pid, 0);
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-// Take `<socket>.lock` exclusively, replacing it only if its owner is dead.
-function takeLock(lock: string): boolean {
-  for (let attempt = 0; attempt < 2; attempt++) {
-    try {
-      const fd = openSync(lock, "wx", 0o600);
-      writeSync(fd, String(process.pid));
-      closeSync(fd);
-      return true;
-    } catch {
-      let owner = 0;
-      try {
-        owner = Number(readFileSync(lock, "utf8").trim());
-      } catch {
-        continue; // removed between our open and read: try again
-      }
-      if (owner > 0 && pidAlive(owner)) return false;
-      try {
-        unlinkSync(lock); // left by a daemon that died without cleaning up
-      } catch {
-        return false; // another starter removed it first; let it win
-      }
-    }
-  }
-  return false;
-}
-
 function removeIfOurs(path: string, inode: number | undefined) {
   try {
     if (inode === undefined || statSync(path).ino === inode) unlinkSync(path);
@@ -95,8 +62,9 @@ function main() {
   const lock = `${socket}.lock`;
   mkdirSync(dirname(socket), { recursive: true, mode: 0o700 });
   chmodSync(dirname(socket), 0o700); // also holds the findings log, which has code excerpts
-  if (!takeLock(lock)) return;
-  removeIfOurs(socket, undefined); // stale socket file: we hold the lock, so it has no live owner
+  const ownership = takeDaemonLock(lock, () => removeIfOurs(socket, undefined));
+  if (!ownership) return;
+  const releaseOwnership = ownership.release;
 
   let lastActivity = Date.now();
   let inFlight = 0;
@@ -162,10 +130,15 @@ function main() {
   function shutdown() {
     clearInterval(timer);
     server.stop(true);
-    removeIfOurs(socket, inode);
     try {
-      if (readFileSync(lock, "utf8").trim() === String(process.pid)) unlinkSync(lock);
-      unlinkSync(`${socket}.started`); // the client's respawn-limit stamp; a clean exit may be followed by a start
+      releaseOwnership(() => {
+        removeIfOurs(socket, inode);
+        try {
+          unlinkSync(`${socket}.started`); // A clean exit may be followed by a start.
+        } catch {
+          // Stamp already absent.
+        }
+      });
     } catch {
       // lock already replaced or removed
     }
