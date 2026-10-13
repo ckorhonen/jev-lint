@@ -1,0 +1,9 @@
+# .code-reviewer.yml — repo-level review configuration.
+# Omitted keys fall through to dashboard, account, then product defaults.
+# Full schema: https://github.com/ckorhonen/code-reviewer (RepoConfigV1).
+version: 1
+profile: balanced
+verify:
+  checkout_verifier: true
+publication:
+  precision_floor: 0.3
