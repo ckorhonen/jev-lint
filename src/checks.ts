@@ -13,9 +13,15 @@ export type Settled = { ok: true; value: LintResult | undefined } | { ok: false;
 
 export async function runChecks(changes: ChangedFile[], opts: { timeoutMs: number; cwd?: string }): Promise<Settled[]> {
   const settled: Settled[] = [];
+  const deadline = performance.now() + opts.timeoutMs;
   for (let i = 0; i < changes.length; i += MAX_PARALLEL) {
     const batch = changes.slice(i, i + MAX_PARALLEL);
-    const results = await Promise.allSettled(batch.map((c) => lintChange(c, opts)));
+    const remaining = Math.floor(deadline - performance.now());
+    if (remaining <= 0) {
+      settled.push(...changes.slice(i).map((): Settled => ({ ok: false, error: "check deadline exceeded" })));
+      break;
+    }
+    const results = await Promise.allSettled(batch.map((c) => lintChange(c, { ...opts, timeoutMs: remaining })));
     for (const r of results) settled.push(r.status === "fulfilled" ? { ok: true, value: r.value } : { ok: false, error: String(r.reason) });
   }
   return settled;
