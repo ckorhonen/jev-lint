@@ -513,7 +513,7 @@ Two rules were removed because the model is weak at counting and tracing; use a 
 | `CLOUDFLARE_API_TOKEN_FILE` | unset | Alternative token file; must have no group/other permissions (use mode 600). Environment token takes priority |
 | `OPENAI_API_KEY` | unset | OpenAI key, read by the Decisions provider; never written to hook configs |
 | `OPENAI_API_KEY_FILE` | unset | Alternative Decisions key file with no group/other permissions (mode 600); environment key takes priority |
-| `JEV_LINT_TIMEOUT_MS` | `8000` | Per-call timeout |
+| `JEV_LINT_TIMEOUT_MS` | `8000` | Shared timeout budget for all files in a hook event |
 | `JEV_LINT_LOG` | unset | Debug: append every raw judgment to a JSONL file |
 | `JEV_LINT_FINDINGS_LOG` | `~/.local/state/jev-lint/findings.jsonl` | Findings log used by `jev-lint-learn`; `off` disables it |
 | `TYPESAFE_BASE_URL` | `https://api.typesafe.ai` | Any `/v1/systemone` server, e.g. a local Kev or Laya (no key needed) |
