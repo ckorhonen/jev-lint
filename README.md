@@ -51,7 +51,7 @@ Also: [pack docs](docs/packs/) · [feedback loop](docs/feedback-loop.md) · [exp
 - **Starts with opinionated defaults.** Tested rule packs for TypeScript and React, Swift and
   SwiftUI, Kotlin, Rust, Python, Ruby and Bazel, plus cross-language packs for security,
   test hygiene (tests that can't fail, flaky tests, tests that lock in the implementation)
-  and performance (177 rules). Every
+  and performance (184 rules). Every
   rule passed an evaluation on held-out examples before it was switched on. See
   [the pack docs](docs/packs/) for a good and bad example of each.
 - **Your rules, not just ours.** The packs are only defaults: turn any pack or rule off, scope
@@ -121,7 +121,7 @@ jev-lint is four pieces:
 
 - **Rule packs, as defaults, plus your own rules.** Tested packs for TypeScript/React,
   Swift/SwiftUI, Kotlin, Rust, Python, Ruby and Bazel, plus cross-language security,
-  test-hygiene and performance packs (177 rules in total). Turn any pack or rule off, or
+  test-hygiene and performance packs (184 rules in total). Turn any pack or rule off, or
   add your own team rules in `.jev-lint/`. See [Rule packs](#rule-packs) for the full pack
   table and how to configure them.
 - **An onboarding skill.** `jev-lint-rules` reads your agent instructions, docs, skills and
@@ -456,8 +456,8 @@ numbers.
 | Pack | Rules | Languages | What it checks |
 | --- | --- | --- | --- |
 | [`hygiene`](docs/packs/hygiene.md) | 24 | swift, typescript | `any`, non-null / force-unwrap, empty catch, debug prints, restating comments, vague names, magic numbers, bare TODOs, hard-coded secrets |
-| [`practices`](docs/packs/practices.md) | 65 | bazel, kotlin, python, ruby, rust, swift, typescript | React effects and rendering, SwiftUI and Swift concurrency, Kotlin coroutines/Flow/Compose, Rust async and `unsafe`, Python async and ORMs, Rails, Bazel |
-| [`security`](docs/packs/security.md) | 33 | python, ruby, rust, typescript | Secrets in client bundles or logs, unverified JWTs, SQL/shell built from input, SSRF, path traversal, mass assignment, unscoped record lookups, Server Actions without auth, unsafe deserialization, weak password hashing |
+| [`practices`](docs/packs/practices.md) | 69 | bazel, kotlin, python, ruby, rust, swift, typescript | React effects and rendering, SwiftUI and Swift concurrency, Kotlin coroutines/Flow/Compose, Rust async and `unsafe`, Python async and ORMs, Rails, Bazel |
+| [`security`](docs/packs/security.md) | 36 | python, ruby, rust, typescript | Secrets in client bundles or logs, unverified JWTs, SQL/shell built from input, SSRF, path traversal, mass assignment, unscoped record lookups, Server Actions without auth, unsafe deserialization, weak password hashing |
 | [`tests`](docs/packs/tests.md) | 42 | bazel, kotlin, python, ruby, rust, swift, typescript | Tests that can't fail; flaky tests (real clock, unseeded randomness, real network, fixed sleeps, order-dependent assertions, shared state); tests bent to pass; tests that lock in the implementation (assert internal calls, mock the codebase's own modules, whole-output snapshots, hand-typed fake API responses) |
 | [`performance`](docs/packs/performance.md) | 13 | kotlin, python, ruby, rust, swift, typescript | N+1 queries and per-item writes, sync I/O on request paths, unbounded queries, independent calls awaited one by one, unbounded fan-out |
 | `repo` | yours | any | Your team's rules in `.jev-lint/*.rules.json`, written with the `jev-lint-rules` and `jev-lint-write-rule` skills |

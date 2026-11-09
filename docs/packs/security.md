@@ -460,6 +460,111 @@ pub async fn find_active(pool: &PgPool, email: &str) -> sqlx::Result<Option<User
 
 Holdout: precision 100%, recall 100% (5 violations in the holdout set). Sources: [cheatsheetseries.owasp.org](https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html), [cwe.mitre.org](https://cwe.mitre.org/data/definitions/89.html)
 
+### `rs-shell-command-interpolation`
+
+Does the new code interpolate externally supplied text (a request field, command-line argument, environment value, filename, or function parameter) into a shell command string executed through std::process::Command or tokio::process::Command with sh/bash -c, cmd /C, or PowerShell -Command?
+
+**Catches:** Untrusted text becomes shell syntax instead of a literal argument, allowing command injection.
+
+**Why it matters:** External input interpreted by a shell can run unintended commands.
+
+**Fix:** Invoke the executable directly with separate arguments, or keep the shell script fixed and pass data as positional arguments (Rust Command docs; OWASP OS Command Injection Defense).
+
+**Bad** (`shell_sh_filename.rs`):
+
+```rust
+pub fn inspect_upload(filename: &str) -> std::io::Result<std::process::Output> {
+    std::process::Command::new("sh")
+        .arg("-c")
+        .arg(format!("file {filename}"))
+        .output()
+}
+```
+
+**Good** (`clean_shell_display_old_trap.rs`, looks similar but is fine):
+
+```rust
+pub fn show_diagnostic_command(filename: &str) -> String {
+    // This string is displayed in a help panel and never executed.
+    format!("file {filename}")
+}
+```
+
+**Not flagged:** The executable is invoked directly with separate arg/args values and no shell; the shell script is fixed and untrusted values are passed as positional arguments; values are selected from a fixed allowlist; a suitable shell-escaping API is used for the target shell; the command is only displayed; or no external value is interpolated into an executed shell command.
+
+Holdout: precision 100%, recall 100% (5 violations in the holdout set). Sources: [doc.rust-lang.org](https://doc.rust-lang.org/std/process/struct.Command.html#method.arg), [cwe.mitre.org](https://cwe.mitre.org/data/definitions/78.html)
+
+### `rs-zip-entry-path-traversal`
+
+Does the new code extract a zip::ZipArchive entry by joining entry.name() or Path::new(entry.name()) directly to a destination and creating/writing that path, without enclosed_name or equivalent component validation that rejects absolute paths and parent-directory traversal?
+
+**Catches:** A ZIP entry controls the output path and can write outside the extraction directory via absolute paths or .. components.
+
+**Why it matters:** Untrusted archive entries can overwrite files outside the extraction root.
+
+**Fix:** Use ZipFile::enclosed_name() and reject invalid paths before joining the extraction root (zip ZipFile docs; CWE-22).
+
+**Bad** (`zip_path_new_write.rs`):
+
+```rust
+pub fn save_first<R: std::io::Read + std::io::Seek>(archive: &mut zip::ZipArchive<R>, root: &std::path::Path) -> anyhow::Result<()> {
+    use std::io::Read;
+    let mut entry = archive.by_index(0)?;
+    let target = root.join(std::path::Path::new(entry.name()));
+    let mut content = Vec::new();
+    entry.read_to_end(&mut content)?;
+    std::fs::write(target, content)?;
+    Ok(())
+}
+```
+
+**Good** (`clean_zip_library_extract.rs`, looks similar but is fine):
+
+```rust
+pub fn install_package<R: std::io::Read + std::io::Seek>(archive: &mut zip::ZipArchive<R>, root: &std::path::Path) -> zip::result::ZipResult<()> {
+    archive.extract(root)
+}
+```
+
+**Not flagged:** The entry path comes from enclosed_name and None is rejected, or equivalent validation rejects root/prefix and parent traversal; ZipArchive::extract handles paths; entry names are only listed or logged; extraction writes to an independently chosen fixed filename; or no ZIP entry is written to its archive-supplied path. This rule checks archive path validation, not preexisting filesystem symlinks.
+
+Holdout: precision 100%, recall 100% (6 violations in the holdout set). Sources: [docs.rs](https://docs.rs/zip/latest/zip/read/struct.ZipFile.html#method.enclosed_name), [cwe.mitre.org](https://cwe.mitre.org/data/definitions/22.html)
+
+### `rs-path-string-prefix-containment`
+
+Does the new code decide whether an untrusted filesystem path is confined to an allowed directory using string starts_with (including to_str/to_string_lossy/display().to_string()), so a sibling directory sharing the same textual prefix or unresolved .. components can pass the check before file access?
+
+**Catches:** A textual path-prefix authorization check can accept a path outside the allowed directory.
+
+**Why it matters:** A sibling directory can pass a textual prefix authorization check.
+
+**Fix:** Resolve the candidate and root paths and compare them with component-aware Path::starts_with; avoid a string prefix as an authorization boundary (Rust Path docs; CWE-22).
+
+**Bad** (`prefix_str_sibling.rs`):
+
+```rust
+pub fn read_tenant_file(user_path: &str) -> anyhow::Result<Vec<u8>> {
+    let allowed_root = "/srv/tenant";
+    anyhow::ensure!(user_path.starts_with(allowed_root), "forbidden path");
+    Ok(std::fs::read(user_path)?)
+}
+```
+
+**Good** (`clean_prefix_canonical_path.rs`, looks similar but is fine):
+
+```rust
+pub fn read_confined(root: &std::path::Path, supplied: &std::path::Path) -> anyhow::Result<Vec<u8>> {
+    let root = root.canonicalize()?;
+    let candidate = supplied.canonicalize()?;
+    anyhow::ensure!(candidate.starts_with(&root), "outside root");
+    Ok(std::fs::read(candidate)?)
+}
+```
+
+**Not flagged:** The code canonicalizes paths and uses Path::starts_with for component-aware containment; it validates safe path components beneath a trusted root; it is checking URL prefixes or a filename naming convention rather than filesystem access authorization; a string check uses a separator boundary on already canonical paths; or no directory containment decision is made.
+
+Holdout: precision 100%, recall 100% (5 violations in the holdout set). Sources: [doc.rust-lang.org](https://doc.rust-lang.org/std/path/struct.Path.html#method.starts_with), [cwe.mitre.org](https://cwe.mitre.org/data/definitions/22.html)
+
 ## Typescript
 
 ### `ts-secret-in-public-env`

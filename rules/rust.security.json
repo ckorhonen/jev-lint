@@ -17,6 +17,30 @@
       "false": "Values are passed as bind parameters (`$1`/`?` with `.bind(v)`, `params![]`, `&[&v]`, `sqlx::query!`); the interpolated part is a compile-time constant or chosen from a fixed allowlist or enum of identifiers (table or column names, `ASC`/`DESC`); a query builder adds the values (`QueryBuilder::push_bind`, SeaQuery, Diesel DSL); or the string isn't SQL.",
       "fix": "Pass values as bind parameters ($1 + .bind(v), params![]) instead of formatting them into the SQL string (OWASP SQL Injection Prevention Cheat Sheet).",
       "when": ["select\\b|insert\\b|update\\b|delete\\b|\\bsql|query"]
+    },
+    {
+      "id": "rs-shell-command-interpolation",
+      "question": "Does `added_code` interpolate externally supplied text (a request field, command-line argument, environment value, filename, or function parameter) into a shell command string executed through std::process::Command or tokio::process::Command with sh/bash -c, cmd /C, or PowerShell -Command?",
+      "true": "Untrusted text becomes shell syntax instead of a literal argument, allowing command injection.",
+      "false": "The executable is invoked directly with separate arg/args values and no shell; the shell script is fixed and untrusted values are passed as positional arguments; values are selected from a fixed allowlist; a suitable shell-escaping API is used for the target shell; the command is only displayed; or no external value is interpolated into an executed shell command.",
+      "fix": "Invoke the executable directly with separate arguments, or keep the shell script fixed and pass data as positional arguments (Rust Command docs; OWASP OS Command Injection Defense).",
+      "when": ["\\bCommand\\b|\\.arg(?:s)?\\s*\\("]
+    },
+    {
+      "id": "rs-zip-entry-path-traversal",
+      "question": "Does `added_code` extract a zip::ZipArchive entry by joining entry.name() or Path::new(entry.name()) directly to a destination and creating/writing that path, without enclosed_name or equivalent component validation that rejects absolute paths and parent-directory traversal?",
+      "true": "A ZIP entry controls the output path and can write outside the extraction directory via absolute paths or .. components.",
+      "false": "The entry path comes from enclosed_name and None is rejected, or equivalent validation rejects root/prefix and parent traversal; ZipArchive::extract handles paths; entry names are only listed or logged; extraction writes to an independently chosen fixed filename; or no ZIP entry is written to its archive-supplied path. This rule checks archive path validation, not preexisting filesystem symlinks.",
+      "fix": "Use ZipFile::enclosed_name() and reject invalid paths before joining the extraction root (zip ZipFile docs; CWE-22).",
+      "when": ["\\.name\\s*\\(|ZipArchive"]
+    },
+    {
+      "id": "rs-path-string-prefix-containment",
+      "question": "Does `added_code` decide whether an untrusted filesystem path is confined to an allowed directory using string starts_with (including to_str/to_string_lossy/display().to_string()), so a sibling directory sharing the same textual prefix or unresolved .. components can pass the check before file access?",
+      "true": "A textual path-prefix authorization check can accept a path outside the allowed directory.",
+      "false": "The code canonicalizes paths and uses Path::starts_with for component-aware containment; it validates safe path components beneath a trusted root; it is checking URL prefixes or a filename naming convention rather than filesystem access authorization; a string check uses a separator boundary on already canonical paths; or no directory containment decision is made.",
+      "fix": "Resolve the candidate and root paths and compare them with component-aware Path::starts_with; avoid a string prefix as an authorization boundary (Rust Path docs; CWE-22).",
+      "when": ["starts_with"]
     }
   ]
 }

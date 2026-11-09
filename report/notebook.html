@@ -111,7 +111,8 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12.5px}
   <div class="eyebrow">Contents</div>
   <ol id="toc-list">
     <li><a href="#answer">Current answer</a></li>
-    <li><a href="#e10">Entry 10 · Test rules from the "unit tests are bloat" debate <span class="tag new">latest</span></a></li>
+    <li><a href="#e11">Entry 11 · Seven Rust rules <span class="tag new">latest</span></a></li>
+    <li><a href="#e10">Entry 10 · Test rules from the "unit tests are bloat" debate</a></li>
     <li><a href="#e9">Entry 9 · Optional Cloudflare Clef</a></li>
     <li><a href="#e8">Entry 8 · Local model, accuracy and speed</a>
       <ol>
@@ -193,10 +194,11 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12.5px}
   <section id="answer">
     <h2>Current answer</h2>
     <div class="verdict">
-      <p class="eyebrow">Recommendation as of Entry 10</p>
+      <p class="eyebrow">Recommendation as of Entry 11</p>
       <p><b>Adopt it, with the five default packs on, as a non-blocking background hint.</b> The hook now carries {{LIVE_ALL}} rules across seven languages. Every new rule shipped only after passing a held-out bar fixed in advance. Thanks to the gate, a check on real code still takes about 0.3 s with twice as many rules. With every pack on, it cut graded rule violations in real Claude Code runs by {{E7_V_ABS}} ({{E7_V_NONE}} → {{E7_V_JEV}} per task), for about {{E7_COST_ABS}} more agent cost. It's most worth it where review is human, or where no AI reviewer checks every change. It still doesn't replace an AI code reviewer: most review comments are about logic and design.</p>
       <p><b>Use cloud Jev.</b> A fine-tuned local model now runs on this Mac for free and offline, at about 0.5 s per check. It's a usable fallback, but it misses more than Jev ({{E8_E22_F1R}}% held-out F1 against {{E8_JEV_F1}}%) and is slower (Entry 8).</p>
     </div>
+    <p><b>Rust now has 17 live rules, up from 10.</b> Seven new checks cover unchecked HTTP status, broadcast lag, task and channel cancellation, shell injection, ZIP traversal and path containment. Across three repetitions of 53 independent held-out cases, the new rules achieved 98.2% precision and 100% recall at the warning threshold, with no false positives at the fix threshold (Entry 11). These are synthetic rule-accuracy results, not evidence of fewer production bugs.</p>
     <p><b>Seven new test rules are live</b> for the patterns behind the "delete your unit tests" debate: tests that assert internal calls, mock the codebase's own modules, snapshot whole outputs, or re-implement the logic they test. All nine candidates passed the held-out bar with 100% precision at the fix tier; the re-implementation pair shipped on a second attempt after a real-code false alarm, and the fake-response pair went back to candidate after two false alarms on agent-written tests in an end-to-end round that otherwise showed no measurable effect (Entry 10).</p>
     <p><b>Cloudflare Clef is optional and experimental.</b> Its integration is tested, but the live comparison is pending credentials (Entry 9). Earlier Jev measurements do not establish Clef accuracy, speed or cost.</p>
     <details class="more"><summary>Entry 6 verdict <span class="tag old">superseded</span></summary>
@@ -236,6 +238,26 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12.5px}
     {{CHART_LATENCY}}
   </section>
 
+  <section class="entry" id="e11">
+    <p class="eyebrow">9 Nov 2026 · Entry 11</p>
+    <h2>Seven Rust rules, independently held out</h2>
+    <h3>Question and setup</h3>
+    <p>Can seven snippet-visible failure modes expand Rust coverage without exceeding the existing false-alarm budget? Four practices rules cover HTTP status handling, broadcast lag, timed-out spawned tasks and cancelled channel sends. Three security rules cover shell interpolation, ZIP entry traversal and string-prefix path authorization. Separate authors wrote 62 development and 53 holdout edits, including 44 clean edits overall, hard negatives, multi-violation edits and removed-code traps.</p>
+    <p>Judge <code>jev-1.13.0</code>, three runs per split. Thresholds stayed at 0.8 / 0.5. The shipping bar remained 90% precision at 0.8, 75% precision and 80% recall at 0.5, with at least three held-out positives. Each new rule has five or six held-out positives. One HTTP question was clarified on development evidence to exclude forwarding a raw Response. Wording was frozen before the holdout was opened.</p>
+    <h3>Results</h3>
+    <figure><svg class="chart" viewBox="0 0 650 150" role="img" aria-label="Across three repeated holdout runs: warning precision 98.2 percent, warning recall 100 percent, fix precision 100 percent, fix recall 87 percent.">
+      <text class="glabel" x="0" y="23">Warning precision</text><rect class="s1" x="180" y="8" width="392.7" height="20"/><text class="val" x="590" y="23">98.2%</text>
+      <text class="glabel" x="0" y="57">Warning recall</text><rect class="s1" x="180" y="42" width="400" height="20"/><text class="val" x="590" y="57">100%</text>
+      <text class="glabel" x="0" y="91">Fix precision</text><rect class="s2" x="180" y="76" width="400" height="20"/><text class="val" x="590" y="91">100%</text>
+      <text class="glabel" x="0" y="125">Fix recall</text><rect class="s2" x="180" y="110" width="348.1" height="20"/><text class="val" x="590" y="125">87.0%</text>
+    </svg><figcaption>Repeated rule decisions on the same 53 holdout cases, not 159 independent examples.</figcaption></figure>
+    <p><b>All seven pass; Rust grows from 10 to 17 live rules.</b> Run 1 has 100% precision and recall at 0.5 for every new rule. Across the three runs there are 108 true positives, two false positives and no false negatives at 0.5: <b>98.2% precision / 100% recall</b>. The path-prefix rule has one medium-confidence false positive in each of runs 2 and 3, giving 83.3% precision in those repetitions, still above the predeclared bar. At 0.8, the repeated totals are 94 true positives, zero false positives and 14 misses.</p>
+    <p>There were no API errors. Primary-run median judge latency was 175 ms for practices and 106 ms for security. Those are synthetic pack calls, not end-to-end hook timings. All 115 decoded additions parsed with rustfmt; the offline suite passed 200 tests plus TypeScript and lint checks. Existing hook settings and explicit pack choices were preserved.</p>
+    <h3>What this establishes</h3>
+    <p>The rules agree well with independently authored synthetic labels, including exceptions. The medium-tier variation is visible, and no holdout tuning was used to hide it. This experiment does not establish production bug prevention or overall agent quality; it adds no new coding-agent end-to-end comparison.</p>
+    <p class="note">Evidence: <a href="../eval/results/rust-expansion-2026-11-08.md">experiment record</a>, <a href="../eval/results/rust-v9-holdout-2026-11-09.json">holdout summary</a>, <a href="../eval/results/rust-v9-repeats-2026-11-09.json">per-repeat counts</a>. Earlier development wording and measurements remain preserved as superseded evidence.</p>
+  </section>
+
   <section class="entry" id="e10">
     <p class="eyebrow">3 Oct 2026 · Entry 10</p>
     <h2>Test rules from the "unit tests are bloat" debate</h2>
@@ -259,11 +281,11 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12.5px}
     </table></div>
     <p><b>Real code.</b> The dry run is where the labeled sets stop helping. <b>untyped-fake-response</b> fired at the fix tier on 6 of 79 files: hand-typed Hue, LIFX, weather-service, MediaWiki, text-to-speech and tuner API responses. Every one is what the rule describes, and every one is normal practice in those repos, so the rule ships at the fix tier only (<code>thresholds.medium = null</code>, as for magic numbers) to keep the double-check noise down. <b>reimplements-logic</b> flagged three files: a token-offset test that recomputes the contract's arithmetic (true), a LoRA merge test that re-derives the merge formula in a second framework (borderline: that is arguably an independent reference), and a <b>differential test</b> that runs two implementations with the same seed and asserts they agree, at 0.92. That last one is exactly what the rule's <code>false</code> criteria call "a different algorithm", and Jev did not read it that way. Following the Entry 7 precedent (<code>ts-perf-linear-lookup-in-loop</code>), both reimplements-logic rules stay candidates rather than being reworded after the holdout was seen. The other four rules fired on nothing at the fix tier across all 79 files.</p>
     <h3>Same day: reimplements-logic, second attempt</h3>
-    <p>The held-back pair got the treatment the method asks for: name the look-alike in <code>false</code> and prove it on fresh data. The criteria now say differential tests do not count (a naive, reference or sequential version against an optimized one; two runs with the same seed; the same formula in a different library as the oracle). Two new authors, again blind to each other, wrote a v8 dev batch (34 cases per language, 7 differential negatives each) and a v8 holdout batch (29 per language, 7–8 differential negatives). Dev: TypeScript 12 of 12 at 0.8, Python 11 of 12, no false alarms; the same-seed cases scored 0.13 and 0.05. Holdout, run once: across all held-out cases for these rules precision is 100% at both tiers, recall 87% (TS) and 100% (PY) at 0.8 and 100% at 0.5; on the v8 batch alone TS caught 7 of 9 positives at 0.8 (two at 0.70–0.74) and PY 9 of 9, with no negative above 0.41. The real differential test that caused the hold no longer fires; the contract-arithmetic test still does. <b>Both rules shipped</b>, which makes 9 of 9 for this entry and {{LIVE_ALL}} live rules.</p>
+    <p>The held-back pair got the treatment the method asks for: name the look-alike in <code>false</code> and prove it on fresh data. The criteria now say differential tests do not count (a naive, reference or sequential version against an optimized one; two runs with the same seed; the same formula in a different library as the oracle). Two new authors, again blind to each other, wrote a v8 dev batch (34 cases per language, 7 differential negatives each) and a v8 holdout batch (29 per language, 7–8 differential negatives). Dev: TypeScript 12 of 12 at 0.8, Python 11 of 12, no false alarms; the same-seed cases scored 0.13 and 0.05. Holdout, run once: across all held-out cases for these rules precision is 100% at both tiers, recall 87% (TS) and 100% (PY) at 0.8 and 100% at 0.5; on the v8 batch alone TS caught 7 of 9 positives at 0.8 (two at 0.70–0.74) and PY 9 of 9, with no negative above 0.41. The real differential test that caused the hold no longer fires; the contract-arithmetic test still does. <b>Both rules shipped</b>, which makes 9 of 9 for this entry and 177 live rules.</p>
     <h3>Same evening: an end-to-end round, and a rule pulled back</h3>
     <p><b>Question.</b> Do these rules change what agents write, not just what Jev flags? <b>Setup.</b> Eight "write unit tests for this module" tasks (four TypeScript with vitest, four Python with pytest) on two new scaffolds with real source: an order service with collaborators, an invoice renderer, an HTTP client for a carrier API, a repository over a database wrapper, pricing. 32 headless Claude Code runs (sonnet), hook off and on, two reps; blind grading of the agent's test files with gpt-6-luna (low), once with all packs and once with the tests pack alone; every suite re-run by hand (32 of 32 green in both conditions).</p>
     <p><b>Result: nothing to measure.</b> With the hook off the agents almost never wrote the patterns: 1 Entry 10 violation in 16 runs under the all-packs grading, 12 under the tests-only grading, almost all of them untyped fake responses and re-computed expected values. Every paired difference has a confidence interval that includes zero (all packs: 0.00, 95% CI −0.19 to 0.19; tests-only: 0.00, −1.25 to 1.19). The scaffolds gave the agent clean seams: clients took their fetch function as a parameter, the service got its collaborators through its constructor, and the response types were exported, so there was no temptation to mock internals or invent response shapes. The hook fired three times in 16 runs; once (a re-computed tax in a Python pricing test, p 0.66) the agent fixed it.</p>
-    <p><b>The useful finding is the other two fires.</b> Both times <code>ts-test-untyped-fake-response</code> fired at the fix tier, the agent's fakes were already typed (<code>const ratesBody: ApiRatesResponse = {…}</code>, <code>satisfies ApiError</code>) and passed through a small <code>json(body, status)</code> helper, next to untyped empty error bodies such as <code>json({}, 404)</code>. The rule's own <code>false</code> criteria exempt both. Two false alarms in two fires, on agent-written code, is the Entry 7 precedent again, so <b>both untyped-fake-response rules are back to candidate</b> (the Python one never fired; it goes with its twin so the wording stays parallel). That leaves 7 of the 9 live and {{LIVE_ALL}} rules in the hook. The next attempt names typed variables, typed helpers and empty or error bodies in <code>false</code>, uses fresh batches, and adds a dry run over agent-written tests, which this round shows is a different population from the hand-written repos in the first dry run.</p>
+    <p><b>The useful finding is the other two fires.</b> Both times <code>ts-test-untyped-fake-response</code> fired at the fix tier, the agent's fakes were already typed (<code>const ratesBody: ApiRatesResponse = {…}</code>, <code>satisfies ApiError</code>) and passed through a small <code>json(body, status)</code> helper, next to untyped empty error bodies such as <code>json({}, 404)</code>. The rule's own <code>false</code> criteria exempt both. Two false alarms in two fires, on agent-written code, is the Entry 7 precedent again, so <b>both untyped-fake-response rules are back to candidate</b> (the Python one never fired; it goes with its twin so the wording stays parallel). That leaves 7 of the 9 live and 177 rules in the hook. The next attempt names typed variables, typed helpers and empty or error bodies in <code>false</code>, uses fresh batches, and adds a dry run over agent-written tests, which this round shows is a different population from the hand-written repos in the first dry run.</p>
     <p class="note">A sharper round needs scaffolds without the clean seams (collaborators imported and called directly, global <code>fetch</code>/<code>requests</code>, no exported response types), a React component for the snapshot rule, and more reps: with 8 pairs per language even an effect of one violation per run would be hard to see. Result files: <code>e2e-runs-tests.json</code>, <code>e2e-graded-tests.json</code>, <code>e2e-tests-analysis-2026-10-03.json</code>, <code>e2e-tests-summary-2026-10-03.md</code>; tasks in <code>eval/e2e/tasks.tests.json</code>.</p>
     <h3>What we learned</h3>
     <ul>
@@ -404,7 +426,7 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12.5px}
     <p><b>What changed in this entry:</b></p>
     <ul>
       <li><b>Five packs, seven languages.</b> Hygiene, practices, security, tests and performance, for TypeScript, Swift, Python, Ruby, Kotlin, Rust and Bazel.</li>
-      <li><b>{{LIVE_ALL}} live rules:</b> hygiene {{LIVE_H}}, practices {{LIVE_P}}, security {{LIVE_S}}, tests {{LIVE_T}}, performance {{LIVE_PF}}. Another {{N_CANDIDATES_NOW}} are <i>candidates</i>: written and labelled, but skipped by the hook until they pass.</li>
+      <li><b>177 live rules:</b> hygiene 24, practices 65, security 33, tests 42, performance 13. Another 10 are <i>candidates</i>: written and labelled, but skipped by the hook until they pass.</li>
       <li><b>A warm daemon</b> that keeps one connection to Jev open across hook calls.</li>
       <li><b>A fine-tuned Kev-4B</b>, following the Entry 5 plan.</li>
       <li><b>A second version of the onboarding skill</b>, <code>jev-lint-rules</code>, which writes rules for a new repo.</li>
@@ -444,7 +466,7 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12.5px}
     <p><b>Results.</b> {{N_CAND_JEV}} of {{N_CAND}} candidates passed with Jev. GPT-6-Luna, given the same rules and edits, would have passed {{N_CAND_LUNA}}. The security pack added {{N_SEC}} more rules (SSRF, path traversal, mass assignment, unsafe deserialization, weak password hashing and others) with 280 new labelled edits: {{N_SEC_JEV}} of {{N_SEC}} passed with Jev, and {{N_SEC_LUNA}} with Luna. {{N_MOVED}} security rules from the first batch moved into the new pack. Their held-out scores at p ≥ 0.5 were identical before and after the move, so all of them still pass.</p>
     {{CHART_PACKS}}
     <p class="caption">Every rule scored on the held-out edits, pooled per pack. Candidates are included, so this isn't filtered down to the rules that passed.</p>
-    <details class="more"><summary>Per pack: precision, recall, F1, rules evaluated and live</summary>{{PACK_TABLE}}</details>
+    <details class="more"><summary>Per pack: original accuracy and current live counts</summary><p class="note">Live-rule counts reflect the current rule set; evaluation counts and accuracy retain the original Entry 7 measurements.</p>{{PACK_TABLE}}</details>
     <p><b>Held back as candidates:</b></p>
     {{CAND_TABLE}}
     <ul>
@@ -815,6 +837,7 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12.5px}
 
   <section id="rec">
     <h2>Recommendation</h2>
+    <p>Entry 11 adds seven Rust rules after independent held-out validation. Keep the existing thresholds and treat medium-confidence findings as questions, especially string-prefix path checks. These synthetic measurements do not replace real-code review.</p>
     <p>Entry 10 adds seven test rules for implementation lock-in and over-mocking; they are on by default in the tests pack. If untyped-fake-response argues with your team's habits, disable it in <code>.jev-lint/config.json</code> rather than lowering its threshold.</p>
     <p>Entry 9 adds optional Cloudflare Clef support. Keep Jev as the measured default until the hosted comparison is completed.</p>
     <ol>
@@ -894,6 +917,7 @@ python3 report/build.py path/to/DepartureMono-Regular.woff2 # rebuild this page<
   <section id="log">
     <h2>Changelog</h2>
     <ul>
+      <li><b>9 Nov 2026, Entry 11.</b> Seven Rust rules added, with 115 independently authored dev/holdout cases. One dev-only wording refinement; all seven pass the fixed holdout bar in each of three runs. Repeated holdout precision / recall at 0.5 is 98.2% / 100%. All prior results retained; Rust now has 17 live rules.</li>
       <li><b>3 Oct 2026, Entry 10.</b> Nine candidate test rules from the "unit tests are bloat" debate; 263 new labeled cases from separate authors; all nine passed holdout; seven shipped (untyped-fake-response at the fix tier only), two reimplements-logic rules held back after a real-code false alarm, then shipped the same day after naming differential tests in <code>false</code> and passing fresh v8 dev and holdout batches (126 more cases). Real-code dry runs added to the method. Evening: an end-to-end round with 8 test-writing tasks (32 runs) showed no measurable effect (floor: agents rarely wrote the patterns) and two false alarms from untyped-fake-response on typed fakes, so that pair is back to candidate. Also: the findings log now records the flagged lines, and a first value audit (Luna grading fixed/kept findings) ran on this machine's log.</li>
       <li><b>2 Oct 2026, Entry 9.</b> Added optional Clef/Clef-flash integration and comparison harness. Live comparison blocked by missing credentials; regex holdout completed. No prior evidence replaced.</li>
       <li><b>1 Oct 2026, Entry 8.</b>
@@ -906,7 +930,7 @@ python3 report/build.py path/to/DepartureMono-Regular.woff2 # rebuild this page<
       </li>
       <li><b>27 Sep 2026, Entry 7.</b>
         <ul>
-          <li>Rule packs by language (<code>rules/&lt;lang&gt;.&lt;pack&gt;.json</code>): tests and performance packs, and Python, Ruby, Kotlin, Rust and Bazel. 120 researched rules, of which {{N_CAND_JEV}} of {{N_CAND}} passed held-out, plus a security pack of 33 ({{N_SEC}} new, {{N_MOVED}} moved). {{LIVE_ALL}} live rules and {{N_CANDIDATES_NOW}} candidates.</li>
+          <li>Rule packs by language (<code>rules/&lt;lang&gt;.&lt;pack&gt;.json</code>): tests and performance packs, and Python, Ruby, Kotlin, Rust and Bazel. 120 researched rules, of which {{N_CAND_JEV}} of {{N_CAND}} passed held-out, plus a security pack of 33 ({{N_SEC}} new, {{N_MOVED}} moved). 177 live rules and 10 candidates.</li>
           <li>Rule-count benchmark, rerun with a pooled connection. The first run is snapshotted as superseded.</li>
           <li>48 Claude Code runs with every pack on.</li>
           <li>Fine-tuned Kev-4B.</li>

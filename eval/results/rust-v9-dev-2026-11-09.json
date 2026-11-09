@@ -1,0 +1,825 @@
+{
+  "generatedAt": "2026-11-09T00:01:19.304Z",
+  "gateStats": {
+    "practices.rust": {
+      "cases": 34,
+      "rules": 10,
+      "asked": 107
+    },
+    "security.rust": {
+      "cases": 28,
+      "rules": 5,
+      "asked": 29
+    }
+  },
+  "llmModel": "gpt-6-luna",
+  "models": {
+    "decisions": "gpt-6-luna",
+    "jev": "jev-1.13.0",
+    "clef": "@cf/cloudflare/clef",
+    "clef-flash": "@cf/cloudflare/clef-flash"
+  },
+  "thresholds": {
+    "HIGH": 0.8,
+    "MEDIUM": 0.5
+  },
+  "caseCounts": {
+    "practices.rust.dev": 34,
+    "security.rust.dev": 28
+  },
+  "errors": {
+    "jev": 0
+  },
+  "jevRunConsistency": {
+    "maxAbsDiff": 0.07,
+    "p99AbsDiff": 0.040000000000000036
+  },
+  "results": [
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "rust",
+      "split": "dev",
+      "policy": "high",
+      "threshold": 0.8,
+      "tp": 23,
+      "fp": 0,
+      "fn": 1,
+      "precision": 1,
+      "recall": 0.9583333333333334,
+      "f1": 0.9787234042553191,
+      "cleanCases": 12,
+      "cleanFalseAlarmRate": 0,
+      "perRule": {
+        "rs-http-error-status-unchecked": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "rs-broadcast-lag-ends-consumer": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "rs-timeout-detaches-spawned-task": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "rs-select-send-drops-message": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 1,
+          "precision": 1,
+          "recall": 0.8333333333333334,
+          "f1": 0.9090909090909091
+        }
+      },
+      "runF1": [
+        0.9787234042553191,
+        0.9787234042553191,
+        0.9787234042553191
+      ],
+      "latency": {
+        "p50": 123.03862499999923,
+        "p90": 9452.607333999998,
+        "n": 34,
+        "returnedModels": [
+          "jev-1.13.0"
+        ],
+        "tokens": {
+          "input": 90615,
+          "output": 0
+        }
+      }
+    },
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "rust",
+      "split": "dev",
+      "policy": "high+medium",
+      "threshold": 0.5,
+      "tp": 24,
+      "fp": 1,
+      "fn": 0,
+      "precision": 0.96,
+      "recall": 1,
+      "f1": 0.9795918367346939,
+      "cleanCases": 12,
+      "cleanFalseAlarmRate": 0.08333333333333333,
+      "perRule": {
+        "rs-http-error-status-unchecked": {
+          "tp": 6,
+          "fp": 1,
+          "fn": 0,
+          "precision": 0.8571428571428571,
+          "recall": 1,
+          "f1": 0.923076923076923
+        },
+        "rs-broadcast-lag-ends-consumer": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "rs-timeout-detaches-spawned-task": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "rs-select-send-drops-message": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        }
+      },
+      "runF1": [
+        0.9795918367346939,
+        0.9795918367346939,
+        1
+      ],
+      "latency": {
+        "p50": 123.03862499999923,
+        "p90": 9452.607333999998,
+        "n": 34,
+        "returnedModels": [
+          "jev-1.13.0"
+        ],
+        "tokens": {
+          "input": 90615,
+          "output": 0
+        }
+      }
+    },
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "rust",
+      "split": "dev",
+      "policy": "gated high",
+      "threshold": 0.8,
+      "tp": 23,
+      "fp": 0,
+      "fn": 1,
+      "precision": 1,
+      "recall": 0.9583333333333334,
+      "f1": 0.9787234042553191,
+      "cleanCases": 12,
+      "cleanFalseAlarmRate": 0,
+      "perRule": {
+        "rs-http-error-status-unchecked": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "rs-broadcast-lag-ends-consumer": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "rs-timeout-detaches-spawned-task": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "rs-select-send-drops-message": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 1,
+          "precision": 1,
+          "recall": 0.8333333333333334,
+          "f1": 0.9090909090909091
+        }
+      },
+      "runF1": [
+        0.9787234042553191
+      ],
+      "latency": {
+        "p50": 123.03862499999923,
+        "p90": 9452.607333999998,
+        "n": 34,
+        "returnedModels": [
+          "jev-1.13.0"
+        ],
+        "tokens": {
+          "input": 90615,
+          "output": 0
+        }
+      }
+    },
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "rust",
+      "split": "dev",
+      "policy": "gated high+medium",
+      "threshold": 0.5,
+      "tp": 24,
+      "fp": 1,
+      "fn": 0,
+      "precision": 0.96,
+      "recall": 1,
+      "f1": 0.9795918367346939,
+      "cleanCases": 12,
+      "cleanFalseAlarmRate": 0.08333333333333333,
+      "perRule": {
+        "rs-http-error-status-unchecked": {
+          "tp": 6,
+          "fp": 1,
+          "fn": 0,
+          "precision": 0.8571428571428571,
+          "recall": 1,
+          "f1": 0.923076923076923
+        },
+        "rs-broadcast-lag-ends-consumer": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "rs-timeout-detaches-spawned-task": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "rs-select-send-drops-message": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        }
+      },
+      "runF1": [
+        0.9795918367346939
+      ],
+      "latency": {
+        "p50": 123.03862499999923,
+        "p90": 9452.607333999998,
+        "n": 34,
+        "returnedModels": [
+          "jev-1.13.0"
+        ],
+        "tokens": {
+          "input": 90615,
+          "output": 0
+        }
+      }
+    },
+    {
+      "system": "jev",
+      "pack": "security",
+      "lang": "rust",
+      "split": "dev",
+      "policy": "high",
+      "threshold": 0.8,
+      "tp": 15,
+      "fp": 0,
+      "fn": 4,
+      "precision": 1,
+      "recall": 0.7894736842105263,
+      "f1": 0.8823529411764706,
+      "cleanCases": 11,
+      "cleanFalseAlarmRate": 0,
+      "perRule": {
+        "rs-shell-command-interpolation": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "rs-zip-entry-path-traversal": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 2,
+          "precision": 1,
+          "recall": 0.6666666666666666,
+          "f1": 0.8
+        },
+        "rs-path-string-prefix-containment": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 2,
+          "precision": 1,
+          "recall": 0.7142857142857143,
+          "f1": 0.8333333333333333
+        }
+      },
+      "runF1": [
+        0.8823529411764706,
+        0.9142857142857143,
+        0.9142857142857143
+      ],
+      "latency": {
+        "p50": 110.04533300000003,
+        "p90": 173.86220799999865,
+        "n": 28,
+        "returnedModels": [
+          "jev-1.13.0"
+        ],
+        "tokens": {
+          "input": 38935,
+          "output": 0
+        }
+      }
+    },
+    {
+      "system": "jev",
+      "pack": "security",
+      "lang": "rust",
+      "split": "dev",
+      "policy": "high+medium",
+      "threshold": 0.5,
+      "tp": 19,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "cleanCases": 11,
+      "cleanFalseAlarmRate": 0,
+      "perRule": {
+        "rs-shell-command-interpolation": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "rs-zip-entry-path-traversal": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "rs-path-string-prefix-containment": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        }
+      },
+      "runF1": [
+        1,
+        1,
+        1
+      ],
+      "latency": {
+        "p50": 110.04533300000003,
+        "p90": 173.86220799999865,
+        "n": 28,
+        "returnedModels": [
+          "jev-1.13.0"
+        ],
+        "tokens": {
+          "input": 38935,
+          "output": 0
+        }
+      }
+    },
+    {
+      "system": "jev",
+      "pack": "security",
+      "lang": "rust",
+      "split": "dev",
+      "policy": "gated high",
+      "threshold": 0.8,
+      "tp": 15,
+      "fp": 0,
+      "fn": 4,
+      "precision": 1,
+      "recall": 0.7894736842105263,
+      "f1": 0.8823529411764706,
+      "cleanCases": 11,
+      "cleanFalseAlarmRate": 0,
+      "perRule": {
+        "rs-shell-command-interpolation": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "rs-zip-entry-path-traversal": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 2,
+          "precision": 1,
+          "recall": 0.6666666666666666,
+          "f1": 0.8
+        },
+        "rs-path-string-prefix-containment": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 2,
+          "precision": 1,
+          "recall": 0.7142857142857143,
+          "f1": 0.8333333333333333
+        }
+      },
+      "runF1": [
+        0.8823529411764706
+      ],
+      "latency": {
+        "p50": 110.04533300000003,
+        "p90": 173.86220799999865,
+        "n": 28,
+        "returnedModels": [
+          "jev-1.13.0"
+        ],
+        "tokens": {
+          "input": 38935,
+          "output": 0
+        }
+      }
+    },
+    {
+      "system": "jev",
+      "pack": "security",
+      "lang": "rust",
+      "split": "dev",
+      "policy": "gated high+medium",
+      "threshold": 0.5,
+      "tp": 19,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "cleanCases": 11,
+      "cleanFalseAlarmRate": 0,
+      "perRule": {
+        "rs-shell-command-interpolation": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "rs-zip-entry-path-traversal": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        },
+        "rs-path-string-prefix-containment": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1
+        }
+      },
+      "runF1": [
+        1
+      ],
+      "latency": {
+        "p50": 110.04533300000003,
+        "p90": 173.86220799999865,
+        "n": 28,
+        "returnedModels": [
+          "jev-1.13.0"
+        ],
+        "tokens": {
+          "input": 38935,
+          "output": 0
+        }
+      }
+    }
+  ],
+  "sweeps": [
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "rust",
+      "split": "dev",
+      "threshold": 0.1,
+      "precision": 0.8571428571428571,
+      "recall": 1,
+      "f1": 0.923076923076923,
+      "cleanFalseAlarmRate": 0.25
+    },
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "rust",
+      "split": "dev",
+      "threshold": 0.2,
+      "precision": 0.8888888888888888,
+      "recall": 1,
+      "f1": 0.9411764705882353,
+      "cleanFalseAlarmRate": 0.25
+    },
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "rust",
+      "split": "dev",
+      "threshold": 0.3,
+      "precision": 0.9230769230769231,
+      "recall": 1,
+      "f1": 0.9600000000000001,
+      "cleanFalseAlarmRate": 0.16666666666666666
+    },
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "rust",
+      "split": "dev",
+      "threshold": 0.4,
+      "precision": 0.9230769230769231,
+      "recall": 1,
+      "f1": 0.9600000000000001,
+      "cleanFalseAlarmRate": 0.16666666666666666
+    },
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "rust",
+      "split": "dev",
+      "threshold": 0.5,
+      "precision": 0.96,
+      "recall": 1,
+      "f1": 0.9795918367346939,
+      "cleanFalseAlarmRate": 0.08333333333333333
+    },
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "rust",
+      "split": "dev",
+      "threshold": 0.6,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "rust",
+      "split": "dev",
+      "threshold": 0.7,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "rust",
+      "split": "dev",
+      "threshold": 0.8,
+      "precision": 1,
+      "recall": 0.9583333333333334,
+      "f1": 0.9787234042553191,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "rust",
+      "split": "dev",
+      "threshold": 0.9,
+      "precision": 1,
+      "recall": 0.625,
+      "f1": 0.7692307692307693,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "security",
+      "lang": "rust",
+      "split": "dev",
+      "threshold": 0.1,
+      "precision": 0.6333333333333333,
+      "recall": 1,
+      "f1": 0.7755102040816326,
+      "cleanFalseAlarmRate": 0.6363636363636364
+    },
+    {
+      "system": "jev",
+      "pack": "security",
+      "lang": "rust",
+      "split": "dev",
+      "threshold": 0.2,
+      "precision": 0.7916666666666666,
+      "recall": 1,
+      "f1": 0.8837209302325582,
+      "cleanFalseAlarmRate": 0.2727272727272727
+    },
+    {
+      "system": "jev",
+      "pack": "security",
+      "lang": "rust",
+      "split": "dev",
+      "threshold": 0.3,
+      "precision": 0.8260869565217391,
+      "recall": 1,
+      "f1": 0.9047619047619047,
+      "cleanFalseAlarmRate": 0.2727272727272727
+    },
+    {
+      "system": "jev",
+      "pack": "security",
+      "lang": "rust",
+      "split": "dev",
+      "threshold": 0.4,
+      "precision": 0.95,
+      "recall": 1,
+      "f1": 0.9743589743589743,
+      "cleanFalseAlarmRate": 0.09090909090909091
+    },
+    {
+      "system": "jev",
+      "pack": "security",
+      "lang": "rust",
+      "split": "dev",
+      "threshold": 0.5,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "security",
+      "lang": "rust",
+      "split": "dev",
+      "threshold": 0.6,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "security",
+      "lang": "rust",
+      "split": "dev",
+      "threshold": 0.7,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "security",
+      "lang": "rust",
+      "split": "dev",
+      "threshold": 0.8,
+      "precision": 1,
+      "recall": 0.7894736842105263,
+      "f1": 0.8823529411764706,
+      "cleanFalseAlarmRate": 0
+    },
+    {
+      "system": "jev",
+      "pack": "security",
+      "lang": "rust",
+      "split": "dev",
+      "threshold": 0.9,
+      "precision": 1,
+      "recall": 0.7894736842105263,
+      "f1": 0.8823529411764706,
+      "cleanFalseAlarmRate": 0
+    }
+  ],
+  "bands": [
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "rust",
+      "split": "dev",
+      "lo": 0.8,
+      "hi": 1.01,
+      "findings": 23,
+      "real": 23,
+      "precision": 1
+    },
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "rust",
+      "split": "dev",
+      "lo": 0.5,
+      "hi": 0.8,
+      "findings": 2,
+      "real": 1,
+      "precision": 0.5
+    },
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "rust",
+      "split": "dev",
+      "lo": 0.3,
+      "hi": 0.5,
+      "findings": 1,
+      "real": 0,
+      "precision": 0
+    },
+    {
+      "system": "jev",
+      "pack": "practices",
+      "lang": "rust",
+      "split": "dev",
+      "lo": 0.1,
+      "hi": 0.3,
+      "findings": 2,
+      "real": 0,
+      "precision": 0
+    },
+    {
+      "system": "jev",
+      "pack": "security",
+      "lang": "rust",
+      "split": "dev",
+      "lo": 0.8,
+      "hi": 1.01,
+      "findings": 15,
+      "real": 15,
+      "precision": 1
+    },
+    {
+      "system": "jev",
+      "pack": "security",
+      "lang": "rust",
+      "split": "dev",
+      "lo": 0.5,
+      "hi": 0.8,
+      "findings": 4,
+      "real": 4,
+      "precision": 1
+    },
+    {
+      "system": "jev",
+      "pack": "security",
+      "lang": "rust",
+      "split": "dev",
+      "lo": 0.3,
+      "hi": 0.5,
+      "findings": 4,
+      "real": 0,
+      "precision": 0
+    },
+    {
+      "system": "jev",
+      "pack": "security",
+      "lang": "rust",
+      "split": "dev",
+      "lo": 0.1,
+      "hi": 0.3,
+      "findings": 7,
+      "real": 0,
+      "precision": 0
+    }
+  ]
+}

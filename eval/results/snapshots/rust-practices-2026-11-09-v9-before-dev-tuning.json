@@ -1,0 +1,90 @@
+{
+  "language": "rust",
+  "extensions": [".rs"],
+  "rules": [
+    {
+      "id": "rs-blocking-call-in-async",
+      "question": "Does `added_code` make a blocking call directly inside an `async fn` or `async` block \u2014 `std::thread::sleep`, `std::fs::*`, `std::net`, `std::process::Command::output()`/`status()`, `std::sync::mpsc::Receiver::recv`, `reqwest::blocking`, a synchronous database client, `futures::executor::block_on`/`Handle::block_on`, or a long CPU-bound loop (hashing passwords, compressing, parsing large files) \u2014 instead of the async equivalent or `tokio::task::spawn_blocking`?",
+      "true": "Async code blocks the executor thread, stalling every other task scheduled on it (or panics, in the case of `block_on` inside a runtime).",
+      "false": "It uses async APIs (`tokio::time::sleep`, `tokio::fs`, `tokio::process`, async reqwest, sqlx) or moves blocking work into `spawn_blocking` / `block_in_place`; the blocking call is in a normal (non-async) `fn`; or the work is brief in-memory computation or logging. Holding a `std::sync::Mutex` guard across `.await` is clippy's `await_holding_lock` and doesn't count here.",
+      "fix": "Use the async API or move the blocking work into tokio::task::spawn_blocking (Tokio docs, 'CPU-bound tasks and blocking code').",
+      "when": ["\\basync\\b"]
+    },
+    {
+      "id": "rs-select-cancel-unsafe",
+      "question": "Does `added_code` use `tokio::select!` inside a loop where a branch awaits a future that Tokio documents as not cancellation safe \u2014 `AsyncReadExt::read_exact`, `read_to_end`, `read_to_string`, `AsyncWriteExt::write_all` (can lose data), or `tokio::sync::Mutex::lock`, `RwLock::read`/`write`, `Semaphore::acquire`, `Notify::notified` (lose their queue position) \u2014 created fresh on every iteration, so the partial work is dropped whenever another branch wins?",
+      "true": "A non-cancel-safe operation is raced in `select!` and recreated each loop iteration, so bytes or queue position are silently lost when another branch completes first.",
+      "false": "Branches use cancel-safe methods (`mpsc::Receiver::recv`, `broadcast::Receiver::recv`, `watch::Receiver::changed`, `TcpListener::accept`, `AsyncReadExt::read`/`read_buf`, `AsyncWriteExt::write`/`write_buf`, `StreamExt::next`); the non-cancel-safe future is created once outside the loop, pinned (`tokio::pin!`) and polled as `&mut fut`; the operation runs in its own spawned task that reports back over a channel; or `select!` isn't inside a loop.",
+      "fix": "Race only cancel-safe operations in select!, or create the future once outside the loop and select on &mut fut (Tokio select! docs, 'Cancellation safety').",
+      "when": ["select!"]
+    },
+    {
+      "id": "rs-spawned-task-error-lost",
+      "question": "Does `added_code` call `tokio::spawn`, `tokio::task::spawn`, or `std::thread::spawn` with a body that can fail (it uses `?`, returns a `Result`, or calls something that returns `Result`) while dropping the returned `JoinHandle` and not logging or handling the error inside the task, so any failure disappears silently?",
+      "true": "A fallible spawned task's handle is discarded, and its error is neither logged nor handled.",
+      "false": "The `JoinHandle` is stored and awaited or joined; the task is added to a `JoinSet` or `TaskTracker` whose results are checked; the task logs or handles its own errors (`if let Err(e) = work().await { tracing::error!(\u2026) }`); or the task body can't fail.",
+      "fix": "Await or track the JoinHandle (JoinSet), or handle and log the error inside the spawned task.",
+      "when": ["spawn"]
+    },
+    {
+      "id": "rs-unsigned-subtraction-underflow",
+      "question": "Does `added_code` subtract from an unsigned integer (`usize`, `u32`, `u64`, including `.len()`, indices, counts, byte offsets, or Unix timestamps held in `u64`) where the right-hand side can be larger than the left and nothing in the snippet rules that out \u2014 e.g. `v.len() - 1` on a vector that may be empty, `end - start` on values from input, `remaining -= n` \u2014 instead of using `checked_sub`/`saturating_sub` or a prior guard?",
+      "true": "An unsigned subtraction can underflow, which panics in debug builds and silently wraps to a huge value in release builds.",
+      "false": "A guard in the snippet guarantees the left side is at least the right (`if !v.is_empty()`, `if a >= b`, a loop bound like `for i in 1..v.len()`); the code uses `checked_sub`/`saturating_sub`/`wrapping_sub` or `abs_diff`; the operands are signed; or they are constants known to be ordered. `Instant`/`Duration` subtraction belongs to clippy's `unchecked_time_subtraction` and doesn't count.",
+      "fix": "Use checked_sub/saturating_sub or guard the subtraction so the right side can't exceed the left (Rust Reference, 'Integer overflow').",
+      "when": ["[\\w)\\]]\\s*-=?\\s*[\\w(]"]
+    },
+    {
+      "id": "rs-unchecked-unsafe-on-unvalidated",
+      "question": "Does `added_code` call an unsafe unchecked API \u2014 `get_unchecked`/`get_unchecked_mut`, `str::from_utf8_unchecked`/`String::from_utf8_unchecked`, `unwrap_unchecked`, `Vec::set_len`, `slice::from_raw_parts(_mut)`, `char::from_u32_unchecked`, `NonZero*::new_unchecked`, `mem::transmute` \u2014 on a value whose precondition (index in bounds, valid UTF-8, `Some`/`Ok`, initialized length, valid pointer and length, valid bit pattern) isn't established by a check or construction visible in the snippet, e.g. an index or bytes from a function parameter, user input, a file or the network?",
+      "true": "Undefined behavior depends on an unchecked precondition that nothing verified, typically added 'for performance'.",
+      "false": "The snippet establishes the precondition right before the call (`if i < v.len()`, bytes produced from a `&str`/`String`, `set_len` after writing exactly that many elements, a pointer and length taken from a live slice); the enclosing function is an `unsafe fn` whose `# Safety` doc passes the obligation to callers; or the checked API (`get`, `from_utf8`, `?`) is used. A missing `// SAFETY:` comment is clippy's `undocumented_unsafe_blocks`; a comment alone doesn't make the precondition checked.",
+      "fix": "Use the checked API (get, from_utf8, ?) or validate the precondition right before the unsafe call (std docs: out-of-bounds get_unchecked is undefined behavior; Rustonomicon).",
+      "when": ["unchecked|set_len|from_raw_parts|transmute"]
+    },
+    {
+      "id": "rs-http-client-per-call",
+      "question": "Does `added_code` build a new `reqwest::Client` (`Client::new()` or `Client::builder()\u2026build()`), or call the `reqwest::get(...)` convenience function, inside a loop or inside a function that sends a request and is called repeatedly, instead of creating one client and reusing it?",
+      "true": "A new HTTP client, with its own connection pool and TLS setup, is created for each request or iteration.",
+      "false": "One client is created at startup or outside the loop and passed in, cloned (cheap; the pool is shared), or stored in app state or a `OnceLock`/`LazyLock`; the code is a one-shot `main` making a single request; or no reqwest client is created.",
+      "fix": "Create one reqwest::Client and reuse it (clone it; the pool is shared) (reqwest Client docs).",
+      "when": ["Client::(new|builder)|reqwest::get"]
+    },
+    {
+      "id": "rs-http-error-status-unchecked",
+      "question": "Does `added_code` use a reqwest response as a successful application result by decoding its JSON/text/bytes or returning Ok after send().await, without first rejecting HTTP error statuses via error_for_status/error_for_status_ref or an explicit status check?",
+      "true": "A reqwest request treats a completed HTTP exchange as application success even when the server returned a 4xx or 5xx response.",
+      "false": "The response status is checked before success processing; error_for_status is called; the function deliberately returns the raw Response for its caller to inspect; the code is a proxy preserving the original status, diagnostic/status probe, or intentionally handles an error response body; or no reqwest response is consumed as success.",
+      "fix": "Check error_for_status() or handle response.status() before treating the body as success (reqwest Response docs).",
+      "when": ["\\breqwest\\b|\\.send\\s*\\(|\\.error_for_status|\\.json\\s*(?:::|\\()|\\.text\\s*\\(|\\.bytes\\s*\\("],
+      "status": "candidate"
+    },
+    {
+      "id": "rs-broadcast-lag-ends-consumer",
+      "question": "Does `added_code` continuously consume a tokio::sync::broadcast receiver but stop on any receive error, such as while let Ok(event) = rx.recv().await, rx.recv().await? in a loop, or Err(_) => break/return, without distinguishing recoverable RecvError::Lagged from terminal RecvError::Closed?",
+      "true": "A long-lived broadcast consumer silently stops after falling behind, although a lagged receiver can continue receiving later messages.",
+      "false": "Lagged is explicitly handled by continuing, resynchronizing, or deliberately failing with a visible fail-on-data-loss policy; only Closed ends the loop; it is a one-shot receive; the receiver is mpsc/watch rather than broadcast; or no broadcast receiving loop is added.",
+      "fix": "Handle broadcast RecvError::Lagged separately from Closed and resynchronize or continue according to the consumer policy (Tokio broadcast docs).",
+      "when": ["\\brecv\\s*\\("],
+      "status": "candidate"
+    },
+    {
+      "id": "rs-timeout-detaches-spawned-task",
+      "question": "Does `added_code` pass an owned tokio task JoinHandle directly into tokio::time::timeout or timeout_at, then return/report a timeout without retaining a handle to abort or cooperatively cancel the spawned task, although the timeout is intended to stop that task?",
+      "true": "The timeout drops the JoinHandle and detaches the task, so the supposedly timed-out operation keeps running and may continue side effects.",
+      "false": "The timeout wraps an ordinary unspawned future; it borrows &mut handle and the timeout branch aborts or signals cancellation; a cancellation-on-drop guard owns the handle; the task is explicitly intended to keep running in the background after the wait times out; or no owned JoinHandle is timed out.",
+      "fix": "Retain the JoinHandle, time out &mut handle, and abort or cooperatively cancel it on timeout (Tokio timeout and JoinHandle docs).",
+      "when": ["\\btimeout(?:_at)?\\s*\\("],
+      "status": "candidate"
+    },
+    {
+      "id": "rs-select-send-drops-message",
+      "question": "Does `added_code` move a message into tokio::sync::mpsc Sender::send(message) in tokio::select! or a timeout, where a competing branch can win and the code intends to retry or preserve that message but instead drops the cancelled send future and its owned message?",
+      "true": "A cancelled mpsc send loses ownership of the pending message, violating an explicit retry/preservation/delivery requirement in the surrounding code.",
+      "false": "The code selects on Sender::reserve/reserve_owned before moving the message into the permit; the send future is pinned outside the loop and retained across losing branches; an original copy is retained for retry; the competing branch intentionally discards the message on shutdown, best-effort send, or an explicit documented drop policy; or no owned mpsc send is raced.",
+      "fix": "Reserve channel capacity before moving the message, or retain the pending send future across retries (Tokio mpsc Sender::send cancellation safety).",
+      "when": ["\\bsend\\s*\\("],
+      "status": "candidate"
+    }
+  ]
+}

@@ -1700,5 +1700,68 @@
     "falsePositives": 1,
     "pass": true,
     "reasons": []
+  },
+  "rs-shell-command-interpolation": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "rs-zip-entry-path-traversal": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 6,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "rs-path-string-prefix-containment": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "rs-http-error-status-unchecked": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "rs-broadcast-lag-ends-consumer": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "rs-timeout-detaches-spawned-task": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
+  },
+  "rs-select-send-drops-message": {
+    "precision": 1,
+    "recall": 1,
+    "precisionAtHigh": 1,
+    "positives": 5,
+    "falsePositives": 0,
+    "pass": true,
+    "reasons": []
   }
 }

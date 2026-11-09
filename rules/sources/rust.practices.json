@@ -16,7 +16,7 @@
     ],
     "whyNotLinter": "Clippy has no blocking-in-async lint. `disallowed_methods` could ban `std::thread::sleep` everywhere, including sync code where it is fine; whether code is inside an async context and whether a call blocks takes judgment.",
     "aiRelevance": "High. Agents use `std::fs::read_to_string` and `std::thread::sleep` in async handlers because that is the std API they know best.",
-    "expectedNoise": "low — the blocking APIs are named, and sync functions are a listed negative.",
+    "expectedNoise": "low \u2014 the blocking APIs are named, and sync functions are a listed negative.",
     "languageFile": "rust",
     "evidenceStatus": "meets bar (1 A or 2 B)",
     "overlap": "Duplicates rules/rust.performance.json rs-perf-blocking-in-async, which appeared in the working tree during this research (uncommitted). Keep only one; if the perf pack ships, drop this rule."
@@ -31,8 +31,8 @@
       }
     ],
     "whyNotLinter": "Cancellation safety is a documented runtime property of each method, not part of its type. No clippy or rustc lint covers it.",
-    "aiRelevance": "High. `loop { select! { r = stream.read_exact(&mut buf) => …, _ = shutdown.recv() => break } }` is a natural-looking pattern agents write for protocol loops. Data loss only shows under load.",
-    "expectedNoise": "low — the method list is exact, and the pinned-outside-the-loop pattern is a listed negative.",
+    "aiRelevance": "High. `loop { select! { r = stream.read_exact(&mut buf) => \u2026, _ = shutdown.recv() => break } }` is a natural-looking pattern agents write for protocol loops. Data loss only shows under load.",
+    "expectedNoise": "low \u2014 the method list is exact, and the pinned-outside-the-loop pattern is a listed negative.",
     "languageFile": "rust",
     "evidenceStatus": "single official B source for the exact API; needs a second B (or A from a repo) before shipping as built-in, or accept it on the strength of the vendor doc"
   },
@@ -47,7 +47,7 @@
     ],
     "whyNotLinter": "Dropping a JoinHandle is legal and doesn't trigger a warning (not #[must_use]); clippy's `let_underscore_future` is about futures, not handles. Whether the task handles its own errors is a judgment about its body.",
     "aiRelevance": "Medium-high. Agents spawn background work with `tokio::spawn(async move { do_thing().await? ; Ok::<_, Error>(()) });` and never look at the result.",
-    "expectedNoise": "low — the handle's fate and the body's error handling are both visible.",
+    "expectedNoise": "low \u2014 the handle's fate and the body's error handling are both visible.",
     "languageFile": "rust",
     "evidenceStatus": "single official B source for the exact API; needs a second B (or A from a repo) before shipping as built-in, or accept it on the strength of the vendor doc"
   },
@@ -63,12 +63,12 @@
         "grade": "C",
         "url": "https://arxiv.org/html/2608.00661v1",
         "checked": "2026-09-27",
-        "note": "Study of errors in code from 7 LLMs: numeric-overflow runtime errors are 43.9% of Rust runtime errors vs 4–6% in C/C++/Java."
+        "note": "Study of errors in code from 7 LLMs: numeric-overflow runtime errors are 43.9% of Rust runtime errors vs 4\u20136% in C/C++/Java."
       }
     ],
     "whyNotLinter": "`clippy::arithmetic_side_effects` (restriction) flags every arithmetic operation. `implicit_saturating_sub` only rewrites an already-guarded subtraction. Whether the right side can exceed the left needs judgment about the values.",
     "aiRelevance": "High. It is the dominant Rust runtime failure in LLM output in the one study found (C-grade), and agents write `len() - 1` reflexively.",
-    "expectedNoise": "med — many subtractions are safe for reasons outside the snippet; the question requires that nothing in the snippet rules underflow out, and it may need wording iteration.",
+    "expectedNoise": "med \u2014 many subtractions are safe for reasons outside the snippet; the question requires that nothing in the snippet rules underflow out, and it may need wording iteration.",
     "languageFile": "rust",
     "evidenceStatus": "single official B source for the exact API; needs a second B (or A from a repo) before shipping as built-in, or accept it on the strength of the vendor doc"
   },
@@ -90,12 +90,12 @@
         "grade": "D",
         "url": "https://medium.com/@krun_dev/rust-llm-generated-code-security-risk-guide-0487c1120591",
         "checked": "2026-09-27",
-        "note": "Claims unsafe blocks are 3–5x more frequent in LLM Rust than in human code; unsourced. Lead only."
+        "note": "Claims unsafe blocks are 3\u20135x more frequent in LLM Rust than in human code; unsourced. Lead only."
       }
     ],
     "whyNotLinter": "Clippy checks for a SAFETY comment (`undocumented_unsafe_blocks`, restriction) and some transmute shapes, not whether the precondition actually holds. That takes reasoning about where values come from.",
     "aiRelevance": "Medium-high. Agents reach for `get_unchecked`/`from_utf8_unchecked` when asked to optimize and justify them with confident but wrong SAFETY comments.",
-    "expectedNoise": "low — rare API family; correct uses usually show the bounds check or construction.",
+    "expectedNoise": "low \u2014 rare API family; correct uses usually show the bounds check or construction.",
     "languageFile": "rust",
     "evidenceStatus": "meets bar (1 A or 2 B)"
   },
@@ -109,9 +109,97 @@
       }
     ],
     "whyNotLinter": "Constructing a client is legal; whether the function runs once or per request is a judgment about the call site. Clippy has no lint for it.",
-    "aiRelevance": "Medium-high. Agents write self-contained `async fn fetch_x(url) { let client = Client::new(); … }` helpers.",
-    "expectedNoise": "low — the constructor call and its location are visible.",
+    "aiRelevance": "Medium-high. Agents write self-contained `async fn fetch_x(url) { let client = Client::new(); \u2026 }` helpers.",
+    "expectedNoise": "low \u2014 the constructor call and its location are visible.",
     "languageFile": "rust",
     "evidenceStatus": "single official B source for the exact API; needs a second B (or A from a repo) before shipping as built-in, or accept it on the strength of the vendor doc"
+  },
+  "rs-http-error-status-unchecked": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://docs.rs/reqwest/latest/reqwest/struct.Response.html#method.error_for_status",
+        "checked": "2026-11-08",
+        "note": "error_for_status converts HTTP 400\u2013599 into errors; body readers do not provide this status validation."
+      },
+      {
+        "grade": "B",
+        "url": "https://docs.rs/reqwest/latest/reqwest/struct.RequestBuilder.html#method.send",
+        "checked": "2026-11-08",
+        "note": "send returns a Response for completed exchanges; its documented errors are transport and redirect failures."
+      }
+    ],
+    "whyNotLinter": "Requires recognizing success processing versus intentional error-body/proxy/diagnostic handling; unused_must_use does not catch a successfully consumed Response.",
+    "aiRelevance": "Transport success is not HTTP application success.",
+    "expectedNoise": "Low to medium: explicit diagnostic/error-body exceptions are important.",
+    "languageFile": "rust",
+    "evidenceStatus": "meets bar (two official B sources)",
+    "versions": "Tokio 1.54.1, reqwest 0.13.5 and current stable Rust/zip docs where applicable; APIs also exist in earlier supported releases."
+  },
+  "rs-broadcast-lag-ends-consumer": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://docs.rs/tokio/latest/tokio/sync/broadcast/index.html#lagging",
+        "checked": "2026-11-08",
+        "note": "Lagged does not close the receiver; its cursor advances to retained messages."
+      },
+      {
+        "grade": "B",
+        "url": "https://docs.rs/tokio/latest/tokio/sync/broadcast/struct.Receiver.html#method.recv",
+        "checked": "2026-11-08",
+        "note": "recv documents distinct Lagged and Closed outcomes and allows subsequent receiving after lag."
+      }
+    ],
+    "whyNotLinter": "Requires identifying a broadcast receive loop and whether stopping on data loss is intentional; generic while-let syntax is idiomatic for mpsc.",
+    "aiRelevance": "A consumer can silently stop during a load spike.",
+    "expectedNoise": "Low with visible broadcast type and explicit fail-on-data-loss exception.",
+    "languageFile": "rust",
+    "evidenceStatus": "meets bar (two official B sources)",
+    "versions": "Tokio 1.54.1, reqwest 0.13.5 and current stable Rust/zip docs where applicable; APIs also exist in earlier supported releases."
+  },
+  "rs-timeout-detaches-spawned-task": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://docs.rs/tokio/latest/tokio/task/struct.JoinHandle.html",
+        "checked": "2026-11-08",
+        "note": "Dropping a JoinHandle detaches its running task; abort/cancellation semantics differ from dropping an ordinary future."
+      },
+      {
+        "grade": "B",
+        "url": "https://docs.rs/tokio/latest/tokio/time/fn.timeout.html#cancellation",
+        "checked": "2026-11-08",
+        "note": "Timeout cancellation drops the wrapped future and performs no additional cleanup."
+      }
+    ],
+    "whyNotLinter": "Requires the relationship between spawn, owned handle timeout and cancellation intent; clippy let_underscore_future does not cover an awaited timeout.",
+    "aiRelevance": "An operation can keep making side effects after its caller reports a timeout.",
+    "expectedNoise": "Low when both handle origin and timeout behavior are visible.",
+    "languageFile": "rust",
+    "evidenceStatus": "meets bar (two official B sources)",
+    "versions": "Tokio 1.54.1, reqwest 0.13.5 and current stable Rust/zip docs where applicable; APIs also exist in earlier supported releases."
+  },
+  "rs-select-send-drops-message": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://docs.rs/tokio/latest/tokio/sync/mpsc/struct.Sender.html#method.send",
+        "checked": "2026-11-08",
+        "note": "A cancelled send does not send the message, but drops it; reserve then Permit::send avoids losing the value."
+      },
+      {
+        "grade": "B",
+        "url": "https://docs.rs/tokio/latest/tokio/macro.select.html#cancellation-safety",
+        "checked": "2026-11-08",
+        "note": "Losing select branches are cancelled by dropping their futures; retaining pinned futures avoids recreating partial work."
+      }
+    ],
+    "whyNotLinter": "Requires delivery intent, ownership and losing-branch behavior; send in select is legitimate with an intentional drop policy.",
+    "aiRelevance": "Retry-oriented channel loops can discard the very message they intend to preserve.",
+    "expectedNoise": "Medium: deliberately narrow to visible preservation/retry semantics.",
+    "languageFile": "rust",
+    "evidenceStatus": "meets bar (two official B sources)",
+    "versions": "Tokio 1.54.1, reqwest 0.13.5 and current stable Rust/zip docs where applicable; APIs also exist in earlier supported releases."
   }
 }

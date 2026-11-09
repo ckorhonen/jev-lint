@@ -1254,6 +1254,146 @@ let client = reqwest::Client::new();
 
 Holdout: precision 100%, recall 100% (5 violations in the holdout set). Sources: [docs.rs](https://docs.rs/reqwest/latest/reqwest/struct.Client.html)
 
+### `rs-http-error-status-unchecked`
+
+Does the new code consume a reqwest Response as application success by decoding its JSON/text/bytes or discarding it and reporting successful completion, without first rejecting HTTP error statuses via error_for_status/error_for_status_ref or an explicit status check? Returning the raw Response (including Result<Response, Error>) for a caller to inspect does not count.
+
+**Catches:** A reqwest response body is treated as successful application data, or the response is discarded and completion reported as successful, even when the server returned a 4xx or 5xx response.
+
+**Why it matters:** Transport success is not HTTP application success.
+
+**Fix:** Check error_for_status() or handle response.status() before treating the body as success (reqwest Response docs).
+
+**Bad** (`http_ack_without_body.rs`):
+
+```rust
+pub async fn submit_order(client: &reqwest::Client, url: &str, order: &Order) -> anyhow::Result<()> {
+    client.post(url).json(order).send().await?;
+    Ok(())
+}
+```
+
+**Good** (`clean_http_error_for_status.rs`, looks similar but is fine):
+
+```rust
+pub async fn fetch_config(client: &reqwest::Client, url: &str) -> anyhow::Result<Config> {
+    let response = client.get(url).send().await?.error_for_status()?;
+    Ok(response.json::<Config>().await?)
+}
+```
+
+**Not flagged:** The response status is checked before success processing; error_for_status is called; the function deliberately returns the raw Response for its caller to inspect; the code is a proxy preserving the original status, diagnostic/status probe, or intentionally handles an error response body; or no reqwest response is consumed as success.
+
+Holdout: precision 100%, recall 100% (5 violations in the holdout set). Sources: [docs.rs](https://docs.rs/reqwest/latest/reqwest/struct.Response.html#method.error_for_status), [docs.rs](https://docs.rs/reqwest/latest/reqwest/struct.RequestBuilder.html#method.send)
+
+### `rs-broadcast-lag-ends-consumer`
+
+Does the new code continuously consume a tokio::sync::broadcast receiver but stop on any receive error, such as while let Ok(event) = rx.recv().await, rx.recv().await? in a loop, or Err(_) => break/return, without distinguishing recoverable RecvError::Lagged from terminal RecvError::Closed?
+
+**Catches:** A long-lived broadcast consumer silently stops after falling behind, although a lagged receiver can continue receiving later messages.
+
+**Why it matters:** A consumer can silently stop during a load spike.
+
+**Fix:** Handle broadcast RecvError::Lagged separately from Closed and resynchronize or continue according to the consumer policy (Tokio broadcast docs).
+
+**Bad** (`broadcast_while_let.rs`):
+
+```rust
+pub async fn update_cache(mut rx: tokio::sync::broadcast::Receiver<CacheEvent>, cache: &Cache) {
+    while let Ok(event) = rx.recv().await {
+        cache.apply(event).await;
+    }
+}
+```
+
+**Good** (`clean_mpsc_plus_context_trap.rs`, looks similar but is fine):
+
+```rust
+pub async fn drain_jobs(mut rx: tokio::sync::mpsc::Receiver<Job>) {
+    while let Some(job) = rx.recv().await {
+        job.apply().await;
+    }
+}
+```
+
+**Not flagged:** Lagged is explicitly handled by continuing, resynchronizing, or deliberately failing with a visible fail-on-data-loss policy; only Closed ends the loop; it is a one-shot receive; the receiver is mpsc/watch rather than broadcast; or no broadcast receiving loop is added.
+
+Holdout: precision 100%, recall 100% (5 violations in the holdout set). Sources: [docs.rs](https://docs.rs/tokio/latest/tokio/sync/broadcast/index.html#lagging), [docs.rs](https://docs.rs/tokio/latest/tokio/sync/broadcast/struct.Receiver.html#method.recv)
+
+### `rs-timeout-detaches-spawned-task`
+
+Does the new code pass an owned tokio task JoinHandle directly into tokio::time::timeout or timeout_at, then return/report a timeout without retaining a handle to abort or cooperatively cancel the spawned task, although the timeout is intended to stop that task?
+
+**Catches:** The timeout drops the JoinHandle and detaches the task, so the supposedly timed-out operation keeps running and may continue side effects.
+
+**Why it matters:** An operation can keep making side effects after its caller reports a timeout.
+
+**Fix:** Retain the JoinHandle, time out &mut handle, and abort or cooperatively cancel it on timeout (Tokio timeout and JoinHandle docs).
+
+**Bad** (`timeout_inline_spawn.rs`):
+
+```rust
+pub async fn send_limited_upload(upload: Upload) -> anyhow::Result<()> {
+    // No upload may continue after this request returns a timeout.
+    tokio::time::timeout(
+        std::time::Duration::from_secs(10),
+        tokio::spawn(async move { upload.send_all().await }),
+    ).await.map_err(|_| anyhow::anyhow!("upload timed out"))???;
+    Ok(())
+}
+```
+
+**Good** (`clean_timeout_unspawned_old_trap.rs`, looks similar but is fine):
+
+```rust
+pub async fn write_receipt(receipt: Receipt) -> anyhow::Result<()> {
+    tokio::time::timeout(std::time::Duration::from_secs(1), receipt.write()).await??;
+    Ok(())
+}
+```
+
+**Not flagged:** The timeout wraps an ordinary unspawned future; it borrows &mut handle and the timeout branch aborts or signals cancellation; a cancellation-on-drop guard owns the handle; the task is explicitly intended to keep running in the background after the wait times out; or no owned JoinHandle is timed out.
+
+Holdout: precision 100%, recall 100% (5 violations in the holdout set). Sources: [docs.rs](https://docs.rs/tokio/latest/tokio/task/struct.JoinHandle.html), [docs.rs](https://docs.rs/tokio/latest/tokio/time/fn.timeout.html#cancellation)
+
+### `rs-select-send-drops-message`
+
+Does the new code move a message into tokio::sync::mpsc Sender::send(message) in tokio::select! or a timeout, where a competing branch can win and the code intends to retry or preserve that message but instead drops the cancelled send future and its owned message?
+
+**Catches:** A cancelled mpsc send loses ownership of the pending message, violating an explicit retry/preservation/delivery requirement in the surrounding code.
+
+**Why it matters:** Retry-oriented channel loops can discard the very message they intend to preserve.
+
+**Fix:** Reserve channel capacity before moving the message, or retain the pending send future across retries (Tokio mpsc Sender::send cancellation safety).
+
+**Bad** (`send_reconfigure_race.rs`):
+
+```rust
+pub async fn send_snapshot(tx: tokio::sync::mpsc::Sender<Snapshot>, snapshot: Snapshot, reload: tokio::sync::Notify) {
+    // Configuration reload should postpone this snapshot, never discard it.
+    tokio::select! {
+        sent = tx.send(snapshot) => { if sent.is_err() { tracing::warn!("closed"); } },
+        _ = reload.notified() => tracing::info!("will send snapshot after reload"),
+    }
+}
+```
+
+**Good** (`clean_send_best_effort_edit_trap.rs`, looks similar but is fine):
+
+```rust
+pub async fn send_preview(tx: tokio::sync::mpsc::Sender<Preview>, preview: Preview, shutdown: tokio_util::sync::CancellationToken) {
+    // Preview frames are best effort: intentionally discard on shutdown.
+    tokio::select! {
+        _ = tx.send(preview) => {},
+        _ = shutdown.cancelled() => {},
+    }
+}
+```
+
+**Not flagged:** The code selects on Sender::reserve/reserve_owned before moving the message into the permit; the send future is pinned outside the loop and retained across losing branches; an original copy is retained for retry; the competing branch intentionally discards the message on shutdown, best-effort send, or an explicit documented drop policy; or no owned mpsc send is raced.
+
+Holdout: precision 100%, recall 100% (5 violations in the holdout set). Sources: [docs.rs](https://docs.rs/tokio/latest/tokio/sync/mpsc/struct.Sender.html#method.send), [docs.rs](https://docs.rs/tokio/latest/tokio/macro.select.html#cancellation-safety)
+
 ## Swift
 
 ### `swiftui-observedobject-owned`

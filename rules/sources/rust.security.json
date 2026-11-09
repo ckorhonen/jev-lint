@@ -16,7 +16,7 @@
     ],
     "whyNotLinter": "Clippy has no secret-aware lint (only `missing_fields_in_debug` for manual impls). Recognizing that a field holds a secret takes judgment about its name and type.",
     "aiRelevance": "High. Agents add `#[derive(Debug, Clone, Serialize, Deserialize)]` to every struct by reflex, including config and credential structs.",
-    "expectedNoise": "low — both the field names and the derive are visible in the snippet.",
+    "expectedNoise": "low \u2014 both the field names and the derive are visible in the snippet.",
     "languageFile": "rust",
     "evidenceStatus": "single official B source for the exact API; needs a second B (or A from a repo) before shipping as built-in, or accept it on the strength of the vendor doc"
   },
@@ -37,8 +37,74 @@
     ],
     "whyNotLinter": "Clippy has no SQL lint, and the compiler can't tell SQL text from other strings. Telling identifiers from an allowlist apart from user values takes judgment.",
     "aiRelevance": "Medium-high. Agents use `format!` for dynamic filters and `IN (...)` lists when the bind syntax for the driver is unfamiliar.",
-    "expectedNoise": "low — allowlisted identifiers are the only common look-alike, and they're a listed negative.",
+    "expectedNoise": "low \u2014 allowlisted identifiers are the only common look-alike, and they're a listed negative.",
     "languageFile": "rust",
     "evidenceStatus": "meets bar (1 A or 2 B)"
+  },
+  "rs-shell-command-interpolation": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://doc.rust-lang.org/std/process/struct.Command.html#method.arg",
+        "checked": "2026-11-08",
+        "note": "Separate arguments are passed literally rather than through shell syntax; Windows special decoders require separate care."
+      },
+      {
+        "grade": "B",
+        "url": "https://cwe.mitre.org/data/definitions/78.html",
+        "checked": "2026-11-08",
+        "note": "Externally influenced data in OS command syntax can allow an attacker to modify the intended command."
+      }
+    ],
+    "whyNotLinter": "Requires distinguishing shell syntax from literal args, quoting and allowlisted input; Command use alone is not a defect.",
+    "aiRelevance": "External input interpreted by a shell can run unintended commands.",
+    "expectedNoise": "Low with explicit shell invocation and externally supplied text.",
+    "languageFile": "rust",
+    "evidenceStatus": "meets bar (two official B sources)",
+    "versions": "Tokio 1.54.1, reqwest 0.13.5 and current stable Rust/zip docs where applicable; APIs also exist in earlier supported releases."
+  },
+  "rs-zip-entry-path-traversal": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://docs.rs/zip/latest/zip/read/struct.ZipFile.html#method.enclosed_name",
+        "checked": "2026-11-08",
+        "note": "enclosed_name rejects null bytes, absolute paths and paths resolving outside the current directory."
+      },
+      {
+        "grade": "B",
+        "url": "https://cwe.mitre.org/data/definitions/22.html",
+        "checked": "2026-11-08",
+        "note": "Unrestricted path components and absolute paths can escape an intended directory."
+      }
+    ],
+    "whyNotLinter": "Requires connecting an archive-provided name to a write destination and recognizing validation; listing an entry name is safe.",
+    "aiRelevance": "Untrusted archive entries can overwrite files outside the extraction root.",
+    "expectedNoise": "Low for direct joins; does not claim symlink or race protection.",
+    "languageFile": "rust",
+    "evidenceStatus": "meets bar (two official B sources)",
+    "versions": "Tokio 1.54.1, reqwest 0.13.5 and current stable Rust/zip docs where applicable; APIs also exist in earlier supported releases."
+  },
+  "rs-path-string-prefix-containment": {
+    "evidence": [
+      {
+        "grade": "B",
+        "url": "https://doc.rust-lang.org/std/path/struct.Path.html#method.starts_with",
+        "checked": "2026-11-08",
+        "note": "Path::starts_with compares whole path components, unlike a string prefix."
+      },
+      {
+        "grade": "B",
+        "url": "https://cwe.mitre.org/data/definitions/22.html",
+        "checked": "2026-11-08",
+        "note": "Traversal and inadequate pathname validation can bypass restrictions to an intended directory."
+      }
+    ],
+    "whyNotLinter": "Requires recognizing filesystem authorization rather than ordinary naming or URL checks and checking canonicalization/boundaries.",
+    "aiRelevance": "A sibling directory can pass a textual prefix authorization check.",
+    "expectedNoise": "Low to medium: canonical separator-terminated strings are explicitly exempt.",
+    "languageFile": "rust",
+    "evidenceStatus": "meets bar (two official B sources)",
+    "versions": "Tokio 1.54.1, reqwest 0.13.5 and current stable Rust/zip docs where applicable; APIs also exist in earlier supported releases."
   }
 }

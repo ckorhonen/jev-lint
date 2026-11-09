@@ -1,0 +1,930 @@
+{
+  "generatedAt": "2026-11-09T00:03:58.882Z",
+  "note": "Frozen-rule repeat checks; no retuning on holdout. Main harness summaries score run 1 and separately report score consistency. This artifact preserves per-rule counts for each repeat.",
+  "rows": [
+    {
+      "pack": "practices",
+      "split": "dev",
+      "run": 1,
+      "threshold": 0.5,
+      "cases": 34,
+      "errors": 0,
+      "models": [
+        "jev-1.13.0"
+      ],
+      "cacheVariant": "jev-jev-1.13.0-3ebb3281f0",
+      "perRule": {
+        "rs-http-error-status-unchecked": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "rs-broadcast-lag-ends-consumer": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "rs-timeout-detaches-spawned-task": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "rs-select-send-drops-message": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1
+        }
+      }
+    },
+    {
+      "pack": "practices",
+      "split": "dev",
+      "run": 1,
+      "threshold": 0.8,
+      "cases": 34,
+      "errors": 0,
+      "models": [
+        "jev-1.13.0"
+      ],
+      "cacheVariant": "jev-jev-1.13.0-3ebb3281f0",
+      "perRule": {
+        "rs-http-error-status-unchecked": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 2,
+          "precision": 1,
+          "recall": 0.6666666666666666
+        },
+        "rs-broadcast-lag-ends-consumer": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "rs-timeout-detaches-spawned-task": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "rs-select-send-drops-message": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 1,
+          "precision": 1,
+          "recall": 0.8333333333333334
+        }
+      }
+    },
+    {
+      "pack": "practices",
+      "split": "dev",
+      "run": 2,
+      "threshold": 0.5,
+      "cases": 34,
+      "errors": 0,
+      "models": [
+        "jev-1.13.0"
+      ],
+      "cacheVariant": "jev-jev-1.13.0-3ebb3281f0",
+      "perRule": {
+        "rs-http-error-status-unchecked": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "rs-broadcast-lag-ends-consumer": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "rs-timeout-detaches-spawned-task": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "rs-select-send-drops-message": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1
+        }
+      }
+    },
+    {
+      "pack": "practices",
+      "split": "dev",
+      "run": 2,
+      "threshold": 0.8,
+      "cases": 34,
+      "errors": 0,
+      "models": [
+        "jev-1.13.0"
+      ],
+      "cacheVariant": "jev-jev-1.13.0-3ebb3281f0",
+      "perRule": {
+        "rs-http-error-status-unchecked": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 2,
+          "precision": 1,
+          "recall": 0.6666666666666666
+        },
+        "rs-broadcast-lag-ends-consumer": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "rs-timeout-detaches-spawned-task": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "rs-select-send-drops-message": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 1,
+          "precision": 1,
+          "recall": 0.8333333333333334
+        }
+      }
+    },
+    {
+      "pack": "practices",
+      "split": "dev",
+      "run": 3,
+      "threshold": 0.5,
+      "cases": 34,
+      "errors": 0,
+      "models": [
+        "jev-1.13.0"
+      ],
+      "cacheVariant": "jev-jev-1.13.0-3ebb3281f0",
+      "perRule": {
+        "rs-http-error-status-unchecked": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "rs-broadcast-lag-ends-consumer": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "rs-timeout-detaches-spawned-task": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "rs-select-send-drops-message": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1
+        }
+      }
+    },
+    {
+      "pack": "practices",
+      "split": "dev",
+      "run": 3,
+      "threshold": 0.8,
+      "cases": 34,
+      "errors": 0,
+      "models": [
+        "jev-1.13.0"
+      ],
+      "cacheVariant": "jev-jev-1.13.0-3ebb3281f0",
+      "perRule": {
+        "rs-http-error-status-unchecked": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 2,
+          "precision": 1,
+          "recall": 0.6666666666666666
+        },
+        "rs-broadcast-lag-ends-consumer": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "rs-timeout-detaches-spawned-task": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "rs-select-send-drops-message": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 1,
+          "precision": 1,
+          "recall": 0.8333333333333334
+        }
+      }
+    },
+    {
+      "pack": "practices",
+      "split": "holdout",
+      "run": 1,
+      "threshold": 0.5,
+      "cases": 30,
+      "errors": 0,
+      "models": [
+        "jev-1.13.0"
+      ],
+      "cacheVariant": "jev-jev-1.13.0-3ebb3281f0",
+      "perRule": {
+        "rs-http-error-status-unchecked": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "rs-broadcast-lag-ends-consumer": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "rs-timeout-detaches-spawned-task": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "rs-select-send-drops-message": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1
+        }
+      }
+    },
+    {
+      "pack": "practices",
+      "split": "holdout",
+      "run": 1,
+      "threshold": 0.8,
+      "cases": 30,
+      "errors": 0,
+      "models": [
+        "jev-1.13.0"
+      ],
+      "cacheVariant": "jev-jev-1.13.0-3ebb3281f0",
+      "perRule": {
+        "rs-http-error-status-unchecked": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 1,
+          "precision": 1,
+          "recall": 0.8
+        },
+        "rs-broadcast-lag-ends-consumer": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "rs-timeout-detaches-spawned-task": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "rs-select-send-drops-message": {
+          "tp": 2,
+          "fp": 0,
+          "fn": 3,
+          "precision": 1,
+          "recall": 0.4
+        }
+      }
+    },
+    {
+      "pack": "practices",
+      "split": "holdout",
+      "run": 2,
+      "threshold": 0.5,
+      "cases": 30,
+      "errors": 0,
+      "models": [
+        "jev-1.13.0"
+      ],
+      "cacheVariant": "jev-jev-1.13.0-3ebb3281f0",
+      "perRule": {
+        "rs-http-error-status-unchecked": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "rs-broadcast-lag-ends-consumer": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "rs-timeout-detaches-spawned-task": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "rs-select-send-drops-message": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1
+        }
+      }
+    },
+    {
+      "pack": "practices",
+      "split": "holdout",
+      "run": 2,
+      "threshold": 0.8,
+      "cases": 30,
+      "errors": 0,
+      "models": [
+        "jev-1.13.0"
+      ],
+      "cacheVariant": "jev-jev-1.13.0-3ebb3281f0",
+      "perRule": {
+        "rs-http-error-status-unchecked": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 1,
+          "precision": 1,
+          "recall": 0.8
+        },
+        "rs-broadcast-lag-ends-consumer": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "rs-timeout-detaches-spawned-task": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "rs-select-send-drops-message": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 4,
+          "precision": 1,
+          "recall": 0.2
+        }
+      }
+    },
+    {
+      "pack": "practices",
+      "split": "holdout",
+      "run": 3,
+      "threshold": 0.5,
+      "cases": 30,
+      "errors": 0,
+      "models": [
+        "jev-1.13.0"
+      ],
+      "cacheVariant": "jev-jev-1.13.0-3ebb3281f0",
+      "perRule": {
+        "rs-http-error-status-unchecked": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "rs-broadcast-lag-ends-consumer": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "rs-timeout-detaches-spawned-task": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "rs-select-send-drops-message": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1
+        }
+      }
+    },
+    {
+      "pack": "practices",
+      "split": "holdout",
+      "run": 3,
+      "threshold": 0.8,
+      "cases": 30,
+      "errors": 0,
+      "models": [
+        "jev-1.13.0"
+      ],
+      "cacheVariant": "jev-jev-1.13.0-3ebb3281f0",
+      "perRule": {
+        "rs-http-error-status-unchecked": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 1,
+          "precision": 1,
+          "recall": 0.8
+        },
+        "rs-broadcast-lag-ends-consumer": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "rs-timeout-detaches-spawned-task": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "rs-select-send-drops-message": {
+          "tp": 2,
+          "fp": 0,
+          "fn": 3,
+          "precision": 1,
+          "recall": 0.4
+        }
+      }
+    },
+    {
+      "pack": "security",
+      "split": "dev",
+      "run": 1,
+      "threshold": 0.5,
+      "cases": 28,
+      "errors": 0,
+      "models": [
+        "jev-1.13.0"
+      ],
+      "cacheVariant": "jev-jev-1.13.0-7c4b514ae7",
+      "perRule": {
+        "rs-shell-command-interpolation": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "rs-zip-entry-path-traversal": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "rs-path-string-prefix-containment": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1
+        }
+      }
+    },
+    {
+      "pack": "security",
+      "split": "dev",
+      "run": 1,
+      "threshold": 0.8,
+      "cases": 28,
+      "errors": 0,
+      "models": [
+        "jev-1.13.0"
+      ],
+      "cacheVariant": "jev-jev-1.13.0-7c4b514ae7",
+      "perRule": {
+        "rs-shell-command-interpolation": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "rs-zip-entry-path-traversal": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 2,
+          "precision": 1,
+          "recall": 0.6666666666666666
+        },
+        "rs-path-string-prefix-containment": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 2,
+          "precision": 1,
+          "recall": 0.7142857142857143
+        }
+      }
+    },
+    {
+      "pack": "security",
+      "split": "dev",
+      "run": 2,
+      "threshold": 0.5,
+      "cases": 28,
+      "errors": 0,
+      "models": [
+        "jev-1.13.0"
+      ],
+      "cacheVariant": "jev-jev-1.13.0-7c4b514ae7",
+      "perRule": {
+        "rs-shell-command-interpolation": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "rs-zip-entry-path-traversal": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "rs-path-string-prefix-containment": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1
+        }
+      }
+    },
+    {
+      "pack": "security",
+      "split": "dev",
+      "run": 2,
+      "threshold": 0.8,
+      "cases": 28,
+      "errors": 0,
+      "models": [
+        "jev-1.13.0"
+      ],
+      "cacheVariant": "jev-jev-1.13.0-7c4b514ae7",
+      "perRule": {
+        "rs-shell-command-interpolation": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "rs-zip-entry-path-traversal": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 2,
+          "precision": 1,
+          "recall": 0.6666666666666666
+        },
+        "rs-path-string-prefix-containment": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 1,
+          "precision": 1,
+          "recall": 0.8571428571428571
+        }
+      }
+    },
+    {
+      "pack": "security",
+      "split": "dev",
+      "run": 3,
+      "threshold": 0.5,
+      "cases": 28,
+      "errors": 0,
+      "models": [
+        "jev-1.13.0"
+      ],
+      "cacheVariant": "jev-jev-1.13.0-7c4b514ae7",
+      "perRule": {
+        "rs-shell-command-interpolation": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "rs-zip-entry-path-traversal": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "rs-path-string-prefix-containment": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1
+        }
+      }
+    },
+    {
+      "pack": "security",
+      "split": "dev",
+      "run": 3,
+      "threshold": 0.8,
+      "cases": 28,
+      "errors": 0,
+      "models": [
+        "jev-1.13.0"
+      ],
+      "cacheVariant": "jev-jev-1.13.0-7c4b514ae7",
+      "perRule": {
+        "rs-shell-command-interpolation": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "rs-zip-entry-path-traversal": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 2,
+          "precision": 1,
+          "recall": 0.6666666666666666
+        },
+        "rs-path-string-prefix-containment": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 1,
+          "precision": 1,
+          "recall": 0.8571428571428571
+        }
+      }
+    },
+    {
+      "pack": "security",
+      "split": "holdout",
+      "run": 1,
+      "threshold": 0.5,
+      "cases": 23,
+      "errors": 0,
+      "models": [
+        "jev-1.13.0"
+      ],
+      "cacheVariant": "jev-jev-1.13.0-7c4b514ae7",
+      "perRule": {
+        "rs-shell-command-interpolation": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "rs-zip-entry-path-traversal": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "rs-path-string-prefix-containment": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1
+        }
+      }
+    },
+    {
+      "pack": "security",
+      "split": "holdout",
+      "run": 1,
+      "threshold": 0.8,
+      "cases": 23,
+      "errors": 0,
+      "models": [
+        "jev-1.13.0"
+      ],
+      "cacheVariant": "jev-jev-1.13.0-7c4b514ae7",
+      "perRule": {
+        "rs-shell-command-interpolation": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "rs-zip-entry-path-traversal": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "rs-path-string-prefix-containment": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1
+        }
+      }
+    },
+    {
+      "pack": "security",
+      "split": "holdout",
+      "run": 2,
+      "threshold": 0.5,
+      "cases": 23,
+      "errors": 0,
+      "models": [
+        "jev-1.13.0"
+      ],
+      "cacheVariant": "jev-jev-1.13.0-7c4b514ae7",
+      "perRule": {
+        "rs-shell-command-interpolation": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "rs-zip-entry-path-traversal": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "rs-path-string-prefix-containment": {
+          "tp": 5,
+          "fp": 1,
+          "fn": 0,
+          "precision": 0.8333333333333334,
+          "recall": 1
+        }
+      }
+    },
+    {
+      "pack": "security",
+      "split": "holdout",
+      "run": 2,
+      "threshold": 0.8,
+      "cases": 23,
+      "errors": 0,
+      "models": [
+        "jev-1.13.0"
+      ],
+      "cacheVariant": "jev-jev-1.13.0-7c4b514ae7",
+      "perRule": {
+        "rs-shell-command-interpolation": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "rs-zip-entry-path-traversal": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "rs-path-string-prefix-containment": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1
+        }
+      }
+    },
+    {
+      "pack": "security",
+      "split": "holdout",
+      "run": 3,
+      "threshold": 0.5,
+      "cases": 23,
+      "errors": 0,
+      "models": [
+        "jev-1.13.0"
+      ],
+      "cacheVariant": "jev-jev-1.13.0-7c4b514ae7",
+      "perRule": {
+        "rs-shell-command-interpolation": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "rs-zip-entry-path-traversal": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "rs-path-string-prefix-containment": {
+          "tp": 5,
+          "fp": 1,
+          "fn": 0,
+          "precision": 0.8333333333333334,
+          "recall": 1
+        }
+      }
+    },
+    {
+      "pack": "security",
+      "split": "holdout",
+      "run": 3,
+      "threshold": 0.8,
+      "cases": 23,
+      "errors": 0,
+      "models": [
+        "jev-1.13.0"
+      ],
+      "cacheVariant": "jev-jev-1.13.0-7c4b514ae7",
+      "perRule": {
+        "rs-shell-command-interpolation": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "rs-zip-entry-path-traversal": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "rs-path-string-prefix-containment": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 1,
+          "precision": 1,
+          "recall": 0.8
+        }
+      }
+    }
+  ]
+}
