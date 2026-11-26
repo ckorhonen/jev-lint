@@ -1,8 +1,11 @@
 {
-  "name": "jev-lint",
+  "name": "@ckorhonen/jev-lint",
   "version": "0.1.0",
   "description": "A fuzzy linter for coding agents that catches judgment-based rule violations on every edit.",
   "type": "module",
+  "publishConfig": {
+    "access": "public"
+  },
   "bin": {
     "jev-lint": "./bin/jev-lint.mjs"
   },

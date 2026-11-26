@@ -65,13 +65,24 @@ describe("cli parsing and dispatch", () => {
       },
     };
     expect(runCli(["--help"], io)).toBe(0);
-    expect(out.at(-1)).toContain("bunx jev-lint setup");
+    expect(out.at(-1)).toContain("bunx @ckorhonen/jev-lint setup");
     expect(runCli(["--version"], io)).toBe(0);
     expect(out.at(-1)).toBe(`jev-lint ${packageVersion()}`);
     expect(runCli(["bogus"], io)).toBe(1);
     expect(err.at(-1)).toContain('unknown command "bogus"');
     expect(runCli(["check", "a.ts"], io)).toBe(0);
     expect(calls).toEqual([{ scriptPath: join(REPO, "src/check.ts"), args: ["a.ts"] }]);
+  });
+
+  test("package.json publishes publicly under the scoped @ckorhonen/jev-lint name with jev-lint bin", () => {
+    const pkg = JSON.parse(readFileSync(join(REPO, "package.json"), "utf8")) as {
+      name?: string;
+      publishConfig?: { access?: string };
+      bin?: Record<string, string>;
+    };
+    expect(pkg.name).toBe("@ckorhonen/jev-lint");
+    expect(pkg.publishConfig?.access).toBe("public");
+    expect(pkg.bin?.["jev-lint"]).toBe("./bin/jev-lint.mjs");
   });
 });
 
@@ -117,8 +128,8 @@ describe("ephemeral package staging and zero-clone install", () => {
 
   test("isEphemeralRoot distinguishes git checkouts from bunx/npx cache paths", () => {
     expect(isEphemeralRoot(REPO, {})).toBe(false);
-    expect(isEphemeralRoot("/home/user/.npm/_npx/abc123/node_modules/jev-lint", {})).toBe(true);
-    expect(isEphemeralRoot("/tmp/bunx-1000-jev-lint@0.1.0/node_modules/jev-lint", {})).toBe(true);
+    expect(isEphemeralRoot("/home/user/.npm/_npx/abc123/node_modules/@ckorhonen/jev-lint", {})).toBe(true);
+    expect(isEphemeralRoot("/tmp/bunx-1000-@ckorhonen+jev-lint@0.1.0/node_modules/@ckorhonen/jev-lint", {})).toBe(true);
     expect(isEphemeralRoot(root, {})).toBe(true);
     expect(isEphemeralRoot(REPO, { JEV_LINT_STAGE: "1" })).toBe(true);
     expect(isEphemeralRoot(root, { JEV_LINT_STAGE: "0" })).toBe(false);
@@ -143,6 +154,18 @@ describe("ephemeral package staging and zero-clone install", () => {
     writeFileSync(keepFile, "do not delete");
     expect(() => stageRuntime(REPO, unrelated)).toThrow("unrelated files");
     expect(readFileSync(keepFile, "utf8")).toBe("do not delete");
+
+    const otherPkg = join(root, "other-pkg");
+    mkdirSync(otherPkg);
+    writeFileSync(join(otherPkg, "package.json"), JSON.stringify({ name: "other-package" }));
+    expect(() => stageRuntime(REPO, otherPkg)).toThrow("unrelated files");
+
+    const legacyStaged = join(root, "legacy-staged");
+    mkdirSync(legacyStaged);
+    writeFileSync(join(legacyStaged, "package.json"), JSON.stringify({ name: "jev-lint" }));
+    stageRuntime(REPO, legacyStaged);
+    const replacedPkg = JSON.parse(readFileSync(join(legacyStaged, "package.json"), "utf8")) as { name?: string };
+    expect(replacedPkg.name).toBe("@ckorhonen/jev-lint");
   });
 
   test("preview writes nothing; apply stages runtime, installs hooks/skills, and migrates git-checkout hooks", () => {
@@ -172,7 +195,7 @@ describe("ephemeral package staging and zero-clone install", () => {
     );
 
     // Stage a simulated ephemeral package (no .git) under tmpdir.
-    const ephemeralPkg = join(root, "bunx-1000-jev-lint@0.1.0");
+    const ephemeralPkg = join(root, "bunx-1000-@ckorhonen+jev-lint@0.1.0");
     stageRuntime(REPO, ephemeralPkg);
     expect(existsSync(join(ephemeralPkg, ".git"))).toBe(false);
 
@@ -262,7 +285,7 @@ describe("ephemeral package staging and zero-clone install", () => {
   test("first-time --skills creates missing target agent skill directory on --apply", () => {
     const home = join(root, "fresh-home");
     mkdirSync(home);
-    const ephemeralPkg = join(root, "bunx-fresh-jev-lint@0.1.0");
+    const ephemeralPkg = join(root, "bunx-fresh-@ckorhonen+jev-lint@0.1.0");
     stageRuntime(REPO, ephemeralPkg);
     const cliEnv = { PATH: process.env.PATH, HOME: home, XDG_DATA_HOME: join(home, ".local/share") };
 

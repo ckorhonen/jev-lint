@@ -1,8 +1,9 @@
 {
   "lockfileVersion": 1,
+  "configVersion": 0,
   "workspaces": {
     "": {
-      "name": "jev-lint",
+      "name": "@ckorhonen/jev-lint",
       "devDependencies": {
         "@biomejs/biome": "^2.5.14",
         "bun-types": "^1.4.2",

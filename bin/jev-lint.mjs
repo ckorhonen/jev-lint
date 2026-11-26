@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Cross-runner entrypoint for `bunx jev-lint` and `npx jev-lint`.
+// Cross-runner entrypoint for `bunx @ckorhonen/jev-lint` and `npx @ckorhonen/jev-lint`.
 // Under Bun, loads `src/cli.ts` directly. Under Node, locates Bun and forwards argv/stdio.
 import { spawnSync } from "node:child_process";
 import { existsSync } from "node:fs";
