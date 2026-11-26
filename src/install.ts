@@ -14,14 +14,20 @@
 import { spawnSync } from "node:child_process";
 import {
   copyFileSync,
+  cpSync,
   existsSync,
   lstatSync,
   mkdirSync,
   mkdtempSync,
   readdirSync,
   readFileSync,
+  readlinkSync,
+  realpathSync,
+  renameSync,
+  rmSync,
   statSync,
   symlinkSync,
+  unlinkSync,
   writeFileSync,
 } from "node:fs";
 import { homedir, tmpdir } from "node:os";
@@ -33,6 +39,87 @@ import { cloudflareKey, judgeModel, judgeProvider, keyFilePath } from "./jev";
 const REPO = resolve(import.meta.dir, "..");
 const HOOK = join(REPO, "src/hook.ts");
 const MODEL = "jev-1.13.0";
+const RUNTIME_ENTRIES = ["package.json", "bin", "src", "rules", ".agents/skills"] as const;
+const STAGED_TOP_ENTRIES = new Set(RUNTIME_ENTRIES.map((entry) => entry.split("/")[0]));
+
+function isSafeToReplaceStagedDir(targetDir: string): boolean {
+  const entries = readdirSync(targetDir);
+  if (entries.length === 0) return true;
+  if (!entries.every((entry) => STAGED_TOP_ENTRIES.has(entry))) return false;
+  const pkgPath = join(targetDir, "package.json");
+  if (!existsSync(pkgPath)) return false;
+  try {
+    const pkg = JSON.parse(readFileSync(pkgPath, "utf8")) as { name?: unknown };
+    return pkg.name === "jev-lint";
+  } catch {
+    return false;
+  }
+}
+
+function realOrResolved(path: string): string {
+  try {
+    return realpathSync(path);
+  } catch {
+    return resolve(path);
+  }
+}
+
+// Detect ephemeral bunx/npx cache directories so hooks never point at a temp path that gets cleaned up.
+export function isEphemeralRoot(root: string, env: NodeJS.ProcessEnv = process.env): boolean {
+  if (env.JEV_LINT_STAGE === "1") return true;
+  if (env.JEV_LINT_STAGE === "0") return false;
+  if (existsSync(join(root, ".git"))) return false;
+  const resolved = realOrResolved(root);
+  const tmp = realOrResolved(tmpdir());
+  if (resolved === tmp || resolved.startsWith(`${tmp}${sep}`)) return true;
+  const segments = resolved.split(sep);
+  return segments.some((s) => s === "_npx" || s === "bunx" || s.startsWith("bunx-"));
+}
+
+export function stablePackageDir(env: NodeJS.ProcessEnv = process.env): string {
+  if (env.JEV_LINT_INSTALL_DIR) return resolve(env.JEV_LINT_INSTALL_DIR);
+  const dataHome = env.XDG_DATA_HOME || join(homedir(), ".local", "share");
+  return join(dataHome, "jev-lint", "pkg");
+}
+
+// Atomically copy the self-contained runtime payload to a stable user-owned directory.
+export function stageRuntime(sourceRoot: string, targetDir: string): void {
+  const parent = dirname(targetDir);
+  if (lstatSync(parent, { throwIfNoEntry: false })?.isSymbolicLink())
+    throw new Error(`${parent} is a symlink; review its target and set JEV_LINT_INSTALL_DIR explicitly`);
+  const existing = lstatSync(targetDir, { throwIfNoEntry: false });
+  if (existing?.isSymbolicLink()) throw new Error(`${targetDir} is a symlink; review its target and set JEV_LINT_INSTALL_DIR explicitly`);
+  if (existing && (!existing.isDirectory() || !isSafeToReplaceStagedDir(targetDir)))
+    throw new Error(`${targetDir} contains unrelated files; point JEV_LINT_INSTALL_DIR to an empty or dedicated jev-lint directory`);
+  mkdirSync(parent, { recursive: true });
+  const temp = mkdtempSync(join(parent, ".jev-lint-stage-"));
+  let backup: string | undefined;
+  try {
+    for (const entry of RUNTIME_ENTRIES) {
+      const src = join(sourceRoot, entry);
+      if (!existsSync(src)) continue;
+      const dst = join(temp, entry);
+      mkdirSync(dirname(dst), { recursive: true });
+      cpSync(src, dst, { recursive: true });
+    }
+    if (existsSync(targetDir)) {
+      backup = `${targetDir}.old-${process.pid}-${Date.now()}`;
+      renameSync(targetDir, backup);
+    }
+    renameSync(temp, targetDir);
+    if (backup) rmSync(backup, { recursive: true, force: true });
+  } catch (error) {
+    rmSync(temp, { recursive: true, force: true });
+    if (backup && !existsSync(targetDir)) {
+      try {
+        renameSync(backup, targetDir);
+      } catch {
+        // leave backup intact for manual recovery
+      }
+    }
+    throw error;
+  }
+}
 const installedModel = () => process.env.JEV_LINT_MODEL ?? (judgeProvider() !== "typesafe" ? judgeModel() : MODEL);
 const shellQuote = (value: string) => `'${value.replaceAll("'", "'\\''")}'`;
 // Preserve symlink/.. traversal when anchoring a credential path for another cwd.
@@ -69,10 +156,11 @@ type HookCommand = { type: "command"; command: string; timeout: number; statusMe
 type HookGroup = { matcher?: string; hooks: HookCommand[] };
 type HookConfig = { hooks?: Record<string, HookGroup[] | undefined> } & Record<string, unknown>;
 
-export function hookGroup(agent: "claude" | "codex", opts: { async?: boolean; bun?: string } = {}): HookGroup {
+export function hookGroup(agent: "claude" | "codex", opts: { async?: boolean; bun?: string; root?: string } = {}): HookGroup {
   const bun = opts.bun ?? Bun.which("bun") ?? process.execPath; // the PATH shim survives bun upgrades
+  const hook = opts.root ? join(opts.root, "src/hook.ts") : HOOK;
   const rewake = agent === "claude" && opts.async;
-  const command = `${rewake ? "JEV_LINT_MODE=rewake " : ""}${judgeCommandEnv()} ${shellQuote(bun)} ${shellQuote(HOOK)}`;
+  const command = `${rewake ? "JEV_LINT_MODE=rewake " : ""}${judgeCommandEnv()} ${shellQuote(bun)} ${shellQuote(hook)}`;
   return {
     matcher: agent === "claude" ? "Write|Edit|MultiEdit" : "Edit|Write|apply_patch",
     hooks: [
@@ -165,7 +253,7 @@ export const isJevLint = (h: HookCommand) => {
   return Boolean(
     script &&
       (script === HOOK ||
-        /(?:^|\/)jev-lint\/src\/hook\.ts$/.test(script) ||
+        /(?:^|\/)jev-lint\/(?:pkg\/)?src\/hook\.ts$/.test(script) ||
         (h.statusMessage === "jev-lint" && isAbsolute(script) && script.endsWith("/src/hook.ts"))),
   );
 };
@@ -184,7 +272,7 @@ function recheckOwner(config: HookConfig): (h: HookCommand) => boolean {
       script &&
         (script === RECHECK ||
           oldScripts.has(script) ||
-          /(?:^|\/)jev-lint\/src\/recheck\.ts$/.test(script) ||
+          /(?:^|\/)jev-lint\/(?:pkg\/)?src\/recheck\.ts$/.test(script) ||
           (h.statusMessage === "jev-lint recheck" && isAbsolute(script) && script.endsWith("/src/recheck.ts"))),
     );
   };
@@ -193,13 +281,14 @@ const RECHECK_TIMEOUT_S = 20;
 export const RECHECK_EVENTS = ["Stop", "SubagentStop"] as const;
 
 // End-of-turn re-check for the learning loop (see src/recheck.ts): no matcher, since Stop events have no tool.
-export function recheckGroup(opts: { bun?: string } = {}): HookGroup {
+export function recheckGroup(opts: { bun?: string; root?: string } = {}): HookGroup {
   const bun = opts.bun ?? Bun.which("bun") ?? process.execPath;
+  const recheck = opts.root ? join(opts.root, "src/recheck.ts") : RECHECK;
   return {
     hooks: [
       {
         type: "command",
-        command: `${judgeCommandEnv()} ${shellQuote(bun)} ${shellQuote(RECHECK)}`,
+        command: `${judgeCommandEnv()} ${shellQuote(bun)} ${shellQuote(recheck)}`,
         timeout: RECHECK_TIMEOUT_S,
         statusMessage: "jev-lint recheck",
       },
@@ -284,6 +373,53 @@ export function removeHook(
   return { config: { ...config, hooks }, removed: true };
 }
 
+const PERSISTED_PROVIDER_VARS = new Set([
+  "JEV_LINT_PROVIDER",
+  "JEV_LINT_MODEL",
+  "TYPESAFE_API_KEY_FILE",
+  "OPENAI_API_KEY_FILE",
+  "CLOUDFLARE_ACCOUNT_ID",
+  "CLOUDFLARE_API_TOKEN_FILE",
+]);
+
+// Recover non-secret provider env assignments persisted on the existing hook so --upgrade
+// keeps Clef or Decisions installs on their configured provider instead of resetting to TypeSafe.
+export function installedProviderEnv(config: HookConfig): Record<string, string> {
+  const first = ["PreToolUse", "PostToolUse"]
+    .flatMap((event) => (config.hooks?.[event] ?? []).flatMap((g) => g.hooks ?? []).filter(isJevLint))
+    .at(0);
+  if (!first) return {};
+  const parsed = literalWords(first.command);
+  if (!parsed) return {};
+  const env: Record<string, string> = {};
+  for (const index of parsed.assignments) {
+    const word = parsed.words[index];
+    const eq = word.indexOf("=");
+    if (eq === -1) continue;
+    const key = word.slice(0, eq);
+    if (PERSISTED_PROVIDER_VARS.has(key)) env[key] = word.slice(eq + 1);
+  }
+  return env;
+}
+
+function withProviderEnv<T>(preserved: Record<string, string>, fn: () => T): T {
+  const saved = new Map<string, string | undefined>();
+  for (const [key, value] of Object.entries(preserved)) {
+    if (process.env[key] === undefined) {
+      saved.set(key, undefined);
+      process.env[key] = value;
+    }
+  }
+  try {
+    return fn();
+  } finally {
+    for (const [key, prev] of saved) {
+      if (prev === undefined) delete process.env[key];
+      else process.env[key] = prev;
+    }
+  }
+}
+
 // How jev-lint is installed in a config right now, so --upgrade can re-apply without the user
 // restating --pre / --async / --no-recheck. Pure, so it is unit-tested.
 export function installedMode(config: HookConfig): { installed: boolean; pre: boolean; async: boolean; recheck: boolean } {
@@ -305,8 +441,12 @@ function readConfig(path: string): HookConfig {
   return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? (parsed as HookConfig) : {};
 }
 
-// --upgrade: bring this checkout up to date, then re-apply whatever is installed.
+// --upgrade: in a git checkout, pull and reinstall; in package mode, report the package version.
 function upgradeCheckout(): string {
+  if (!existsSync(join(REPO, ".git"))) {
+    const pkg = JSON.parse(readFileSync(join(REPO, "package.json"), "utf8")) as { version?: string };
+    return `package v${pkg.version ?? "0.0.0"}`;
+  }
   const git = (...a: string[]) => spawnSync("git", ["-C", REPO, ...a], { encoding: "utf8" });
   const before = git("rev-parse", "--short", "HEAD").stdout.trim();
   const pull = git("pull", "--ff-only", "--quiet");
@@ -318,7 +458,7 @@ function upgradeCheckout(): string {
 }
 
 // Main hook on PostToolUse (or PreToolUse with --pre), plus (unless disabled) the end-of-turn re-check on Stop/SubagentStop.
-function writeConfig(path: string, group: HookGroup, apply: boolean, recheck: boolean, pre = false): string {
+function writeConfig(path: string, group: HookGroup, apply: boolean, recheck: boolean, pre = false, root = REPO): string {
   if (lstatSync(dirname(path), { throwIfNoEntry: false })?.isSymbolicLink())
     throw new Error(`${dirname(path)} is a symlink; review its target and configure that location explicitly before applying`);
   if (lstatSync(path, { throwIfNoEntry: false })?.isSymbolicLink())
@@ -338,7 +478,7 @@ function writeConfig(path: string, group: HookGroup, apply: boolean, recheck: bo
   if (moved.removed) actions.push(`removed from ${other}`);
   if (recheck) {
     for (const event of RECHECK_EVENTS) {
-      const merged = mergeHook(config, recheckGroup(), event, isJevLintRecheck);
+      const merged = mergeHook(config, recheckGroup({ root }), event, isJevLintRecheck);
       config = merged.config;
       actions.push(`${event} re-check ${merged.action}`);
     }
@@ -372,16 +512,44 @@ function codexFeatureStatus(): string {
     : "Codex hooks feature NOT enabled: add `hooks = true` under `[features]` in ~/.codex/config.toml";
 }
 
-function linkSkills(apply: boolean): string[] {
-  const source = join(REPO, ".agents/skills");
+function isJevLintSkillLink(linkTarget: string, name: string): boolean {
+  const normalized = linkTarget.replaceAll("\\", "/");
+  const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return new RegExp(`(?:^|/)jev-lint/(?:pkg/)?\\.agents/skills/${escaped}$`).test(normalized);
+}
+
+function linkSkills(apply: boolean, root = REPO, targets: { claude?: boolean; codex?: boolean } = {}): string[] {
+  const source = join(root, ".agents/skills");
+  const listFrom = existsSync(source) ? source : join(REPO, ".agents/skills");
   const out: string[] = [];
-  for (const dir of [".agents/skills", ".claude/skills", ".codex/skills"].map((d) => join(homedir(), d))) {
-    if (!existsSync(dir)) continue;
-    for (const name of readdirSync(source)) {
+  const candidates: Array<{ dir: string; createIfMissing: boolean }> = [{ dir: join(homedir(), ".agents/skills"), createIfMissing: false }];
+  if (targets.claude) candidates.push({ dir: join(homedir(), ".claude/skills"), createIfMissing: true });
+  if (targets.codex) candidates.push({ dir: join(homedir(), ".codex/skills"), createIfMissing: true });
+  for (const { dir, createIfMissing } of candidates) {
+    const dirExists = existsSync(dir);
+    if (!dirExists && !createIfMissing) continue;
+    if (lstatSync(dirname(dir), { throwIfNoEntry: false })?.isSymbolicLink() || lstatSync(dir, { throwIfNoEntry: false })?.isSymbolicLink())
+      throw new Error(`${dir} is a symlink; review its target before linking skills`);
+    if (!dirExists && apply) mkdirSync(dir, { recursive: true });
+    for (const name of readdirSync(listFrom)) {
       const target = join(dir, name);
-      if (lstatSync(target, { throwIfNoEntry: false })) out.push(`${target}: exists`);
-      else if (apply) {
-        symlinkSync(join(source, name), target);
+      const desired = join(source, name);
+      const existing = dirExists ? lstatSync(target, { throwIfNoEntry: false }) : undefined;
+      if (existing) {
+        if (existing.isSymbolicLink()) {
+          const current = readlinkSync(target);
+          if (current !== desired && isJevLintSkillLink(current, name)) {
+            if (apply) {
+              unlinkSync(target);
+              symlinkSync(desired, target);
+              out.push(`${target}: updated`);
+            } else out.push(`${target}: would update`);
+            continue;
+          }
+        }
+        out.push(`${target}: exists`);
+      } else if (apply) {
+        symlinkSync(desired, target);
         out.push(`${target}: linked`);
       } else out.push(`${target}: would link`);
     }
@@ -390,13 +558,14 @@ function linkSkills(apply: boolean): string[] {
 }
 
 // One real check through the hook: a Write with an empty catch should come back flagged.
-function smoke(): string {
+function smoke(root = REPO): string {
+  const hook = existsSync(join(root, "src/hook.ts")) ? join(root, "src/hook.ts") : HOOK;
   const dir = mkdtempSync(join(tmpdir(), "jev-lint-smoke-"));
   const file = join(dir, "smoke.ts");
   const content = "export async function load(url: string) {\n  try {\n    return await fetch(url);\n  } catch (e) {}\n}\n";
   writeFileSync(file, content);
   const event = { hook_event_name: "PostToolUse", cwd: dir, tool_name: "Write", tool_input: { file_path: file, content } };
-  const run = spawnSync(process.execPath, [HOOK], {
+  const run = spawnSync(process.execPath, [hook], {
     input: JSON.stringify(event),
     cwd: dir,
     env: { ...process.env, JEV_LINT_FINDINGS_LOG: "off", JEV_LINT_MODEL: installedModel() },
@@ -425,15 +594,23 @@ if (import.meta.main) {
         upgrade: { type: "boolean", default: false },
       },
     });
+    let claudePreserved: Record<string, string> = {};
+    let codexPreserved: Record<string, string> = {};
     if (values.upgrade) {
       // Pull first, so the modes below are detected and re-applied with the new code.
       console.log(`upgrade: ${upgradeCheckout()}`);
       const claudePath = values.project ? projectSettingsPath(values.project) : join(homedir(), ".claude/settings.json");
-      const mode = installedMode(readConfig(claudePath));
-      const codexMode = installedMode(readConfig(join(homedir(), ".codex/hooks.json")));
+      const claudeConfig = readConfig(claudePath);
+      const codexConfig = readConfig(join(homedir(), ".codex/hooks.json"));
+      const mode = installedMode(claudeConfig);
+      const codexMode = installedMode(codexConfig);
       if (!mode.installed && !codexMode.installed) {
         console.error("upgrade: jev-lint is not installed here; run without --upgrade (and with --apply) to install");
         process.exit(1);
+      }
+      if (!process.env.JEV_LINT_PROVIDER) {
+        if (mode.installed) claudePreserved = installedProviderEnv(claudeConfig);
+        if (codexMode.installed) codexPreserved = installedProviderEnv(codexConfig);
       }
       values.apply = true;
       if (!values.pre && !values.async) {
@@ -455,7 +632,9 @@ if (import.meta.main) {
       console.error("Codex has no project-scoped hook config; drop --project or --codex-only");
       process.exit(1);
     }
-    console.log(`jev-lint at ${REPO}`);
+    const ephemeral = isEphemeralRoot(REPO);
+    const targetRoot = ephemeral ? stablePackageDir() : REPO;
+    console.log(`jev-lint at ${targetRoot}`);
     console.log(
       values.apply
         ? "Local setup: applying hook configuration (backups created for changed files)."
@@ -465,36 +644,73 @@ if (import.meta.main) {
       "Setup does not contact a model unless --smoke is explicitly supplied. Installed hooks send code to the selected provider on future edits.",
     );
     console.log(`bun: ${process.execPath}`);
-    console.log(
-      judgeProvider() === "cloudflare"
-        ? `Cloudflare token: ${cloudflareKey() ? "present" : "MISSING"} (must be available to the agent at runtime)`
-        : judgeProvider() === "openai"
-          ? `OpenAI key: ${openaiKey() ? "present" : "MISSING"} (must be available to the agent at runtime)`
-          : `TypeSafe key: ${keyStatus()}`,
-    );
+    const statusPreserved = !values["codex-only"] ? claudePreserved : codexPreserved;
+    withProviderEnv(statusPreserved, () => {
+      console.log(
+        judgeProvider() === "cloudflare"
+          ? `Cloudflare token: ${cloudflareKey() ? "present" : "MISSING"} (must be available to the agent at runtime)`
+          : judgeProvider() === "openai"
+            ? `OpenAI key: ${openaiKey() ? "present" : "MISSING"} (must be available to the agent at runtime)`
+            : `TypeSafe key: ${keyStatus()}`,
+      );
+    });
     try {
-      judgeCommandEnv(); // a missing account ID or an unknown model is a setup error, not a crash
+      if (!values["codex-only"]) withProviderEnv(claudePreserved, () => judgeCommandEnv());
+      if (!values["claude-only"] && !values.project) withProviderEnv(codexPreserved, () => judgeCommandEnv());
     } catch (error) {
       console.error(`Provider setup: ${error instanceof Error ? error.message : error}`);
       process.exit(1);
     }
+    if (ephemeral) {
+      if (values.apply) {
+        stageRuntime(REPO, targetRoot);
+        console.log(`runtime: staged to ${targetRoot}`);
+      } else {
+        console.log(`runtime: would stage to ${targetRoot} (dry run; pass --apply)`);
+      }
+    }
     if (!values["codex-only"]) {
       const path = values.project ? projectSettingsPath(values.project) : join(homedir(), ".claude/settings.json");
-      console.log(
-        `Claude Code: ${writeConfig(path, hookGroup("claude", { async: values.async }), values.apply, !values["no-recheck"], values.pre)}`,
+      const result = withProviderEnv(claudePreserved, () =>
+        writeConfig(
+          path,
+          hookGroup("claude", { async: values.async, root: targetRoot }),
+          values.apply,
+          !values["no-recheck"],
+          values.pre,
+          targetRoot,
+        ),
       );
+      console.log(`Claude Code: ${result}`);
     }
     if (!values["claude-only"] && !values.project) {
-      console.log(`Codex: ${writeConfig(join(homedir(), ".codex/hooks.json"), hookGroup("codex"), values.apply, !values["no-recheck"])}`);
+      const result = withProviderEnv(codexPreserved, () =>
+        writeConfig(
+          join(homedir(), ".codex/hooks.json"),
+          hookGroup("codex", { root: targetRoot }),
+          values.apply,
+          !values["no-recheck"],
+          false,
+          targetRoot,
+        ),
+      );
+      console.log(`Codex: ${result}`);
       console.log(`Codex: ${codexFeatureStatus()}; the first run asks you to trust the hook`);
       if (values.pre) console.log("Codex: --pre applies to Claude Code only for now; Codex keeps checking after the write");
     }
-    if (values.skills) for (const line of linkSkills(values.apply)) console.log(`skill ${line}`);
+    if (values.skills)
+      for (const line of linkSkills(values.apply, targetRoot, {
+        claude: !values["codex-only"],
+        codex: !values["claude-only"] && !values.project,
+      }))
+        console.log(`skill ${line}`);
     if (values.smoke) {
-      console.log(
-        `Network smoke test: sending a synthetic TypeScript fixture and rule context to ${judgeProvider()} (${installedModel()}); API charges may apply.`,
-      );
-      console.log(smoke());
+      withProviderEnv(statusPreserved, () => {
+        console.log(
+          `Network smoke test: sending a synthetic TypeScript fixture and rule context to ${judgeProvider()} (${installedModel()}); API charges may apply.`,
+        );
+        console.log(smoke(targetRoot));
+      });
     }
   } catch (error) {
     console.error(`Setup could not complete: ${error instanceof Error ? error.message : error}`);

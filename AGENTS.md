@@ -13,6 +13,7 @@ reword a single rule, use `jev-lint-write-rule`. All five skills are symlinked i
 
 ## Layout
 
+- `bin/jev-lint.mjs` / `src/cli.ts` — publishable `jev-lint` CLI entrypoint (`bunx jev-lint` / `npx jev-lint`) routing subcommands (`setup`, `install`, `upgrade`, `check`, `findings`, `audit`, `validate`, `inventory`, `eval`, `hook`, `recheck`).
 - `src/hook.ts` — hook entry (Claude Code `Write|Edit|MultiEdit`, Codex `apply_patch`). Must fail open: never throw, never block, always exit 0.
 - `src/recheck.ts` — end-of-turn re-check (Stop/SubagentStop hook): re-asks still-flagged rules about the current file so findings get fixed/kept outcomes; fail-open, prints nothing.
 - `src/checks.ts` — runs the checks for one event (file cap, parallelism); used in process and by the daemon.
