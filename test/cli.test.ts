@@ -1,6 +1,17 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { spawnSync } from "node:child_process";
-import { existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, readlinkSync, realpathSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+import {
+  existsSync,
+  lstatSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  readlinkSync,
+  realpathSync,
+  rmSync,
+  symlinkSync,
+  writeFileSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { COMMANDS, packageVersion, parseCli, runCli } from "../src/cli";
@@ -225,6 +236,31 @@ describe("ephemeral package staging and zero-clone install", () => {
     expect(afterUpgrade.hooks.PreToolUse[0].hooks[0].command).toContain("JEV_LINT_MODEL='gpt-6-luna'");
     expect(afterUpgrade.hooks.PostToolUse).toBeUndefined();
     expect(afterUpgrade.hooks.Stop).toBeUndefined();
+  });
+
+  test("first-time --skills creates missing target agent skill directory on --apply", () => {
+    const home = join(root, "fresh-home");
+    mkdirSync(home);
+    const ephemeralPkg = join(root, "bunx-fresh-jev-lint@0.1.0");
+    stageRuntime(REPO, ephemeralPkg);
+    const cliEnv = { PATH: process.env.PATH, HOME: home, XDG_DATA_HOME: join(home, ".local/share") };
+
+    const preview = spawnSync(process.execPath, [join(ephemeralPkg, "bin/jev-lint.mjs"), "install", "--claude-only", "--skills"], {
+      env: cliEnv,
+      encoding: "utf8",
+    });
+    expect(preview.status).toBe(0);
+    expect(preview.stdout).toContain("jev-lint-rules: would link");
+    expect(existsSync(join(home, ".claude/skills"))).toBe(false);
+
+    const applied = spawnSync(
+      process.execPath,
+      [join(ephemeralPkg, "bin/jev-lint.mjs"), "install", "--apply", "--claude-only", "--skills"],
+      { env: cliEnv, encoding: "utf8" },
+    );
+    expect(applied.status).toBe(0);
+    expect(lstatSync(join(home, ".claude/skills/jev-lint-rules")).isSymbolicLink()).toBe(true);
+    expect(existsSync(join(home, ".codex/skills"))).toBe(false);
   });
 
   test("staged jev-lint/pkg hook path is recognized by mergeHook as owned", () => {

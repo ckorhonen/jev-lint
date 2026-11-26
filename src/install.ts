@@ -88,8 +88,7 @@ export function stageRuntime(sourceRoot: string, targetDir: string): void {
   if (lstatSync(parent, { throwIfNoEntry: false })?.isSymbolicLink())
     throw new Error(`${parent} is a symlink; review its target and set JEV_LINT_INSTALL_DIR explicitly`);
   const existing = lstatSync(targetDir, { throwIfNoEntry: false });
-  if (existing?.isSymbolicLink())
-    throw new Error(`${targetDir} is a symlink; review its target and set JEV_LINT_INSTALL_DIR explicitly`);
+  if (existing?.isSymbolicLink()) throw new Error(`${targetDir} is a symlink; review its target and set JEV_LINT_INSTALL_DIR explicitly`);
   if (existing && (!existing.isDirectory() || !isSafeToReplaceStagedDir(targetDir)))
     throw new Error(`${targetDir} contains unrelated files; point JEV_LINT_INSTALL_DIR to an empty or dedicated jev-lint directory`);
   mkdirSync(parent, { recursive: true });
@@ -499,16 +498,25 @@ function isJevLintSkillLink(linkTarget: string, name: string): boolean {
   return linkTarget.endsWith(`${sep}.agents${sep}skills${sep}${name}`) || linkTarget.endsWith(`/.agents/skills/${name}`);
 }
 
-function linkSkills(apply: boolean, root = REPO): string[] {
+function linkSkills(apply: boolean, root = REPO, targets: { claude?: boolean; codex?: boolean } = {}): string[] {
   const source = join(root, ".agents/skills");
   const listFrom = existsSync(source) ? source : join(REPO, ".agents/skills");
   const out: string[] = [];
-  for (const dir of [".agents/skills", ".claude/skills", ".codex/skills"].map((d) => join(homedir(), d))) {
-    if (!existsSync(dir)) continue;
+  const candidates: Array<{ dir: string; createIfMissing: boolean }> = [
+    { dir: join(homedir(), ".agents/skills"), createIfMissing: false },
+    { dir: join(homedir(), ".claude/skills"), createIfMissing: Boolean(targets.claude) },
+    { dir: join(homedir(), ".codex/skills"), createIfMissing: Boolean(targets.codex) },
+  ];
+  for (const { dir, createIfMissing } of candidates) {
+    const dirExists = existsSync(dir);
+    if (!dirExists && !createIfMissing) continue;
+    if (lstatSync(dirname(dir), { throwIfNoEntry: false })?.isSymbolicLink() || lstatSync(dir, { throwIfNoEntry: false })?.isSymbolicLink())
+      throw new Error(`${dir} is a symlink; review its target before linking skills`);
+    if (!dirExists && apply) mkdirSync(dir, { recursive: true });
     for (const name of readdirSync(listFrom)) {
       const target = join(dir, name);
       const desired = join(source, name);
-      const existing = lstatSync(target, { throwIfNoEntry: false });
+      const existing = dirExists ? lstatSync(target, { throwIfNoEntry: false }) : undefined;
       if (existing) {
         if (existing.isSymbolicLink()) {
           const current = readlinkSync(target);
@@ -652,7 +660,12 @@ if (import.meta.main) {
       console.log(`Codex: ${codexFeatureStatus()}; the first run asks you to trust the hook`);
       if (values.pre) console.log("Codex: --pre applies to Claude Code only for now; Codex keeps checking after the write");
     }
-    if (values.skills) for (const line of linkSkills(values.apply, targetRoot)) console.log(`skill ${line}`);
+    if (values.skills)
+      for (const line of linkSkills(values.apply, targetRoot, {
+        claude: !values["codex-only"],
+        codex: !values["claude-only"] && !values.project,
+      }))
+        console.log(`skill ${line}`);
     if (values.smoke) {
       console.log(
         `Network smoke test: sending a synthetic TypeScript fixture and rule context to ${judgeProvider()} (${installedModel()}); API charges may apply.`,
