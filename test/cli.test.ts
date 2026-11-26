@@ -118,13 +118,20 @@ describe("ephemeral package staging and zero-clone install", () => {
     expect(stablePackageDir({ XDG_DATA_HOME: join(root, "xdg") })).toBe(join(root, "xdg", "jev-lint", "pkg"));
   });
 
-  test("stageRuntime refuses symlink targets and parents", () => {
+  test("stageRuntime refuses symlink targets, symlink parents, and non-empty unrelated directories", () => {
     const real = join(root, "real");
     mkdirSync(real);
     const link = join(root, "link-pkg");
     symlinkSync(real, link);
     expect(() => stageRuntime(REPO, link)).toThrow("is a symlink");
     expect(() => stageRuntime(REPO, join(link, "pkg"))).toThrow("is a symlink");
+
+    const unrelated = join(root, "existing-user-dir");
+    mkdirSync(unrelated);
+    const keepFile = join(unrelated, "important.txt");
+    writeFileSync(keepFile, "do not delete");
+    expect(() => stageRuntime(REPO, unrelated)).toThrow("unrelated files");
+    expect(readFileSync(keepFile, "utf8")).toBe("do not delete");
   });
 
   test("preview writes nothing; apply stages runtime, installs hooks/skills, and migrates git-checkout hooks", () => {

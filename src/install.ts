@@ -38,6 +38,21 @@ const REPO = resolve(import.meta.dir, "..");
 const HOOK = join(REPO, "src/hook.ts");
 const MODEL = "jev-1.13.0";
 const RUNTIME_ENTRIES = ["package.json", "bin", "src", "rules", ".agents/skills"] as const;
+const STAGED_TOP_ENTRIES = new Set(RUNTIME_ENTRIES.map((entry) => entry.split("/")[0]));
+
+function isSafeToReplaceStagedDir(targetDir: string): boolean {
+  const entries = readdirSync(targetDir);
+  if (entries.length === 0) return true;
+  if (!entries.every((entry) => STAGED_TOP_ENTRIES.has(entry))) return false;
+  const pkgPath = join(targetDir, "package.json");
+  if (!existsSync(pkgPath)) return false;
+  try {
+    const pkg = JSON.parse(readFileSync(pkgPath, "utf8")) as { name?: unknown };
+    return pkg.name === "jev-lint";
+  } catch {
+    return false;
+  }
+}
 
 function realOrResolved(path: string): string {
   try {
@@ -70,8 +85,11 @@ export function stageRuntime(sourceRoot: string, targetDir: string): void {
   const parent = dirname(targetDir);
   if (lstatSync(parent, { throwIfNoEntry: false })?.isSymbolicLink())
     throw new Error(`${parent} is a symlink; review its target and set JEV_LINT_INSTALL_DIR explicitly`);
-  if (lstatSync(targetDir, { throwIfNoEntry: false })?.isSymbolicLink())
+  const existing = lstatSync(targetDir, { throwIfNoEntry: false });
+  if (existing?.isSymbolicLink())
     throw new Error(`${targetDir} is a symlink; review its target and set JEV_LINT_INSTALL_DIR explicitly`);
+  if (existing && (!existing.isDirectory() || !isSafeToReplaceStagedDir(targetDir)))
+    throw new Error(`${targetDir} contains unrelated files; point JEV_LINT_INSTALL_DIR to an empty or dedicated jev-lint directory`);
   mkdirSync(parent, { recursive: true });
   const temp = mkdtempSync(join(parent, ".jev-lint-stage-"));
   let backup: string | undefined;
