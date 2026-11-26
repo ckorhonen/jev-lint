@@ -4,5 +4,6 @@
     "strict": true, "resolveJsonModule": true, "noEmit": true, "skipLibCheck": true,
     "types": ["bun-types"]
   },
-  "include": ["src", "eval", "test"]
+  "include": ["src", "eval", "test"],
+  "exclude": ["eval/e2e/scaffold"]
 }
