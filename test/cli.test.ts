@@ -5,6 +5,7 @@ import {
   lstatSync,
   mkdirSync,
   mkdtempSync,
+  readdirSync,
   readFileSync,
   readlinkSync,
   realpathSync,
@@ -320,6 +321,113 @@ describe("ephemeral package staging and zero-clone install", () => {
     expect(codexOnly.status).toBe(0);
     expect(lstatSync(join(codexHome, ".codex/skills/jev-lint-rules")).isSymbolicLink()).toBe(true);
   });
+
+  test("npm-packed artifact installs through npx and the staged hook completes a judged write", async () => {
+    const npm = Bun.which("npm");
+    const npx = Bun.which("npx");
+    if (!npm || !npx) return;
+
+    const pack = spawnSync(npm, ["pack", "--silent", "--pack-destination", root], { cwd: REPO, encoding: "utf8" });
+    if (pack.status !== 0) throw new Error(`npm pack failed (${pack.status}):\n${pack.stdout}\n${pack.stderr}`);
+    const tarballName = readdirSync(root).find((name) => name.endsWith(".tgz"));
+    if (!tarballName) throw new Error("npm pack produced no tarball");
+    const tarball = join(root, tarballName);
+
+    const home = join(root, "npx-home");
+    mkdirSync(home, { recursive: true });
+    const cliEnv = {
+      PATH: process.env.PATH,
+      HOME: home,
+      XDG_DATA_HOME: join(home, ".local", "share"),
+      XDG_STATE_HOME: join(home, ".local", "state"),
+      npm_config_cache: join(root, "npm-cache"),
+    };
+    const install = spawnSync(npx, ["--yes", "--package", tarball, "--", "jev-lint", "install", "--apply", "--claude-only", "--skills"], {
+      env: cliEnv,
+      encoding: "utf8",
+      timeout: 30_000,
+    });
+    if (install.status !== 0) throw new Error(`npx install failed (${install.status}):\n${install.stdout}\n${install.stderr}`);
+
+    const staged = join(home, ".local/share/jev-lint/pkg");
+    expect(install.stdout).toContain(`runtime: staged to ${staged}`);
+    expect(existsSync(join(staged, "src/hook.ts"))).toBe(true);
+    expect(existsSync(join(staged, "rules/typescript.json"))).toBe(true);
+    expect(lstatSync(join(home, ".claude/skills/jev-lint-setup")).isSymbolicLink()).toBe(true);
+
+    const settings = JSON.parse(readFileSync(join(home, ".claude/settings.json"), "utf8")) as {
+      hooks: { PostToolUse: { hooks: { command: string }[] }[] };
+    };
+    const command = settings.hooks.PostToolUse[0].hooks[0].command;
+    expect(command).toContain(join(staged, "src/hook.ts"));
+    expect(command).not.toContain("_npx");
+
+    type SystemOneRequest = {
+      model?: string;
+      state?: { language?: string; file_path?: string; added_code?: string };
+      questions?: Record<string, unknown>;
+    };
+    const seen: SystemOneRequest[] = [];
+    const server = Bun.serve({
+      hostname: "127.0.0.1",
+      port: 0,
+      async fetch(request) {
+        if (new URL(request.url).pathname !== "/v1/systemone") return new Response("not found", { status: 404 });
+        const body = (await request.json()) as SystemOneRequest;
+        seen.push(body);
+        const answers = Object.fromEntries(
+          Object.keys(body.questions ?? {}).map((id) => [id, { type: "noul", noul: id === "ts-no-empty-catch" ? 0.99 : 0 }]),
+        );
+        return Response.json({ model: body.model ?? "mock", answers, usage: { input_tokens: 1, output_tokens: 1 } });
+      },
+    });
+    try {
+      const repo = join(root, "target-repo");
+      mkdirSync(join(repo, ".git"), { recursive: true });
+      const file = join(repo, "smoke.ts");
+      const content = "export async function load(url: string) {\n  try {\n    return await fetch(url);\n  } catch (e) {}\n}\n";
+      writeFileSync(file, content);
+      const event = {
+        hook_event_name: "PostToolUse",
+        cwd: repo,
+        tool_name: "Write",
+        session_id: "package-e2e",
+        tool_input: { file_path: file, content },
+      };
+      const child = Bun.spawn(["sh", "-c", command], {
+        stdin: "pipe",
+        stdout: "pipe",
+        stderr: "pipe",
+        env: {
+          PATH: process.env.PATH,
+          HOME: home,
+          XDG_STATE_HOME: join(home, ".local", "state"),
+          TYPESAFE_BASE_URL: `http://127.0.0.1:${server.port}`,
+          JEV_LINT_DAEMON: "off",
+        },
+      });
+      child.stdin.write(JSON.stringify(event));
+      child.stdin.end();
+      const [stdout, stderr, status] = await Promise.all([
+        new Response(child.stdout).text(),
+        new Response(child.stderr).text(),
+        child.exited,
+      ]);
+      if (status !== 0) throw new Error(`staged hook failed (${status}):\n${stdout}\n${stderr}`);
+      expect(stderr).toBe("");
+      const output = JSON.parse(stdout) as { hookSpecificOutput?: { additionalContext?: string } };
+      expect(output.hookSpecificOutput?.additionalContext).toContain("ts-no-empty-catch");
+      expect(seen).toHaveLength(1);
+      expect(seen[0].model).toBe("jev-1.13.0");
+      expect(seen[0].state?.language).toBe("typescript");
+      expect(seen[0].state?.added_code).toBe(content);
+      expect(seen[0].questions).toHaveProperty("ts-no-empty-catch");
+      const log = readFileSync(join(home, ".local/state/jev-lint/findings.jsonl"), "utf8");
+      expect(log).toContain('"rule":"ts-no-empty-catch"');
+    } finally {
+      server.stop(true);
+    }
+  }, 30_000);
 
   test("staged jev-lint/pkg hook path is recognized by mergeHook as owned", () => {
     const stagedHook = hookGroup("claude", { bun: "/usr/bin/bun", root: "/home/u/.local/share/jev-lint/pkg" });
