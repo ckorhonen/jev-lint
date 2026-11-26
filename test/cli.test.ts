@@ -156,7 +156,6 @@ describe("ephemeral package staging and zero-clone install", () => {
       PATH: process.env.PATH,
       HOME: home,
       XDG_DATA_HOME: join(home, ".local/share"),
-      TYPESAFE_API_KEY: "dummy-key",
     };
 
     // Dry run preview writes nothing.
