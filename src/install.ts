@@ -21,11 +21,13 @@ import {
   mkdtempSync,
   readdirSync,
   readFileSync,
+  readlinkSync,
   realpathSync,
   renameSync,
   rmSync,
   statSync,
   symlinkSync,
+  unlinkSync,
   writeFileSync,
 } from "node:fs";
 import { homedir, tmpdir } from "node:os";
@@ -493,6 +495,10 @@ function codexFeatureStatus(): string {
     : "Codex hooks feature NOT enabled: add `hooks = true` under `[features]` in ~/.codex/config.toml";
 }
 
+function isJevLintSkillLink(linkTarget: string, name: string): boolean {
+  return linkTarget.endsWith(`${sep}.agents${sep}skills${sep}${name}`) || linkTarget.endsWith(`/.agents/skills/${name}`);
+}
+
 function linkSkills(apply: boolean, root = REPO): string[] {
   const source = join(root, ".agents/skills");
   const listFrom = existsSync(source) ? source : join(REPO, ".agents/skills");
@@ -501,9 +507,23 @@ function linkSkills(apply: boolean, root = REPO): string[] {
     if (!existsSync(dir)) continue;
     for (const name of readdirSync(listFrom)) {
       const target = join(dir, name);
-      if (lstatSync(target, { throwIfNoEntry: false })) out.push(`${target}: exists`);
-      else if (apply) {
-        symlinkSync(join(source, name), target);
+      const desired = join(source, name);
+      const existing = lstatSync(target, { throwIfNoEntry: false });
+      if (existing) {
+        if (existing.isSymbolicLink()) {
+          const current = readlinkSync(target);
+          if (current !== desired && isJevLintSkillLink(current, name)) {
+            if (apply) {
+              unlinkSync(target);
+              symlinkSync(desired, target);
+              out.push(`${target}: updated`);
+            } else out.push(`${target}: would update`);
+            continue;
+          }
+        }
+        out.push(`${target}: exists`);
+      } else if (apply) {
+        symlinkSync(desired, target);
         out.push(`${target}: linked`);
       } else out.push(`${target}: would link`);
     }

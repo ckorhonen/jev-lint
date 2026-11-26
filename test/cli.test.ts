@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { spawnSync } from "node:child_process";
-import { existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+import { existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, readlinkSync, realpathSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { COMMANDS, packageVersion, parseCli, runCli } from "../src/cli";
@@ -138,6 +138,8 @@ describe("ephemeral package staging and zero-clone install", () => {
     const home = join(root, "home");
     const staged = join(home, ".local/share/jev-lint/pkg");
     mkdirSync(join(home, ".claude/skills"), { recursive: true });
+    // Pre-populate a legacy checkout skill symlink (even dangling) to verify migration updates it.
+    symlinkSync("/old/checkout/jev-lint/.agents/skills/jev-lint-setup", join(home, ".claude/skills/jev-lint-setup"));
     // Pre-populate an older git-checkout hook to verify clean migration without duplicates.
     const claudeSettings = join(home, ".claude/settings.json");
     writeFileSync(
@@ -192,6 +194,7 @@ describe("ephemeral package staging and zero-clone install", () => {
     expect(cmd).not.toContain("bunx-1000");
     expect(isJevLint(settings.hooks.PostToolUse[0].hooks[0])).toBe(true);
     expect(lstatSync(join(home, ".claude/skills/jev-lint-setup")).isSymbolicLink()).toBe(true);
+    expect(readlinkSync(join(home, ".claude/skills/jev-lint-setup"))).toBe(join(staged, ".agents/skills/jev-lint-setup"));
 
     // Re-running apply is idempotent.
     const rerun = spawnSync(process.execPath, [join(ephemeralPkg, "bin/jev-lint.mjs"), "install", "--apply", "--claude-only"], {
