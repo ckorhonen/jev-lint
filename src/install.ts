@@ -522,11 +522,9 @@ function linkSkills(apply: boolean, root = REPO, targets: { claude?: boolean; co
   const source = join(root, ".agents/skills");
   const listFrom = existsSync(source) ? source : join(REPO, ".agents/skills");
   const out: string[] = [];
-  const candidates: Array<{ dir: string; createIfMissing: boolean }> = [
-    { dir: join(homedir(), ".agents/skills"), createIfMissing: false },
-    { dir: join(homedir(), ".claude/skills"), createIfMissing: Boolean(targets.claude) },
-    { dir: join(homedir(), ".codex/skills"), createIfMissing: Boolean(targets.codex) },
-  ];
+  const candidates: Array<{ dir: string; createIfMissing: boolean }> = [{ dir: join(homedir(), ".agents/skills"), createIfMissing: false }];
+  if (targets.claude) candidates.push({ dir: join(homedir(), ".claude/skills"), createIfMissing: true });
+  if (targets.codex) candidates.push({ dir: join(homedir(), ".codex/skills"), createIfMissing: true });
   for (const { dir, createIfMissing } of candidates) {
     const dirExists = existsSync(dir);
     if (!dirExists && !createIfMissing) continue;

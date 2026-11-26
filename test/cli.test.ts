@@ -282,6 +282,20 @@ describe("ephemeral package staging and zero-clone install", () => {
     expect(applied.status).toBe(0);
     expect(lstatSync(join(home, ".claude/skills/jev-lint-rules")).isSymbolicLink()).toBe(true);
     expect(existsSync(join(home, ".codex/skills"))).toBe(false);
+
+    // --codex-only --skills ignores a symlinked ~/.claude/skills directory.
+    const codexHome = join(root, "codex-only-home");
+    mkdirSync(join(codexHome, ".claude"), { recursive: true });
+    const symlinkTarget = join(root, "external-claude-skills");
+    mkdirSync(symlinkTarget);
+    symlinkSync(symlinkTarget, join(codexHome, ".claude/skills"));
+    const codexOnly = spawnSync(
+      process.execPath,
+      [join(ephemeralPkg, "bin/jev-lint.mjs"), "install", "--apply", "--codex-only", "--skills"],
+      { env: { PATH: process.env.PATH, HOME: codexHome, XDG_DATA_HOME: join(codexHome, ".local/share") }, encoding: "utf8" },
+    );
+    expect(codexOnly.status).toBe(0);
+    expect(lstatSync(join(codexHome, ".codex/skills/jev-lint-rules")).isSymbolicLink()).toBe(true);
   });
 
   test("staged jev-lint/pkg hook path is recognized by mergeHook as owned", () => {
