@@ -41,6 +41,7 @@ const HOOK = join(REPO, "src/hook.ts");
 const MODEL = "jev-1.13.0";
 const RUNTIME_ENTRIES = ["package.json", "bin", "src", "rules", ".agents/skills"] as const;
 const STAGED_TOP_ENTRIES = new Set(RUNTIME_ENTRIES.map((entry) => entry.split("/")[0]));
+const STAGED_PACKAGE_NAMES = new Set(["@ckorhonen/jev-lint", "jev-lint"]);
 
 function isSafeToReplaceStagedDir(targetDir: string): boolean {
   const entries = readdirSync(targetDir);
@@ -50,7 +51,7 @@ function isSafeToReplaceStagedDir(targetDir: string): boolean {
   if (!existsSync(pkgPath)) return false;
   try {
     const pkg = JSON.parse(readFileSync(pkgPath, "utf8")) as { name?: unknown };
-    return pkg.name === "jev-lint";
+    return typeof pkg.name === "string" && STAGED_PACKAGE_NAMES.has(pkg.name);
   } catch {
     return false;
   }

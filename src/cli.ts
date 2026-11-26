@@ -1,5 +1,5 @@
 #!/usr/bin/env bun
-// Unified CLI entrypoint for `jev-lint` (`bunx jev-lint` / `npx jev-lint` / `bun src/cli.ts`).
+// Unified CLI entrypoint for `jev-lint` (`bunx @ckorhonen/jev-lint` / `npx @ckorhonen/jev-lint` / `bun src/cli.ts`).
 import { spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
@@ -50,10 +50,10 @@ Options:
   -v, --version   Show version
 
 Examples:
-  bunx jev-lint setup
-  bunx jev-lint install --apply --skills
-  bunx jev-lint check src/app.ts
-  bunx jev-lint findings --repo . --days 30`;
+  bunx @ckorhonen/jev-lint setup
+  bunx @ckorhonen/jev-lint install --apply --skills
+  bunx @ckorhonen/jev-lint check src/app.ts
+  bunx @ckorhonen/jev-lint findings --repo . --days 30`;
 }
 
 export type ParsedCli =

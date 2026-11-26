@@ -9,7 +9,7 @@
   /* ── Setup prompt: Claude Code / Codex variants ─────────────────────── */
   const BASE = `Set up jev-lint for me: https://jevlint.dev
 Source: https://github.com/ckorhonen/jev-lint
-Run \`bunx jev-lint setup\` (or \`npx jev-lint setup\`, no clone needed): use TypeSafe Jev by
+Run \`bunx @ckorhonen/jev-lint setup\` (or \`npx @ckorhonen/jev-lint setup\`, no clone needed): use TypeSafe Jev by
 default; if I choose OpenAI Decisions API or Cloudflare Clef, pass \`--provider decisions\`
 or \`--provider clef\`. Check the selected provider's credentials without printing them, show me
 the dry run, install the hook (with \`--skills\`) once I confirm, and run the smoke test. Then

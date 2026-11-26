@@ -72,7 +72,7 @@ It complements linters, type checkers and code review; it doesn't replace them.
 Paste this into Claude Code or Codex, from the repo you want checked:
 
 ```text
-Set up jev-lint for me using the CLI (`bunx jev-lint setup` or `npx jev-lint setup`; no clone needed).
+Set up jev-lint for me using the CLI (`bunx @ckorhonen/jev-lint setup` or `npx @ckorhonen/jev-lint setup`; no clone needed).
 Choose TypeSafe Jev, Cloudflare Clef, or OpenAI Decisions, check existing credentials without
 printing them, show me the local dry run, and install the hook (with `--skills`) once I confirm.
 Do not create credentials or make model requests during setup. Then use the jev-lint-rules skill
@@ -80,7 +80,7 @@ on this repo: read our agent instructions, skills, docs and linter configs, and 
 for me to approve before writing anything.
 ```
 
-For guided setup without cloning, run `bunx jev-lint setup` (or `npx jev-lint setup`).
+For guided setup without cloning, run `bunx @ckorhonen/jev-lint setup` (or `npx @ckorhonen/jev-lint setup`).
 It offers TypeSafe Jev (default), Cloudflare Clef (`clef`), and OpenAI Decisions
 (`gpt-6-luna`), checks existing credentials, previews the local installer dry run, and asks
 before `--apply`. When run via `bunx`/`npx`, `--apply` stages the self-contained runtime into
@@ -225,8 +225,8 @@ Requires [bun](https://bun.sh) and existing credentials for your selected provid
 Zero-clone install via `bunx` or `npx`:
 
 ```sh
-bunx jev-lint setup                  # interactive provider choice + dry run + confirm
-# or: npx jev-lint setup
+bunx @ckorhonen/jev-lint setup       # interactive provider choice + dry run + confirm
+# or: npx @ckorhonen/jev-lint setup
 ```
 
 Or from a local git checkout (for development or pinned checkouts):
@@ -245,15 +245,15 @@ Keychain service `typesafe-api-key`. Cloudflare needs `CLOUDFLARE_ACCOUNT_ID` an
 `OPENAI_API_KEY` or a mode-600 `OPENAI_API_KEY_FILE`. Setup checks for existing
 credentials without printing them; it does not create credentials or call a model.
 
-For a noninteractive local preview, use `bunx jev-lint setup --provider typesafe`
+For a noninteractive local preview, use `bunx @ckorhonen/jev-lint setup --provider typesafe`
 (or `clef` / `decisions`). Add `--apply` to authorize the reviewed local changes.
 The guide accepts the scope and mode flags shown below; network smoke tests stay separate.
 
 The manual installer checks first and writes only with `--apply`, after you approve its preview:
 
 ```sh
-bunx jev-lint install --skills                 # local dry run; no model request
-bunx jev-lint install --apply --skills         # Claude Code + Codex, user-wide
+bunx @ckorhonen/jev-lint install --skills                 # local dry run; no model request
+bunx @ckorhonen/jev-lint install --apply --skills         # Claude Code + Codex, user-wide
 #   --claude-only | --codex-only   --project <repo> (Claude, repo-scoped)   --async (Claude, background)
 ```
 
@@ -262,7 +262,7 @@ into `~/.local/share/jev-lint/pkg` (override with `JEV_LINT_INSTALL_DIR`) so ins
 and linked skills keep working after the cache is cleared. From a git checkout, hooks continue
 to point directly at your checkout (`bun src/install.ts ...`).
 
-**Optional network verification:** `bunx jev-lint install --smoke` (or `bun src/install.ts --smoke`)
+**Optional network verification:** `bunx @ckorhonen/jev-lint install --smoke` (or `bun src/install.ts --smoke`)
 makes a REAL NETWORK request, sending synthetic fixture code and rule questions to the selected
 provider; it may incur charges. Run it only with explicit approval for that provider and
 transmission. It must flag an empty `catch`; report failures instead of treating
@@ -280,7 +280,7 @@ in whatever mode they're in (`--pre`, `--async`, re-check on or off are read bac
 config), for both Claude Code and Codex:
 
 ```sh
-bunx jev-lint@latest upgrade         # package install (re-stages runtime and re-applies hooks)
+bunx @ckorhonen/jev-lint@latest upgrade  # package install (re-stages runtime and re-applies hooks)
 # or from a git checkout:
 bun src/install.ts --upgrade
 ```
