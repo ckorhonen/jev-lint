@@ -513,7 +513,9 @@ function codexFeatureStatus(): string {
 }
 
 function isJevLintSkillLink(linkTarget: string, name: string): boolean {
-  return linkTarget.endsWith(`${sep}.agents${sep}skills${sep}${name}`) || linkTarget.endsWith(`/.agents/skills/${name}`);
+  const normalized = linkTarget.replaceAll("\\", "/");
+  const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return new RegExp(`(?:^|/)jev-lint/(?:pkg/)?\\.agents/skills/${escaped}$`).test(normalized);
 }
 
 function linkSkills(apply: boolean, root = REPO, targets: { claude?: boolean; codex?: boolean } = {}): string[] {
