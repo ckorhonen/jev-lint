@@ -705,10 +705,12 @@ if (import.meta.main) {
       }))
         console.log(`skill ${line}`);
     if (values.smoke) {
-      console.log(
-        `Network smoke test: sending a synthetic TypeScript fixture and rule context to ${judgeProvider()} (${installedModel()}); API charges may apply.`,
-      );
-      console.log(smoke(targetRoot));
+      withProviderEnv(statusPreserved, () => {
+        console.log(
+          `Network smoke test: sending a synthetic TypeScript fixture and rule context to ${judgeProvider()} (${installedModel()}); API charges may apply.`,
+        );
+        console.log(smoke(targetRoot));
+      });
     }
   } catch (error) {
     console.error(`Setup could not complete: ${error instanceof Error ? error.message : error}`);
