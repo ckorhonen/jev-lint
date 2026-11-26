@@ -402,6 +402,24 @@ export function installedProviderEnv(config: HookConfig): Record<string, string>
   return env;
 }
 
+function withProviderEnv<T>(preserved: Record<string, string>, fn: () => T): T {
+  const saved = new Map<string, string | undefined>();
+  for (const [key, value] of Object.entries(preserved)) {
+    if (process.env[key] === undefined) {
+      saved.set(key, undefined);
+      process.env[key] = value;
+    }
+  }
+  try {
+    return fn();
+  } finally {
+    for (const [key, prev] of saved) {
+      if (prev === undefined) delete process.env[key];
+      else process.env[key] = prev;
+    }
+  }
+}
+
 // How jev-lint is installed in a config right now, so --upgrade can re-apply without the user
 // restating --pre / --async / --no-recheck. Pure, so it is unit-tested.
 export function installedMode(config: HookConfig): { installed: boolean; pre: boolean; async: boolean; recheck: boolean } {
@@ -576,6 +594,8 @@ if (import.meta.main) {
         upgrade: { type: "boolean", default: false },
       },
     });
+    let claudePreserved: Record<string, string> = {};
+    let codexPreserved: Record<string, string> = {};
     if (values.upgrade) {
       // Pull first, so the modes below are detected and re-applied with the new code.
       console.log(`upgrade: ${upgradeCheckout()}`);
@@ -589,10 +609,8 @@ if (import.meta.main) {
         process.exit(1);
       }
       if (!process.env.JEV_LINT_PROVIDER) {
-        const preserved = installedProviderEnv(mode.installed ? claudeConfig : codexConfig);
-        for (const [key, value] of Object.entries(preserved)) {
-          if (process.env[key] === undefined) process.env[key] = value;
-        }
+        if (mode.installed) claudePreserved = installedProviderEnv(claudeConfig);
+        if (codexMode.installed) codexPreserved = installedProviderEnv(codexConfig);
       }
       values.apply = true;
       if (!values.pre && !values.async) {
@@ -626,15 +644,19 @@ if (import.meta.main) {
       "Setup does not contact a model unless --smoke is explicitly supplied. Installed hooks send code to the selected provider on future edits.",
     );
     console.log(`bun: ${process.execPath}`);
-    console.log(
-      judgeProvider() === "cloudflare"
-        ? `Cloudflare token: ${cloudflareKey() ? "present" : "MISSING"} (must be available to the agent at runtime)`
-        : judgeProvider() === "openai"
-          ? `OpenAI key: ${openaiKey() ? "present" : "MISSING"} (must be available to the agent at runtime)`
-          : `TypeSafe key: ${keyStatus()}`,
-    );
+    const statusPreserved = !values["codex-only"] ? claudePreserved : codexPreserved;
+    withProviderEnv(statusPreserved, () => {
+      console.log(
+        judgeProvider() === "cloudflare"
+          ? `Cloudflare token: ${cloudflareKey() ? "present" : "MISSING"} (must be available to the agent at runtime)`
+          : judgeProvider() === "openai"
+            ? `OpenAI key: ${openaiKey() ? "present" : "MISSING"} (must be available to the agent at runtime)`
+            : `TypeSafe key: ${keyStatus()}`,
+      );
+    });
     try {
-      judgeCommandEnv(); // a missing account ID or an unknown model is a setup error, not a crash
+      if (!values["codex-only"]) withProviderEnv(claudePreserved, () => judgeCommandEnv());
+      if (!values["claude-only"] && !values.project) withProviderEnv(codexPreserved, () => judgeCommandEnv());
     } catch (error) {
       console.error(`Provider setup: ${error instanceof Error ? error.message : error}`);
       process.exit(1);
@@ -649,14 +671,30 @@ if (import.meta.main) {
     }
     if (!values["codex-only"]) {
       const path = values.project ? projectSettingsPath(values.project) : join(homedir(), ".claude/settings.json");
-      console.log(
-        `Claude Code: ${writeConfig(path, hookGroup("claude", { async: values.async, root: targetRoot }), values.apply, !values["no-recheck"], values.pre, targetRoot)}`,
+      const result = withProviderEnv(claudePreserved, () =>
+        writeConfig(
+          path,
+          hookGroup("claude", { async: values.async, root: targetRoot }),
+          values.apply,
+          !values["no-recheck"],
+          values.pre,
+          targetRoot,
+        ),
       );
+      console.log(`Claude Code: ${result}`);
     }
     if (!values["claude-only"] && !values.project) {
-      console.log(
-        `Codex: ${writeConfig(join(homedir(), ".codex/hooks.json"), hookGroup("codex", { root: targetRoot }), values.apply, !values["no-recheck"], false, targetRoot)}`,
+      const result = withProviderEnv(codexPreserved, () =>
+        writeConfig(
+          join(homedir(), ".codex/hooks.json"),
+          hookGroup("codex", { root: targetRoot }),
+          values.apply,
+          !values["no-recheck"],
+          false,
+          targetRoot,
+        ),
       );
+      console.log(`Codex: ${result}`);
       console.log(`Codex: ${codexFeatureStatus()}; the first run asks you to trust the hook`);
       if (values.pre) console.log("Codex: --pre applies to Claude Code only for now; Codex keeps checking after the write");
     }

@@ -236,6 +236,22 @@ describe("ephemeral package staging and zero-clone install", () => {
     expect(afterUpgrade.hooks.PreToolUse[0].hooks[0].command).toContain("JEV_LINT_MODEL='gpt-6-luna'");
     expect(afterUpgrade.hooks.PostToolUse).toBeUndefined();
     expect(afterUpgrade.hooks.Stop).toBeUndefined();
+
+    // Upgrading Codex when Claude has a different provider preserves each agent's own provider.
+    const codexApply = spawnSync(process.execPath, [join(ephemeralPkg, "bin/jev-lint.mjs"), "install", "--apply", "--codex-only"], {
+      env: { ...cliEnv, JEV_LINT_PROVIDER: "typesafe" },
+      encoding: "utf8",
+    });
+    expect(codexApply.status).toBe(0);
+    const dualUpgrade = spawnSync(process.execPath, [join(ephemeralPkg, "bin/jev-lint.mjs"), "upgrade"], {
+      env: cliEnv,
+      encoding: "utf8",
+    });
+    expect(dualUpgrade.status).toBe(0);
+    const claudeAfterDual = JSON.parse(readFileSync(claudeSettings, "utf8"));
+    const codexAfterDual = JSON.parse(readFileSync(join(home, ".codex/hooks.json"), "utf8"));
+    expect(claudeAfterDual.hooks.PreToolUse[0].hooks[0].command).toContain("JEV_LINT_PROVIDER=openai");
+    expect(codexAfterDual.hooks.PostToolUse[0].hooks[0].command).toContain("JEV_LINT_PROVIDER=typesafe");
   });
 
   test("first-time --skills creates missing target agent skill directory on --apply", () => {
