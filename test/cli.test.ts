@@ -201,13 +201,13 @@ describe("ephemeral package staging and zero-clone install", () => {
     expect(rerun.status).toBe(0);
     expect(rerun.stdout).toContain("hook unchanged");
 
-    // Package-mode upgrade works without .git and preserves installed mode (--pre).
-    const preApply = spawnSync(
+    // Package-mode upgrade preserves non-default judge provider settings (e.g. OpenAI Decisions).
+    const decisionsApply = spawnSync(
       process.execPath,
       [join(ephemeralPkg, "bin/jev-lint.mjs"), "install", "--apply", "--claude-only", "--pre", "--no-recheck"],
-      { env: cliEnv, encoding: "utf8" },
+      { env: { ...cliEnv, JEV_LINT_PROVIDER: "openai", JEV_LINT_MODEL: "gpt-6-luna" }, encoding: "utf8" },
     );
-    expect(preApply.status).toBe(0);
+    expect(decisionsApply.status).toBe(0);
 
     const upgraded = spawnSync(process.execPath, [join(ephemeralPkg, "bin/jev-lint.mjs"), "upgrade"], {
       env: cliEnv,
@@ -218,6 +218,8 @@ describe("ephemeral package staging and zero-clone install", () => {
     expect(upgraded.stdout).toContain("before-the-write, no re-check");
     const afterUpgrade = JSON.parse(readFileSync(claudeSettings, "utf8"));
     expect(afterUpgrade.hooks.PreToolUse).toHaveLength(1);
+    expect(afterUpgrade.hooks.PreToolUse[0].hooks[0].command).toContain("JEV_LINT_PROVIDER=openai");
+    expect(afterUpgrade.hooks.PreToolUse[0].hooks[0].command).toContain("JEV_LINT_MODEL='gpt-6-luna'");
     expect(afterUpgrade.hooks.PostToolUse).toBeUndefined();
     expect(afterUpgrade.hooks.Stop).toBeUndefined();
   });

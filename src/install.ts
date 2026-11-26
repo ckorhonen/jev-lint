@@ -372,6 +372,35 @@ export function removeHook(
   return { config: { ...config, hooks }, removed: true };
 }
 
+const PERSISTED_PROVIDER_VARS = new Set([
+  "JEV_LINT_PROVIDER",
+  "JEV_LINT_MODEL",
+  "TYPESAFE_API_KEY_FILE",
+  "OPENAI_API_KEY_FILE",
+  "CLOUDFLARE_ACCOUNT_ID",
+  "CLOUDFLARE_API_TOKEN_FILE",
+]);
+
+// Recover non-secret provider env assignments persisted on the existing hook so --upgrade
+// keeps Clef or Decisions installs on their configured provider instead of resetting to TypeSafe.
+export function installedProviderEnv(config: HookConfig): Record<string, string> {
+  const first = ["PreToolUse", "PostToolUse"]
+    .flatMap((event) => (config.hooks?.[event] ?? []).flatMap((g) => g.hooks ?? []).filter(isJevLint))
+    .at(0);
+  if (!first) return {};
+  const parsed = literalWords(first.command);
+  if (!parsed) return {};
+  const env: Record<string, string> = {};
+  for (const index of parsed.assignments) {
+    const word = parsed.words[index];
+    const eq = word.indexOf("=");
+    if (eq === -1) continue;
+    const key = word.slice(0, eq);
+    if (PERSISTED_PROVIDER_VARS.has(key)) env[key] = word.slice(eq + 1);
+  }
+  return env;
+}
+
 // How jev-lint is installed in a config right now, so --upgrade can re-apply without the user
 // restating --pre / --async / --no-recheck. Pure, so it is unit-tested.
 export function installedMode(config: HookConfig): { installed: boolean; pre: boolean; async: boolean; recheck: boolean } {
@@ -523,11 +552,19 @@ if (import.meta.main) {
       // Pull first, so the modes below are detected and re-applied with the new code.
       console.log(`upgrade: ${upgradeCheckout()}`);
       const claudePath = values.project ? projectSettingsPath(values.project) : join(homedir(), ".claude/settings.json");
-      const mode = installedMode(readConfig(claudePath));
-      const codexMode = installedMode(readConfig(join(homedir(), ".codex/hooks.json")));
+      const claudeConfig = readConfig(claudePath);
+      const codexConfig = readConfig(join(homedir(), ".codex/hooks.json"));
+      const mode = installedMode(claudeConfig);
+      const codexMode = installedMode(codexConfig);
       if (!mode.installed && !codexMode.installed) {
         console.error("upgrade: jev-lint is not installed here; run without --upgrade (and with --apply) to install");
         process.exit(1);
+      }
+      if (!process.env.JEV_LINT_PROVIDER) {
+        const preserved = installedProviderEnv(mode.installed ? claudeConfig : codexConfig);
+        for (const [key, value] of Object.entries(preserved)) {
+          if (process.env[key] === undefined) process.env[key] = value;
+        }
       }
       values.apply = true;
       if (!values.pre && !values.async) {
