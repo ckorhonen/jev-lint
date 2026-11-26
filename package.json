@@ -1,8 +1,34 @@
 {
   "name": "jev-lint",
-  "private": true,
+  "version": "0.1.0",
+  "description": "A fuzzy linter for coding agents that catches judgment-based rule violations on every edit.",
   "type": "module",
+  "bin": {
+    "jev-lint": "./bin/jev-lint.mjs"
+  },
+  "files": [
+    "bin",
+    "src",
+    "rules",
+    ".agents/skills",
+    "README.md",
+    "LICENSE"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ckorhonen/jev-lint.git"
+  },
+  "homepage": "https://jevlint.dev",
+  "keywords": [
+    "lint",
+    "linter",
+    "claude-code",
+    "codex",
+    "coding-agent",
+    "ai"
+  ],
   "scripts": {
+    "cli": "bun src/cli.ts",
     "hook": "bun src/hook.ts",
     "test": "bun test",
     "typecheck": "tsc --noEmit",
