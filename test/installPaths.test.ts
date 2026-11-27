@@ -85,6 +85,20 @@ afterEach(() => {
   rmSync(root, { recursive: true, force: true });
 });
 
+test("Codex missing-config instructions print pasteable TOML lines", () => {
+  const home = join(root, "codex-home");
+  mkdirSync(home);
+  const run = spawnSync(process.execPath, [installer, "--apply", "--codex-only"], {
+    env: { PATH: process.env.PATH, HOME: home, TYPESAFE_API_KEY: "dummy" },
+    encoding: "utf8",
+  });
+  expect(run.status).toBe(0);
+  expect(run.stdout).toContain(
+    "Codex: ~/.codex/config.toml missing; add:\n  [features]\n  hooks = true\nCodex: the first run asks you to trust the hook",
+  );
+  expect(run.stdout).not.toContain("\\nhooks = true");
+});
+
 test("shell commands preserve spaces, quotes and literal shell syntax in binary paths", () => {
   const binary = join(root, "bun folder 'quote' $(literal);", "bun");
   mkdirSync(join(binary, ".."), { recursive: true });
