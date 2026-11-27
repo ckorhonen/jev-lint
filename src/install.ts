@@ -507,8 +507,8 @@ function codexFeatureStatus(): string {
   const path = join(homedir(), ".codex/config.toml");
   if (!existsSync(path)) return "~/.codex/config.toml missing; add:\n  [features]\n  hooks = true";
   const toml = readFileSync(path, "utf8");
-  const features = toml.split(/^\[/m).find((s) => s.startsWith("features]"));
-  return features && /^\s*hooks\s*=\s*true/m.test(features)
+  const features = toml.split(/^[ \t]*\[/m).find((s) => s.startsWith("features]"));
+  return features && /^[ \t]*hooks[ \t]*=[ \t]*true/m.test(features)
     ? "Codex hooks feature enabled"
     : "Codex hooks feature NOT enabled: add `hooks = true` under `[features]` in ~/.codex/config.toml";
 }

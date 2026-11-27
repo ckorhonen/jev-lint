@@ -97,6 +97,16 @@ test("Codex missing-config instructions print pasteable TOML lines", () => {
     "Codex: ~/.codex/config.toml missing; add:\n  [features]\n  hooks = true\nCodex: the first run asks you to trust the hook",
   );
   expect(run.stdout).not.toContain("\\nhooks = true");
+
+  const snippet = run.stdout.match(/missing; add:\n((?: {2}.+\n)+)Codex:/)?.[1];
+  expect(snippet).toBe("  [features]\n  hooks = true\n");
+  writeFileSync(join(home, ".codex/config.toml"), snippet ?? "");
+  const rerun = spawnSync(process.execPath, [installer, "--apply", "--codex-only"], {
+    env: { PATH: process.env.PATH, HOME: home, TYPESAFE_API_KEY: "dummy" },
+    encoding: "utf8",
+  });
+  expect(rerun.status).toBe(0);
+  expect(rerun.stdout).toContain("Codex hooks feature enabled");
 });
 
 test("shell commands preserve spaces, quotes and literal shell syntax in binary paths", () => {
