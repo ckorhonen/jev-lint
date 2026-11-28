@@ -505,10 +505,10 @@ function writeConfig(path: string, group: HookGroup, apply: boolean, recheck: bo
 
 function codexFeatureStatus(): string {
   const path = join(homedir(), ".codex/config.toml");
-  if (!existsSync(path)) return "~/.codex/config.toml missing; add `[features]\\nhooks = true`";
+  if (!existsSync(path)) return "~/.codex/config.toml missing; add:\n  [features]\n  hooks = true";
   const toml = readFileSync(path, "utf8");
-  const features = toml.split(/^\[/m).find((s) => s.startsWith("features]"));
-  return features && /^\s*hooks\s*=\s*true/m.test(features)
+  const features = toml.split(/^[ \t]*\[/m).find((s) => s.startsWith("features]"));
+  return features && /^[ \t]*hooks[ \t]*=[ \t]*true/m.test(features)
     ? "Codex hooks feature enabled"
     : "Codex hooks feature NOT enabled: add `hooks = true` under `[features]` in ~/.codex/config.toml";
 }
@@ -696,7 +696,8 @@ if (import.meta.main) {
         ),
       );
       console.log(`Codex: ${result}`);
-      console.log(`Codex: ${codexFeatureStatus()}; the first run asks you to trust the hook`);
+      console.log(`Codex: ${codexFeatureStatus()}`);
+      console.log("Codex: the first run asks you to trust the hook");
       if (values.pre) console.log("Codex: --pre applies to Claude Code only for now; Codex keeps checking after the write");
     }
     if (values.skills)
