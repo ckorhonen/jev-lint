@@ -81,11 +81,17 @@ function parseHttp(chunks: Buffer[]): { status: number; body: string; complete: 
 function postDaemon(path: string, body: string, timeoutMs: number): Promise<DaemonHttp> {
   return new Promise((resolve) => {
     const chunks: Buffer[] = [];
+    let activeSocket: Bun.Socket | undefined;
     let done = false;
     const finish = (value: DaemonHttp) => {
       if (done) return;
       done = true;
       clearTimeout(timer);
+      try {
+        activeSocket?.terminate(); // a wedged daemon must not keep this short-lived hook alive
+      } catch {
+        // already closed
+      }
       resolve(value);
     };
     const timer = setTimeout(() => finish("timeout"), timeoutMs);
@@ -115,7 +121,10 @@ function postDaemon(path: string, body: string, timeoutMs: number): Promise<Daem
       unix: path,
       socket: {
         binaryType: "buffer",
-        open: send,
+        open(socket) {
+          activeSocket = socket;
+          send(socket);
+        },
         drain: send,
         data(socket, data) {
           chunks.push(data);

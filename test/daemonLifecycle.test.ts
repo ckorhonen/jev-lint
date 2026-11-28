@@ -60,6 +60,49 @@ test("a daemon timeout never kills, deletes ownership files, or spawns a replace
   }
 });
 
+test("a wedged daemon cannot keep the hook process alive", async () => {
+  const socket = daemonSocketPath();
+  mkdirSync(dirname(socket), { recursive: true, mode: 0o700 });
+  let accepted = false;
+  const server = Bun.listen({
+    unix: socket,
+    socket: {
+      open() {
+        accepted = true; // accept and never answer
+      },
+      data() {},
+      close() {},
+      error() {},
+    },
+  });
+  const project = join(root, "repo");
+  mkdirSync(join(project, ".git"), { recursive: true });
+  const child = childProcess.spawn(process.execPath, [join(import.meta.dir, "../src/hook.ts")], {
+    cwd: project,
+    env: { ...process.env, JEV_LINT_TIMEOUT_MS: "30", JEV_LINT_FINDINGS_LOG: "off" },
+    stdio: ["pipe", "pipe", "pipe"],
+  });
+  child.stdin.end(
+    `${JSON.stringify({
+      hook_event_name: "PostToolUse",
+      session_id: "wedged-daemon-test",
+      tool_name: "Write",
+      cwd: project,
+      tool_input: { file_path: join(project, "x.ts"), content: "export const x = 1;\n" },
+    })}\n`,
+  );
+  const exit = new Promise<number | null>((resolve) => child.once("exit", (code) => resolve(code)));
+  const code = await Promise.race([exit, Bun.sleep(1500).then(() => "still running" as const)]);
+  try {
+    if (code === "still running") child.kill();
+    expect(code).toBe(0);
+    expect(accepted).toBe(true);
+  } finally {
+    server.stop(true);
+    if (!child.killed) child.kill();
+  }
+}, 5000);
+
 test.each(["CLOUDFLARE_API_TOKEN_FILE", "TYPESAFE_API_KEY_FILE"])(
   "relative %s filenames in different projects isolate daemon identity",
   (name) => {
