@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, expect, spyOn, test } from "bun:test";
 import { runChecks } from "../src/checks";
 
-const changes = Array.from({ length: 8 }, (_, i) => ({
+const changes = Array.from({ length: 10 }, (_, i) => ({
   filePath: `/tmp/check-deadline-${i}.ts`,
   addedCode: "try { run(); } catch (e) {}",
   changeKind: "write" as const,
@@ -59,11 +59,11 @@ test("all file batches share one deadline and expired files are recorded as fail
   const mock = mockFetch((_url, init) => time.expire(init?.signal));
   try {
     const results = await runChecks(changes, { timeoutMs: 400 });
-    expect(results).toHaveLength(8);
-    expect(results.slice(0, 4)).toEqual(Array(4).fill({ ok: false, error: "TimeoutError: request timed out" }));
-    expect(results.slice(4)).toEqual(Array(4).fill({ ok: false, error: "check deadline exceeded" }));
-    expect(mock).toHaveBeenCalledTimes(4);
-    expect(time.budgets()).toEqual([400, 400, 400, 400]);
+    expect(results).toHaveLength(10);
+    expect(results.slice(0, 8)).toEqual(Array(8).fill({ ok: false, error: "TimeoutError: request timed out" }));
+    expect(results.slice(8)).toEqual(Array(2).fill({ ok: false, error: "check deadline exceeded" }));
+    expect(mock).toHaveBeenCalledTimes(8);
+    expect(time.budgets()).toEqual(Array(8).fill(400));
   } finally {
     mock.mockRestore();
     time.restore();
@@ -72,7 +72,7 @@ test("all file batches share one deadline and expired files are recorded as fail
 
 test("later batches use the remaining budget while preserving successful results and order", async () => {
   const time = controlledTimeouts();
-  const firstBatch = changes.slice(0, 4).map(() => Promise.withResolvers<void>());
+  const firstBatch = changes.slice(0, 8).map(() => Promise.withResolvers<void>());
   const completed: string[] = [];
   const mock = mockFetch(async (_url, init) => {
     const body = JSON.parse(String(init?.body));
@@ -94,18 +94,18 @@ test("later batches use the remaining budget while preserving successful results
     time.advance(225);
     for (const request of [...firstBatch].reverse()) request.resolve();
     const results = await pending;
-    expect(initialCalls).toBe(4);
-    expect(mock).toHaveBeenCalledTimes(8);
-    expect(time.budgets()).toEqual([400, 400, 400, 400, 175, 175, 175, 175]);
-    const firstPaths = changes.slice(0, 4).map((change) => change.filePath);
+    expect(initialCalls).toBe(8);
+    expect(mock).toHaveBeenCalledTimes(10);
+    expect(time.budgets()).toEqual([...Array(8).fill(400), 175, 175]);
+    const firstPaths = changes.slice(0, 8).map((change) => change.filePath);
     expect(completed).toEqual(firstPaths.reverse());
-    expect(results).toHaveLength(8);
-    for (let i = 0; i < 4; i++) {
+    expect(results).toHaveLength(10);
+    for (let i = 0; i < 8; i++) {
       const result = results[i];
       expect(result.ok).toBe(true);
       if (result.ok) expect(result.value?.filePath).toBe(changes[i].filePath);
     }
-    expect(results.slice(4)).toEqual(Array(4).fill({ ok: false, error: "TimeoutError: request timed out" }));
+    expect(results.slice(8)).toEqual(Array(2).fill({ ok: false, error: "TimeoutError: request timed out" }));
   } finally {
     mock.mockRestore();
     time.restore();
@@ -118,7 +118,7 @@ test("an exhausted budget starts no requests", async () => {
   });
   try {
     const results = await runChecks(changes, { timeoutMs: 0 });
-    expect(results).toEqual(Array(8).fill({ ok: false, error: "check deadline exceeded" }));
+    expect(results).toEqual(Array(10).fill({ ok: false, error: "check deadline exceeded" }));
     expect(mock).not.toHaveBeenCalled();
   } finally {
     mock.mockRestore();

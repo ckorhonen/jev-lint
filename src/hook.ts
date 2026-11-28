@@ -15,21 +15,21 @@
 //      JEV_LINT_DAEMON=off  always check in process instead of via the warm daemon (daemon.ts)
 //      JEV_LINT_SCOPE=repo (default: only files inside the repo around cwd) | all (scratch files too)
 
-import { appendFileSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { MAX_FILES, runChecks, type Settled } from "./checks";
 import { checkViaDaemon, daemonEnabled, startDaemon } from "./daemonClient";
 import { extractChanges } from "./extract";
-import { appendRecords, isInsideRepo, stateDir, toErrorRecords, toRecords } from "./findingsLog";
-import { formatFeedback, type LintResult } from "./lint";
+import type { LintResult } from "./lint";
+import { MAX_FILES, type Settled } from "./results";
+import { isInsideRepo } from "./scope";
+import { stateDir } from "./state";
 
 // Pre-write mode: how often one rule may block one file in a conversation before it lets the
 // edit through as a hint (a false alarm must not deadlock the agent).
 const MAX_DENIALS = 2;
-const DENIALS_FILE = join(stateDir(), "pre-denials.json");
+const DENIALS_FILE = `${stateDir()}/pre-denials.json`;
 
 function readDenials(): Record<string, number> {
   try {
+    const { readFileSync } = require("node:fs") as typeof import("node:fs");
     const parsed: unknown = JSON.parse(readFileSync(DENIALS_FILE, "utf8"));
     return parsed && typeof parsed === "object" ? (parsed as Record<string, number>) : {};
   } catch {
@@ -41,6 +41,8 @@ function countDenial(session: string | undefined, key: string): number {
 }
 function recordDenial(session: string | undefined, key: string) {
   try {
+    const { mkdirSync, writeFileSync } = require("node:fs") as typeof import("node:fs");
+    const { dirname } = require("node:path") as typeof import("node:path");
     const all = readDenials();
     all[`${session ?? "?"}|${key}`] = (all[`${session ?? "?"}|${key}`] ?? 0) + 1;
     mkdirSync(dirname(DENIALS_FILE), { recursive: true });
@@ -74,6 +76,10 @@ async function main() {
     .slice(0, MAX_FILES);
   if (!changes.length) return;
 
+  // The findings log pulls in node:fs. Load it while the judge request is in flight
+  // instead of making every hook pay that startup cost before the request can begin.
+  const findingsLog = process.env.JEV_LINT_FINDINGS_LOG === "off" ? undefined : import("./findingsLog");
+
   // Prefer the warm daemon; if it isn't there, start one for next time and check in process.
   // One deadline covers both, so falling back after a failed daemon call can't double the wait.
   const deadline = Date.now() + timeoutMs;
@@ -83,7 +89,7 @@ async function main() {
     const remaining = deadline - Date.now();
     settled =
       remaining >= MIN_FALLBACK_MS
-        ? await runChecks(changes, { timeoutMs: remaining, cwd })
+        ? await (await import("./checks")).runChecks(changes, { timeoutMs: remaining, cwd })
         : changes.map(() => ({ ok: false as const, error: "no time left after daemon failure" }));
   }
   if (process.env.JEV_LINT_DEBUG) for (const s of settled) if (!s.ok) process.stderr.write(`[jev-lint] check failed: ${s.error}\n`);
@@ -92,6 +98,7 @@ async function main() {
     .map((r): LintResult => ({ ...r, findings: r.findings.filter((f) => tiers.has(f.tier)) }));
 
   if (process.env.JEV_LINT_LOG) {
+    const { appendFileSync } = require("node:fs") as typeof import("node:fs");
     const errors = settled.flatMap((s) => (s.ok ? [] : [s.error]));
     appendFileSync(
       process.env.JEV_LINT_LOG,
@@ -99,7 +106,7 @@ async function main() {
     );
   }
 
-  const feedback = formatFeedback(results);
+  const feedback = results.some((r) => r.findings.length) ? (await import("./feedback")).formatFeedback(results) : "";
   if (pre) {
     const high = results.flatMap((r) => r.findings.filter((f) => f.tier === "high").map((f) => `${r.filePath}|${f.ruleId}`));
     const blocking = high.filter((key) => countDenial(event.session_id, key) < MAX_DENIALS);
@@ -128,8 +135,11 @@ async function main() {
   // Clean checks are logged too: a later clean check of the same file is how a finding
   // counts as fixed. Logging must never affect the agent, so errors are swallowed.
   try {
-    const failures = settled.flatMap((s, i) => (s.ok ? [] : [{ change: changes[i], error: s.error }]));
-    appendRecords([...toRecords(results, changes, event), ...toErrorRecords(failures, event)]);
+    if (findingsLog) {
+      const { appendRecords, toErrorRecords, toRecords } = await findingsLog;
+      const failures = settled.flatMap((s, i) => (s.ok ? [] : [{ change: changes[i], error: s.error }]));
+      appendRecords([...toRecords(results, changes, event), ...toErrorRecords(failures, event)]);
+    }
   } catch (err) {
     if (process.env.JEV_LINT_DEBUG) process.stderr.write(`[jev-lint] findings log: ${err}\n`);
   }

@@ -17,6 +17,8 @@ export type JevResponse = {
   model: string;
   answers: Record<string, { type: "noul"; noul: number }>;
   usage: { input_tokens: number; output_tokens: number };
+  requestBytes?: number; // JSON request body bytes, not including HTTP/TLS framing
+  responseBytes?: number; // JSON response body bytes, not including HTTP/TLS framing
 };
 
 // Any server speaking the same `POST /v1/systemone` protocol works, e.g. a local Kev or
@@ -127,12 +129,15 @@ async function askCloudflare(state: unknown, questions: Record<string, NoulQuest
         redirect: "error",
       });
       if (res.ok) {
-        results.push(
-          cloudflareResponse(
-            await res.json(),
+        const text = await res.text();
+        results.push({
+          ...cloudflareResponse(
+            JSON.parse(text),
             batch.map(([id]) => id),
           ),
-        );
+          requestBytes: Buffer.byteLength(body),
+          responseBytes: Buffer.byteLength(text),
+        });
         break;
       }
       const retryable = res.status === 429 || res.status >= 500;
@@ -160,6 +165,8 @@ async function askCloudflare(state: unknown, questions: Record<string, NoulQuest
       input_tokens: results.reduce((n, r) => n + r.usage.input_tokens, 0),
       output_tokens: results.reduce((n, r) => n + r.usage.output_tokens, 0),
     },
+    requestBytes: results.reduce((n, r) => n + (r.requestBytes ?? 0), 0),
+    responseBytes: results.reduce((n, r) => n + (r.responseBytes ?? 0), 0),
   };
 }
 
@@ -181,7 +188,10 @@ export async function askNouls(state: unknown, questions: Record<string, NoulQue
       body,
       signal: AbortSignal.timeout(opts.timeoutMs ?? 10_000),
     });
-    if (res.ok) return (await res.json()) as JevResponse;
+    if (res.ok) {
+      const text = await res.text();
+      return { ...(JSON.parse(text) as JevResponse), requestBytes: Buffer.byteLength(body), responseBytes: Buffer.byteLength(text) };
+    }
 
     const retryable = res.status === 429 || res.status === 529 || res.status >= 500;
     if (!retryable || attempt >= retries) {

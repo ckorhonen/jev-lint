@@ -365,7 +365,7 @@ describe("ephemeral package staging and zero-clone install", () => {
     type SystemOneRequest = {
       model?: string;
       state?: { language?: string; file_path?: string; added_code?: string };
-      questions?: Record<string, unknown>;
+      questions?: Record<string, { instructions?: string }>;
     };
     const seen: SystemOneRequest[] = [];
     const server = Bun.serve({
@@ -376,7 +376,10 @@ describe("ephemeral package staging and zero-clone install", () => {
         const body = (await request.json()) as SystemOneRequest;
         seen.push(body);
         const answers = Object.fromEntries(
-          Object.keys(body.questions ?? {}).map((id) => [id, { type: "noul", noul: id === "ts-no-empty-catch" ? 0.99 : 0 }]),
+          Object.entries(body.questions ?? {}).map(([id, q]) => [
+            id,
+            { type: "noul", noul: q.instructions?.includes("catch block") ? 0.99 : 0 },
+          ]),
         );
         return Response.json({ model: body.model ?? "mock", answers, usage: { input_tokens: 1, output_tokens: 1 } });
       },
@@ -421,7 +424,7 @@ describe("ephemeral package staging and zero-clone install", () => {
       expect(seen[0].model).toBe("jev-1.13.0");
       expect(seen[0].state?.language).toBe("typescript");
       expect(seen[0].state?.added_code).toBe(content);
-      expect(seen[0].questions).toHaveProperty("ts-no-empty-catch");
+      expect(Object.values(seen[0].questions ?? {}).some((q) => q.instructions?.includes("catch block"))).toBe(true);
       const log = readFileSync(join(home, ".local/state/jev-lint/findings.jsonl"), "utf8");
       expect(log).toContain('"rule":"ts-no-empty-catch"');
     } finally {

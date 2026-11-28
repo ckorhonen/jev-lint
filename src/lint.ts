@@ -1,8 +1,12 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { basename, dirname, extname, isAbsolute, join, relative, resolve } from "node:path";
 import type { ChangedFile } from "./extract";
+import { ruleApplies } from "./gates";
 import { askNouls, type JudgeProvider, type NoulQuestion } from "./jev";
 import { findRepoConfig } from "./repoRules";
+
+export { formatFeedback } from "./feedback";
+export { clearGateCache, firstGateMatch, ruleApplies } from "./gates";
 
 // `when`: optional regex sources (case-insensitive). The rule is only asked when one of
 // them matches the added code — a cheap, recall-safe gate that cuts model calls.
@@ -134,48 +138,6 @@ export function rulePathsMatch(rule: Rule, relPath: string): boolean {
   return !rule.paths?.length || rule.paths.some((glob) => matchesGlob(glob, relPath));
 }
 
-// Keyed by the patterns themselves, not the rule id: two repos can reuse an id with
-// different gates, and an edited `when` must take effect in the long-lived daemon.
-const gateCache = new Map<string, RegExp[]>();
-
-export function clearGateCache() {
-  gateCache.clear();
-}
-
-function gatePatterns(when: string[]): RegExp[] {
-  const key = when.join("\0");
-  let patterns = gateCache.get(key);
-  if (!patterns) {
-    patterns = when.flatMap((source) => {
-      try {
-        return [new RegExp(source, "im")];
-      } catch {
-        return []; // a broken pattern must not hide the rule; see ruleApplies
-      }
-    });
-    gateCache.set(key, patterns);
-  }
-  return patterns;
-}
-
-export function ruleApplies(rule: Rule, code: string): boolean {
-  if (!rule.when?.length) return true;
-  const patterns = gatePatterns(rule.when);
-  return patterns.length === 0 || patterns.some((re) => re.test(code));
-}
-
-// Character offset of the earliest match of any `when` pattern, or undefined when there is
-// none (no patterns, all broken, or the gate was off and nothing matched).
-export function firstGateMatch(when: string[] | undefined, code: string): number | undefined {
-  if (!when?.length) return undefined;
-  let first: number | undefined;
-  for (const re of gatePatterns(when)) {
-    const m = re.exec(code);
-    if (m && (first === undefined || m.index < first)) first = m.index;
-  }
-  return first;
-}
-
 export function gateRules(ruleSet: RuleSet, code: string): RuleSet {
   return { ...ruleSet, rules: ruleSet.rules.filter((r) => ruleApplies(r, code)) };
 }
@@ -202,6 +164,8 @@ export type LintResult = {
   findings: Finding[];
   latencyMs: number;
   inputTokens: number;
+  requestBytes?: number;
+  responseBytes?: number;
   model: string;
   asked: number; // rules sent to the model after gating
   gatedOut: number; // rules skipped by their `when` patterns
@@ -230,16 +194,26 @@ export async function lintChange(
   const gate = opts.gate ?? process.env.JEV_LINT_GATE !== "off";
   const asked = gate ? gateRules(ruleSet, change.addedCode) : ruleSet;
   const state = { language: ruleSet.language, file_path: change.filePath, added_code: change.addedCode };
+  // Question ids are response keys rather than model input, so use compact aliases on
+  // the wire and map them back here. Long rule ids otherwise repeat in both directions.
+  const aliases = new Map(asked.rules.map((rule, index) => [rule.id, `q${index}`]));
+  const wireQuestions = Object.fromEntries(
+    asked.rules.map((rule, index) => [
+      `q${index}`,
+      { type: "noul" as const, instructions: rule.question, criteria: { true: rule.true, false: rule.false } },
+    ]),
+  );
   const started = performance.now();
   const response = asked.rules.length
-    ? await askNouls(state, buildQuestions(asked), opts)
-    : { answers: {}, usage: { input_tokens: 0, output_tokens: 0 }, model: "gated" };
+    ? await askNouls(state, wireQuestions, opts)
+    : { answers: {}, usage: { input_tokens: 0, output_tokens: 0 }, requestBytes: 0, responseBytes: 0, model: "gated" };
   const latencyMs = performance.now() - started;
 
   const probabilities: Record<string, number> = {};
   const findings: Finding[] = [];
   for (const rule of ruleSet.rules) {
-    const probability = (response.answers as Record<string, { noul: number }>)[rule.id]?.noul ?? 0;
+    const alias = aliases.get(rule.id);
+    const probability = (alias ? (response.answers as Record<string, { noul: number }>)[alias]?.noul : undefined) ?? 0;
     probabilities[rule.id] = probability;
     const tier = tierFor(probability, opts.thresholds, rule.thresholds);
     if (tier) findings.push({ ruleId: rule.id, probability, tier, fix: rule.fix, ...(rule.when ? { when: rule.when } : {}) });
@@ -254,32 +228,10 @@ export async function lintChange(
     findings,
     latencyMs,
     inputTokens: response.usage.input_tokens,
+    requestBytes: response.requestBytes,
+    responseBytes: response.responseBytes,
     model: response.model,
     asked: asked.rules.length,
     gatedOut: ruleSet.rules.length - asked.rules.length,
   };
-}
-
-export function formatFeedback(results: LintResult[]): string {
-  const lines: string[] = [];
-  for (const result of results) {
-    const high = result.findings.filter((f) => f.tier === "high");
-    const medium = result.findings.filter((f) => f.tier === "medium");
-    if (!high.length && !medium.length) continue;
-
-    const scope = result.changeKind === "write" ? "checked the whole file this Write produced" : "checked only the code this edit added";
-    lines.push(`jev-lint: ${result.filePath} (${scope})`);
-    if (high.length) {
-      lines.push("Likely violations — fix these:");
-      for (const f of high) lines.push(`  - ${f.ruleId} (p=${f.probability.toFixed(2)}): ${f.fix}`);
-    }
-    if (medium.length) {
-      lines.push("Possible violations — double-check; ignore if the code is actually fine:");
-      for (const f of medium) lines.push(`  - ${f.ruleId} (p=${f.probability.toFixed(2)}): ${f.fix}`);
-    }
-  }
-  if (lines.length) {
-    lines.push("These come from a fast heuristic model and can be wrong. Don't mention this check to the user; just fix real issues.");
-  }
-  return lines.join("\n");
 }

@@ -44,7 +44,10 @@ afterEach(() => {
 describe("optional Cloudflare judge", () => {
   test("sends the System One contract to Workers AI and unwraps the result", async () => {
     const state = { added_code: "code" };
-    expect(await askNouls(state, { rule: question })).toEqual(response().result);
+    const { requestBytes, responseBytes, ...result } = await askNouls(state, { rule: question });
+    expect(result).toEqual(response().result);
+    expect(requestBytes).toBeGreaterThan(0);
+    expect(responseBytes).toBeGreaterThan(0);
     const [url, init] = fetchMock.mock.calls[0];
     expect(String(url)).toBe(`https://api.cloudflare.com/client/v4/accounts/${"a".repeat(32)}/ai/run/@cf/cloudflare/clef`);
     expect(init?.headers).toEqual({ Authorization: "Bearer test-token", "Content-Type": "application/json" });

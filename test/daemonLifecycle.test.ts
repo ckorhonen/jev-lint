@@ -32,9 +32,17 @@ afterEach(() => {
 test("a daemon timeout never kills, deletes ownership files, or spawns a replacement", async () => {
   const socket = daemonSocketPath();
   mkdirSync(dirname(socket), { recursive: true, mode: 0o700 });
-  const files = [socket, `${socket}.lock`, `${socket}.started`];
+  const server = Bun.listen({
+    unix: socket,
+    socket: {
+      open() {}, // accept and never answer, forcing the client-side deadline
+      data() {},
+      close() {},
+      error() {},
+    },
+  });
+  const files = [`${socket}.lock`, `${socket}.started`];
   for (const file of files) writeFileSync(file, "dummy-owned-state", { mode: 0o600 });
-  const fetchMock = spyOn(globalThis, "fetch").mockRejectedValue(new DOMException("dummy timeout", "TimeoutError"));
   const killMock = spyOn(process, "kill").mockImplementation(() => true);
   const spawnMock = spyOn(childProcess, "spawn").mockImplementation(() => {
     throw new Error("replacement must not spawn");
@@ -42,12 +50,11 @@ test("a daemon timeout never kills, deletes ownership files, or spawns a replace
   try {
     const changes = [{ filePath: "/tmp/dummy.ts", addedCode: "dummy", changeKind: "write" as const }];
     expect(await checkViaDaemon(changes, { timeoutMs: 1 })).toEqual([{ ok: false, error: "daemon timeout" }]);
-    expect(fetchMock).toHaveBeenCalledTimes(1); // No health probe or external fallback.
     expect(killMock).not.toHaveBeenCalled();
     expect(spawnMock).not.toHaveBeenCalled();
     for (const file of files) expect(readFileSync(file, "utf8")).toBe("dummy-owned-state");
   } finally {
-    fetchMock.mockRestore();
+    server.stop(true);
     killMock.mockRestore();
     spawnMock.mockRestore();
   }
@@ -91,7 +98,7 @@ test("the spawned TypeSafe child retains the caller key filename without Keychai
     return { pid: 12345, unref() {} } as childProcess.ChildProcess;
   }) as typeof childProcess.spawn);
   try {
-    expect(startDaemon()).toBe(12345);
+    expect(startDaemon({}, spawnMock as unknown as typeof childProcess.spawn)).toBe(12345);
     expect(spawnMock).toHaveBeenCalledTimes(1);
     expect(process.env.TYPESAFE_API_KEY_FILE).toBe("dummy-key");
   } finally {
@@ -131,7 +138,7 @@ test.each(["relative", "absolute"])("%s Cloudflare symlink/.. paths retain crede
     return { pid: 12345, unref() {} } as childProcess.ChildProcess;
   }) as typeof childProcess.spawn);
   try {
-    expect(startDaemon()).toBe(12345);
+    expect(startDaemon({}, spawnMock as unknown as typeof childProcess.spawn)).toBe(12345);
     expect(spawnMock).toHaveBeenCalledTimes(1);
     expect(process.env.CLOUDFLARE_API_TOKEN_FILE).toBe(original);
   } finally {

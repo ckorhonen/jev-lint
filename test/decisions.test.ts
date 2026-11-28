@@ -42,7 +42,9 @@ afterEach(() => {
 
 test("documented POST contract translates state and criteria without System One fields", async () => {
   const state = { added_code: "code", language: "typescript" };
-  const result = await askNouls(state, { rule: question });
+  const { requestBytes, responseBytes, ...result } = await askNouls(state, { rule: question });
+  expect(requestBytes).toBeGreaterThan(0);
+  expect(responseBytes).toBeGreaterThan(0);
   expect(result).toEqual({
     model: "gpt-6-luna",
     answers: { rule: { type: "noul", noul: 0.9 } },

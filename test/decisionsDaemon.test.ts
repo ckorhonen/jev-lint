@@ -69,7 +69,7 @@ function assertSpawnedCredential(expectedFile: string) {
   }) as typeof childProcess.spawn;
   const mock = spyOn(childProcess, "spawn").mockImplementation(mockSpawn);
   try {
-    expect(startDaemon()).toBe(12345);
+    expect(startDaemon({}, mock as unknown as typeof childProcess.spawn)).toBe(12345);
     expect(mock).toHaveBeenCalledTimes(1);
     expect(childResult?.status).toBe(0);
     expect(JSON.parse(childResult?.stdout ?? "{}")).toEqual({ credentialMatches: true, socket: callerSocket });
