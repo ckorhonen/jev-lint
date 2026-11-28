@@ -4,6 +4,7 @@ import type { ChangedFile } from "./extract";
 import { askNouls, type JudgeProvider, type NoulQuestion } from "./jev";
 import { findRepoConfig } from "./repoRules";
 import { ruleApplies } from "./ruleGate";
+import { type WarningEvidence, warningEvidence } from "./warningEvidence";
 
 export { formatFeedback } from "./feedback";
 export { clearGateCache, firstGateMatch, ruleApplies } from "./ruleGate";
@@ -37,7 +38,7 @@ export type RuleThresholds = { high?: number; medium?: number | null | Record<st
 export type RuleSet = { language: string; extensions: string[]; filenames?: string[]; rules: Rule[] };
 export type Tier = "high" | "medium";
 // `when` is carried so the findings log can point at the lines that most plausibly triggered it.
-export type Finding = { ruleId: string; probability: number; tier: Tier; fix: string; when?: string[] };
+export type Finding = { ruleId: string; probability: number; tier: Tier; fix: string; evidence?: WarningEvidence; when?: string[] };
 
 // Built-in packs live in rules/<language>.json ("hygiene") and rules/<language>.<pack>.json.
 // "hygiene": small code-hygiene rules. "practices": opinionated framework and language best
@@ -202,13 +203,30 @@ export async function lintChange(
     : { answers: {}, usage: { input_tokens: 0, output_tokens: 0 }, model: "gated" };
   const latencyMs = performance.now() - started;
 
+  if (
+    opts.onlyRules &&
+    asked.rules.some(({ id }) => {
+      const p = response.answers[id]?.noul;
+      return !Number.isFinite(p) || p < 0 || p > 1;
+    })
+  )
+    throw new Error("Invalid or missing whole-file recheck score");
+
   const probabilities: Record<string, number> = {};
   const findings: Finding[] = [];
   for (const rule of ruleSet.rules) {
     const probability = (response.answers as Record<string, { noul: number }>)[rule.id]?.noul ?? 0;
     probabilities[rule.id] = probability;
     const tier = tierFor(probability, opts.thresholds, rule.thresholds, response.model);
-    if (tier) findings.push({ ruleId: rule.id, probability, tier, fix: rule.fix, ...(rule.when ? { when: rule.when } : {}) });
+    if (tier)
+      findings.push({
+        ruleId: rule.id,
+        probability,
+        tier,
+        fix: rule.fix,
+        evidence: warningEvidence(rule, change.addedCode),
+        ...(rule.when ? { when: rule.when } : {}),
+      });
   }
   findings.sort((a, b) => b.probability - a.probability);
 

@@ -1,10 +1,5 @@
 #!/usr/bin/env bun
-// End-of-turn re-check for the learning loop. Runs as a Stop (or SubagentStop) hook in Claude
-// Code and Codex. For every file this conversation edited whose last check still had findings,
-// it asks just those rules again against the file as it is now, and logs the result. That gives
-// every finding an outcome (fixed or kept) even when the agent never touched the file again,
-// which otherwise leaves most findings "unknown" and starves jev-lint-learn of evidence.
-//
+// Stop/SubagentStop rechecks pending warnings against the current whole file.
 // Fails open like the main hook: it prints nothing, always exits 0, and is time-bounded.
 // Env: JEV_LINT_RECHECK=off disables it; JEV_LINT_FINDINGS_LOG as for the hook.
 
@@ -13,6 +8,7 @@ import { isAbsolute, join } from "node:path";
 import { loadRecords } from "./findings";
 import { appendRecords, type CheckRecord, findingsLogPath, toErrorRecords, toRecords } from "./findingsLog";
 import { lintChange } from "./lint";
+import { trackedFiles } from "./outcomes";
 
 const MAX_FILES = 8; // two parallel batches, so a worst case stays under the hook timeout
 const MAX_PARALLEL = 4;
@@ -22,19 +18,18 @@ const LOOKBACK_MS = 24 * 60 * 60_000;
 
 type StopEvent = { hook_event_name?: string; session_id?: string; agent_id?: string; cwd?: string };
 
-// Files whose latest check in this conversation (or this subagent) still has findings.
+// Pending rules survive unrelated edits in the same file and agent thread.
 export function unresolved(records: CheckRecord[], event: StopEvent, now = Date.now()) {
-  const latest = new Map<string, CheckRecord>();
-  for (const r of records) {
-    if (r.session !== event.session_id || r.error) continue;
-    if (event.agent_id && r.agent !== event.agent_id) continue; // SubagentStop: only that subagent's files
-    if (now - Date.parse(r.ts) > LOOKBACK_MS) continue;
-    const key = `${r.agent ?? ""}|${r.repo}|${r.file}`;
-    const prev = latest.get(key);
-    if (!prev || prev.ts <= r.ts) latest.set(key, r);
-  }
-  // A file whose latest record is already a re-check has its outcome; re-check only after new edits.
-  return [...latest.values()].filter((r) => r.flagged.length > 0 && r.tool !== "recheck").slice(0, MAX_FILES);
+  const recent = records.filter(
+    (r) => r.session === event.session_id && (!event.agent_id || r.agent === event.agent_id) && now - Date.parse(r.ts) <= LOOKBACK_MS,
+  );
+  return trackedFiles(recent)
+    .flatMap(({ latestEdit, warnings }) => {
+      const rules = [...warnings.values()].filter((warning) => warning.pending).map((warning) => warning.hit.rule);
+      return rules.length ? [{ ...latestEdit, rules }] : [];
+    })
+    .sort((a, b) => b.ts.localeCompare(a.ts))
+    .slice(0, MAX_FILES);
 }
 
 async function main() {
@@ -57,8 +52,11 @@ async function main() {
         const change = { filePath: path, addedCode: code, changeKind: "recheck" as const };
         const ids = { session_id: event.session_id, agent_id: last.agent, tool_name: "recheck", cwd: last.repo };
         try {
-          const result = await lintChange(change, { timeoutMs: TIMEOUT_MS, cwd: last.repo, onlyRules: last.flagged.map((f) => f.rule) });
-          if (result) appendRecords(toRecords([result], [change], ids));
+          const result = await lintChange(change, { timeoutMs: TIMEOUT_MS, cwd: last.repo, onlyRules: last.rules });
+          if (result) {
+            const [record] = toRecords([result], [change], ids);
+            appendRecords([{ ...record, checkedRules: Object.keys(result.probabilities), recheckOf: last.ts }]);
+          }
         } catch (error) {
           appendRecords(toErrorRecords([{ change, error }], ids));
         }

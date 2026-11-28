@@ -1,4 +1,12 @@
-import type { LintResult } from "./lint";
+import type { Finding, LintResult } from "./lint";
+
+function describe(f: Finding) {
+  const e = f.evidence;
+  if (!e) return `  - ${f.ruleId} (p=${f.probability.toFixed(2)}): ${f.fix}`;
+  const where = e.snippetLine ? ` [checked snippet line ${e.snippetLine}]` : "";
+  const advice = f.ruleId === "ts-boolean-trap" && !e.snippetLine ? "If confirmed" : "Suggested fix";
+  return `  - ${f.ruleId} (p=${f.probability.toFixed(2)}): ${e.reason}${e.detail ? ` ${e.detail}` : ""}${where}\n    ${advice}: ${f.fix}`;
+}
 
 export function formatFeedback(results: LintResult[]): string {
   const lines: string[] = [];
@@ -11,11 +19,11 @@ export function formatFeedback(results: LintResult[]): string {
     lines.push(`jev-lint: ${result.filePath} (${scope})`);
     if (high.length) {
       lines.push("Likely violations — fix these:");
-      for (const f of high) lines.push(`  - ${f.ruleId} (p=${f.probability.toFixed(2)}): ${f.fix}`);
+      for (const f of high) lines.push(describe(f));
     }
     if (medium.length) {
       lines.push("Possible violations — double-check; ignore if the code is actually fine:");
-      for (const f of medium) lines.push(`  - ${f.ruleId} (p=${f.probability.toFixed(2)}): ${f.fix}`);
+      for (const f of medium) lines.push(describe(f));
     }
   }
   if (lines.length) {

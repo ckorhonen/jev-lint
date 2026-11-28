@@ -16,7 +16,7 @@ export const COMMANDS: Record<string, CliCommand> = {
   install: { script: "install.ts", summary: "Install or preview Claude Code / Codex hooks (--apply, --pre, --async, --skills, --smoke)" },
   upgrade: { script: "install.ts", prependArgs: ["--upgrade"], summary: "Upgrade jev-lint and re-apply installed hooks" },
   check: { script: "check.ts", summary: "Run rules over existing files to preview findings" },
-  findings: { script: "findings.ts", summary: "Summarize the findings log (--repo, --days, --clusters, --compare)" },
+  findings: { script: "findings.ts", summary: "Summarize the findings log (--rule, --mark, --as, --repo, --days, --clusters, --compare)" },
   audit: { script: "valueAudit.ts", summary: "Grade fixed/kept findings with an LLM value audit" },
   validate: { script: "validate.ts", summary: "Validate a repo's .jev-lint rules against labeled cases" },
   inventory: { script: "inventory.ts", summary: "List a repo's instructions, skills, docs, linters, and CI configs" },

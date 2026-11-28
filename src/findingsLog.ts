@@ -23,12 +23,14 @@ import type { ChangedFile } from "./extract";
 import type { LintResult, Tier } from "./lint";
 import { firstGateMatch } from "./ruleGate";
 
+import type { WarningEvidence } from "./warningEvidence";
+
 const EXCERPT_CHARS = 400;
 const LINES_BEFORE = 3;
 const LINES_AFTER = 6;
 
 export type FlaggedLines = { start: number; text: string };
-export type Flagged = { rule: string; p: number; tier: Tier; lines?: FlaggedLines };
+export type Flagged = { rule: string; p: number; tier: Tier; evidence?: WarningEvidence; fix?: string; lines?: FlaggedLines };
 
 export type CheckRecord = {
   ts: string;
@@ -41,6 +43,8 @@ export type CheckRecord = {
   model: string;
   flagged: Flagged[];
   excerpt?: string;
+  checkedRules?: string[]; // eligible rules evaluated on the whole file, including deterministic gate exclusions
+  recheckOf?: string; // last edit timestamp when the stop hook selected this file
   error?: string; // the check failed (timeout, API error); fail-open means the agent saw nothing
   latencyMs?: number; // time for the judge call
   inputTokens?: number; // judge input tokens (Jev bills input only)
@@ -90,7 +94,13 @@ export function toRecords(results: LintResult[], changes: ChangedFile[], event: 
     const code = changes.find((c) => c.filePath === r.filePath)?.addedCode ?? "";
     const flagged: Flagged[] = r.findings.map((f) => {
       const lines = flaggedLines(code, f.when);
-      return { rule: f.ruleId, p: Number(f.probability.toFixed(3)), tier: f.tier, ...(lines ? { lines } : {}) };
+      return {
+        rule: f.ruleId,
+        p: Number(f.probability.toFixed(3)),
+        tier: f.tier,
+        ...(f.evidence ? { evidence: f.evidence, fix: f.fix } : {}),
+        ...(lines ? { lines } : {}),
+      };
     });
     const excerpt = flagged.find((f) => f.lines)?.lines?.text ?? code.slice(0, EXCERPT_CHARS);
     return {

@@ -28,12 +28,12 @@ function rec(session: string, file: string, rules: string[], extra: Partial<Chec
 // a: fixed (old header excerpt), b: kept (edit, new lines window), c: unknown (never rechecked)
 const records = [
   rec("s1", "a.ts", ["ts-no-explicit-any"]),
-  rec("s1", "a.ts", []),
+  rec("s1", "a.ts", [], { tool: "recheck", changeKind: "recheck", checkedRules: ["ts-no-explicit-any"] }),
   rec("s2", "b.ts", ["ts-no-empty-catch"], {
     changeKind: "edit",
     flagged: [{ rule: "ts-no-empty-catch", p: 0.7, tier: "medium", lines: { start: 4, text: "try { f() } catch {}" } }],
   }),
-  rec("s2", "b.ts", ["ts-no-empty-catch"], { changeKind: "edit" }),
+  rec("s2", "b.ts", ["ts-no-empty-catch"], { tool: "recheck", changeKind: "recheck", checkedRules: ["ts-no-empty-catch"] }),
   rec("s3", "c.ts", ["ts-no-debug-console"]),
 ];
 

@@ -4,22 +4,16 @@
 //   bun ~/Repos/jev-lint/src/findings.ts --repo <path> --clusters          # rule × area × test/non-test
 //   bun ~/Repos/jev-lint/src/findings.ts --repo <path> --compare <rule> --at <ISO date>
 //
-// For every finding (thread, file, rule) the outcome is:
-//   fixed   — a later check of the same file in the same thread no longer flags the rule
-//   kept    — the file was checked again and the rule was still flagged at the last check
-//   unknown — the file was never checked again in that thread
-// A thread is one agent context: the main agent of a session, or one subagent inside it
-// (Claude Code and Codex give subagents the parent's session_id plus their own agent_id), so
-// two subagents editing the same file don't mix outcomes. "sessions" still counts
-// conversations: subagents of one conversation are not independent evidence.
-// "fixed" means the agent made the mistake and corrected it: worth upfront guidance in
-// AGENTS.md so it stops happening. "kept" means the agent disagreed or ignored the hint:
-// a likely false positive, or a rule that needs rewording.
+// Fixed and kept describe the last applicable whole-file recheck of the warning.
+// Unknown includes edits followed only by unrelated patches.
 
-import { existsSync, readFileSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { appendFileSync, existsSync, readFileSync } from "node:fs";
 import { dirname, extname, isAbsolute, relative, resolve } from "node:path";
 import { parseArgs } from "node:util";
 import { type CheckRecord, findingsLogPath } from "./findingsLog";
+import { trackedFiles, type WarningState } from "./outcomes";
+import type { WarningEvidence } from "./warningEvidence";
 
 export type RuleSummary = {
   rule: string;
@@ -34,7 +28,15 @@ export type RuleSummary = {
   suggestion: "add-guidance" | "review-rule" | "watch";
   // `line` is set when the excerpt is the window around the rule's `when` match (records from
   // 2026-10-03 on); without it the excerpt is the start of the checked code.
-  excerpts: { file: string; outcome: "fixed" | "kept" | "unknown"; p: number; excerpt: string; line?: number }[];
+  excerpts: {
+    evidence?: WarningState["evidence"];
+    checkedAt?: string;
+    file: string;
+    outcome: "fixed" | "kept" | "unknown";
+    p: number;
+    excerpt: string;
+    line?: number;
+  }[];
 };
 
 // Thresholds for a suggestion: enough evidence across sessions, not one noisy afternoon.
@@ -58,12 +60,6 @@ export function threadOf(r: Pick<CheckRecord, "session" | "agent">): string {
 
 export function summarize(allRecords: CheckRecord[]): RuleSummary[] {
   const records = allRecords.filter((r) => !r.error);
-  const byThread = new Map<string, CheckRecord[]>();
-  for (const r of records) {
-    const key = `${threadOf(r)}|${r.repo}|${r.file}`;
-    byThread.set(key, [...(byThread.get(key) ?? []), r]);
-  }
-
   const rules = new Map<string, RuleSummary & { _sessions: Set<string>; _files: Set<string> }>();
   const get = (rule: string) => {
     let s = rules.get(rule);
@@ -88,29 +84,28 @@ export function summarize(allRecords: CheckRecord[]): RuleSummary[] {
     return s;
   };
 
-  for (const checks of byThread.values()) {
-    checks.sort((a, b) => a.ts.localeCompare(b.ts));
-    const session = checks[0].session ?? "?";
-    // One outcome per (thread, rule): judged from the first flag onward.
-    const firstFlag = new Map<string, number>();
-    checks.forEach((c, i) => {
-      for (const f of c.flagged) {
-        const s = get(f.rule);
-        s.flags++;
-        s[f.tier]++;
-        if (!firstFlag.has(f.rule)) firstFlag.set(f.rule, i);
-      }
-    });
-    for (const [rule, index] of firstFlag) {
-      const s = get(rule);
-      s._sessions.add(session);
-      s._files.add(`${checks[index].repo}|${checks[index].file}`);
-      const last = checks[checks.length - 1];
-      const outcome = index === checks.length - 1 ? "unknown" : last.flagged.some((f) => f.rule === rule) ? "kept" : "fixed";
-      s[outcome]++;
-      const hit = checks[index].flagged.find((f) => f.rule === rule);
-      s.excerpts.push({ file: checks[index].file, outcome, p: hit?.p ?? 0, ...excerptOf(checks[index], rule) });
+  for (const record of records) {
+    if (record.tool === "recheck" || record.changeKind === "recheck") continue;
+    for (const hit of record.flagged) {
+      const s = get(hit.rule);
+      s.flags++;
+      s[hit.tier]++;
     }
+  }
+  for (const f of findingsOf(records)) {
+    const s = get(f.rule);
+    s._sessions.add(f.session);
+    s._files.add(JSON.stringify([f.repo, f.file]));
+    s[f.outcome]++;
+    s.excerpts.push({
+      file: f.file,
+      outcome: f.outcome,
+      evidence: f.evidence,
+      checkedAt: f.checkedAt,
+      p: f.p,
+      excerpt: f.excerpt,
+      line: f.line,
+    });
   }
 
   return [...rules.values()]
@@ -156,48 +151,41 @@ export type Finding = {
   rule: string;
   session: string;
   thread: string;
+  agent?: string;
   repo: string;
   file: string;
   ts: string;
+  trigger?: WarningEvidence;
+  fix?: string;
   changeKind: CheckRecord["changeKind"];
   p: number;
+  evidence?: WarningState["evidence"];
+  checkedAt?: string;
   outcome: "fixed" | "kept" | "unknown";
   excerpt: string;
   line?: number; // set when the excerpt is the window around the rule's `when` match
 };
 
 export function findingsOf(allRecords: CheckRecord[]): Finding[] {
-  const byThread = new Map<string, CheckRecord[]>();
-  for (const r of allRecords.filter((r) => !r.error)) {
-    const key = `${threadOf(r)}|${r.repo}|${r.file}`;
-    byThread.set(key, [...(byThread.get(key) ?? []), r]);
-  }
-  const out: Finding[] = [];
-  for (const checks of byThread.values()) {
-    checks.sort((a, b) => a.ts.localeCompare(b.ts));
-    const last = checks[checks.length - 1];
-    const seen = new Set<string>();
-    checks.forEach((c, i) => {
-      for (const f of c.flagged) {
-        if (seen.has(f.rule)) continue;
-        seen.add(f.rule);
-        const outcome = i === checks.length - 1 ? "unknown" : last.flagged.some((g) => g.rule === f.rule) ? "kept" : "fixed";
-        out.push({
-          rule: f.rule,
-          session: c.session ?? "?",
-          thread: threadOf(c),
-          repo: c.repo,
-          file: c.file,
-          ts: c.ts,
-          changeKind: c.changeKind,
-          p: f.p,
-          outcome,
-          ...excerptOf(c, f.rule),
-        });
-      }
-    });
-  }
-  return out;
+  return trackedFiles(allRecords).flatMap(({ warnings }) =>
+    [...warnings.values()].map(({ first, hit, outcome, evidence, checkedAt }) => ({
+      rule: hit.rule,
+      session: first.session ?? "?",
+      thread: threadOf(first),
+      agent: first.agent,
+      repo: first.repo,
+      file: first.file,
+      ts: first.ts,
+      trigger: hit.evidence,
+      fix: hit.fix,
+      changeKind: first.changeKind,
+      p: hit.p,
+      outcome,
+      evidence,
+      checkedAt,
+      ...excerptOf(first, hit.rule),
+    })),
+  );
 }
 
 export type Cluster = {
@@ -361,6 +349,9 @@ if (import.meta.main) {
       days: { type: "string", default: "30" },
       json: { type: "boolean", default: false },
       log: { type: "string" },
+      rule: { type: "string" },
+      mark: { type: "string" },
+      as: { type: "string" },
       clusters: { type: "boolean", default: false },
       compare: { type: "string" },
       at: { type: "string" },
@@ -369,6 +360,57 @@ if (import.meta.main) {
   const path = values.log ?? findingsLogPath();
   if (!path) throw new Error("findings log is disabled (JEV_LINT_FINDINGS_LOG=off)");
   const records = loadRecords(path, { repo: values.repo, days: Number(values.days) });
+  if (values.rule || values.mark !== undefined || values.as !== undefined) {
+    const marks = new Map<string, string>();
+    if (existsSync(path))
+      for (const line of readFileSync(path, "utf8").split("\n")) {
+        try {
+          const event = JSON.parse(line);
+          if (event?.type === "warning-disposition" && ["fixed", "intentional", "dismissed"].includes(event.value))
+            marks.set(event.id, event.value);
+        } catch {
+          /* A partial log line is ignored. */
+        }
+      }
+    const rows = findingsOf(records)
+      .filter((f) => !values.rule || f.rule === values.rule)
+      .map((f) => {
+        const id = createHash("sha256")
+          .update(JSON.stringify([f.repo, f.session, f.agent, f.file, f.rule]))
+          .digest("hex")
+          .slice(0, 24);
+        return { ...f, id, disposition: marks.get(id) ?? null };
+      })
+      .sort((a, b) => b.ts.localeCompare(a.ts));
+    if (values.mark !== undefined || values.as !== undefined) {
+      const row = rows.find((r) => r.id === values.mark);
+      if (!row || !values.as || !["fixed", "intentional", "dismissed"].includes(values.as))
+        throw new Error("Use --mark <listed id> --as fixed|intentional|dismissed");
+      appendFileSync(
+        path,
+        `${JSON.stringify({ type: "warning-disposition", id: row.id, value: values.as, ts: new Date().toISOString() })}\n`,
+        { mode: 0o600 },
+      );
+      console.log(`Recorded ${values.as} for ${row.id}`);
+    } else if (values.json) console.log(JSON.stringify(rows, null, 2));
+    else {
+      if (!rows.length) console.log("No matching warnings in the selected period.");
+      for (const f of rows) {
+        console.log(`${f.id}  ${f.rule}  ${f.file}  ${f.ts}`);
+        console.log(`  Why: ${f.trigger?.reason ?? "Explanation unavailable in this older log entry."}`);
+        if (f.trigger?.detail)
+          console.log(`  Evidence: ${f.trigger.detail}${f.trigger.snippetLine ? ` (checked snippet line ${f.trigger.snippetLine})` : ""}`);
+        if (f.fix) console.log(`  Suggested fix: ${f.fix}`);
+        console.log(
+          "  Recheck: " +
+            { fixed: "cleared", kept: "still flagged", unknown: "no applicable recheck" }[f.outcome] +
+            (f.checkedAt ? ` at ${f.checkedAt}` : ""),
+        );
+        console.log(`  Author feedback: ${f.disposition ?? "unreported"}`);
+      }
+    }
+    process.exit(0);
+  }
   const summary = summarize(records);
   if (values.compare) {
     if (!values.at) throw new Error("--compare needs --at <ISO date of the change>");
@@ -420,6 +462,7 @@ if (import.meta.main) {
     const jevTokens = timed.filter((r) => /^jev(?:-|$)/.test(r.model)).reduce((n, r) => n + (r.inputTokens ?? 0), 0);
     if (jevTokens)
       console.log(`Jev only: ~$${((jevTokens * 0.042) / 1e6).toFixed(5)} at Jev list price; other models excluded (see provider billing)`);
+    console.log("Whole-file recheck outcomes: fixed = cleared, kept = still flagged, unknown = no applicable recheck since flag.");
     console.log("rule                                    flags  high  med  sessions  fixed  kept  unknown  suggestion");
     for (const s of summary) {
       console.log(

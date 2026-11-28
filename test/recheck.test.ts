@@ -17,14 +17,14 @@ const NOW = Date.parse("2026-09-27T13:00:00.000Z");
 const flag = [{ rule: "ts-no-empty-catch", p: 0.9, tier: "high" as const }];
 
 describe("recheck: which files still need an outcome", () => {
-  test("only files whose latest check in this session still has findings", () => {
+  test("an unrelated clean patch leaves an earlier warning pending", () => {
     const records = [
       rec({ file: "a.ts", flagged: flag }),
       rec({ file: "b.ts", flagged: flag }),
-      rec({ file: "b.ts", ts: "2026-09-27T12:30:00.000Z" }), // fixed later
+      rec({ file: "b.ts", ts: "2026-09-27T12:30:00.000Z" }), // patch to another line
       rec({ file: "c.ts", flagged: flag, session: "other" }),
     ];
-    expect(unresolved(records, { session_id: "s1" }, NOW).map((r) => r.file)).toEqual(["a.ts"]);
+    expect(unresolved(records, { session_id: "s1" }, NOW).map((r) => r.file)).toEqual(["b.ts", "a.ts"]);
   });
 
   test("SubagentStop only looks at that subagent's files; re-checked files are skipped until edited again", () => {

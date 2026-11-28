@@ -17,15 +17,38 @@ function check(session: string, file: string, rules: string[], tier: "high" | "m
   };
 }
 
+function stop(session: string, file: string, scope: string[], flags: string[] = []): CheckRecord {
+  return { ...check(session, file, flags), tool: "recheck", changeKind: "recheck", checkedRules: scope };
+}
+
 describe("findings outcomes", () => {
-  test("fixed when a later check of the file no longer flags the rule", () => {
-    const [s] = summarize([check("a", "x.ts", ["r"]), check("a", "x.ts", [])]);
+  test("fixed when the whole-file recheck clears the rule", () => {
+    const [s] = summarize([check("a", "x.ts", ["r"]), stop("a", "x.ts", ["r"])]);
     expect([s.fixed, s.kept, s.unknown]).toEqual([1, 0, 0]);
   });
 
   test("kept when the rule is still flagged at the last check", () => {
-    const [s] = summarize([check("a", "x.ts", ["r"]), check("a", "x.ts", ["r"])]);
+    const [s] = summarize([check("a", "x.ts", ["r"]), stop("a", "x.ts", ["r"], ["r"])]);
     expect([s.fixed, s.kept, s.unknown]).toEqual([0, 1, 0]);
+  });
+
+  test("edits, out-of-scope rechecks and stale results cannot clear a warning", () => {
+    const origin = check("a", "x.ts", ["r", "s"]);
+    const edit = check("a", "x.ts", []);
+    const stale = { ...stop("a", "x.ts", ["r"]), recheckOf: origin.ts };
+    const scoped = { ...stop("a", "x.ts", ["s"]), recheckOf: edit.ts };
+    const fs = findingsOf([origin, edit, stale, scoped]);
+    expect(fs.map((f) => [f.rule, f.outcome, f.evidence])).toEqual([
+      ["r", "unknown", undefined],
+      ["s", "fixed", "scoped-recheck"],
+    ]);
+    expect(findingsOf([origin, scoped, edit, check("a", "x.ts", ["s"])])[1].outcome).toBe("unknown");
+  });
+  test("legacy clearance requires enough evidence to identify the full scope", () => {
+    const edit = check("a", "x.ts", ["r", "s"]);
+    const legacy = { ...stop("a", "x.ts", ["r", "s"], ["r"]), checkedRules: undefined, asked: 1, gatedOut: 0 };
+    expect(findingsOf([edit, legacy]).map((f) => f.outcome)).toEqual(["kept", "unknown"]);
+    expect(findingsOf([edit, { ...legacy, gatedOut: 1 }])[1]).toMatchObject({ outcome: "fixed", evidence: "legacy-recheck" });
   });
 
   test("unknown when the file is never checked again in that session", () => {
@@ -35,29 +58,30 @@ describe("findings outcomes", () => {
 
   test("recurring fixes across sessions suggest guidance; recurring kept flags suggest reviewing the rule", () => {
     const records: CheckRecord[] = [];
-    for (const session of ["a", "b", "c", "d", "e"]) records.push(check(session, "x.ts", ["often-fixed"]), check(session, "x.ts", []));
+    for (const session of ["a", "b", "c", "d", "e"])
+      records.push(check(session, "x.ts", ["often-fixed"]), stop(session, "x.ts", ["often-fixed"]));
     for (const session of ["f", "g", "h", "i", "j"])
-      records.push(check(session, "y.ts", ["often-kept"]), check(session, "y.ts", ["often-kept"]));
+      records.push(check(session, "y.ts", ["often-kept"]), stop(session, "y.ts", ["often-kept"], ["often-kept"]));
     const byRule = Object.fromEntries(summarize(records).map((s) => [s.rule, s]));
     expect(byRule["often-fixed"].suggestion).toBe("add-guidance");
     expect(byRule["often-kept"].suggestion).toBe("review-rule");
   });
 
   test("a single noisy session is only watched", () => {
-    const records = [check("a", "x.ts", ["r"]), check("a", "x.ts", []), check("a", "z.ts", ["r"]), check("a", "z.ts", [])];
+    const records = [check("a", "x.ts", ["r"]), stop("a", "x.ts", ["r"]), check("a", "z.ts", ["r"]), check("a", "z.ts", [])];
     expect(summarize(records)[0].suggestion).toBe("watch");
   });
 
   test("three events across three sessions is still only watched", () => {
     const records: CheckRecord[] = [];
-    for (const session of ["a", "b", "c"]) records.push(check(session, "x.ts", ["r"]), check(session, "x.ts", []));
+    for (const session of ["a", "b", "c"]) records.push(check(session, "x.ts", ["r"]), stop(session, "x.ts", ["often-fixed"]));
     expect(summarize(records)[0].suggestion).toBe("watch");
   });
 
   test("a rule ignored 3 of 5 times is not yet a confident review-rule", () => {
     const records: CheckRecord[] = [];
-    for (const s of ["a", "b", "c"]) records.push(check(s, "y.ts", ["r"]), check(s, "y.ts", ["r"]));
-    for (const s of ["d", "e"]) records.push(check(s, "y.ts", ["r"]), check(s, "y.ts", []));
+    for (const s of ["a", "b", "c"]) records.push(check(s, "y.ts", ["r"]), stop(s, "y.ts", ["r"], ["r"]));
+    for (const s of ["d", "e"]) records.push(check(s, "y.ts", ["r"]), stop(s, "y.ts", ["r"]));
     expect(summarize(records)[0].suggestion).toBe("watch");
   });
 });
@@ -77,8 +101,8 @@ describe("clusters and comparisons", () => {
   test("the same rule splits into a test cluster and a source cluster", () => {
     const records: CheckRecord[] = [];
     for (const s of ["a", "b", "c", "d", "e"]) {
-      records.push(check(s, "/repo/src/a.test.ts", ["magic"]), check(s, "/repo/src/a.test.ts", ["magic"]));
-      records.push(check(s, "/repo/src/a.ts", ["magic"]), check(s, "/repo/src/a.ts", []));
+      records.push(check(s, "/repo/src/a.test.ts", ["magic"]), stop(s, "/repo/src/a.test.ts", ["magic"], ["magic"]));
+      records.push(check(s, "/repo/src/a.ts", ["magic"]), stop(s, "/repo/src/a.ts", ["magic"]));
     }
     const byTest = Object.fromEntries(clusters(records).map((c) => [String(c.test), c]));
     expect(byTest.true.action).toBe("review-rule");
@@ -116,7 +140,7 @@ describe("threads", () => {
   });
 
   test("subagents of one conversation count as one session", () => {
-    const records = ["a1", "a2", "a3"].flatMap((a) => [sub("root", a, "x.ts", ["r"]), sub("root", a, "x.ts", [])]);
+    const records = ["a1", "a2", "a3"].flatMap((a) => [sub("root", a, "x.ts", ["r"]), { ...stop("root", "x.ts", ["r"]), agent: a }]);
     const [s] = summarize(records);
     expect([s.fixed, s.sessions]).toEqual([3, 1]);
   });
@@ -194,7 +218,7 @@ describe("flagged lines", () => {
     };
     const fs = findingsOf([fresh, old]);
     // `fresh` sorts later; findingsOf reports each rule at its first flag in the thread
-    expect(fs.find((f) => f.rule === "a")).toMatchObject({ excerpt: "import header", outcome: "kept" });
+    expect(fs.find((f) => f.rule === "a")).toMatchObject({ excerpt: "import header", outcome: "unknown" });
     expect(fs.find((f) => f.rule === "b")).toMatchObject({ excerpt: "code", outcome: "unknown" });
     const [late] = findingsOf([{ ...fresh, session: "s10" }]);
     expect(late).toMatchObject({ rule: "a", excerpt: "x as any", line: 7 });

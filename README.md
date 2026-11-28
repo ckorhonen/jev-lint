@@ -410,18 +410,21 @@ repo dogfoods it: see [`.jev-lint/`](.jev-lint/).
 ### Learn from what it catches
 
 The hook keeps a local findings log: one line per checked file, with the rules that fired,
-the lines around each flag, latency and tokens. For each finding it records whether the agent **fixed**
-it on a later edit, **kept** it (disagreed or ignored it), or never touched the file again.
-At the end of each turn, a re-check hook (`src/recheck.ts`, installed on `Stop` and
-`SubagentStop` by `install.ts`) looks again at files that still had findings, so almost every
-finding gets a fixed-or-kept outcome. Subagents are tracked separately.
+the lines around each flag, latency and tokens. At the end of the turn, the Stop or SubagentStop hook rechecks pending rules
+against the whole file. **Fixed** means a targeted recheck cleared the warning. **Kept**
+means it still fired. **Unknown** means there is no applicable whole-file result since the
+warning. A later patch to another line leaves it pending. Each subagent is tracked separately.
 
 ```sh
+bun src/findings.ts --rule ts-boolean-trap       # show evidence, recheck result and author feedback
+bun src/findings.ts --mark <id> --as fixed       # credit the warning for a fix; also accepts intentional or dismissed
 bun src/findings.ts --repo /absolute/path/to/target-repo --days 30              # per rule, plus failed checks and judge cost
 bun src/findings.ts --repo /absolute/path/to/target-repo --clusters             # rule × area × test/non-test
 bun src/findings.ts --repo /absolute/path/to/target-repo --compare <rule> --at <date>   # before/after, 95% CI
 bun src/valueAudit.ts --repo /absolute/path/to/target-repo --days 30            # LLM-graded: were the fixed/kept findings worth it?
 ```
+
+A cleared recheck means the rule stopped firing on the whole file. Only mark a warning as fixed when it prompted the change. The [four-PR boolean-trap audit](docs/boolean-trap-review.md) shows how the distinction affects interpretation.
 
 The **value audit** asks `gpt-6-luna` whether a reviewer would have asked for each fixed or
 kept change (bug, security, review comment) or whether it was style or noise; see
