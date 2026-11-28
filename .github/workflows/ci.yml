@@ -15,7 +15,7 @@ jobs:
           persist-credentials: false
       - uses: oven-sh/setup-bun@v2
         with:
-          bun-version: "1.2.14"
+          bun-version: "1.4.5"
       - run: bun install --frozen-lockfile
       - run: bun run typecheck
       - run: bun run lint
