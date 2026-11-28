@@ -1,0 +1,227 @@
+{
+  "generatedAt": "2026-11-28T15:17:35.265Z",
+  "runs": 15,
+  "delayMs": 50,
+  "scenarios": {
+    "noop-unknown-file": {
+      "cold": {
+        "latencyMs": {
+          "runs": 15,
+          "mean": 30.45491913333333,
+          "min": 27.735138999999975,
+          "p50": 29.653437999999994,
+          "p90": 33.87451399999998,
+          "max": 35.31932900000001,
+          "failures": 0
+        },
+        "transfer": {
+          "apiRequests": 0,
+          "questions": 0,
+          "bytesInPerHook": 0,
+          "bytesOutPerHook": 0,
+          "bytesInPerRequest": 0,
+          "bytesOutPerRequest": 0,
+          "meanQuestionsPerRequest": 0,
+          "meanStateBytesPerRequest": 0
+        }
+      },
+      "warm": {
+        "latencyMs": {
+          "runs": 15,
+          "mean": 18.73084439999999,
+          "min": 16.261833000000024,
+          "p50": 17.652503999999908,
+          "p90": 25.95456700000011,
+          "max": 26.514719000000014,
+          "failures": 0
+        },
+        "transfer": {
+          "apiRequests": 0,
+          "questions": 0,
+          "bytesInPerHook": 0,
+          "bytesOutPerHook": 0,
+          "bytesInPerRequest": 0,
+          "bytesOutPerRequest": 0,
+          "meanQuestionsPerRequest": 0,
+          "meanStateBytesPerRequest": 0
+        }
+      }
+    },
+    "small-ts-edit": {
+      "cold": {
+        "latencyMs": {
+          "runs": 15,
+          "mean": 88.09399366666662,
+          "min": 82.48343399999999,
+          "p50": 85.23778700000003,
+          "p90": 96.69875699999966,
+          "max": 118.29357999999979,
+          "failures": 0
+        },
+        "transfer": {
+          "apiRequests": 15,
+          "questions": 15,
+          "bytesInPerHook": 653,
+          "bytesOutPerHook": 115,
+          "bytesInPerRequest": 653,
+          "bytesOutPerRequest": 115,
+          "meanQuestionsPerRequest": 1,
+          "meanStateBytesPerRequest": 161
+        }
+      },
+      "warm": {
+        "latencyMs": {
+          "runs": 15,
+          "mean": 69.04190893333325,
+          "min": 67.65947099999994,
+          "p50": 68.44122899999957,
+          "p90": 70.43260400000008,
+          "max": 74.39290500000016,
+          "failures": 0
+        },
+        "transfer": {
+          "apiRequests": 15,
+          "questions": 15,
+          "bytesInPerHook": 653,
+          "bytesOutPerHook": 115,
+          "bytesInPerRequest": 653,
+          "bytesOutPerRequest": 115,
+          "meanQuestionsPerRequest": 1,
+          "meanStateBytesPerRequest": 161
+        }
+      }
+    },
+    "trigger-ts-edit": {
+      "cold": {
+        "latencyMs": {
+          "runs": 15,
+          "mean": 85.62157559999987,
+          "min": 83.6874170000001,
+          "p50": 85.0019829999992,
+          "p90": 88.38867399999981,
+          "max": 93.07409999999982,
+          "failures": 0
+        },
+        "transfer": {
+          "apiRequests": 15,
+          "questions": 165,
+          "bytesInPerHook": 11331,
+          "bytesOutPerHook": 447,
+          "bytesInPerRequest": 11331,
+          "bytesOutPerRequest": 447,
+          "meanQuestionsPerRequest": 11,
+          "meanStateBytesPerRequest": 358
+        }
+      },
+      "warm": {
+        "latencyMs": {
+          "runs": 15,
+          "mean": 68.99493373333341,
+          "min": 66.77498900000046,
+          "p50": 68.78419200000008,
+          "p90": 71.50488899999982,
+          "max": 72.14453700000013,
+          "failures": 0
+        },
+        "transfer": {
+          "apiRequests": 15,
+          "questions": 165,
+          "bytesInPerHook": 11331,
+          "bytesOutPerHook": 447,
+          "bytesInPerRequest": 11331,
+          "bytesOutPerRequest": 447,
+          "meanQuestionsPerRequest": 11,
+          "meanStateBytesPerRequest": 358
+        }
+      }
+    },
+    "large-ts-write": {
+      "cold": {
+        "latencyMs": {
+          "runs": 15,
+          "mean": 90.63602059999994,
+          "min": 88.59053399999993,
+          "p50": 89.89863100000002,
+          "p90": 93.1279199999999,
+          "max": 95.72193499999958,
+          "failures": 0
+        },
+        "transfer": {
+          "apiRequests": 15,
+          "questions": 60,
+          "bytesInPerHook": 22258,
+          "bytesOutPerHook": 215,
+          "bytesInPerRequest": 22258,
+          "bytesOutPerRequest": 215,
+          "meanQuestionsPerRequest": 4,
+          "meanStateBytesPerRequest": 20505
+        }
+      },
+      "warm": {
+        "latencyMs": {
+          "runs": 15,
+          "mean": 72.9170788666667,
+          "min": 71.25065600000016,
+          "p50": 73.14686299999994,
+          "p90": 73.74825799999962,
+          "max": 75.59822800000074,
+          "failures": 0
+        },
+        "transfer": {
+          "apiRequests": 15,
+          "questions": 60,
+          "bytesInPerHook": 22258,
+          "bytesOutPerHook": 215,
+          "bytesInPerRequest": 22258,
+          "bytesOutPerRequest": 215,
+          "meanQuestionsPerRequest": 4,
+          "meanStateBytesPerRequest": 20505
+        }
+      }
+    },
+    "multi-file-patch": {
+      "cold": {
+        "latencyMs": {
+          "runs": 15,
+          "mean": 139.87029293333313,
+          "min": 134.72484500000064,
+          "p50": 138.53398299999935,
+          "p90": 148.2494800000004,
+          "max": 150.58000399999946,
+          "failures": 0
+        },
+        "transfer": {
+          "apiRequests": 120,
+          "questions": 720,
+          "bytesInPerHook": 47880,
+          "bytesOutPerHook": 2248,
+          "bytesInPerRequest": 5985,
+          "bytesOutPerRequest": 281,
+          "meanQuestionsPerRequest": 6,
+          "meanStateBytesPerRequest": 252.5
+        }
+      },
+      "warm": {
+        "latencyMs": {
+          "runs": 15,
+          "mean": 122.84400240000008,
+          "min": 119.40739100000064,
+          "p50": 121.17068199999994,
+          "p90": 131.67492200000015,
+          "max": 132.52019699999983,
+          "failures": 0
+        },
+        "transfer": {
+          "apiRequests": 120,
+          "questions": 720,
+          "bytesInPerHook": 47880,
+          "bytesOutPerHook": 2248,
+          "bytesInPerRequest": 5985,
+          "bytesOutPerRequest": 281,
+          "meanQuestionsPerRequest": 6,
+          "meanStateBytesPerRequest": 252.5
+        }
+      }
+    }
+  }
+}
