@@ -8,16 +8,16 @@
     "render:square": "remotion render src/index.ts JevLintSquare out/jev-lint-square.mp4 --codec=h264 --crf=20"
   },
   "devDependencies": {
-    "@types/react": "19.3.0",
+    "@types/react": "19.3.3",
     "typescript": "7.0.2"
   },
   "dependencies": {
-    "@remotion/cli": "4.0.529",
-    "@remotion/fonts": "4.0.529",
-    "@remotion/media": "4.0.529",
-    "@remotion/transitions": "4.0.529",
-    "react": "19.3.0",
-    "react-dom": "19.3.0",
-    "remotion": "4.0.529"
+    "@remotion/cli": "4.0.547",
+    "@remotion/fonts": "4.0.547",
+    "@remotion/media": "4.0.547",
+    "@remotion/transitions": "4.0.547",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "remotion": "4.0.547"
   }
 }
