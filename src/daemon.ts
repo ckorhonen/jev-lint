@@ -58,7 +58,9 @@ function removeIfOurs(path: string, inode: number | undefined) {
 }
 
 function main() {
-  const socket = daemonSocketPath();
+  const socketPath = daemonSocketPath();
+  if (!socketPath) return; // no user-only state directory: the hook checks in process instead
+  const socket: string = socketPath;
   const lock = `${socket}.lock`;
   mkdirSync(dirname(socket), { recursive: true, mode: 0o700 });
   chmodSync(dirname(socket), 0o700); // also holds the findings log, which has code excerpts

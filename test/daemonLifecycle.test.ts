@@ -6,6 +6,12 @@ import { dirname, join } from "node:path";
 import { checkViaDaemon, daemonSocketPath, startDaemon } from "../src/daemonClient";
 import { cloudflareKey } from "../src/jev";
 
+function requiredSocketPath(): string {
+  const socket = daemonSocketPath();
+  if (!socket) throw new Error("test requires a state directory");
+  return socket;
+}
+
 const names = ["JEV_LINT_PROVIDER", "CLOUDFLARE_API_TOKEN", "CLOUDFLARE_API_TOKEN_FILE", "TYPESAFE_API_KEY_FILE", "XDG_STATE_HOME"];
 let saved: Record<string, string | undefined>;
 let originalCwd: string;
@@ -30,11 +36,19 @@ afterEach(() => {
 });
 
 test("a daemon timeout never kills, deletes ownership files, or spawns a replacement", async () => {
-  const socket = daemonSocketPath();
+  const socket = requiredSocketPath();
   mkdirSync(dirname(socket), { recursive: true, mode: 0o700 });
-  const files = [socket, `${socket}.lock`, `${socket}.started`];
+  const server = Bun.listen({
+    unix: socket,
+    socket: {
+      open() {}, // accept and never answer, forcing the client-side deadline
+      data() {},
+      close() {},
+      error() {},
+    },
+  });
+  const files = [`${socket}.lock`, `${socket}.started`];
   for (const file of files) writeFileSync(file, "dummy-owned-state", { mode: 0o600 });
-  const fetchMock = spyOn(globalThis, "fetch").mockRejectedValue(new DOMException("dummy timeout", "TimeoutError"));
   const killMock = spyOn(process, "kill").mockImplementation(() => true);
   const spawnMock = spyOn(childProcess, "spawn").mockImplementation(() => {
     throw new Error("replacement must not spawn");
@@ -42,16 +56,58 @@ test("a daemon timeout never kills, deletes ownership files, or spawns a replace
   try {
     const changes = [{ filePath: "/tmp/dummy.ts", addedCode: "dummy", changeKind: "write" as const }];
     expect(await checkViaDaemon(changes, { timeoutMs: 1 })).toEqual([{ ok: false, error: "daemon timeout" }]);
-    expect(fetchMock).toHaveBeenCalledTimes(1); // No health probe or external fallback.
     expect(killMock).not.toHaveBeenCalled();
     expect(spawnMock).not.toHaveBeenCalled();
     for (const file of files) expect(readFileSync(file, "utf8")).toBe("dummy-owned-state");
   } finally {
-    fetchMock.mockRestore();
+    server.stop(true);
     killMock.mockRestore();
     spawnMock.mockRestore();
   }
 });
+
+test("a wedged daemon cannot keep the hook process alive", async () => {
+  const socket = requiredSocketPath();
+  mkdirSync(dirname(socket), { recursive: true, mode: 0o700 });
+  let accepted = false;
+  const server = Bun.listen({
+    unix: socket,
+    socket: {
+      open() {
+        accepted = true; // accept and never answer
+      },
+      data() {},
+      close() {},
+      error() {},
+    },
+  });
+  const project = join(root, "repo");
+  mkdirSync(join(project, ".git"), { recursive: true });
+  const child = childProcess.spawn(process.execPath, [join(import.meta.dir, "../src/hook.ts")], {
+    cwd: project,
+    env: { ...process.env, JEV_LINT_TIMEOUT_MS: "30", JEV_LINT_FINDINGS_LOG: "off" },
+    stdio: ["pipe", "pipe", "pipe"],
+  });
+  child.stdin.end(
+    `${JSON.stringify({
+      hook_event_name: "PostToolUse",
+      session_id: "wedged-daemon-test",
+      tool_name: "Write",
+      cwd: project,
+      tool_input: { file_path: join(project, "x.ts"), content: "export const x = 1;\n" },
+    })}\n`,
+  );
+  const exit = new Promise<number | null>((resolve) => child.once("exit", (code) => resolve(code)));
+  const code = await Promise.race([exit, Bun.sleep(1500).then(() => "still running" as const)]);
+  try {
+    if (code === "still running") child.kill();
+    expect(code).toBe(0);
+    expect(accepted).toBe(true);
+  } finally {
+    server.stop(true);
+    if (!child.killed) child.kill();
+  }
+}, 5000);
 
 test.each(["CLOUDFLARE_API_TOKEN_FILE", "TYPESAFE_API_KEY_FILE"])(
   "relative %s filenames in different projects isolate daemon identity",
@@ -73,7 +129,7 @@ test("the spawned TypeSafe child retains the caller key filename without Keychai
   writeFileSync("dummy-key", "dummy-expected", { mode: 0o600 });
   process.env.JEV_LINT_PROVIDER = "typesafe";
   process.env.TYPESAFE_API_KEY_FILE = "dummy-key";
-  const socket = daemonSocketPath();
+  const socket = requiredSocketPath();
   const probe = `import { readFileSync } from "node:fs";
     import { daemonSocketPath } from ${JSON.stringify(join(import.meta.dir, "../src/daemonClient.ts"))};
     console.log(JSON.stringify({ credentialMatches: readFileSync(process.env.TYPESAFE_API_KEY_FILE, "utf8") === "dummy-expected", socket: daemonSocketPath() }));`;
@@ -91,7 +147,7 @@ test("the spawned TypeSafe child retains the caller key filename without Keychai
     return { pid: 12345, unref() {} } as childProcess.ChildProcess;
   }) as typeof childProcess.spawn);
   try {
-    expect(startDaemon()).toBe(12345);
+    expect(startDaemon({}, spawnMock as unknown as typeof childProcess.spawn)).toBe(12345);
     expect(spawnMock).toHaveBeenCalledTimes(1);
     expect(process.env.TYPESAFE_API_KEY_FILE).toBe("dummy-key");
   } finally {
@@ -113,7 +169,7 @@ test.each(["relative", "absolute"])("%s Cloudflare symlink/.. paths retain crede
   const original = kind === "relative" ? relative : absolute;
   process.env.CLOUDFLARE_API_TOKEN_FILE = original;
   expect(cloudflareKey()).toBe("dummy-expected");
-  const socket = daemonSocketPath();
+  const socket = requiredSocketPath();
   const probe = `import { cloudflareKey } from ${JSON.stringify(join(import.meta.dir, "../src/jev.ts"))};
     import { daemonSocketPath } from ${JSON.stringify(join(import.meta.dir, "../src/daemonClient.ts"))};
     console.log(JSON.stringify({ credentialMatches: cloudflareKey() === "dummy-expected", socket: daemonSocketPath() }));`;
@@ -131,7 +187,7 @@ test.each(["relative", "absolute"])("%s Cloudflare symlink/.. paths retain crede
     return { pid: 12345, unref() {} } as childProcess.ChildProcess;
   }) as typeof childProcess.spawn);
   try {
-    expect(startDaemon()).toBe(12345);
+    expect(startDaemon({}, spawnMock as unknown as typeof childProcess.spawn)).toBe(12345);
     expect(spawnMock).toHaveBeenCalledTimes(1);
     expect(process.env.CLOUDFLARE_API_TOKEN_FILE).toBe(original);
   } finally {

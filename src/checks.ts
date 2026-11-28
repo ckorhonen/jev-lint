@@ -1,13 +1,12 @@
 // The hosted TypeSafe hook can send its eight selected files in one wave. Local servers
 // and other providers keep the four-worker limit. Results stay in input order.
 import type { ChangedFile } from "./extract";
-import type { LintResult } from "./lint";
+import { MAX_FILES, type Settled } from "./results";
 
-export const MAX_FILES = 8;
+export type { Settled } from "./results";
+export { isSettledList, MAX_FILES } from "./results";
+
 const DEFAULT_PARALLEL = 4;
-
-// Serializable, so the daemon can send it over its socket.
-export type Settled = { ok: true; value: LintResult | undefined } | { ok: false; error: string };
 
 export async function runChecks(changes: ChangedFile[], opts: { timeoutMs: number; cwd?: string }): Promise<Settled[]> {
   const settled: Settled[] = [];
@@ -41,8 +40,4 @@ export async function runChecks(changes: ChangedFile[], opts: { timeoutMs: numbe
 export function isChangedFile(value: unknown): value is ChangedFile {
   const c = value as ChangedFile;
   return Boolean(c && typeof c.filePath === "string" && typeof c.addedCode === "string" && typeof c.changeKind === "string");
-}
-
-export function isSettledList(value: unknown): value is Settled[] {
-  return Array.isArray(value) && value.every((s) => s && typeof s === "object" && typeof (s as Settled).ok === "boolean");
 }

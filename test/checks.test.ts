@@ -130,7 +130,7 @@ test("TypeSafe bounds a stalled transport and body even when cancellation is ign
   try {
     mock.mockReturnValueOnce(new Promise<Response>(() => {}));
     const stalledBody = new Response();
-    stalledBody.json = () => new Promise(() => {});
+    stalledBody.text = () => new Promise(() => {});
     mock.mockResolvedValueOnce(stalledBody);
     for (let i = 0; i < 2; i++) {
       await expect(askNouls({}, {}, options)).rejects.toThrow("TypeSafe deadline exceeded");

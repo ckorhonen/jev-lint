@@ -17,11 +17,13 @@
 // Default path: ~/.local/state/jev-lint/findings.jsonl. JEV_LINT_FINDINGS_LOG=off disables it.
 
 import { appendFileSync, existsSync, mkdirSync } from "node:fs";
-import { homedir } from "node:os";
 import { dirname, isAbsolute, join, parse, relative, resolve } from "node:path";
 import type { ChangedFile } from "./extract";
 import type { LintResult, Tier } from "./lint";
 import { firstGateMatch } from "./ruleGate";
+import { stateDir } from "./state";
+
+export { stateDir } from "./state";
 
 const EXCERPT_CHARS = 400;
 const LINES_BEFORE = 3;
@@ -44,20 +46,18 @@ export type CheckRecord = {
   error?: string; // the check failed (timeout, API error); fail-open means the agent saw nothing
   latencyMs?: number; // time for the judge call
   inputTokens?: number; // judge input tokens (Jev bills input only)
+  requestBytes?: number; // judge request JSON bytes
+  responseBytes?: number; // judge response JSON bytes
   asked?: number; // rules sent to the judge after the gate
   gatedOut?: number; // rules skipped by their `when` patterns
 };
 
-// Findings log, daemon sockets and pre-mode denials live here. XDG_STATE_HOME lets tests
-// (and non-standard setups) keep them out of the real state directory.
-export function stateDir(): string {
-  return join(process.env.XDG_STATE_HOME || join(homedir(), ".local/state"), "jev-lint");
-}
-
 export function findingsLogPath(): string | undefined {
   const configured = process.env.JEV_LINT_FINDINGS_LOG;
   if (configured === "off") return undefined;
-  return configured || join(stateDir(), "findings.jsonl");
+  if (configured) return configured;
+  const state = stateDir();
+  return state ? join(state, "findings.jsonl") : undefined;
 }
 
 // Nearest directory above the file that has .git or .jev-lint; otherwise the event cwd.
@@ -105,6 +105,8 @@ export function toRecords(results: LintResult[], changes: ChangedFile[], event: 
       flagged,
       latencyMs: Math.round(r.latencyMs),
       inputTokens: r.inputTokens,
+      requestBytes: r.requestBytes,
+      responseBytes: r.responseBytes,
       asked: r.asked,
       gatedOut: r.gatedOut,
       ...(flagged.length ? { excerpt } : {}),

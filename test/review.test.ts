@@ -19,7 +19,12 @@ test("PR worker replies before EOF, processes every file once, and reloads repo 
       return Response.json({
         model: "fixture",
         usage: { input_tokens: 1, output_tokens: 0 },
-        answers: Object.fromEntries(Object.keys(questions).map((k) => [k, { type: "noul", noul: k === "ts-no-magic-numbers" ? 1 : 0 }])),
+        answers: Object.fromEntries(
+          Object.entries(questions).map(([k, q]) => [
+            k,
+            { type: "noul", noul: (q as { instructions?: string }).instructions?.includes("numeric literal") ? 1 : 0 },
+          ]),
+        ),
       });
     },
   });

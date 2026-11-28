@@ -5,9 +5,9 @@ import { createInterface } from "node:readline";
 import { Readable } from "node:stream";
 import { MAX_FILES, runChecks } from "./checks";
 import { extractChanges } from "./extract";
-import { isInsideRepo } from "./findingsLog";
 import { clearRepoCache } from "./repoRules";
 import { clearGateCache } from "./ruleGate";
+import { isInsideRepo } from "./scope";
 
 // Read the pipe without waiting for EOF, including on Bun 1.2.
 async function* stdinChunks() {

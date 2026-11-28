@@ -42,7 +42,9 @@ afterEach(() => {
 
 test("documented POST contract translates state and criteria without System One fields", async () => {
   const state = { added_code: "code", language: "typescript" };
-  const result = await askNouls(state, { rule: question });
+  const { requestBytes, responseBytes, ...result } = await askNouls(state, { rule: question });
+  expect(requestBytes).toBeGreaterThan(0);
+  expect(responseBytes).toBeGreaterThan(0);
   expect(result).toEqual({
     model: "gpt-6-luna",
     answers: { rule: { type: "noul", noul: 0.9 } },
@@ -64,7 +66,7 @@ test.each(["transport", "body"])("a stalled %s cannot outlive the Decisions dead
     mock.mockReturnValue(new Promise<Response>(() => {}));
   } else {
     const stalled = Response.json({});
-    stalled.json = () => new Promise(() => {});
+    stalled.text = () => new Promise(() => {});
     mock.mockResolvedValue(stalled);
   }
   await expect(askNouls({}, { rule: question }, { timeoutMs: 50 })).rejects.toMatchObject({ name: "TimeoutError" });

@@ -168,6 +168,8 @@ export type LintResult = {
   findings: Finding[];
   latencyMs: number;
   inputTokens: number;
+  requestBytes?: number;
+  responseBytes?: number;
   model: string;
   asked: number; // rules sent to the model after gating
   gatedOut: number; // rules skipped by their `when` patterns
@@ -196,16 +198,26 @@ export async function lintChange(
   const gate = opts.gate ?? process.env.JEV_LINT_GATE !== "off";
   const asked = gate ? gateRules(ruleSet, change.addedCode) : ruleSet;
   const state = { language: ruleSet.language, file_path: change.filePath, added_code: change.addedCode };
+  // Question ids are response keys rather than model input, so use compact aliases on
+  // the wire and map them back here. Long rule ids otherwise repeat in both directions.
+  const aliases = new Map(asked.rules.map((rule, index) => [rule.id, `q${index}`]));
+  const wireQuestions = Object.fromEntries(
+    asked.rules.map((rule, index) => [
+      `q${index}`,
+      { type: "noul" as const, instructions: rule.question, criteria: { true: rule.true, false: rule.false } },
+    ]),
+  );
   const started = performance.now();
   const response = asked.rules.length
-    ? await askNouls(state, buildQuestions(asked), opts)
-    : { answers: {}, usage: { input_tokens: 0, output_tokens: 0 }, model: "gated" };
+    ? await askNouls(state, wireQuestions, opts)
+    : { answers: {}, usage: { input_tokens: 0, output_tokens: 0 }, requestBytes: 0, responseBytes: 0, model: "gated" };
   const latencyMs = performance.now() - started;
 
   const probabilities: Record<string, number> = {};
   const findings: Finding[] = [];
   for (const rule of ruleSet.rules) {
-    const probability = (response.answers as Record<string, { noul: number }>)[rule.id]?.noul ?? 0;
+    const alias = aliases.get(rule.id);
+    const probability = (alias ? (response.answers as Record<string, { noul: number }>)[alias]?.noul : undefined) ?? 0;
     probabilities[rule.id] = probability;
     const tier = tierFor(probability, opts.thresholds, rule.thresholds, response.model);
     if (tier) findings.push({ ruleId: rule.id, probability, tier, fix: rule.fix, ...(rule.when ? { when: rule.when } : {}) });
@@ -220,6 +232,8 @@ export async function lintChange(
     findings,
     latencyMs,
     inputTokens: response.usage.input_tokens,
+    requestBytes: response.requestBytes,
+    responseBytes: response.responseBytes,
     model: response.model,
     asked: asked.rules.length,
     gatedOut: ruleSet.rules.length - asked.rules.length,

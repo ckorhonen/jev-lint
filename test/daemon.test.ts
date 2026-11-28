@@ -22,6 +22,12 @@ process.env.TYPESAFE_BASE_URL = `http://127.0.0.1:${mock.port}`;
 process.env.XDG_STATE_HOME = mkdtempSync("/tmp/jev-lint-state-");
 const { checkViaDaemon, daemonSocketPath, startDaemon } = await import("../src/daemonClient");
 
+function requiredSocketPath(): string {
+  const socket = daemonSocketPath();
+  if (!socket) throw new Error("test requires a state directory");
+  return socket;
+}
+
 const repo = mkdtempSync(join(tmpdir(), "jev-lint-daemon-"));
 mkdirSync(join(repo, ".git"));
 const change = { filePath: join(repo, "a.ts"), addedCode: "try { run(); } catch (e) {}\n", changeKind: "write" as const };
@@ -74,8 +80,19 @@ describe("daemon", () => {
     expect(await asked()).toBe(true);
   });
 
+  test("a request larger than the socket buffer is written completely", async () => {
+    const large = Array.from({ length: 8 }, (_, i) => ({
+      filePath: join(repo, `large-${i}.ts`),
+      addedCode: `export const value${i} = "${"x".repeat(80_000)}";\n`,
+      changeKind: "write" as const,
+    }));
+    const settled = await checkViaDaemon(large, { timeoutMs: 5000, cwd: repo });
+    expect(settled).toHaveLength(8);
+    expect(settled?.every((s) => s.ok)).toBe(true);
+  }, 10_000);
+
   test("starting more daemons while one runs leaves exactly one owner", async () => {
-    const socket = daemonSocketPath();
+    const socket = requiredSocketPath();
     const owner = readFileSync(`${socket}.lock`, "utf8").trim();
     const extra = [1, 2, 3].map(() => startDaemon({ force: true }));
     await Bun.sleep(1500);

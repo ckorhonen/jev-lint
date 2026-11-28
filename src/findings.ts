@@ -411,10 +411,12 @@ if (import.meta.main) {
     if (timed.length) {
       const lat = timed.map((r) => r.latencyMs as number).sort((a, b) => a - b);
       const tokens = timed.reduce((n, r) => n + (r.inputTokens ?? 0), 0);
+      const requestBytes = timed.reduce((n, r) => n + (r.requestBytes ?? 0), 0);
+      const responseBytes = timed.reduce((n, r) => n + (r.responseBytes ?? 0), 0);
       const asked = timed.reduce((n, r) => n + (r.asked ?? 0), 0);
       const total = asked + timed.reduce((n, r) => n + (r.gatedOut ?? 0), 0);
       console.log(
-        `judge: median ${lat[Math.floor(lat.length / 2)]} ms, p90 ${lat[Math.floor(lat.length * 0.9)]} ms; ${tokens} input tokens; ${asked} of ${total} rules asked after the gate`,
+        `judge: median ${lat[Math.floor(lat.length / 2)]} ms, p90 ${lat[Math.floor(lat.length * 0.9)]} ms; ${tokens} input tokens; ${requestBytes + responseBytes} JSON bytes (${requestBytes} out/${responseBytes} in); ${asked} of ${total} rules asked after the gate`,
       );
     }
     const jevTokens = timed.filter((r) => /^jev(?:-|$)/.test(r.model)).reduce((n, r) => n + (r.inputTokens ?? 0), 0);

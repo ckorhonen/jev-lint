@@ -88,11 +88,17 @@ export async function askDecisions(state: unknown, questions: Record<string, Nou
         signal,
         redirect: "error",
       });
-      if (res.ok)
-        return decisionsResponse(
-          await res.json(),
-          entries.map(([id]) => id),
-        );
+      if (res.ok) {
+        const text = await res.text();
+        return {
+          ...decisionsResponse(
+            JSON.parse(text),
+            entries.map(([id]) => id),
+          ),
+          requestBytes: Buffer.byteLength(body),
+          responseBytes: Buffer.byteLength(text),
+        };
+      }
       if ((res.status !== 429 && res.status < 500) || attempt >= (opts.retries ?? 0)) throw new Error(`OpenAI Decisions ${res.status}`);
       const retryAfter = Number(res.headers.get("retry-after"));
       await new Promise<void>((resolve, reject) => {
