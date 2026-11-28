@@ -1,12 +1,12 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { basename, dirname, extname, isAbsolute, join, relative, resolve } from "node:path";
 import type { ChangedFile } from "./extract";
-import { ruleApplies } from "./gates";
 import { askNouls, type JudgeProvider, type NoulQuestion } from "./jev";
 import { findRepoConfig } from "./repoRules";
+import { ruleApplies } from "./ruleGate";
 
 export { formatFeedback } from "./feedback";
-export { clearGateCache, firstGateMatch, ruleApplies } from "./gates";
+export { clearGateCache, firstGateMatch, ruleApplies } from "./ruleGate";
 
 // `when`: optional regex sources (case-insensitive). The rule is only asked when one of
 // them matches the added code — a cheap, recall-safe gate that cuts model calls.
@@ -31,7 +31,7 @@ export type Rule = {
   thresholds?: RuleThresholds;
   status?: "candidate";
 };
-export type RuleThresholds = { high?: number; medium?: number | null };
+export type RuleThresholds = { high?: number; medium?: number | null | Record<string, number> };
 // `filenames`: exact file names that belong to the set when the extension alone can't say
 // (Bazel's BUILD, BUILD.bazel, WORKSPACE, MODULE.bazel).
 export type RuleSet = { language: string; extensions: string[]; filenames?: string[]; rules: Rule[] };
@@ -148,10 +148,14 @@ export function buildQuestions(ruleSet: RuleSet): Record<string, NoulQuestion> {
   );
 }
 
-export function tierFor(probability: number, thresholds = THRESHOLDS, rule?: RuleThresholds): Tier | undefined {
+export function tierFor(probability: number, thresholds = THRESHOLDS, rule?: RuleThresholds, model?: string): Tier | undefined {
   const high = rule?.high ?? thresholds.high;
-  const medium = rule?.medium === null ? undefined : (rule?.medium ?? thresholds.medium);
   if (probability >= high) return "high";
+  // A model-specific advisory cutoff enables this tier only for the calibrated model.
+  const cutoff = rule?.medium;
+  if (cutoff === null) return undefined;
+  const medium =
+    typeof cutoff === "object" ? (model && Object.hasOwn(cutoff, model) ? cutoff[model] : undefined) : (cutoff ?? thresholds.medium);
   if (medium !== undefined && probability >= medium) return "medium";
   return undefined;
 }
@@ -215,7 +219,7 @@ export async function lintChange(
     const alias = aliases.get(rule.id);
     const probability = (alias ? (response.answers as Record<string, { noul: number }>)[alias]?.noul : undefined) ?? 0;
     probabilities[rule.id] = probability;
-    const tier = tierFor(probability, opts.thresholds, rule.thresholds);
+    const tier = tierFor(probability, opts.thresholds, rule.thresholds, response.model);
     if (tier) findings.push({ ruleId: rule.id, probability, tier, fix: rule.fix, ...(rule.when ? { when: rule.when } : {}) });
   }
   findings.sort((a, b) => b.probability - a.probability);

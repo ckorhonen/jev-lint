@@ -19,8 +19,8 @@
 import { appendFileSync, existsSync, mkdirSync } from "node:fs";
 import { dirname, isAbsolute, join, parse, relative, resolve } from "node:path";
 import type { ChangedFile } from "./extract";
-import { firstGateMatch } from "./gates";
 import type { LintResult, Tier } from "./lint";
+import { firstGateMatch } from "./ruleGate";
 import { stateDir } from "./state";
 
 export { stateDir } from "./state";

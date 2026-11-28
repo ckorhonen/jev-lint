@@ -21,6 +21,8 @@ export const COMMANDS: Record<string, CliCommand> = {
   validate: { script: "validate.ts", summary: "Validate a repo's .jev-lint rules against labeled cases" },
   inventory: { script: "inventory.ts", summary: "List a repo's instructions, skills, docs, linters, and CI configs" },
   eval: { script: "repoEval.ts", summary: "Evaluate a repo instruction or skill change with paired agent runs" },
+  review: { script: "review.ts", summary: "Review a stream of private PR events (JSON Lines on stdin and stdout)" },
+
   hook: { script: "hook.ts", summary: "Run the PostToolUse/PreToolUse hook (reads hook event JSON on stdin)" },
   recheck: { script: "recheck.ts", summary: "Run the Stop/SubagentStop end-of-turn recheck hook (reads stdin)" },
 };

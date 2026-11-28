@@ -161,7 +161,7 @@ test("local CLI preview writes nothing; apply backs up, preserves unrelated hook
 test("a checkout with spaces and apostrophes has recognised, idempotent quoted hook paths", () => {
   const checkout = join(root, "custom checkout 'name'");
   mkdirSync(join(checkout, "src"), { recursive: true });
-  for (const file of ["install.ts", "jev.ts", "decisions.ts"])
+  for (const file of ["install.ts", "jev.ts", "decisions.ts", "requestDeadline.ts"])
     copyFileSync(join(import.meta.dir, "../src", file), join(checkout, "src", file));
   const probe = `import { hookGroup, isJevLint, mergeHook, recheckGroup, installedMode } from ${JSON.stringify(join(checkout, "src/install.ts"))};
     const group = hookGroup("claude", {bun:"/usr/bin/bun"});

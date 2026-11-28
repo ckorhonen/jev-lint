@@ -1,29 +1,39 @@
-// Lint a hook event's changed files: at most MAX_FILES files, MAX_PARALLEL at a time, so a
-// large multi-file patch can't fan out into dozens of API calls. Shared by the hook (in
-// process) and the daemon (which keeps the API connection open between checks).
-
+// The hosted TypeSafe hook can send its eight selected files in one wave. Local servers
+// and other providers keep the four-worker limit. Results stay in input order.
 import type { ChangedFile } from "./extract";
-import { lintChange } from "./lint";
 import { MAX_FILES, type Settled } from "./results";
 
 export type { Settled } from "./results";
-export { MAX_FILES } from "./results";
+export { isSettledList, MAX_FILES } from "./results";
 
-const MAX_PARALLEL = MAX_FILES;
+const DEFAULT_PARALLEL = 4;
 
 export async function runChecks(changes: ChangedFile[], opts: { timeoutMs: number; cwd?: string }): Promise<Settled[]> {
   const settled: Settled[] = [];
   const deadline = performance.now() + opts.timeoutMs;
-  for (let i = 0; i < changes.length; i += MAX_PARALLEL) {
-    const batch = changes.slice(i, i + MAX_PARALLEL);
-    const remaining = Math.floor(deadline - performance.now());
-    if (remaining <= 0) {
-      settled.push(...changes.slice(i).map((): Settled => ({ ok: false, error: "check deadline exceeded" })));
-      break;
+  const { lintChange } = await import("./lint");
+  let next = 0;
+  async function worker() {
+    while (next < changes.length) {
+      const index = next++;
+      const remaining = Math.floor(deadline - performance.now());
+      if (remaining <= 0) {
+        settled[index] = { ok: false, error: "check deadline exceeded" };
+        continue;
+      }
+      try {
+        const value = await lintChange(changes[index], { ...opts, timeoutMs: remaining });
+        settled[index] = { ok: true, value };
+      } catch (error) {
+        settled[index] = { ok: false, error: String(error) };
+      }
     }
-    const results = await Promise.allSettled(batch.map((c) => lintChange(c, { ...opts, timeoutMs: remaining })));
-    for (const r of results) settled.push(r.status === "fulfilled" ? { ok: true, value: r.value } : { ok: false, error: String(r.reason) });
   }
+  const hostedTypeSafe =
+    (process.env.JEV_LINT_PROVIDER ?? "typesafe") === "typesafe" &&
+    (process.env.TYPESAFE_BASE_URL ?? "https://api.typesafe.ai") === "https://api.typesafe.ai";
+  const parallel = hostedTypeSafe ? MAX_FILES : DEFAULT_PARALLEL;
+  await Promise.all(Array.from({ length: Math.min(changes.length, parallel) }, worker));
   return settled;
 }
 

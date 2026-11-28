@@ -68,6 +68,18 @@ describe("per-rule thresholds and excludePaths", () => {
     expect(tierFor(0.85, undefined, { high: 0.9 })).toBe("medium");
   });
 
+  test("magic-number advisories use the returned Jev version and preserve the high cutoff", async () => {
+    const { tierFor, ruleSetForLanguage } = await import("../src/lint");
+    const rule = ruleSetForLanguage("typescript", ["hygiene"])?.rules.find((r) => r.id === "ts-no-magic-numbers");
+    expect(rule).toBeDefined();
+    expect(tierFor(0.69, undefined, rule?.thresholds, "jev-1.14.0")).toBeUndefined();
+    expect(tierFor(0.7, undefined, rule?.thresholds, "jev-1.14.0")).toBe("medium");
+    for (const model of ["gpt-6-luna", "jev-latest", "jev-1.15.0", undefined]) {
+      expect(tierFor(0.79, undefined, rule?.thresholds, model)).toBeUndefined();
+      expect(tierFor(0.8, undefined, rule?.thresholds, model)).toBe("high");
+    }
+  });
+
   test("excludePaths skips a rule for matching files; repo config thresholds merge per key", () => {
     const dir = mkdtempSync(join(tmpdir(), "jev-lint-thr-"));
     mkdirSync(join(dir, ".jev-lint"));

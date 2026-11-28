@@ -8,7 +8,7 @@
       "true": "At least one added test has no assertion that depends on the real behaviour of the code under test: no assertion, a tautology, an assertion on the test's own stub or input, or the unit under test is itself mocked.",
       "false": "Every added test calls real code and asserts on its output, thrown error, returned value, rendered result, or a side effect it causes (including a mock the unit under test calls, with arguments the unit computed). Weak but real assertions (`toBeTruthy()` on a computed result) do not count. Test helpers, fixtures, factories and setup code without test cases do not count, and neither does code that is not a test.",
       "fix": "Make the test exercise the real code and assert on a result that would change if that code broke; delete it if it can't.",
-      "when": ["\\b(it|test)(\\.\\w+)?\\s*\\(", "describe\\s*\\("]
+      "when": ["(?<!/[dgimsuvy]{0,8}\\.)\\b(it|test)(\\.\\w+)?\\s*\\(", "describe\\s*\\("]
     },
     {
       "id": "ts-test-fixed-sleep",
@@ -24,7 +24,7 @@
       "true": "The assertions contradict or ignore the outcome the test title promises.",
       "false": "The assertions check the titled outcome, even loosely; the title is generic ('works', 'handles input', 'renders'); the title describes a scenario and the assertions check its stated consequence; `it.todo`/`test.todo`. Tests with no real assertion at all belong to ts-test-cannot-fail.",
       "fix": "Make the assertion check the behavior the title promises, or fix the code; never flip an assertion just to make the test pass.",
-      "when": ["\\b(it|test)(\\.\\w+)?\\s*\\("]
+      "when": ["(?<!/[dgimsuvy]{0,8}\\.)\\b(it|test)(\\.\\w+)?\\s*\\("]
     },
     {
       "id": "ts-test-shared-mutable-state",
@@ -32,7 +32,7 @@
       "true": "One test's outcome depends on state left behind by another test.",
       "false": "State is created inside each test or reset in `beforeEach`/`afterEach`; module-level constants and fixtures that no test mutates; resources set up in `beforeAll` that tests only read (a server, a DB connection, a seeded read-only dataset); Playwright fixtures that give each test its own page/storage; code that is not a test.",
       "fix": "Create fresh state in each test or reset it in beforeEach so tests pass in any order (Playwright best practices: make tests isolated).",
-      "when": ["describe|beforeAll|before\\(|test\\.describe|\\b(it|test)\\s*\\("]
+      "when": ["describe|beforeAll|before\\(|test\\.describe|(?<!/[dgimsuvy]{0,8}\\.)\\b(it|test)\\s*\\("]
     },
     {
       "id": "ts-test-special-case-in-source",
@@ -48,7 +48,7 @@
       "true": "A test's pass/fail depends on when it runs, because it asserts on time-dependent output while the real clock is used.",
       "false": "The clock is controlled (fake timers with a set system time (`vi.useFakeTimers()` + `vi.setSystemTime(...)`, `jest.useFakeTimers().setSystemTime(...)`), an injected clock, or a fixed date passed to the code); assertions only check that a timestamp exists (`toBeInstanceOf(Date)`) or lies between `Date.now()` values the test captured before and after the call (`toBeGreaterThanOrEqual(before)`/`toBeLessThanOrEqual(after)`); or the test does not assert on anything time-dependent. Non-test code does not count.",
       "fix": "Control the clock in the test (fake timers, a frozen or injected clock) and assert against a fixed time.",
-      "when": ["\\b(it|test)(\\.\\w+)?\\s*\\(", "describe\\s*\\("]
+      "when": ["(?<!/[dgimsuvy]{0,8}\\.)\\b(it|test)(\\.\\w+)?\\s*\\(", "describe\\s*\\("]
     },
     {
       "id": "ts-test-uncontrolled-randomness",
@@ -56,7 +56,7 @@
       "true": "A test compares an exact expected value against output that depends on an unseeded random or generated-id source.",
       "false": "The source is seeded or injected (a seeded generator (`faker.seed(...)`), a mocked/injected id or random source, or assertions that only check shape (`expect.any(String)`, a regex, length)); the random value is generated once and the same variable is used on both sides of the comparison; or randomness does not reach any assertion. Non-test code does not count.",
       "fix": "Seed or inject the random or id source, or assert only on the shape of the generated value.",
-      "when": ["\\b(it|test)(\\.\\w+)?\\s*\\(", "describe\\s*\\("]
+      "when": ["(?<!/[dgimsuvy]{0,8}\\.)\\b(it|test)(\\.\\w+)?\\s*\\(", "describe\\s*\\("]
     },
     {
       "id": "ts-test-real-network",
@@ -64,7 +64,7 @@
       "true": "A unit test depends on a live external service over the network.",
       "false": "The network is stubbed or local (an HTTP mock (msw, nock, `vi.spyOn(globalThis, 'fetch')`, a fake client), `localhost`/a test server the test starts, or a test explicitly marked as an integration/e2e/contract test (file name or `describe` says so, or it is a Playwright `page.goto` against the app)). Non-test code does not count.",
       "fix": "Stub the HTTP layer (or start a local test server) so the unit test never depends on a real network.",
-      "when": ["\\b(it|test)(\\.\\w+)?\\s*\\(", "describe\\s*\\("]
+      "when": ["(?<!/[dgimsuvy]{0,8}\\.)\\b(it|test)(\\.\\w+)?\\s*\\(", "describe\\s*\\("]
     },
     {
       "id": "ts-test-unordered-assertion",
@@ -72,7 +72,7 @@
       "true": "A test asserts a specific order on results whose order the code does not guarantee.",
       "false": "The test orders or ignores order before asserting (sorting before asserting, `expect.arrayContaining`/`toContainEqual`/`toHaveLength` checks, comparing as sets, or asserting order that the code guarantees (an explicit sort or `orderBy`)), or the source is ordered (arrays/lists built in order, sorted results, `Promise.all`/`Promise.allSettled` results, which keep input order, insertion-ordered maps). Exact expectations on randomly shuffled output belong to ts-test-uncontrolled-randomness. Non-test code does not count.",
       "fix": "Sort before asserting or compare without order (as a set or with an order-insensitive matcher).",
-      "when": ["\\b(it|test)(\\.\\w+)?\\s*\\(", "describe\\s*\\("],
+      "when": ["(?<!/[dgimsuvy]{0,8}\\.)\\b(it|test)(\\.\\w+)?\\s*\\(", "describe\\s*\\("],
       "status": "candidate"
     },
     {
@@ -81,7 +81,7 @@
       "true": "At least one added test asserts only which internal functions or methods were called, how many times, in what order or with what arguments, so it pins the implementation and would fail on a correct refactor.",
       "false": "The test asserts a result (returned value, thrown error, rendered DOM, emitted event, stored record) and may also check calls; or the call assertion is on an external boundary (an HTTP client, database, queue, mailer, logger, SDK or third-party package) with arguments the unit computed, which is observable behaviour; or the test's only purpose is that boundary call (e.g. 'sends the welcome email'). Mocking the unit under test itself, or asserting that a function the test called directly was called, belongs to ts-test-cannot-fail and does not count here. Non-test code does not count.",
       "fix": "Assert on what the unit returns, throws, renders or persists; only check calls to external boundaries, and delete assertions about internal call mechanics.",
-      "when": ["\\b(it|test)(\\.\\w+)?\\s*\\(", "describe\\s*\\("]
+      "when": ["called|calls|callCount|invocation|spy"]
     },
     {
       "id": "ts-test-reimplements-logic",
@@ -89,7 +89,7 @@
       "true": "The expected value in at least one added test is derived from the input with the same logic the implementation uses, so the test duplicates the implementation and passes even when both are wrong.",
       "false": "Expected values are literals, hand-written fixtures, golden files, values from an independent source (a different algorithm, an inverse operation, a known reference), or property checks (sorted, length, round-trip). Differential tests do not count: comparing two implementations of the same computation (a naive, reference or sequential version against an optimized, batched or parallel one; two runs with the same seed; the same formula written with a different library as the oracle) asserts agreement, not a re-computation of the implementation under test. Setup code that builds the input, simple loops over literal input/expected pairs, and helper calls that are not the logic under test do not count. Non-test code does not count.",
       "fix": "Assert against a literal or golden value worked out independently of the implementation, not against a re-computation of it.",
-      "when": ["\\b(it|test)(\\.\\w+)?\\s*\\(", "describe\\s*\\("]
+      "when": ["(?<!/[dgimsuvy]{0,8}\\.)\\b(it|test)(\\.\\w+)?\\s*\\(", "describe\\s*\\("]
     },
     {
       "id": "ts-test-mocks-own-module",
@@ -97,7 +97,7 @@
       "true": "A test stubs out internal application logic, so the test never crosses the real boundary between the unit and its collaborators and cannot catch a drift between them.",
       "false": "The mocked module is a boundary to something external — a database or ORM client, HTTP/fetch client, file system, clock, randomness, environment/config loader, queue, cache, mailer, payment/SDK wrapper, logger — whether it lives in the codebase (`./db`, `../lib/http`, `./clock`) or in node_modules; or the mock is a spy that keeps the real implementation (`vi.spyOn(x, 'y')` without a mock return); or the test is explicitly an isolated unit test of error handling that stubs a collaborator to throw. Mocking the very unit under test belongs to ts-test-cannot-fail. Non-test code does not count.",
       "fix": "Call the real internal module and mock only at external boundaries (database, network, file system, clock), so the test covers the seam between units.",
-      "when": ["\\b(it|test)(\\.\\w+)?\\s*\\(", "describe\\s*\\("]
+      "when": ["mock|spy|stub"]
     },
     {
       "id": "ts-test-snapshot-lock-in",
@@ -105,7 +105,7 @@
       "true": "At least one added test asserts nothing but a whole-output snapshot that the test runner writes from the current implementation, so it locks in whatever the code does today and fails on any change, correct or not.",
       "false": "The snapshot is of a small scalar or short string, or sits beside targeted assertions (`toBe`, `toEqual` on specific fields, `getByText`, `toHaveTextContent`); or the expected output is a hand-maintained golden file or fixture compared with `toEqual`/`toBe` (a golden test, not an auto-written snapshot); or the test is explicitly a visual-regression or screenshot test (Playwright `toHaveScreenshot`). Non-test code does not count.",
       "fix": "Assert the specific values, text or fields that matter, or compare against a hand-maintained golden fixture; keep snapshots for small, stable outputs.",
-      "when": ["\\b(it|test)(\\.\\w+)?\\s*\\(", "describe\\s*\\("]
+      "when": ["snapshot"]
     },
     {
       "id": "ts-test-untyped-fake-response",
@@ -113,7 +113,7 @@
       "true": "A test invents the shape of an external response inline, so the test keeps passing when the real API or schema drifts.",
       "false": "The fake response comes from a shared fixture file, a recorded response, a typed factory or builder, or is annotated with the response type (`satisfies UserResponse`, `const body: ApiUser = ...`); or the stub is an error, an empty result, a primitive, or a one-field literal the test immediately asserts on; or the stubbed thing is internal, not an external system. Non-test code does not count.",
       "fix": "Build fake external responses from a typed factory or a recorded fixture (or annotate them with the response type) so schema drift breaks the test.",
-      "when": ["\\b(it|test)(\\.\\w+)?\\s*\\(", "describe\\s*\\("],
+      "when": ["(?<!/[dgimsuvy]{0,8}\\.)\\b(it|test)(\\.\\w+)?\\s*\\(", "describe\\s*\\("],
       "thresholds": {
         "medium": null
       },
