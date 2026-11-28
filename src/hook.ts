@@ -25,9 +25,11 @@ import { stateDir } from "./state";
 // Pre-write mode: how often one rule may block one file in a conversation before it lets the
 // edit through as a hint (a false alarm must not deadlock the agent).
 const MAX_DENIALS = 2;
-const DENIALS_FILE = `${stateDir()}/pre-denials.json`;
+const STATE_DIR = stateDir();
+const DENIALS_FILE = STATE_DIR ? `${STATE_DIR}/pre-denials.json` : undefined;
 
 function readDenials(): Record<string, number> {
+  if (!DENIALS_FILE) return {};
   try {
     const { readFileSync } = require("node:fs") as typeof import("node:fs");
     const parsed: unknown = JSON.parse(readFileSync(DENIALS_FILE, "utf8"));
@@ -37,9 +39,12 @@ function readDenials(): Record<string, number> {
   }
 }
 function countDenial(session: string | undefined, key: string): number {
+  // Without persistent state, never deny outright: a false alarm could block every edit.
+  if (!DENIALS_FILE) return MAX_DENIALS;
   return readDenials()[`${session ?? "?"}|${key}`] ?? 0;
 }
 function recordDenial(session: string | undefined, key: string) {
+  if (!DENIALS_FILE) return;
   try {
     const { mkdirSync, writeFileSync } = require("node:fs") as typeof import("node:fs");
     const { dirname } = require("node:path") as typeof import("node:path");

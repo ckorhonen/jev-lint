@@ -55,7 +55,9 @@ export type CheckRecord = {
 export function findingsLogPath(): string | undefined {
   const configured = process.env.JEV_LINT_FINDINGS_LOG;
   if (configured === "off") return undefined;
-  return configured || join(stateDir(), "findings.jsonl");
+  if (configured) return configured;
+  const state = stateDir();
+  return state ? join(state, "findings.jsonl") : undefined;
 }
 
 // Nearest directory above the file that has .git or .jev-lint; otherwise the event cwd.

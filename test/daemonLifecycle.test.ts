@@ -6,6 +6,12 @@ import { dirname, join } from "node:path";
 import { checkViaDaemon, daemonSocketPath, startDaemon } from "../src/daemonClient";
 import { cloudflareKey } from "../src/jev";
 
+function requiredSocketPath(): string {
+  const socket = daemonSocketPath();
+  if (!socket) throw new Error("test requires a state directory");
+  return socket;
+}
+
 const names = ["JEV_LINT_PROVIDER", "CLOUDFLARE_API_TOKEN", "CLOUDFLARE_API_TOKEN_FILE", "TYPESAFE_API_KEY_FILE", "XDG_STATE_HOME"];
 let saved: Record<string, string | undefined>;
 let originalCwd: string;
@@ -30,7 +36,7 @@ afterEach(() => {
 });
 
 test("a daemon timeout never kills, deletes ownership files, or spawns a replacement", async () => {
-  const socket = daemonSocketPath();
+  const socket = requiredSocketPath();
   mkdirSync(dirname(socket), { recursive: true, mode: 0o700 });
   const server = Bun.listen({
     unix: socket,
@@ -61,7 +67,7 @@ test("a daemon timeout never kills, deletes ownership files, or spawns a replace
 });
 
 test("a wedged daemon cannot keep the hook process alive", async () => {
-  const socket = daemonSocketPath();
+  const socket = requiredSocketPath();
   mkdirSync(dirname(socket), { recursive: true, mode: 0o700 });
   let accepted = false;
   const server = Bun.listen({
@@ -123,7 +129,7 @@ test("the spawned TypeSafe child retains the caller key filename without Keychai
   writeFileSync("dummy-key", "dummy-expected", { mode: 0o600 });
   process.env.JEV_LINT_PROVIDER = "typesafe";
   process.env.TYPESAFE_API_KEY_FILE = "dummy-key";
-  const socket = daemonSocketPath();
+  const socket = requiredSocketPath();
   const probe = `import { readFileSync } from "node:fs";
     import { daemonSocketPath } from ${JSON.stringify(join(import.meta.dir, "../src/daemonClient.ts"))};
     console.log(JSON.stringify({ credentialMatches: readFileSync(process.env.TYPESAFE_API_KEY_FILE, "utf8") === "dummy-expected", socket: daemonSocketPath() }));`;
@@ -163,7 +169,7 @@ test.each(["relative", "absolute"])("%s Cloudflare symlink/.. paths retain crede
   const original = kind === "relative" ? relative : absolute;
   process.env.CLOUDFLARE_API_TOKEN_FILE = original;
   expect(cloudflareKey()).toBe("dummy-expected");
-  const socket = daemonSocketPath();
+  const socket = requiredSocketPath();
   const probe = `import { cloudflareKey } from ${JSON.stringify(join(import.meta.dir, "../src/jev.ts"))};
     import { daemonSocketPath } from ${JSON.stringify(join(import.meta.dir, "../src/daemonClient.ts"))};
     console.log(JSON.stringify({ credentialMatches: cloudflareKey() === "dummy-expected", socket: daemonSocketPath() }));`;

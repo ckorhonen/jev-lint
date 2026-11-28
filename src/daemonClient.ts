@@ -41,7 +41,7 @@ function daemonEnvironment(): NodeJS.ProcessEnv {
   return env;
 }
 
-export function daemonSocketPath(env = daemonEnvironment()): string {
+export function daemonSocketPath(env = daemonEnvironment()): string | undefined {
   // The key is part of the identity (hashed, never stored) so projects with different keys
   // never share a daemon. A Keychain key isn't known here; the daemon exits on 401/403 instead.
   const config = [
@@ -50,10 +50,12 @@ export function daemonSocketPath(env = daemonEnvironment()): string {
     `openaiKey=${env.OPENAI_API_KEY ?? ""}`,
     `cfKey=${env.CLOUDFLARE_API_TOKEN ?? ""}`,
   ].join("\n");
+  const state = stateDir();
+  if (!state) return undefined;
   const hash = new Bun.CryptoHasher("sha256");
   hash.update(`${import.meta.dir}\n${config}`);
   const id = hash.digest("hex").slice(0, 12);
-  return `${stateDir()}/daemon-${id}.sock`;
+  return `${state}/daemon-${id}.sock`;
 }
 
 export const daemonEnabled = () => process.env.JEV_LINT_DAEMON !== "off";
@@ -153,7 +155,9 @@ function postDaemon(path: string, body: string, timeoutMs: number): Promise<Daem
 // daemon that was reached but ran out of time counts as failed checks (fail open), not as a
 // reason to start the whole check again and double the wait.
 export async function checkViaDaemon(changes: ChangedFile[], opts: { timeoutMs: number; cwd?: string }): Promise<Settled[] | undefined> {
-  const res = await postDaemon(daemonSocketPath(), JSON.stringify({ changes, ...opts }), opts.timeoutMs + CONNECT_TIMEOUT_MS);
+  const socket = daemonSocketPath();
+  if (!socket) return undefined;
+  const res = await postDaemon(socket, JSON.stringify({ changes, ...opts }), opts.timeoutMs + CONNECT_TIMEOUT_MS);
   if (res === "timeout") {
     // A lock PID alone cannot prove process ownership (PIDs can be reused). Leave
     // cleanup to the daemon's idle/source-change/drain shutdown rather than kill
@@ -183,7 +187,9 @@ export function startDaemon(opts: { force?: boolean } = {}, spawnImpl?: Spawn): 
   const { homedir } = require("node:os") as typeof import("node:os");
   const { dirname, join } = require("node:path") as typeof import("node:path");
   const env = daemonEnvironment();
-  const stamp = `${daemonSocketPath(env)}.started`;
+  const socket = daemonSocketPath(env);
+  if (!socket) return undefined;
+  const stamp = `${socket}.started`;
   try {
     if (!opts.force && Date.now() - statSync(stamp).mtimeMs < RESPAWN_WINDOW_MS) return undefined;
   } catch {
