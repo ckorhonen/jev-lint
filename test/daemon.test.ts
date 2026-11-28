@@ -74,6 +74,17 @@ describe("daemon", () => {
     expect(await asked()).toBe(true);
   });
 
+  test("a request larger than the socket buffer is written completely", async () => {
+    const large = Array.from({ length: 8 }, (_, i) => ({
+      filePath: join(repo, `large-${i}.ts`),
+      addedCode: `export const value${i} = "${"x".repeat(80_000)}";\n`,
+      changeKind: "write" as const,
+    }));
+    const settled = await checkViaDaemon(large, { timeoutMs: 5000, cwd: repo });
+    expect(settled).toHaveLength(8);
+    expect(settled?.every((s) => s.ok)).toBe(true);
+  }, 10_000);
+
   test("starting more daemons while one runs leaves exactly one owner", async () => {
     const socket = daemonSocketPath();
     const owner = readFileSync(`${socket}.lock`, "utf8").trim();

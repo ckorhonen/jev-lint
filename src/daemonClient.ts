@@ -95,13 +95,28 @@ function postDaemon(path: string, body: string, timeoutMs: number): Promise<Daem
       ),
       Buffer.from(body),
     ]);
+    let offset = 0;
+    const send = (socket: Bun.Socket) => {
+      try {
+        while (offset < request.length) {
+          const written = socket.write(request, offset, request.length - offset);
+          if (written < 0) {
+            finish(undefined);
+            return;
+          }
+          offset += written;
+          if (written === 0 || offset < request.length) return; // wait for drain when backpressured
+        }
+      } catch {
+        finish(undefined);
+      }
+    };
     void Bun.connect({
       unix: path,
       socket: {
         binaryType: "buffer",
-        open(socket) {
-          socket.write(request);
-        },
+        open: send,
+        drain: send,
         data(socket, data) {
           chunks.push(data);
           const parsed = parseHttp(chunks);
