@@ -69,7 +69,7 @@
       "fix": "Extract the number into a well-named constant.",
       "when": ["\\d"],
       "thresholds": {
-        "medium": null
+        "medium": { "jev-1.14.0": 0.7 }
       },
       "excludePaths": [
         "**/*.test.*",

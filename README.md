@@ -682,6 +682,19 @@ bun eval/bench-rules.ts                   # rules per request vs accuracy, laten
 python3 report/build.py <DepartureMono-Regular.woff2>   # rebuild the notebook
 ```
 
+For a queue of private PR reviews, run `bun src/review.ts` and send one JSON hook event
+per line on stdin. Each line on stdout is a receipt with file counts, findings and errors.
+Use `tool_name: "apply_patch"` with a Codex-format patch (`*** Update File:` and `+` lines) in `tool_input.patch` and set
+`cwd` to the repository. The worker reuses its provider connection, reloads repository
+configuration for each review and sends fresh model requests for each file. Restart it
+after updating built-in rules or provider settings. Each group of up to 16 files shares
+an eight-second deadline by default, with at most eight active hosted TypeSafe requests.
+
+Run `python3 eval/replay-pr-cohort.py --live --provider typesafe` to replay the 46 pinned
+public PRs through the review worker. Add `--edit-hooks` for the installed edit-hook path
+or `--only 'ckorhonen/jev-lint#5'` for one PR. Live replay incurs provider usage.
+
+
 **Rule-pack languages (E2E):** `eval/e2e/tasks.packs.json` has 15 tasks for Python (FastAPI),
 Ruby (ActiveRecord, no full Rails), Kotlin, Rust (Tokio), Bazel (rules_python) and one
 TypeScript security task, on scaffolds in `eval/e2e/scaffold/<lang>/`. Only files the agent

@@ -3,6 +3,10 @@ import { basename, dirname, extname, isAbsolute, join, relative, resolve } from 
 import type { ChangedFile } from "./extract";
 import { askNouls, type JudgeProvider, type NoulQuestion } from "./jev";
 import { findRepoConfig } from "./repoRules";
+import { ruleApplies } from "./ruleGate";
+
+export { formatFeedback } from "./feedback";
+export { clearGateCache, firstGateMatch, ruleApplies } from "./ruleGate";
 
 // `when`: optional regex sources (case-insensitive). The rule is only asked when one of
 // them matches the added code — a cheap, recall-safe gate that cuts model calls.
@@ -27,7 +31,7 @@ export type Rule = {
   thresholds?: RuleThresholds;
   status?: "candidate";
 };
-export type RuleThresholds = { high?: number; medium?: number | null };
+export type RuleThresholds = { high?: number; medium?: number | null | Record<string, number> };
 // `filenames`: exact file names that belong to the set when the extension alone can't say
 // (Bazel's BUILD, BUILD.bazel, WORKSPACE, MODULE.bazel).
 export type RuleSet = { language: string; extensions: string[]; filenames?: string[]; rules: Rule[] };
@@ -134,48 +138,6 @@ export function rulePathsMatch(rule: Rule, relPath: string): boolean {
   return !rule.paths?.length || rule.paths.some((glob) => matchesGlob(glob, relPath));
 }
 
-// Keyed by the patterns themselves, not the rule id: two repos can reuse an id with
-// different gates, and an edited `when` must take effect in the long-lived daemon.
-const gateCache = new Map<string, RegExp[]>();
-
-export function clearGateCache() {
-  gateCache.clear();
-}
-
-function gatePatterns(when: string[]): RegExp[] {
-  const key = when.join("\0");
-  let patterns = gateCache.get(key);
-  if (!patterns) {
-    patterns = when.flatMap((source) => {
-      try {
-        return [new RegExp(source, "im")];
-      } catch {
-        return []; // a broken pattern must not hide the rule; see ruleApplies
-      }
-    });
-    gateCache.set(key, patterns);
-  }
-  return patterns;
-}
-
-export function ruleApplies(rule: Rule, code: string): boolean {
-  if (!rule.when?.length) return true;
-  const patterns = gatePatterns(rule.when);
-  return patterns.length === 0 || patterns.some((re) => re.test(code));
-}
-
-// Character offset of the earliest match of any `when` pattern, or undefined when there is
-// none (no patterns, all broken, or the gate was off and nothing matched).
-export function firstGateMatch(when: string[] | undefined, code: string): number | undefined {
-  if (!when?.length) return undefined;
-  let first: number | undefined;
-  for (const re of gatePatterns(when)) {
-    const m = re.exec(code);
-    if (m && (first === undefined || m.index < first)) first = m.index;
-  }
-  return first;
-}
-
 export function gateRules(ruleSet: RuleSet, code: string): RuleSet {
   return { ...ruleSet, rules: ruleSet.rules.filter((r) => ruleApplies(r, code)) };
 }
@@ -186,10 +148,14 @@ export function buildQuestions(ruleSet: RuleSet): Record<string, NoulQuestion> {
   );
 }
 
-export function tierFor(probability: number, thresholds = THRESHOLDS, rule?: RuleThresholds): Tier | undefined {
+export function tierFor(probability: number, thresholds = THRESHOLDS, rule?: RuleThresholds, model?: string): Tier | undefined {
   const high = rule?.high ?? thresholds.high;
-  const medium = rule?.medium === null ? undefined : (rule?.medium ?? thresholds.medium);
   if (probability >= high) return "high";
+  // A model-specific advisory cutoff enables this tier only for the calibrated model.
+  const cutoff = rule?.medium;
+  if (cutoff === null) return undefined;
+  const medium =
+    typeof cutoff === "object" ? (model && Object.hasOwn(cutoff, model) ? cutoff[model] : undefined) : (cutoff ?? thresholds.medium);
   if (medium !== undefined && probability >= medium) return "medium";
   return undefined;
 }
@@ -241,7 +207,7 @@ export async function lintChange(
   for (const rule of ruleSet.rules) {
     const probability = (response.answers as Record<string, { noul: number }>)[rule.id]?.noul ?? 0;
     probabilities[rule.id] = probability;
-    const tier = tierFor(probability, opts.thresholds, rule.thresholds);
+    const tier = tierFor(probability, opts.thresholds, rule.thresholds, response.model);
     if (tier) findings.push({ ruleId: rule.id, probability, tier, fix: rule.fix, ...(rule.when ? { when: rule.when } : {}) });
   }
   findings.sort((a, b) => b.probability - a.probability);
@@ -258,28 +224,4 @@ export async function lintChange(
     asked: asked.rules.length,
     gatedOut: ruleSet.rules.length - asked.rules.length,
   };
-}
-
-export function formatFeedback(results: LintResult[]): string {
-  const lines: string[] = [];
-  for (const result of results) {
-    const high = result.findings.filter((f) => f.tier === "high");
-    const medium = result.findings.filter((f) => f.tier === "medium");
-    if (!high.length && !medium.length) continue;
-
-    const scope = result.changeKind === "write" ? "checked the whole file this Write produced" : "checked only the code this edit added";
-    lines.push(`jev-lint: ${result.filePath} (${scope})`);
-    if (high.length) {
-      lines.push("Likely violations — fix these:");
-      for (const f of high) lines.push(`  - ${f.ruleId} (p=${f.probability.toFixed(2)}): ${f.fix}`);
-    }
-    if (medium.length) {
-      lines.push("Possible violations — double-check; ignore if the code is actually fine:");
-      for (const f of medium) lines.push(`  - ${f.ruleId} (p=${f.probability.toFixed(2)}): ${f.fix}`);
-    }
-  }
-  if (lines.length) {
-    lines.push("These come from a fast heuristic model and can be wrong. Don't mention this check to the user; just fix real issues.");
-  }
-  return lines.join("\n");
 }

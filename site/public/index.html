@@ -425,10 +425,13 @@ footer a{color:var(--dim);display:inline-flex;align-items:center;min-height:44px
 
 <section id="proof" aria-labelledby="h-proof">
   <div class="wrap">
-    <p class="lead">One measured result.</p>
+    <p class="lead">Measured results.</p>
     <h2 id="h-proof"><span class="green">41% fewer</span><br>rule-covered review comments.</h2>
     <p class="lede">32 findings with JevLint off. 19 with it on. Across 48 synthetic Claude Code runs with TypeSafe Jev: 12 React and SwiftUI tasks, run twice per condition.</p>
     <p class="src">September 2026 · AI review and rule mapping · not measured time, token or review-cycle savings. <a href="https://github.com/ckorhonen/jev-lint#results">Read the results →</a></p>
+    <h3>304 ms p95 for queued PR reviews</h3>
+    <p class="lede">A reusable TypeSafe worker reviewed 46 public TypeScript pull requests four times. All 184 reviews completed. The edit hook measured 648 ms p95 on the same inputs. Both averaged $0.000455 per review from reported token usage.</p>
+    <p class="src">November 2026 · Against model-graded findings, the worker reached 54.4% precision and 59.6% recall. <a href="https://github.com/ckorhonen/jev-lint/blob/main/eval/results/typesafe-pr-stream-2026-11-28.json">See the paired results and traces →</a></p>
   </div>
 </section>
 
@@ -448,12 +451,13 @@ footer a{color:var(--dim);display:inline-flex;align-items:center;min-height:44px
       </header>
 <pre id="prompt-text" data-prompt>Set up jev-lint for me: https://jevlint.dev
 Source: https://github.com/ckorhonen/jev-lint
-Run `bunx @ckorhonen/jev-lint setup` (or `npx @ckorhonen/jev-lint setup`, no clone needed): use TypeSafe Jev by
-default; if I choose OpenAI Decisions API or Cloudflare Clef, pass `--provider decisions`
-or `--provider clef`. Check the selected provider's credentials without printing them, show me
-the dry run, install the hook (with `--skills`) once I confirm, and run the smoke test. Then
-use its jev-lint-rules skill on this repo: read all of our agent instructions, skills, docs
-and linter configs, and propose rules for me to approve before writing anything.
+Clone it to ~/Repos/jev-lint if it isn't there, then follow its jev-lint-setup skill
+(.agents/skills/jev-lint-setup/SKILL.md): use TypeSafe Jev by default; if I choose OpenAI
+Decisions API or Cloudflare Clef, follow its README setup. Check the selected provider's
+credentials without printing them, show me the dry run, install
+the hook once I confirm, and run the smoke test. Then use its jev-lint-rules skill on this
+repo: read all of our agent instructions, skills, docs and linter configs, and propose rules
+for me to approve before writing anything.
 I'm using Claude Code, so install the hook for Claude Code (--claude-only).</pre>
     </div>
     </details>

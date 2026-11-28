@@ -20,8 +20,9 @@ import { dirname, join } from "node:path";
 import { MAX_FILES, runChecks, type Settled } from "./checks";
 import { checkViaDaemon, daemonEnabled, startDaemon } from "./daemonClient";
 import { extractChanges } from "./extract";
+import { formatFeedback } from "./feedback";
 import { appendRecords, isInsideRepo, stateDir, toErrorRecords, toRecords } from "./findingsLog";
-import { formatFeedback, type LintResult } from "./lint";
+import type { LintResult } from "./lint";
 
 // Pre-write mode: how often one rule may block one file in a conversation before it lets the
 // edit through as a hint (a false alarm must not deadlock the agent).
@@ -56,6 +57,7 @@ const MIN_FALLBACK_MS = 1000;
 let exitCode = 0;
 
 async function main() {
+  const started = performance.now();
   const raw = await Bun.stdin.text();
   const event = JSON.parse(raw);
   const pre = event.hook_event_name === "PreToolUse";
@@ -95,7 +97,22 @@ async function main() {
     const errors = settled.flatMap((s) => (s.ok ? [] : [s.error]));
     appendFileSync(
       process.env.JEV_LINT_LOG,
-      `${JSON.stringify({ ts: new Date().toISOString(), tool: event.tool_name, session: event.session_id, results, errors })}\n`,
+      `${JSON.stringify({
+        ts: new Date().toISOString(),
+        tool: event.tool_name,
+        session: event.session_id,
+        metrics: {
+          elapsedMs: Math.round(performance.now() - started),
+          selectedFiles: changes.length,
+          checkedFiles: results.length,
+          failedFiles: errors.length,
+          skippedFiles: changes.length - errors.length - results.length,
+          inputTokens: results.reduce((total, r) => total + r.inputTokens, 0),
+          findings: results.reduce((total, r) => total + r.findings.length, 0),
+        },
+        results,
+        errors,
+      })}\n`,
     );
   }
 

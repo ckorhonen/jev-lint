@@ -6,7 +6,7 @@ const changes = Array.from({ length: 8 }, (_, i) => ({
   addedCode: "try { run(); } catch (e) {}",
   changeKind: "write" as const,
 }));
-const names = ["JEV_LINT_PROVIDER", "TYPESAFE_BASE_URL", "JEV_LINT_GATE"];
+const names = ["JEV_LINT_PROVIDER", "TYPESAFE_BASE_URL", "TYPESAFE_API_KEY", "JEV_LINT_GATE"];
 let saved: Record<string, string | undefined>;
 beforeEach(() => {
   saved = Object.fromEntries(names.map((name) => [name, process.env[name]]));
@@ -27,28 +27,23 @@ function mockFetch(handler: (...args: Parameters<typeof fetch>) => Promise<Respo
 
 function controlledTimeouts() {
   let now = 0;
-  const pending = new Map<AbortSignal, { controller: AbortController; expires: number }>();
   const clock = spyOn(performance, "now").mockImplementation(() => now);
-  const timeout = spyOn(AbortSignal, "timeout").mockImplementation((ms) => {
-    const controller = new AbortController();
-    pending.set(controller.signal, { controller, expires: now + ms });
-    return controller.signal;
-  });
+  const timer = spyOn(globalThis, "setTimeout");
   return {
-    budgets: () => timeout.mock.calls.map(([ms]) => ms),
+    budgets: () => timer.mock.calls.map(([, ms]) => ms),
     advance: (ms: number) => {
       now += ms;
     },
     expire: async (signal: AbortSignal | null | undefined): Promise<Response> => {
-      const request = signal && pending.get(signal);
-      if (!request) throw new Error("request is missing a timeout signal");
+      const duration = timer.mock.calls.at(-1)?.[1];
+      if (!signal || typeof duration !== "number") throw new Error("request is missing a timeout signal");
+      const expires = now + duration;
       await Promise.resolve();
-      now = Math.max(now, request.expires);
-      request.controller.abort(new DOMException("request timed out", "TimeoutError"));
-      throw request.controller.signal.reason;
+      now = Math.max(now, expires);
+      throw new DOMException("request timed out", "TimeoutError");
     },
     restore: () => {
-      timeout.mockRestore();
+      timer.mockRestore();
       clock.mockRestore();
     },
   };
@@ -72,12 +67,14 @@ test("all file batches share one deadline and expired files are recorded as fail
 
 test("later batches use the remaining budget while preserving successful results and order", async () => {
   const time = controlledTimeouts();
+  const started = Promise.withResolvers<void>();
   const firstBatch = changes.slice(0, 4).map(() => Promise.withResolvers<void>());
   const completed: string[] = [];
   const mock = mockFetch(async (_url, init) => {
     const body = JSON.parse(String(init?.body));
     const index = changes.findIndex((change) => change.filePath === body.state.file_path);
     if (index >= 0 && index < firstBatch.length) {
+      if (index === 3) started.resolve();
       await firstBatch[index].promise;
       completed.push(body.state.file_path);
       return Response.json({
@@ -90,6 +87,7 @@ test("later batches use the remaining budget while preserving successful results
   });
   try {
     const pending = runChecks(changes, { timeoutMs: 400 });
+    await started.promise;
     const initialCalls = mock.mock.calls.length;
     time.advance(225);
     for (const request of [...firstBatch].reverse()) request.resolve();
@@ -120,6 +118,54 @@ test("an exhausted budget starts no requests", async () => {
     const results = await runChecks(changes, { timeoutMs: 0 });
     expect(results).toEqual(Array(8).fill({ ok: false, error: "check deadline exceeded" }));
     expect(mock).not.toHaveBeenCalled();
+  } finally {
+    mock.mockRestore();
+  }
+});
+
+test("TypeSafe bounds a stalled transport and body even when cancellation is ignored", async () => {
+  const { askNouls } = await import("../src/jev");
+  const mock = spyOn(globalThis, "fetch");
+  const options = { baseUrl: "http://127.0.0.1:1", timeoutMs: 30 };
+  try {
+    mock.mockReturnValueOnce(new Promise<Response>(() => {}));
+    const stalledBody = new Response();
+    stalledBody.json = () => new Promise(() => {});
+    mock.mockResolvedValueOnce(stalledBody);
+    for (let i = 0; i < 2; i++) {
+      await expect(askNouls({}, {}, options)).rejects.toThrow("TypeSafe deadline exceeded");
+      expect(mock.mock.calls[i][1]?.signal?.aborted).toBe(true);
+    }
+    expect(mock).toHaveBeenCalledTimes(2);
+  } finally {
+    mock.mockRestore();
+  }
+});
+
+test("hosted TypeSafe dispatches eight files in one wave and preserves input order", async () => {
+  process.env.JEV_LINT_PROVIDER = "typesafe";
+  process.env.TYPESAFE_BASE_URL = "https://api.typesafe.ai";
+  process.env.TYPESAFE_API_KEY = "test-fixture";
+  let active = 0;
+  let peak = 0;
+  const mock = spyOn(globalThis, "fetch").mockImplementation(
+    Object.assign(
+      async (_url: Parameters<typeof fetch>[0], init?: Parameters<typeof fetch>[1]) => {
+        active++;
+        peak = Math.max(peak, active);
+        const { state } = JSON.parse(String(init?.body));
+        await Bun.sleep(state.file_path === changes[0].filePath ? 20 : 1);
+        active--;
+        return Response.json({ model: "test", answers: {}, usage: { input_tokens: 1, output_tokens: 0 } });
+      },
+      { preconnect: fetch.preconnect },
+    ),
+  );
+  try {
+    const results = await runChecks(changes, { timeoutMs: 1000 });
+    expect(peak).toBe(8);
+    expect(mock).toHaveBeenCalledTimes(8);
+    expect(results.map((r) => r.ok && r.value?.filePath)).toEqual(changes.map((c) => c.filePath));
   } finally {
     mock.mockRestore();
   }

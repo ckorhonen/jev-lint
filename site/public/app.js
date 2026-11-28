@@ -9,12 +9,13 @@
   /* ── Setup prompt: Claude Code / Codex variants ─────────────────────── */
   const BASE = `Set up jev-lint for me: https://jevlint.dev
 Source: https://github.com/ckorhonen/jev-lint
-Run \`bunx @ckorhonen/jev-lint setup\` (or \`npx @ckorhonen/jev-lint setup\`, no clone needed): use TypeSafe Jev by
-default; if I choose OpenAI Decisions API or Cloudflare Clef, pass \`--provider decisions\`
-or \`--provider clef\`. Check the selected provider's credentials without printing them, show me
-the dry run, install the hook (with \`--skills\`) once I confirm, and run the smoke test. Then
-use its jev-lint-rules skill on this repo: read all of our agent instructions, skills, docs
-and linter configs, and propose rules for me to approve before writing anything.`;
+Clone it to ~/Repos/jev-lint if it isn't there, then follow its jev-lint-setup skill
+(.agents/skills/jev-lint-setup/SKILL.md): use TypeSafe Jev by default; if I choose OpenAI
+Decisions API or Cloudflare Clef, follow its README setup. Check the selected provider's
+credentials without printing them, show me the dry run, install
+the hook once I confirm, and run the smoke test. Then use its jev-lint-rules skill on this
+repo: read all of our agent instructions, skills, docs and linter configs, and propose rules
+for me to approve before writing anything.`;
   const AGENTS = {
     claude: { name: "Claude Code", tail: "I'm using Claude Code, so install the hook for Claude Code (--claude-only)." },
     codex: {

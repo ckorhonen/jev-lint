@@ -193,6 +193,7 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12.5px}
 
   <section id="answer">
     <h2>Current answer</h2>
+    <p><a href="#typesafe-stream-20261128">Queued TypeSafe PR reviews</a> completed 184/184 reviews with 304 ms pooled p95.</p>
     <div class="verdict">
       <p class="eyebrow">Recommendation as of Entry 11</p>
       <p><b>Adopt it, with the five default packs on, as a non-blocking background hint.</b> The hook now carries {{LIVE_ALL}} rules across seven languages. Every new rule shipped only after passing a held-out bar fixed in advance. Thanks to the gate, a check on real code still takes about 0.3 s with twice as many rules. With every pack on, it cut graded rule violations in real Claude Code runs by {{E7_V_ABS}} ({{E7_V_NONE}} → {{E7_V_JEV}} per task), for about {{E7_COST_ABS}} more agent cost. It's most worth it where review is human, or where no AI reviewer checks every change. It still doesn't replace an AI code reviewer: most review comments are about logic and design.</p>
@@ -236,6 +237,54 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12.5px}
     <h3>Speed</h3>
     <p class="note">Median seconds per check on the held-out edits. Jev also costs less ($0.76 vs $2.41 per 10,000 single-pack checks for Luna), but at these prices cost is not the deciding factor; the extra second or more per edit is.</p>
     {{CHART_LATENCY}}
+  </section>
+
+  <section class="entry" id="typesafe-stream-20261128">
+    <p class="eyebrow">28 Nov 2026 · Private PR review latency</p>
+    <h2>Reusing the PR review process</h2>
+    <p>In the previous 2.38 s Ky #873 review, the first provider requests started 1,116 ms and 819 ms into two separate hook invocations. Across another paired trial, a single process launch for Ky #846 took over four seconds before Bun loaded the tracer. Grouping files alone still missed the 657 ms target under load.</p>
+    <p>The PR worker accepts a queue of hook events, checks fresh file content on every submission, and returns one receipt per PR. Startup is included in the first submission of each round. Both versions use at most eight concurrent TypeSafe requests.</p>
+    <div class="table"><table><thead><tr><th>46 PRs × 4 rounds</th><th>p50</th><th>p95</th><th>Precision</th><th>Recall</th><th>Completed</th><th>USD/review</th></tr></thead><tbody>
+    <tr><th>Installed edit hook</th><td>230 ms</td><td>648 ms</td><td>54.0%</td><td>58.2%</td><td>184/184</td><td>$0.000455</td></tr>
+    <tr><th>PR worker</th><td>122 ms</td><td>304 ms</td><td>54.4%</td><td>59.6%</td><td>184/184</td><td>$0.000455</td></tr>
+    </tbody></table></div>
+    <p>Worker p95 by round was 270, 382, 262, 424 ms. The paired 95% interval for the p95 change was -486 to -191 ms. A separate four-round comparison kept the eight-file event boundaries on both arms and measured 430 ms worker p95. Replaying frozen responses produced identical findings and confidence tiers on all 173 files.</p>
+    <p><a href="../eval/results/typesafe-pr-stream-2026-11-28.json">Per-PR measurements, startup and provider traces, quality and spend</a></p>
+  </section>
+
+  <section class="entry" id="typesafe-dispatch-20261128">
+    <p class="eyebrow">28 Nov 2026 · TypeSafe hook latency</p>
+    <h2>Dispatching eight files in one wave</h2>
+    <p>On Jev Lint PR #5, two hook invocations took 1.047 s in the earlier run. Four available workers delayed dispatch of the next four files. One of the final two requests waited 582 ms for response headers. The revised hosted TypeSafe hook dispatches up to eight files together and lets the daemon load the rules. Each file still receives the same questions.</p>
+    <div class="table"><table><thead><tr><th>Warm hook</th><th>p50</th><th>p95</th><th>Precision</th><th>Recall</th><th>Completed</th><th>USD/review</th></tr></thead><tbody><tr><th>Original hook</th><td>295 ms</td><td>949 ms</td><td>50.0%</td><td>54.8%</td><td>184/184</td><td>$0.000455</td></tr><tr><th>Calibrated hook</th><td>301 ms</td><td>917 ms</td><td>52.5%</td><td>59.6%</td><td>184/184</td><td>$0.000455</td></tr><tr><th>Calibrated hook with parallel dispatch</th><td>290 ms</td><td>742 ms</td><td>53.2%</td><td>60.6%</td><td>184/184</td><td>$0.000455</td></tr></tbody></table></div>
+    <p>Four interleaved rounds reused 46 public PRs, 173 TypeScript files and 52 model-graded positives. The paired 95% interval for the p95 change versus the original hook was -375 to -72 ms. Replaying identical provider scores also preserved every calibrated finding and tier. Cost uses provider-reported input tokens.</p>
+    <p><a href="../eval/results/ts-hook-p95-2026-11-28.json">Round results, per-PR measurements, request traces and spend</a></p>
+  </section>
+
+  <section class="entry" id="typesafe-pr-recall-20261128">
+    <p class="eyebrow">28 Nov 2026 · Default hook on 46 public PRs</p>
+    <h2>Three timeout and backoff findings recovered from existing Jev responses</h2>
+    <p>TypeSafe completed 46/46 reviews with 53.8% recall, 49.1% precision, 1.53 s p95 and $0.000455 per review. OpenAI completed 46/46 with 61.5% recall, 61.5% precision, 2.07 s p95 and $0.001228 per review. Both caught all 14 parser-confirmed findings across two syntax rules. Other labels were model-graded.</p>
+    <p>Scoring those same TypeSafe responses with a 0.70 advisory cutoff for magic numbers recovered three genuine findings with zero extra false positives. Precision reached 51.7% and recall 59.6% with identical inputs and cost. The cutoff applies only to Jev 1.14.0. Its high-confidence cutoff stays at 0.80.</p>
+    <p>In two paired live repeats, the revised hook completed 92/92 and the original completed 87/92. Pooled p95 was 1.70 s versus 8.55 s. The paired 95% interval for the p95 difference spans −7.65 to +0.47 s. The first repeat, in which both arms finished, measured 1.70 s versus 1.19 s. Cost matched on completed pairs. Fix rate requires feedback and follow-up edits from authors.</p>
+    <p>In three further paired runs of the original and final hooks, the revised TypeSafe client also bounded stalled request and body reads. It completed 138/138 reviews versus 138/138. Precision was 53.4% versus 51.5%, recall 60.3% versus 55.8%, and p95 0.744 s versus 0.657 s. The 95% paired bootstrap interval for the p95 difference was -0.180 to +0.168 s. Repeats reuse the same 46 PRs.</p>
+    <p><a href="../eval/results/provider-recall-2026-11-28.json">Per-PR results, rejected experiments, labels and spend</a></p>
+  </section>
+
+  <section class="entry" id="real-pr-tail-20261128">
+    <p class="eyebrow">28 Nov 2026 · Hook tail latency</p>
+    <h2>Connection reuse and bounded OpenAI requests</h2>
+    <p>OpenAI Decisions reviewed 173 TypeScript file edits across 46 pinned public PRs in Jev Lint, Ky and p-limit. The hook watchdog reproduced on Jev Lint PR 14. Three fresh requests were in flight by 2.71 s and none had received headers by the 22 s kill. A separate probe timed out establishing TCP. The original incident had no phase trace.</p>
+    <p>In the four-arm comparison, cold p95 fell from 22.26 s to 10.64 s with an explicit request deadline. Completion rose from 39/46 to 42/46. The warm daemon completed all 46. Narrowing three test-rule gates reduced questions from 1,623 to 1,520; warm p95 measured 5.66 s before and 4.88 s after, a difference inside sampling uncertainty. Model-graded recall was 61.5% for both warm variants. Both caught all 14 parser-confirmed file/rule positives for explicit any and non-null assertion.</p>
+    <p><a href="../eval/results/pr-tail-2026-11-28.json">Per-PR metrics, source pins, phase timings, labels, and paired intervals</a></p>
+  </section>
+
+  <section class="entry" id="real-pr-hook-20261128">
+    <p class="eyebrow">28 Nov 2026 · Real PR hook replay</p>
+    <h2>Regex calls triggered test review on production code</h2>
+    <p>Cold hooks reviewed the TypeScript additions from nine merged PRs through OpenAI Decisions. On the five development PRs, excluding regex-literal method calls from the test-rule gate saved 60 questions. Both configurations completed ten of ten replays. Usage-priced cost per replay fell from $0.00346 to $0.00298. Against a separate same-model labeling pass, precision rose from 43% to 50% and recall stayed at 40%.</p>
+    <p>All four held-out PRs selected identical questions. In an interleaved repeat both configurations completed eight of eight runs, with identical usage, precision and recall. An earlier candidate pass completed five of eight and had a 22-second timeout. Tail latency remains unresolved. The replays sent no feedback to authors, so they supply no fix-rate denominator.</p>
+    <p><a href="../eval/results/real-pr-hook-2026-11-28.json">Per-review measurements and frozen labels</a></p>
   </section>
 
   <section class="entry" id="e11">

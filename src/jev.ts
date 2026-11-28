@@ -6,6 +6,7 @@ import { readFileSync, statSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
 import { askDecisions } from "./decisions";
+import { withRequestDeadline } from "./requestDeadline";
 
 export type NoulQuestion = {
   type: "noul";
@@ -175,19 +176,20 @@ export async function askNouls(state: unknown, questions: Record<string, NoulQue
   const retries = opts.retries ?? 0;
 
   for (let attempt = 0; ; attempt++) {
-    const res = await fetch(`${baseUrl}/v1/systemone`, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-      body,
-      signal: AbortSignal.timeout(opts.timeoutMs ?? 10_000),
+    const outcome = await withRequestDeadline(opts.timeoutMs ?? 10_000, "TypeSafe deadline exceeded", async (signal) => {
+      const res = await fetch(`${baseUrl}/v1/systemone`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+        body,
+        signal,
+      });
+      if (res.ok) return { ok: true as const, result: (await res.json()) as JevResponse };
+      const retryable = res.status === 429 || res.status === 529 || res.status >= 500;
+      if (!retryable || attempt >= retries) throw new Error(`TypeSafe ${res.status}: ${(await res.text()).slice(0, 300)}`);
+      return { ok: false as const, retryAfter: res.headers.get("retry-after") };
     });
-    if (res.ok) return (await res.json()) as JevResponse;
-
-    const retryable = res.status === 429 || res.status === 529 || res.status >= 500;
-    if (!retryable || attempt >= retries) {
-      throw new Error(`TypeSafe ${res.status}: ${(await res.text()).slice(0, 300)}`);
-    }
-    const retryAfterSec = Number(res.headers.get("retry-after"));
+    if (outcome.ok) return outcome.result;
+    const retryAfterSec = Number(outcome.retryAfter);
     await Bun.sleep(retryAfterSec > 0 ? retryAfterSec * 1000 : 500 * 2 ** attempt);
   }
 }

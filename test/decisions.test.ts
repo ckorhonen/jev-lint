@@ -59,6 +59,19 @@ test("documented POST contract translates state and criteria without System One 
     questions: [{ type: "predicate", name: "rule", instructions: "Is this unsafe?\nTrue when: Unsafe\nFalse when: Safe" }],
   });
 });
+test.each(["transport", "body"])("a stalled %s cannot outlive the Decisions deadline when abort is ignored", async (phase) => {
+  if (phase === "transport") {
+    mock.mockReturnValue(new Promise<Response>(() => {}));
+  } else {
+    const stalled = Response.json({});
+    stalled.json = () => new Promise(() => {});
+    mock.mockResolvedValue(stalled);
+  }
+  await expect(askNouls({}, { rule: question }, { timeoutMs: 50 })).rejects.toMatchObject({ name: "TimeoutError" });
+  expect(mock).toHaveBeenCalledTimes(1);
+  expect(mock.mock.calls[0][1]?.signal?.aborted).toBe(true);
+});
+
 test("string input and optional criteria preserve evidence", async () => {
   await askNouls("plain text", { rule: { type: "noul", instructions: "Check" } });
   expect(JSON.parse(String(mock.mock.calls[0][1]?.body)).input).toBe("plain text");

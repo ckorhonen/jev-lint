@@ -1,0 +1,1823 @@
+{
+  "date": "2026-11-28",
+  "repository": "ckorhonen/jev-lint",
+  "scope": "Public TypeScript additions in 9 merged PRs, replayed in groups of at most 8 files through cold PostToolUse hook with default built-in packs, daemon off, default deadline, no publication. Five development and four holdout PRs. PR 6 used its squash merge. PR duration from before first hook spawn through last log read. Nearest-rank percentiles.",
+  "quality": "Blind separate Responses call using gpt-6-luna, low effort, all applicable rules, including gated negatives. Same model family. Labels are provisional. File/rule micro counts, missing predictions count as misses.",
+  "billing": "USD from response usage at Decisions short-context standard cache-aware rates. Timed-out responses can lack receipts. Actual invoiced charges unavailable. Grading separate.",
+  "ratesUsdPerMillion": {
+    "input": 0.1,
+    "cacheRead": 0.01,
+    "cacheWrite": 0.125,
+    "output": 0
+  },
+  "fixRate": {
+    "replay": null,
+    "sevenDayHookOutcomes": {
+      "fixed": 2,
+      "kept": 4,
+      "unknown": 14
+    }
+  },
+  "gateValidation": {
+    "devPreviouslyCaught": 102,
+    "holdoutPreviouslyCaught": 84,
+    "lost": 0
+  },
+  "prPins": {
+    "2": [
+      "799dbf3a5c6eb19f8e59c72a1a3f7c24fc20301c",
+      "22c7ab6d8a435adb2cee278a1a8b577a7096bc64"
+    ],
+    "3": [
+      "6afc5af7c9914ed873945203afdf01f0efe95083",
+      "9e873fd8f6cfab08b08cb7450ddb1931d5ee5e0b"
+    ],
+    "4": [
+      "8618de7d7f4cb515535d6f7e1578d44c85079156",
+      "1bdd340f2b1537ba069c3476ae83dc3f6c4adbae"
+    ],
+    "5": [
+      "5a8335184991fd3b5b858c3ae9b85f7d05486a9d",
+      "36b03492b4152d4bba4b7f5e2b765dc137342e6f"
+    ],
+    "6": [
+      "ebefe17bde12842c5ad7bbfffc07ae92b8146feb",
+      "a89a6d9d8d2e75fac456bf6a7aab1f4068689124"
+    ],
+    "9": [
+      "d2eaa7b524aaa745d427168dac2fde1466fdd72d",
+      "b5f7e7b6af77516307f7172a29a2bc8b110b17d1"
+    ],
+    "14": [
+      "90ec0c6a88b3f8f58f6de799015253a3da7ad3d8",
+      "75def600436c7cea4baf50f3dddc4db397f2d98c"
+    ],
+    "15": [
+      "5505647325f75d2935e418d5663093b5b47ff9db",
+      "2d76230399cd4b6a46d3dd03558b5906cb44e360"
+    ],
+    "19": [
+      "ab61cec6ef446dbd6c7d299e99329503dc7a07ed",
+      "e37db9bef93fbbe2411475a7663267aac6893583"
+    ]
+  },
+  "ruleQuestionsRemoved": {
+    "2": 40,
+    "5": 20
+  },
+  "labels": [
+    {
+      "pr": 2,
+      "file": "eval/systems.ts",
+      "labels": [
+        "ts-no-vague-names",
+        "ts-no-magic-numbers"
+      ]
+    },
+    {
+      "pr": 2,
+      "file": "src/daemon.ts",
+      "labels": [
+        "ts-no-empty-catch",
+        "ts-no-vague-names",
+        "ts-no-magic-numbers"
+      ]
+    },
+    {
+      "pr": 2,
+      "file": "eval/run.ts",
+      "labels": [
+        "ts-no-vague-names",
+        "ts-no-vague-names",
+        "ts-no-vague-names"
+      ]
+    },
+    {
+      "pr": 2,
+      "file": "src/findings.ts",
+      "labels": [
+        "ts-no-magic-numbers"
+      ]
+    },
+    {
+      "pr": 2,
+      "file": "src/daemonClient.ts",
+      "labels": []
+    },
+    {
+      "pr": 2,
+      "file": "src/install.ts",
+      "labels": []
+    },
+    {
+      "pr": 2,
+      "file": "src/lint.ts",
+      "labels": []
+    },
+    {
+      "pr": 3,
+      "file": "eval/run.ts",
+      "labels": []
+    },
+    {
+      "pr": 2,
+      "file": "test/cloudflare.test.ts",
+      "labels": []
+    },
+    {
+      "pr": 2,
+      "file": "src/jev.ts",
+      "labels": [
+        "ts-no-magic-numbers",
+        "ts-no-magic-numbers"
+      ]
+    },
+    {
+      "pr": 3,
+      "file": "eval/systems.ts",
+      "labels": [
+        "ts-no-vague-names"
+      ]
+    },
+    {
+      "pr": 3,
+      "file": "src/daemonClient.ts",
+      "labels": []
+    },
+    {
+      "pr": 3,
+      "file": "src/install.ts",
+      "labels": []
+    },
+    {
+      "pr": 3,
+      "file": "src/jev.ts",
+      "labels": []
+    },
+    {
+      "pr": 3,
+      "file": "src/decisions.ts",
+      "labels": [
+        "ts-no-empty-catch",
+        "ts-no-magic-numbers"
+      ]
+    },
+    {
+      "pr": 3,
+      "file": "test/decisions.test.ts",
+      "labels": []
+    },
+    {
+      "pr": 4,
+      "file": "src/daemonClient.ts",
+      "labels": []
+    },
+    {
+      "pr": 4,
+      "file": "test/decisionsDaemon.test.ts",
+      "labels": []
+    },
+    {
+      "pr": 5,
+      "file": "src/daemon.ts",
+      "labels": [
+        "ts-no-empty-catch"
+      ]
+    },
+    {
+      "pr": 5,
+      "file": "src/daemonClient.ts",
+      "labels": []
+    },
+    {
+      "pr": 5,
+      "file": "src/daemonLock.ts",
+      "labels": [
+        "ts-no-magic-numbers"
+      ]
+    },
+    {
+      "pr": 5,
+      "file": "src/setup.ts",
+      "labels": []
+    },
+    {
+      "pr": 5,
+      "file": "src/install.ts",
+      "labels": []
+    },
+    {
+      "pr": 5,
+      "file": "test/daemonLock.test.ts",
+      "labels": []
+    },
+    {
+      "pr": 5,
+      "file": "test/install.test.ts",
+      "labels": []
+    },
+    {
+      "pr": 5,
+      "file": "test/daemonLifecycle.test.ts",
+      "labels": []
+    },
+    {
+      "pr": 6,
+      "file": "src/checks.ts",
+      "labels": [
+        "ts-no-magic-numbers"
+      ]
+    },
+    {
+      "pr": 5,
+      "file": "test/setup.test.ts",
+      "labels": []
+    },
+    {
+      "pr": 5,
+      "file": "test/installPaths.test.ts",
+      "labels": []
+    },
+    {
+      "pr": 6,
+      "file": "test/checks.test.ts",
+      "labels": [
+        "ts-test-real-clock"
+      ]
+    },
+    {
+      "pr": 14,
+      "file": "src/cli.ts",
+      "labels": [
+        "ts-unvalidated-external-data"
+      ]
+    },
+    {
+      "pr": 14,
+      "file": "src/install.ts",
+      "labels": [
+        "ts-no-empty-catch",
+        "ts-no-vague-names",
+        "ts-no-vague-names",
+        "ts-unvalidated-external-data"
+      ]
+    },
+    {
+      "pr": 9,
+      "file": "test/checks.test.ts",
+      "labels": []
+    },
+    {
+      "pr": 15,
+      "file": "src/cli.ts",
+      "labels": []
+    },
+    {
+      "pr": 14,
+      "file": "test/cli.test.ts",
+      "labels": []
+    },
+    {
+      "pr": 15,
+      "file": "src/install.ts",
+      "labels": []
+    },
+    {
+      "pr": 15,
+      "file": "test/cli.test.ts",
+      "labels": []
+    },
+    {
+      "pr": 19,
+      "file": "test/cli.test.ts",
+      "labels": []
+    }
+  ],
+  "groups": {
+    "exploratory": {
+      "n": 5,
+      "complete": 5,
+      "p50": 1.739,
+      "p95": 3.967,
+      "recordedUsageUsd": null,
+      "precision": 0.42857142857142855,
+      "recall": 0.4,
+      "runs": [
+        {
+          "pr": 2,
+          "seconds": 3.967,
+          "files": 9,
+          "checked": 9,
+          "complete": true,
+          "returnedInputTokens": null,
+          "usageUsd": null,
+          "findings": [
+            [
+              "src/daemon.ts",
+              "ts-no-empty-catch"
+            ],
+            [
+              "src/daemon.ts",
+              "ts-no-magic-numbers"
+            ],
+            [
+              "src/daemonClient.ts",
+              "ts-secret-env-fallback"
+            ],
+            [
+              "src/findings.ts",
+              "ts-no-magic-numbers"
+            ],
+            [
+              "src/findings.ts",
+              "ts-test-cannot-fail"
+            ],
+            [
+              "src/jev.ts",
+              "ts-no-magic-numbers"
+            ],
+            [
+              "src/jev.ts",
+              "ts-test-cannot-fail"
+            ],
+            [
+              "test/cloudflare.test.ts",
+              "ts-no-empty-catch"
+            ]
+          ],
+          "tp": 4,
+          "fp": 4,
+          "fn": 4,
+          "errors": []
+        },
+        {
+          "pr": 3,
+          "seconds": 0.925,
+          "files": 7,
+          "checked": 7,
+          "complete": true,
+          "returnedInputTokens": null,
+          "usageUsd": null,
+          "findings": [
+            [
+              "src/decisions.ts",
+              "ts-no-magic-numbers"
+            ],
+            [
+              "test/decisions.test.ts",
+              "ts-no-empty-catch"
+            ]
+          ],
+          "tp": 1,
+          "fp": 1,
+          "fn": 2,
+          "errors": []
+        },
+        {
+          "pr": 4,
+          "seconds": 1.054,
+          "files": 2,
+          "checked": 2,
+          "complete": true,
+          "returnedInputTokens": null,
+          "usageUsd": null,
+          "findings": [
+            [
+              "test/decisionsDaemon.test.ts",
+              "ts-no-debug-console"
+            ]
+          ],
+          "tp": 0,
+          "fp": 1,
+          "fn": 0,
+          "errors": []
+        },
+        {
+          "pr": 5,
+          "seconds": 2.579,
+          "files": 10,
+          "checked": 10,
+          "complete": true,
+          "returnedInputTokens": null,
+          "usageUsd": null,
+          "findings": [
+            [
+              "src/daemon.ts",
+              "ts-no-empty-catch"
+            ],
+            [
+              "test/installPaths.test.ts",
+              "ts-shell-command-interpolation"
+            ]
+          ],
+          "tp": 1,
+          "fp": 1,
+          "fn": 1,
+          "errors": []
+        },
+        {
+          "pr": 6,
+          "seconds": 1.739,
+          "files": 2,
+          "checked": 2,
+          "complete": true,
+          "returnedInputTokens": null,
+          "usageUsd": null,
+          "findings": [
+            [
+              "test/checks.test.ts",
+              "ts-no-empty-catch"
+            ]
+          ],
+          "tp": 0,
+          "fp": 1,
+          "fn": 2,
+          "errors": []
+        }
+      ]
+    },
+    "development-control": {
+      "n": 10,
+      "complete": 10,
+      "p50": 1.138,
+      "p95": 2.012,
+      "recordedUsageUsd": 0.03463038,
+      "precision": 0.42857142857142855,
+      "recall": 0.4,
+      "runs": [
+        {
+          "pr": 2,
+          "seconds": 2.012,
+          "files": 9,
+          "checked": 9,
+          "complete": true,
+          "returnedInputTokens": 61080,
+          "usageUsd": 0.00566214,
+          "findings": [
+            [
+              "src/daemon.ts",
+              "ts-no-empty-catch"
+            ],
+            [
+              "src/daemon.ts",
+              "ts-no-magic-numbers"
+            ],
+            [
+              "src/daemonClient.ts",
+              "ts-secret-env-fallback"
+            ],
+            [
+              "src/findings.ts",
+              "ts-no-magic-numbers"
+            ],
+            [
+              "src/findings.ts",
+              "ts-test-cannot-fail"
+            ],
+            [
+              "src/jev.ts",
+              "ts-no-magic-numbers"
+            ],
+            [
+              "src/jev.ts",
+              "ts-test-cannot-fail"
+            ],
+            [
+              "test/cloudflare.test.ts",
+              "ts-no-empty-catch"
+            ]
+          ],
+          "tp": 4,
+          "fp": 4,
+          "fn": 4,
+          "errors": []
+        },
+        {
+          "pr": 3,
+          "seconds": 0.957,
+          "files": 7,
+          "checked": 7,
+          "complete": true,
+          "returnedInputTokens": 30757,
+          "usageUsd": 0.00262372,
+          "findings": [
+            [
+              "src/decisions.ts",
+              "ts-no-magic-numbers"
+            ],
+            [
+              "test/decisions.test.ts",
+              "ts-no-empty-catch"
+            ]
+          ],
+          "tp": 1,
+          "fp": 1,
+          "fn": 2,
+          "errors": []
+        },
+        {
+          "pr": 4,
+          "seconds": 0.561,
+          "files": 2,
+          "checked": 2,
+          "complete": true,
+          "returnedInputTokens": 12785,
+          "usageUsd": 0.0011543,
+          "findings": [
+            [
+              "test/decisionsDaemon.test.ts",
+              "ts-no-debug-console"
+            ]
+          ],
+          "tp": 0,
+          "fp": 1,
+          "fn": 0,
+          "errors": []
+        },
+        {
+          "pr": 5,
+          "seconds": 1.426,
+          "files": 10,
+          "checked": 10,
+          "complete": true,
+          "returnedInputTokens": 81322,
+          "usageUsd": 0.0068929,
+          "findings": [
+            [
+              "src/daemon.ts",
+              "ts-no-empty-catch"
+            ],
+            [
+              "test/installPaths.test.ts",
+              "ts-shell-command-interpolation"
+            ]
+          ],
+          "tp": 1,
+          "fp": 1,
+          "fn": 1,
+          "errors": []
+        },
+        {
+          "pr": 6,
+          "seconds": 0.46,
+          "files": 2,
+          "checked": 2,
+          "complete": true,
+          "returnedInputTokens": 10850,
+          "usageUsd": 0.00098213,
+          "findings": [
+            [
+              "test/checks.test.ts",
+              "ts-no-empty-catch"
+            ]
+          ],
+          "tp": 0,
+          "fp": 1,
+          "fn": 2,
+          "errors": []
+        },
+        {
+          "pr": 2,
+          "seconds": 1.138,
+          "files": 9,
+          "checked": 9,
+          "complete": true,
+          "returnedInputTokens": 61080,
+          "usageUsd": 0.00566214,
+          "findings": [
+            [
+              "src/daemon.ts",
+              "ts-no-empty-catch"
+            ],
+            [
+              "src/daemon.ts",
+              "ts-no-magic-numbers"
+            ],
+            [
+              "src/daemonClient.ts",
+              "ts-secret-env-fallback"
+            ],
+            [
+              "src/findings.ts",
+              "ts-no-magic-numbers"
+            ],
+            [
+              "src/findings.ts",
+              "ts-test-cannot-fail"
+            ],
+            [
+              "src/jev.ts",
+              "ts-no-magic-numbers"
+            ],
+            [
+              "src/jev.ts",
+              "ts-test-cannot-fail"
+            ],
+            [
+              "test/cloudflare.test.ts",
+              "ts-no-empty-catch"
+            ]
+          ],
+          "tp": 4,
+          "fp": 4,
+          "fn": 4,
+          "errors": []
+        },
+        {
+          "pr": 3,
+          "seconds": 0.829,
+          "files": 7,
+          "checked": 7,
+          "complete": true,
+          "returnedInputTokens": 30757,
+          "usageUsd": 0.00262372,
+          "findings": [
+            [
+              "src/decisions.ts",
+              "ts-no-magic-numbers"
+            ],
+            [
+              "test/decisions.test.ts",
+              "ts-no-empty-catch"
+            ]
+          ],
+          "tp": 1,
+          "fp": 1,
+          "fn": 2,
+          "errors": []
+        },
+        {
+          "pr": 4,
+          "seconds": 1.457,
+          "files": 2,
+          "checked": 2,
+          "complete": true,
+          "returnedInputTokens": 12785,
+          "usageUsd": 0.0011543,
+          "findings": [
+            [
+              "test/decisionsDaemon.test.ts",
+              "ts-no-debug-console"
+            ]
+          ],
+          "tp": 0,
+          "fp": 1,
+          "fn": 0,
+          "errors": []
+        },
+        {
+          "pr": 5,
+          "seconds": 1.505,
+          "files": 10,
+          "checked": 10,
+          "complete": true,
+          "returnedInputTokens": 81322,
+          "usageUsd": 0.0068929,
+          "findings": [
+            [
+              "src/daemon.ts",
+              "ts-no-empty-catch"
+            ],
+            [
+              "test/installPaths.test.ts",
+              "ts-shell-command-interpolation"
+            ]
+          ],
+          "tp": 1,
+          "fp": 1,
+          "fn": 1,
+          "errors": []
+        },
+        {
+          "pr": 6,
+          "seconds": 1.223,
+          "files": 2,
+          "checked": 2,
+          "complete": true,
+          "returnedInputTokens": 10850,
+          "usageUsd": 0.00098213,
+          "findings": [
+            [
+              "test/checks.test.ts",
+              "ts-no-empty-catch"
+            ]
+          ],
+          "tp": 0,
+          "fp": 1,
+          "fn": 2,
+          "errors": []
+        }
+      ]
+    },
+    "combined-candidate": {
+      "n": 10,
+      "complete": 8,
+      "p50": 0.913,
+      "p95": 2.503,
+      "recordedUsageUsd": 0.02977318,
+      "precision": 0.6,
+      "recall": 0.4,
+      "runs": [
+        {
+          "pr": 2,
+          "seconds": 2.039,
+          "files": 9,
+          "checked": 8,
+          "complete": false,
+          "returnedInputTokens": 44737,
+          "usageUsd": 0.00402784,
+          "findings": [
+            [
+              "src/daemon.ts",
+              "ts-no-empty-catch"
+            ],
+            [
+              "src/daemon.ts",
+              "ts-no-magic-numbers"
+            ],
+            [
+              "src/daemonClient.ts",
+              "ts-secret-env-fallback"
+            ],
+            [
+              "src/findings.ts",
+              "ts-no-magic-numbers"
+            ],
+            [
+              "src/jev.ts",
+              "ts-no-magic-numbers"
+            ]
+          ],
+          "tp": 4,
+          "fp": 1,
+          "fn": 4,
+          "errors": [
+            "Error: OpenAI Decisions refused a question"
+          ]
+        },
+        {
+          "pr": 3,
+          "seconds": 0.913,
+          "files": 7,
+          "checked": 7,
+          "complete": true,
+          "returnedInputTokens": 30799,
+          "usageUsd": 0.00262792,
+          "findings": [
+            [
+              "src/decisions.ts",
+              "ts-no-magic-numbers"
+            ]
+          ],
+          "tp": 1,
+          "fp": 0,
+          "fn": 2,
+          "errors": []
+        },
+        {
+          "pr": 4,
+          "seconds": 1.453,
+          "files": 2,
+          "checked": 2,
+          "complete": true,
+          "returnedInputTokens": 12785,
+          "usageUsd": 0.0011543,
+          "findings": [
+            [
+              "test/decisionsDaemon.test.ts",
+              "ts-no-debug-console"
+            ]
+          ],
+          "tp": 0,
+          "fp": 1,
+          "fn": 0,
+          "errors": []
+        },
+        {
+          "pr": 5,
+          "seconds": 2.503,
+          "files": 10,
+          "checked": 10,
+          "complete": true,
+          "returnedInputTokens": 73316,
+          "usageUsd": 0.0060923,
+          "findings": [
+            [
+              "src/daemon.ts",
+              "ts-no-empty-catch"
+            ],
+            [
+              "test/installPaths.test.ts",
+              "ts-shell-command-interpolation"
+            ]
+          ],
+          "tp": 1,
+          "fp": 1,
+          "fn": 1,
+          "errors": []
+        },
+        {
+          "pr": 6,
+          "seconds": 0.516,
+          "files": 2,
+          "checked": 2,
+          "complete": true,
+          "returnedInputTokens": 10871,
+          "usageUsd": 0.00098423,
+          "findings": [
+            [
+              "test/checks.test.ts",
+              "ts-no-empty-catch"
+            ]
+          ],
+          "tp": 0,
+          "fp": 1,
+          "fn": 2,
+          "errors": []
+        },
+        {
+          "pr": 2,
+          "seconds": 1.575,
+          "files": 9,
+          "checked": 8,
+          "complete": false,
+          "returnedInputTokens": 44737,
+          "usageUsd": 0.00402784,
+          "findings": [
+            [
+              "src/daemon.ts",
+              "ts-no-empty-catch"
+            ],
+            [
+              "src/daemon.ts",
+              "ts-no-magic-numbers"
+            ],
+            [
+              "src/daemonClient.ts",
+              "ts-secret-env-fallback"
+            ],
+            [
+              "src/findings.ts",
+              "ts-no-magic-numbers"
+            ],
+            [
+              "src/jev.ts",
+              "ts-no-magic-numbers"
+            ]
+          ],
+          "tp": 4,
+          "fp": 1,
+          "fn": 4,
+          "errors": [
+            "Error: OpenAI Decisions refused a question"
+          ]
+        },
+        {
+          "pr": 3,
+          "seconds": 0.825,
+          "files": 7,
+          "checked": 7,
+          "complete": true,
+          "returnedInputTokens": 30799,
+          "usageUsd": 0.00262792,
+          "findings": [
+            [
+              "src/decisions.ts",
+              "ts-no-magic-numbers"
+            ]
+          ],
+          "tp": 1,
+          "fp": 0,
+          "fn": 2,
+          "errors": []
+        },
+        {
+          "pr": 4,
+          "seconds": 0.51,
+          "files": 2,
+          "checked": 2,
+          "complete": true,
+          "returnedInputTokens": 12785,
+          "usageUsd": 0.0011543,
+          "findings": [
+            [
+              "test/decisionsDaemon.test.ts",
+              "ts-no-debug-console"
+            ]
+          ],
+          "tp": 0,
+          "fp": 1,
+          "fn": 0,
+          "errors": []
+        },
+        {
+          "pr": 5,
+          "seconds": 1.344,
+          "files": 10,
+          "checked": 10,
+          "complete": true,
+          "returnedInputTokens": 73316,
+          "usageUsd": 0.0060923,
+          "findings": [
+            [
+              "src/daemon.ts",
+              "ts-no-empty-catch"
+            ],
+            [
+              "test/installPaths.test.ts",
+              "ts-shell-command-interpolation"
+            ]
+          ],
+          "tp": 1,
+          "fp": 1,
+          "fn": 1,
+          "errors": []
+        },
+        {
+          "pr": 6,
+          "seconds": 0.62,
+          "files": 2,
+          "checked": 2,
+          "complete": true,
+          "returnedInputTokens": 10871,
+          "usageUsd": 0.00098423,
+          "findings": [
+            [
+              "test/checks.test.ts",
+              "ts-no-empty-catch"
+            ]
+          ],
+          "tp": 0,
+          "fp": 1,
+          "fn": 2,
+          "errors": []
+        }
+      ]
+    },
+    "development-gate": {
+      "n": 10,
+      "complete": 10,
+      "p50": 0.976,
+      "p95": 2.046,
+      "recordedUsageUsd": 0.02977638,
+      "precision": 0.5,
+      "recall": 0.4,
+      "runs": [
+        {
+          "pr": 2,
+          "seconds": 1.28,
+          "files": 9,
+          "checked": 9,
+          "complete": true,
+          "returnedInputTokens": 44900,
+          "usageUsd": 0.00404414,
+          "findings": [
+            [
+              "src/daemon.ts",
+              "ts-no-empty-catch"
+            ],
+            [
+              "src/daemon.ts",
+              "ts-no-magic-numbers"
+            ],
+            [
+              "src/daemonClient.ts",
+              "ts-secret-env-fallback"
+            ],
+            [
+              "src/findings.ts",
+              "ts-no-magic-numbers"
+            ],
+            [
+              "src/jev.ts",
+              "ts-no-magic-numbers"
+            ],
+            [
+              "test/cloudflare.test.ts",
+              "ts-no-empty-catch"
+            ]
+          ],
+          "tp": 4,
+          "fp": 2,
+          "fn": 4,
+          "errors": []
+        },
+        {
+          "pr": 3,
+          "seconds": 1.444,
+          "files": 7,
+          "checked": 7,
+          "complete": true,
+          "returnedInputTokens": 30757,
+          "usageUsd": 0.00262372,
+          "findings": [
+            [
+              "src/decisions.ts",
+              "ts-no-magic-numbers"
+            ],
+            [
+              "test/decisions.test.ts",
+              "ts-no-empty-catch"
+            ]
+          ],
+          "tp": 1,
+          "fp": 1,
+          "fn": 2,
+          "errors": []
+        },
+        {
+          "pr": 4,
+          "seconds": 0.969,
+          "files": 2,
+          "checked": 2,
+          "complete": true,
+          "returnedInputTokens": 12785,
+          "usageUsd": 0.0011543,
+          "findings": [
+            [
+              "test/decisionsDaemon.test.ts",
+              "ts-no-debug-console"
+            ]
+          ],
+          "tp": 0,
+          "fp": 1,
+          "fn": 0,
+          "errors": []
+        },
+        {
+          "pr": 5,
+          "seconds": 2.046,
+          "files": 10,
+          "checked": 10,
+          "complete": true,
+          "returnedInputTokens": 73232,
+          "usageUsd": 0.0060839,
+          "findings": [
+            [
+              "src/daemon.ts",
+              "ts-no-empty-catch"
+            ],
+            [
+              "test/installPaths.test.ts",
+              "ts-shell-command-interpolation"
+            ]
+          ],
+          "tp": 1,
+          "fp": 1,
+          "fn": 1,
+          "errors": []
+        },
+        {
+          "pr": 6,
+          "seconds": 0.738,
+          "files": 2,
+          "checked": 2,
+          "complete": true,
+          "returnedInputTokens": 10850,
+          "usageUsd": 0.00098213,
+          "findings": [
+            [
+              "test/checks.test.ts",
+              "ts-no-empty-catch"
+            ]
+          ],
+          "tp": 0,
+          "fp": 1,
+          "fn": 2,
+          "errors": []
+        },
+        {
+          "pr": 2,
+          "seconds": 1.71,
+          "files": 9,
+          "checked": 9,
+          "complete": true,
+          "returnedInputTokens": 44900,
+          "usageUsd": 0.00404414,
+          "findings": [
+            [
+              "src/daemon.ts",
+              "ts-no-empty-catch"
+            ],
+            [
+              "src/daemon.ts",
+              "ts-no-magic-numbers"
+            ],
+            [
+              "src/daemonClient.ts",
+              "ts-secret-env-fallback"
+            ],
+            [
+              "src/findings.ts",
+              "ts-no-magic-numbers"
+            ],
+            [
+              "src/jev.ts",
+              "ts-no-magic-numbers"
+            ],
+            [
+              "test/cloudflare.test.ts",
+              "ts-no-empty-catch"
+            ]
+          ],
+          "tp": 4,
+          "fp": 2,
+          "fn": 4,
+          "errors": []
+        },
+        {
+          "pr": 3,
+          "seconds": 0.976,
+          "files": 7,
+          "checked": 7,
+          "complete": true,
+          "returnedInputTokens": 30757,
+          "usageUsd": 0.00262372,
+          "findings": [
+            [
+              "src/decisions.ts",
+              "ts-no-magic-numbers"
+            ],
+            [
+              "test/decisions.test.ts",
+              "ts-no-empty-catch"
+            ]
+          ],
+          "tp": 1,
+          "fp": 1,
+          "fn": 2,
+          "errors": []
+        },
+        {
+          "pr": 4,
+          "seconds": 0.893,
+          "files": 2,
+          "checked": 2,
+          "complete": true,
+          "returnedInputTokens": 12785,
+          "usageUsd": 0.0011543,
+          "findings": [
+            [
+              "test/decisionsDaemon.test.ts",
+              "ts-no-debug-console"
+            ]
+          ],
+          "tp": 0,
+          "fp": 1,
+          "fn": 0,
+          "errors": []
+        },
+        {
+          "pr": 5,
+          "seconds": 1.72,
+          "files": 10,
+          "checked": 10,
+          "complete": true,
+          "returnedInputTokens": 73232,
+          "usageUsd": 0.0060839,
+          "findings": [
+            [
+              "src/daemon.ts",
+              "ts-no-empty-catch"
+            ],
+            [
+              "test/installPaths.test.ts",
+              "ts-shell-command-interpolation"
+            ]
+          ],
+          "tp": 1,
+          "fp": 1,
+          "fn": 1,
+          "errors": []
+        },
+        {
+          "pr": 6,
+          "seconds": 0.563,
+          "files": 2,
+          "checked": 2,
+          "complete": true,
+          "returnedInputTokens": 10850,
+          "usageUsd": 0.00098213,
+          "findings": [
+            [
+              "test/checks.test.ts",
+              "ts-no-empty-catch"
+            ]
+          ],
+          "tp": 0,
+          "fp": 1,
+          "fn": 2,
+          "errors": []
+        }
+      ]
+    },
+    "holdout-control": {
+      "n": 8,
+      "complete": 8,
+      "p50": 0.7,
+      "p95": 2.601,
+      "recordedUsageUsd": 0.00951502,
+      "precision": 0.6666666666666666,
+      "recall": 0.5,
+      "runs": [
+        {
+          "pr": 9,
+          "seconds": 1.029,
+          "files": 1,
+          "checked": 1,
+          "complete": true,
+          "returnedInputTokens": 3992,
+          "usageUsd": 0.0004254,
+          "findings": [],
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "errors": []
+        },
+        {
+          "pr": 14,
+          "seconds": 1.386,
+          "files": 3,
+          "checked": 3,
+          "complete": true,
+          "returnedInputTokens": 29027,
+          "usageUsd": 0.00313385,
+          "findings": [
+            [
+              "src/install.ts",
+              "ts-no-vague-names"
+            ],
+            [
+              "src/install.ts",
+              "ts-no-empty-catch"
+            ]
+          ],
+          "tp": 2,
+          "fp": 0,
+          "fn": 2,
+          "errors": []
+        },
+        {
+          "pr": 15,
+          "seconds": 1.316,
+          "files": 3,
+          "checked": 3,
+          "complete": true,
+          "returnedInputTokens": 7147,
+          "usageUsd": 0.0007147,
+          "findings": [],
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "errors": []
+        },
+        {
+          "pr": 19,
+          "seconds": 2.601,
+          "files": 1,
+          "checked": 1,
+          "complete": true,
+          "returnedInputTokens": 11248,
+          "usageUsd": 0.00116275,
+          "findings": [
+            [
+              "test/cli.test.ts",
+              "ts-no-empty-catch"
+            ]
+          ],
+          "tp": 0,
+          "fp": 1,
+          "fn": 0,
+          "errors": []
+        },
+        {
+          "pr": 9,
+          "seconds": 0.452,
+          "files": 1,
+          "checked": 1,
+          "complete": true,
+          "returnedInputTokens": 3992,
+          "usageUsd": 0.00030488,
+          "findings": [],
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "errors": []
+        },
+        {
+          "pr": 14,
+          "seconds": 0.7,
+          "files": 3,
+          "checked": 3,
+          "complete": true,
+          "returnedInputTokens": 29027,
+          "usageUsd": 0.00207056,
+          "findings": [
+            [
+              "src/install.ts",
+              "ts-no-vague-names"
+            ],
+            [
+              "src/install.ts",
+              "ts-no-empty-catch"
+            ]
+          ],
+          "tp": 2,
+          "fp": 0,
+          "fn": 2,
+          "errors": []
+        },
+        {
+          "pr": 15,
+          "seconds": 0.652,
+          "files": 3,
+          "checked": 3,
+          "complete": true,
+          "returnedInputTokens": 7147,
+          "usageUsd": 0.0007147,
+          "findings": [],
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "errors": []
+        },
+        {
+          "pr": 19,
+          "seconds": 0.527,
+          "files": 1,
+          "checked": 1,
+          "complete": true,
+          "returnedInputTokens": 11248,
+          "usageUsd": 0.00098818,
+          "findings": [
+            [
+              "test/cli.test.ts",
+              "ts-no-empty-catch"
+            ]
+          ],
+          "tp": 0,
+          "fp": 1,
+          "fn": 0,
+          "errors": []
+        }
+      ]
+    },
+    "holdout-gate": {
+      "n": 8,
+      "complete": 5,
+      "p50": 4.771,
+      "p95": 22,
+      "recordedUsageUsd": 0.0050665,
+      "precision": 0.5,
+      "recall": 0.25,
+      "runs": [
+        {
+          "pr": 9,
+          "seconds": 6.254,
+          "files": 1,
+          "checked": 1,
+          "complete": true,
+          "returnedInputTokens": 3992,
+          "usageUsd": 0.00030488,
+          "findings": [],
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "errors": []
+        },
+        {
+          "pr": 14,
+          "seconds": 2.052,
+          "files": 3,
+          "checked": 3,
+          "complete": true,
+          "returnedInputTokens": 29027,
+          "usageUsd": 0.00207056,
+          "findings": [
+            [
+              "src/install.ts",
+              "ts-no-vague-names"
+            ],
+            [
+              "src/install.ts",
+              "ts-no-empty-catch"
+            ]
+          ],
+          "tp": 2,
+          "fp": 0,
+          "fn": 2,
+          "errors": []
+        },
+        {
+          "pr": 15,
+          "seconds": 4.771,
+          "files": 3,
+          "checked": 3,
+          "complete": true,
+          "returnedInputTokens": 7147,
+          "usageUsd": 0.0007147,
+          "findings": [],
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "errors": []
+        },
+        {
+          "pr": 19,
+          "seconds": 3.323,
+          "files": 1,
+          "checked": 1,
+          "complete": true,
+          "returnedInputTokens": 11248,
+          "usageUsd": 0.00098818,
+          "findings": [
+            [
+              "test/cli.test.ts",
+              "ts-no-empty-catch"
+            ]
+          ],
+          "tp": 0,
+          "fp": 1,
+          "fn": 0,
+          "errors": []
+        },
+        {
+          "pr": 9,
+          "seconds": 10.032,
+          "files": 1,
+          "checked": 0,
+          "complete": false,
+          "returnedInputTokens": null,
+          "usageUsd": null,
+          "findings": [],
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "errors": [
+            "provider timeout"
+          ]
+        },
+        {
+          "pr": 14,
+          "seconds": 22,
+          "files": 3,
+          "checked": 0,
+          "complete": false,
+          "returnedInputTokens": null,
+          "usageUsd": null,
+          "findings": [],
+          "tp": 0,
+          "fp": 0,
+          "fn": 4,
+          "errors": [
+            "hook process timeout; duration lower bound"
+          ]
+        },
+        {
+          "pr": 15,
+          "seconds": 10.13,
+          "files": 3,
+          "checked": 0,
+          "complete": false,
+          "returnedInputTokens": null,
+          "usageUsd": null,
+          "findings": [],
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "errors": [
+            "provider timeout",
+            "provider timeout",
+            "provider timeout"
+          ]
+        },
+        {
+          "pr": 19,
+          "seconds": 3.292,
+          "files": 1,
+          "checked": 1,
+          "complete": true,
+          "returnedInputTokens": 11248,
+          "usageUsd": 0.00098818,
+          "findings": [
+            [
+              "test/cli.test.ts",
+              "ts-no-empty-catch"
+            ]
+          ],
+          "tp": 0,
+          "fp": 1,
+          "fn": 0,
+          "errors": []
+        }
+      ]
+    },
+    "interleaved-control": {
+      "n": 8,
+      "complete": 8,
+      "p50": 1.647,
+      "p95": 4.878,
+      "recordedUsageUsd": 0.00815664,
+      "precision": 0.6666666666666666,
+      "recall": 0.5,
+      "runs": [
+        {
+          "pr": 9,
+          "seconds": 3.261,
+          "files": 1,
+          "checked": 1,
+          "complete": true,
+          "returnedInputTokens": 3992,
+          "usageUsd": 0.00030488,
+          "findings": [],
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "errors": []
+        },
+        {
+          "pr": 14,
+          "seconds": 1.647,
+          "files": 3,
+          "checked": 3,
+          "complete": true,
+          "returnedInputTokens": 29027,
+          "usageUsd": 0.00207056,
+          "findings": [
+            [
+              "src/install.ts",
+              "ts-no-vague-names"
+            ],
+            [
+              "src/install.ts",
+              "ts-no-empty-catch"
+            ]
+          ],
+          "tp": 2,
+          "fp": 0,
+          "fn": 2,
+          "errors": []
+        },
+        {
+          "pr": 15,
+          "seconds": 1.874,
+          "files": 3,
+          "checked": 3,
+          "complete": true,
+          "returnedInputTokens": 7147,
+          "usageUsd": 0.0007147,
+          "findings": [],
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "errors": []
+        },
+        {
+          "pr": 19,
+          "seconds": 0.461,
+          "files": 1,
+          "checked": 1,
+          "complete": true,
+          "returnedInputTokens": 11248,
+          "usageUsd": 0.00098818,
+          "findings": [
+            [
+              "test/cli.test.ts",
+              "ts-no-empty-catch"
+            ]
+          ],
+          "tp": 0,
+          "fp": 1,
+          "fn": 0,
+          "errors": []
+        },
+        {
+          "pr": 9,
+          "seconds": 1.66,
+          "files": 1,
+          "checked": 1,
+          "complete": true,
+          "returnedInputTokens": 3992,
+          "usageUsd": 0.00030488,
+          "findings": [],
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "errors": []
+        },
+        {
+          "pr": 14,
+          "seconds": 4.878,
+          "files": 3,
+          "checked": 3,
+          "complete": true,
+          "returnedInputTokens": 29027,
+          "usageUsd": 0.00207056,
+          "findings": [
+            [
+              "src/install.ts",
+              "ts-no-vague-names"
+            ],
+            [
+              "src/install.ts",
+              "ts-no-empty-catch"
+            ]
+          ],
+          "tp": 2,
+          "fp": 0,
+          "fn": 2,
+          "errors": []
+        },
+        {
+          "pr": 15,
+          "seconds": 0.464,
+          "files": 3,
+          "checked": 3,
+          "complete": true,
+          "returnedInputTokens": 7147,
+          "usageUsd": 0.0007147,
+          "findings": [],
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "errors": []
+        },
+        {
+          "pr": 19,
+          "seconds": 0.646,
+          "files": 1,
+          "checked": 1,
+          "complete": true,
+          "returnedInputTokens": 11248,
+          "usageUsd": 0.00098818,
+          "findings": [
+            [
+              "test/cli.test.ts",
+              "ts-no-empty-catch"
+            ]
+          ],
+          "tp": 0,
+          "fp": 1,
+          "fn": 0,
+          "errors": []
+        }
+      ]
+    },
+    "interleaved-gate": {
+      "n": 8,
+      "complete": 8,
+      "p50": 0.903,
+      "p95": 8.497,
+      "recordedUsageUsd": 0.00815664,
+      "precision": 0.6666666666666666,
+      "recall": 0.5,
+      "runs": [
+        {
+          "pr": 9,
+          "seconds": 4.345,
+          "files": 1,
+          "checked": 1,
+          "complete": true,
+          "returnedInputTokens": 3992,
+          "usageUsd": 0.00030488,
+          "findings": [],
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "errors": []
+        },
+        {
+          "pr": 14,
+          "seconds": 3.211,
+          "files": 3,
+          "checked": 3,
+          "complete": true,
+          "returnedInputTokens": 29027,
+          "usageUsd": 0.00207056,
+          "findings": [
+            [
+              "src/install.ts",
+              "ts-no-vague-names"
+            ],
+            [
+              "src/install.ts",
+              "ts-no-empty-catch"
+            ]
+          ],
+          "tp": 2,
+          "fp": 0,
+          "fn": 2,
+          "errors": []
+        },
+        {
+          "pr": 15,
+          "seconds": 0.903,
+          "files": 3,
+          "checked": 3,
+          "complete": true,
+          "returnedInputTokens": 7147,
+          "usageUsd": 0.0007147,
+          "findings": [],
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "errors": []
+        },
+        {
+          "pr": 19,
+          "seconds": 0.516,
+          "files": 1,
+          "checked": 1,
+          "complete": true,
+          "returnedInputTokens": 11248,
+          "usageUsd": 0.00098818,
+          "findings": [
+            [
+              "test/cli.test.ts",
+              "ts-no-empty-catch"
+            ]
+          ],
+          "tp": 0,
+          "fp": 1,
+          "fn": 0,
+          "errors": []
+        },
+        {
+          "pr": 9,
+          "seconds": 1.93,
+          "files": 1,
+          "checked": 1,
+          "complete": true,
+          "returnedInputTokens": 3992,
+          "usageUsd": 0.00030488,
+          "findings": [],
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "errors": []
+        },
+        {
+          "pr": 14,
+          "seconds": 8.497,
+          "files": 3,
+          "checked": 3,
+          "complete": true,
+          "returnedInputTokens": 29027,
+          "usageUsd": 0.00207056,
+          "findings": [
+            [
+              "src/install.ts",
+              "ts-no-vague-names"
+            ],
+            [
+              "src/install.ts",
+              "ts-no-empty-catch"
+            ]
+          ],
+          "tp": 2,
+          "fp": 0,
+          "fn": 2,
+          "errors": []
+        },
+        {
+          "pr": 15,
+          "seconds": 0.458,
+          "files": 3,
+          "checked": 3,
+          "complete": true,
+          "returnedInputTokens": 7147,
+          "usageUsd": 0.0007147,
+          "findings": [],
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "errors": []
+        },
+        {
+          "pr": 19,
+          "seconds": 0.563,
+          "files": 1,
+          "checked": 1,
+          "complete": true,
+          "returnedInputTokens": 11248,
+          "usageUsd": 0.00098818,
+          "findings": [
+            [
+              "test/cli.test.ts",
+              "ts-no-empty-catch"
+            ]
+          ],
+          "tp": 0,
+          "fp": 1,
+          "fn": 0,
+          "errors": []
+        }
+      ]
+    }
+  },
+  "graderUsage": {
+    "input_tokens": 480391,
+    "output_tokens": 9838
+  },
+  "exploratoryInputTokens": 196794
+}

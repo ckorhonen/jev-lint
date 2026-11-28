@@ -1,0 +1,15 @@
+{
+  "benchmark": "bun scripts/bench-checks.ts",
+  "provider": "offline synthetic, no billable calls",
+  "eventsPerScenario": 20,
+  "filesPerScenario": 160,
+  "requestsPerScenario": 160,
+  "peakConcurrency": 4,
+  "scenarios": [
+    {"deadlineMs":1000,"scheduler":"fixed batches","successfulEvents":20,"completedFiles":160,"p50Ms":254,"p95Ms":431,"filesPerSecond":27},
+    {"deadlineMs":1000,"scheduler":"rolling","successfulEvents":20,"completedFiles":160,"p50Ms":114,"p95Ms":136,"filesPerSecond":63},
+    {"deadlineMs":160,"scheduler":"fixed batches","successfulEvents":0,"completedFiles":140,"p50Ms":165,"p95Ms":176,"filesPerSecond":42},
+    {"deadlineMs":160,"scheduler":"rolling","successfulEvents":20,"completedFiles":160,"p50Ms":112,"p95Ms":118,"filesPerSecond":70}
+  ],
+  "localSevenDayBaseline": {"recordedSuccessfulChecks":154,"recordedFailures":0,"judgeMedianMs":105,"judgeP90Ms":339,"inputTokens":336346,"askedRules":812,"eligibleRules":6102}
+}

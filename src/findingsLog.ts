@@ -20,7 +20,8 @@ import { appendFileSync, existsSync, mkdirSync } from "node:fs";
 import { homedir } from "node:os";
 import { dirname, isAbsolute, join, parse, relative, resolve } from "node:path";
 import type { ChangedFile } from "./extract";
-import { firstGateMatch, type LintResult, type Tier } from "./lint";
+import type { LintResult, Tier } from "./lint";
+import { firstGateMatch } from "./ruleGate";
 
 const EXCERPT_CHARS = 400;
 const LINES_BEFORE = 3;
